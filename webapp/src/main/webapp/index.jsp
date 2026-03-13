@@ -11,6 +11,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <title>Vinyland</title>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/style.css"/>"/>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/components.css"/>"/>
 </head>
 <body>
 	<header>
@@ -19,8 +21,29 @@
 
 	<main>
 
-		<h2><c:out value="${message}" /></h2>
-		<vl:button text="Primary"/>
+        <div id="index">
+            <h3>Botones!</h3>
+
+            <div id="index_list">
+                <ul>
+                    <li><vl:button text="Ofertas"/></li>
+                    <li><vl:button text="Catálogo"/></li>
+                    <li><vl:button text="Mis pedidos"/></li>
+                    <li><vl:button text="Acerca de"/></li>
+                </ul>   
+            </div>
+        </div>
+
+        <div id="main_content">
+
+            <h3>Vinilos que cuentan historias</h3>
+
+            <p>Descubrí nuestra colección de vinilos clásicos y ediciones especiales. 
+            Cada disco es un viaje al pasado, listo para girar en tu tocadiscos.</p>
+            
+        </div>
+
+        <hr>
 
 	</main>
 

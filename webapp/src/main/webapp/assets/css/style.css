@@ -1,0 +1,43 @@
+
+/* === Body === */
+body {
+    font-size: 16pt;
+    color: #264653;
+    background-color: #f8f9fa;
+}
+
+/* === Header === */
+
+/* TItle */
+#title {
+    text-align: center;
+    background-color: #ffd7a8;
+    color: #fe0509;
+}
+
+/*== Main ==*/
+
+main {
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 20%;
+}
+
+ul{
+    list-style: none;
+}
+
+#index {
+    text-align: center;
+    background-color: #264653;
+    color: #ffd7a8;
+    text-align: left;
+    text-decoration: none;
+    position: fixed;
+    width: 200px;
+}
+
+#main_content {
+    margin-left: 230px;
+    margin-right: 5%;
+}

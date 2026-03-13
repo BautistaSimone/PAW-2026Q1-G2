@@ -8,11 +8,11 @@
 
   <context-param>
     <param-name>contextClass</param-name>
-	<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+	  <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
   </context-param>
   <context-param>
     <param-name>contextConfigLocation</param-name>
-	<param-value>ar.edu.itba.paw.webapp.config.WebConfig</param-value>
+	  <param-value>ar.edu.itba.paw.webapp.config.WebConfig</param-value>
   </context-param>
 
   <listener>
@@ -20,21 +20,26 @@
   </listener>
 
   <servlet>
-	<servlet-name>dispatcher</servlet-name>
-	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-	<!-- Generally, these are only loaded when a request arrived, 
-	we can change that by adding load-on-startup -->
-	<load-on-startup>1</load-on-startup>
+	  <servlet-name>dispatcher</servlet-name>
+	  <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	  <!-- Generally, these are only loaded when a request arrived, 
+	  we can change that by adding load-on-startup -->
+	  <load-on-startup>1</load-on-startup>
 
-	<init-param>
-		<param-name>contextClass</param-name>
-		<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+	  <init-param>
+      <param-name>contextClass</param-name>
+      <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
     </init-param>
   </servlet>
 
   <servlet-mapping>
     <servlet-name>dispatcher</servlet-name>
-	<url-pattern>/</url-pattern>
+	  <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/assets/*</url-pattern>
   </servlet-mapping>
 
 </web-app>
