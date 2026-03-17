@@ -1,5 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+
 <!-- vl prefix = VinyLand -->
 <%@ taglib prefix="vl" tagdir="/WEB-INF/tags" %>
 
@@ -26,8 +28,8 @@
 
             <div id="index_list">
                 <ul>
-                    <li><vl:button text="Ofertas"/></li>
-                    <li><vl:button text="Catálogo"/></li>
+                    <li><vl:button text="Ofertas" img="/assets/images/vinyl_disk.png"/></li>
+                    <li><vl:button text="Catálogo" img="/assets/images/shopping_cart.png"/></li>
                     <li><vl:button text="Mis pedidos"/></li>
                     <li><vl:button text="Acerca de"/></li>
                 </ul>   
@@ -35,7 +37,6 @@
         </div>
 
         <div id="main_content">
-
             <h3>Vinilos que cuentan historias</h3>
 
             <p>Descubrí nuestra colección de vinilos clásicos y ediciones especiales. 
