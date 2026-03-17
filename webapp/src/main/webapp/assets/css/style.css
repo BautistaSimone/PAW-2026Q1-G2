@@ -34,10 +34,23 @@ ul{
     text-align: left;
     text-decoration: none;
     position: fixed;
-    width: 30%;
+    width: 20%;
+}
+
+
+#index .btn{
+    width: 80%;
 }
 
 #main_content {
-    margin-left: 230px;
+    margin-left: 25%;
     margin-right: 5%;
+}
+
+#main_content .category-card{
+    width: 30%;
+}
+
+#categories{
+    text-align: center;
 }

@@ -17,8 +17,8 @@
     class="${classes}"
     <c:if test="${btnDisabled}">disabled</c:if>
     >
-    
-    <c:if test="${btnImage}"><img src="${img}" alt="Button image"></c:if>
+
+    <c:if test="${btnImage}"><img src="<c:url value="${img}"/>" alt="Button image"></c:if>
     <p>${text}</p>
 
 </button>

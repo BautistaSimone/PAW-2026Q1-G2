@@ -42,6 +42,25 @@
             <p>Descubrí nuestra colección de vinilos clásicos y ediciones especiales. 
             Cada disco es un viaje al pasado, listo para girar en tu tocadiscos.</p>
             
+            <hr>
+
+            <div id="categories">
+
+                <h2>Algunas de nuestras categorias</h2>
+
+                <vl:category-card 
+                    title="Artistas alternativos" 
+                    text="Bla bla, hacen algo diferente"
+                    img="/assets/images/album.jpg"/>
+                <vl:category-card 
+                    title="Rock nacional" 
+                    text="Para los que quieren algo mas cercano"
+                    img="/assets/images/album.jpg"/>
+                <vl:category-card 
+                    title="Jazz" 
+                    text="???"
+                    img="/assets/images/album.jpg"/>
+            </div>
         </div>
 
         <hr>
