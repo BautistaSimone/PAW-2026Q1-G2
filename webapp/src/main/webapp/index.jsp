@@ -18,13 +18,13 @@
 </head>
 <body>
 	<header>
-    	<h1 id="title">VINYLAND</h1>
+        <vl:text type="h1" value="VINYLAND"/>
     </header>
 
 	<main>
 
         <div id="index">
-            <h3>Botones!</h3>
+            <vl:text type="h3" value="Botones >:)"/>
 
             <div id="index_list">
                 <ul>
@@ -37,16 +37,17 @@
         </div>
 
         <div id="main_content">
-            <h3>Vinilos que cuentan historias</h3>
+            <vl:text type="h3" value="Vinilos que cuentan historias"/>
 
-            <p>Descubrí nuestra colección de vinilos clásicos y ediciones especiales. 
-            Cada disco es un viaje al pasado, listo para girar en tu tocadiscos.</p>
+            <vl:text type="p" value="Descubrí nuestra colección de vinilos clásicos y ediciones especiales.
+            Cada disco es un viaje al pasado, listo para girar en tu tocadiscos."
+            />
             
             <hr>
 
             <div id="categories">
 
-                <h2>Algunas de nuestras categorias</h2>
+                <vl:text type="h2" value="Algunas de nuestras categorias"/>
 
                 <vl:category-card 
                     title="Artistas alternativos" 
@@ -68,7 +69,7 @@
 	</main>
 
 	<footer>
-		<p>&copy; 2026 Vinyland - <a>vinyland@vinyland.com</a></p>
+        <vl:text type="p" value="© 2026 Vinyland - vinyland@vinyland.com"/>
 	</footer>
 </body>
 
