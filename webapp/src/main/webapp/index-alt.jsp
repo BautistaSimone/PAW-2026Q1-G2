@@ -68,6 +68,9 @@
 
         <hr>
 
+        <vl:dialog
+            title="Alerta" 
+            text="¿Está seguro de que desea borrar todo?"/>
 	</main>
 
 	<footer>

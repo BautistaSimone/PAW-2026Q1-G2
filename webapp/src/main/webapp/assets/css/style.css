@@ -4,15 +4,15 @@ body {
     font-size: 16pt;
     color: #264653;
     background-color: #f8f9fa;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 /* === Header === */
 
 /* TItle */
-#title {
+header {
     text-align: center;
     background-color: #ffd7a8;
-    color: #fe0509;
 }
 
 /*== Main ==*/
@@ -33,7 +33,6 @@ ul{
     color: #ffd7a8;
     text-align: left;
     text-decoration: none;
-    position: fixed;
     width: 20%;
 }
 
@@ -43,8 +42,7 @@ ul{
 }
 
 #main_content {
-    margin-left: 25%;
-    margin-right: 5%;
+    margin: 2%;
 }
 
 #main_content .category-card{
