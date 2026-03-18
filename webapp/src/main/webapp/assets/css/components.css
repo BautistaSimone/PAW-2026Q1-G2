@@ -118,3 +118,11 @@
 .dialog-buttons .btn {
     width: 30%; 
 }
+
+.dialog-buttons .accept {
+    background-color: #aaf27d;
+}
+
+.dialog-buttons .cancel {
+    background-color: #ea603a;
+}

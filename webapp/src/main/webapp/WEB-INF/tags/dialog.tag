@@ -15,8 +15,8 @@
         <p>${text}</p>
 
         <div class="dialog-buttons">
-            <vl:button text="Cancelar"/>
-            <vl:button text="Aceptar"/>
+            <vl:button cssClass="cancel" text="Cancelar"/>
+            <vl:button cssClass="accept" text="Aceptar"/>
         </div>
     </div>
 </div>
