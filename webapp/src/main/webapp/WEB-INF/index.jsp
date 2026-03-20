@@ -15,10 +15,14 @@
     <title>Vinyland</title>
     <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/style.css"/>"/>
     <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/components.css"/>"/>
+    
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="<c:url value="/assets/bootstrap/css/bootstrap.min.css"/>">
 </head>
 <body>
 	<header>
         <vl:text type="h1" value="VINYLAND"/>
+        <h1 class="text-success">Test bootsrap</h1>
     </header>
 
 	<main>
