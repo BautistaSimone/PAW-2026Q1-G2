@@ -22,7 +22,7 @@
 <body>
 	<header>
         <vl:text type="h1" value="VINYLAND"/>
-        <h1 class="text-success">Test bootsrap</h1>
+        <h1 class="text-success">Test bootstrap</h1>
     </header>
 
 	<main>
@@ -32,8 +32,8 @@
 
             <div id="index_list">
                 <ul>
-                    <li><vl:button text="Ofertas" img="/assets/images/vinyl_disk.png"/></li>
-                    <li><vl:button text="Catálogo" img="/assets/images/shopping_cart.png"/></li>
+                    <li><vl:button text="Ofertas"/></li>
+                    <li><vl:button text="Catálogo"/></li>
                     <li><vl:button text="Mis pedidos"/></li>
                     <li><vl:button text="Acerca de"/></li>
                 </ul>   
@@ -41,6 +41,10 @@
         </div>
 
         <div id="main_content">
+        
+            <vl:button text="Abrir modal" target="#exampleModal"/>
+            <vl:modal title="Titulo" text="Acerca de" id="exampleModal"/>
+
             <vl:text type="h3" value="Vinilos que cuentan historias"/>
 
             <vl:text type="p" value="Descubrí nuestra colección de vinilos clásicos y ediciones especiales.
@@ -77,6 +81,11 @@
 	<footer>
         <vl:text type="p" value="© 2026 Vinyland - vinyland@vinyland.com"/>
 	</footer>
+
+
+    <script src="<c:url value="/assets/bootstrap/js/bootstrap.bundle.min.js"/>"></script>
+    <script src="<c:url value="/assets/bootstrap/js/bootstrap.min.js"/>"></script>
+
 </body>
 
 </html>
