@@ -1,0 +1,50 @@
+<%@ tag language="java" pageEncoding="UTF-8" %>
+<%@ attribute name="title" required="true" %>
+<%@ attribute name="artist" required="true" %>
+<%@ attribute name="price" required="true" %>
+<%@ attribute name="installments" required="true" %>
+<%@ attribute name="href" required="true" %>
+<%@ attribute name="imageUrl" required="false" %>
+<%@ attribute name="onSale" required="false" type="java.lang.Boolean" %>
+<%@ attribute name="discountPercentage" required="false" type="java.lang.Integer" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<c:set var="isOnSale" value="${onSale ne null ? onSale : false}" />
+
+<a href="${href}" class="card product-card text-decoration-none" style="cursor: pointer;">
+    <div class="product-image-placeholder" style="position: relative;">
+        <c:choose>
+            <c:when test="${not empty imageUrl}">
+                <img
+                        src="${imageUrl}"
+                        alt="${artist} - ${title}"
+                        style="width: 100%; height: 100%; object-fit: cover;"
+                />
+            </c:when>
+            <c:otherwise>
+                <i class="bi bi-camera" aria-hidden="true" style="font-size: 2rem; color: #adb5bd;"></i>
+            </c:otherwise>
+        </c:choose>
+
+        <c:if test="${isOnSale && discountPercentage ne null && discountPercentage gt 0}">
+            <div class="offer-badge">-${discountPercentage}%</div>
+        </c:if>
+    </div>
+
+    <div class="card-body">
+        <h6 class="product-title">${title}</h6>
+        <p class="product-artist">${artist}</p>
+        <c:choose>
+            <c:when test="${isOnSale && discountPercentage ne null && discountPercentage gt 0}">
+                <div class="price-wrapper" style="margin-bottom: 0.25rem;">
+                    <span class="album-price-original">$${price}</span>
+                    <span class="product-price" style="margin-top: 0;">$${price}</span>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div class="product-price">$${price}</div>
+            </c:otherwise>
+        </c:choose>
+        <p class="product-installments">3 cuotas sin interes de $${installments}</p>
+    </div>
+</a>
