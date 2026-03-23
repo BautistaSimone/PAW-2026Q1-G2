@@ -21,6 +21,7 @@ main {
     display: flex;
     flex-direction: row;
     padding-bottom: 20%;
+    justify-content: center;
 }
 
 ul{
@@ -39,10 +40,6 @@ ul{
 
 #index .btn{
     width: 80%;
-}
-
-#main_content {
-    margin: 2%;
 }
 
 #main_content .category-card{

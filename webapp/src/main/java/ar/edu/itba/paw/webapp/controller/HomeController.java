@@ -21,7 +21,7 @@ public class HomeController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ModelAndView home() {
-		final ModelAndView mav = new ModelAndView("WEB-INF/index.jsp");
+		final ModelAndView mav = new ModelAndView("WEB-INF/views/home.jsp");
 		mav.addObject("message", "Hihihihihi");
 		return mav;
 	}

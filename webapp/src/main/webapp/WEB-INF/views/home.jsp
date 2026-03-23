@@ -21,24 +21,10 @@
 </head>
 <body>
 	<header>
-        <vl:text type="h1" value="VINYLAND"/>
-        <h1 class="text-success">Test bootstrap</h1>
+        <vl:navbar cssClass="navbar-input"/>
     </header>
 
 	<main>
-
-        <div id="index">
-            <vl:text type="h3" value="Botones >:)"/>
-
-            <div id="index_list">
-                <ul>
-                    <li><vl:button text="Ofertas"/></li>
-                    <li><vl:button text="Catálogo"/></li>
-                    <li><vl:button text="Mis pedidos"/></li>
-                    <li><vl:button text="Acerca de"/></li>
-                </ul>   
-            </div>
-        </div>
 
         <div id="main_content">
         
