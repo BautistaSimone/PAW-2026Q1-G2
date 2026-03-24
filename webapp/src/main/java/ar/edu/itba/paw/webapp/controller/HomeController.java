@@ -22,7 +22,7 @@ public class HomeController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ModelAndView home() {
-		final ModelAndView mav = new ModelAndView("WEB-INF/views/home.jsp");
+		final ModelAndView mav = new ModelAndView("home");
 		mav.addObject("message", "Hihihihihi");
 		return mav;
 	}
@@ -32,7 +32,7 @@ public class HomeController {
 		@RequestParam("email") final String email, 
 		@RequestParam("password") final String password, 
 		@RequestParam("username") final String username) {
-		final ModelAndView mav = new ModelAndView("WEB-INF/index.jsp");
+		final ModelAndView mav = new ModelAndView("home");
 		
 		User user = userService.createUser(email, password, username);
 
