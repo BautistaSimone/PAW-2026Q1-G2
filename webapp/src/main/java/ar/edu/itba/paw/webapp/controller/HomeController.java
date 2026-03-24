@@ -8,6 +8,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import ar.edu.itba.paw.services.UserService;
+import ar.edu.itba.paw.models.User;
 
 @Controller
 public class HomeController {
@@ -27,10 +28,13 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)
-	public ModelAndView createUser(@RequestParam("email") final String email) {
+	public ModelAndView createUser(
+		@RequestParam("email") final String email, 
+		@RequestParam("password") final String password, 
+		@RequestParam("username") final String username) {
 		final ModelAndView mav = new ModelAndView("WEB-INF/index.jsp");
 		
-		Object user = userService.createUser(email);
+		User user = userService.createUser(email, password, username);
 
 		return mav;
 	}

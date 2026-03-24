@@ -10,8 +10,8 @@
     <module>services</module>
     <module>service-contracts</module>
     <module>persistence</module>
-    <module>persistence-contracts</module>
     <module>models</module>
+    <module>persistence-contracts</module>
   </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
