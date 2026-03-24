@@ -1,1 +1,2 @@
-ar/edu/itba/paw/persistence/UserJdbcDao.class
+ar\edu\itba\paw\persistence\ProductJdbcDao.class
+ar\edu\itba\paw\persistence\UserJdbcDao.class
