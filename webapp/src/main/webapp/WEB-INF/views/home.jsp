@@ -1,13 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <ui:layout title="Vinyland | Productos">
     <div class="products-section">
         <div class="container">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                        <a href="${pageContext.request.contextPath}/index.jsp">Inicio</a>
+                        <a href="<c:url value="#"/>">Inicio</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">Productos</li>
                 </ol>
