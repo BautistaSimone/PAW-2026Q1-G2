@@ -5,40 +5,40 @@ import java.time.LocalDate;
 
 public class Product {
 
-    private final Long id;
+    private final Long productId;
+    private final Long userId;
     private final String title;
     private final String artist;
     private final String genre;
-    private final String vinylCondition;
-    private final BigDecimal price;
-    private final String imageUrl;
     private final String description;
-    private final LocalDate publishedDate;
+    private final String condition;
+    private final LocalDate published;
+    private final BigDecimal price;
 
     public Product(
-        final Long id,
+        final Long productId,
+        final Long userId,
         final String title,
         final String artist,
         final String genre,
-        final String vinylCondition,
-        final BigDecimal price,
-        final String imageUrl,
         final String description,
-        final LocalDate publishedDate
+        final String condition,
+        final LocalDate published,
+        final BigDecimal price
     ) {
-        this.id = id;
+        this.productId = productId;
+        this.userId = userId;
         this.title = title;
         this.artist = artist;
         this.genre = genre;
-        this.vinylCondition = vinylCondition;
-        this.price = price;
-        this.imageUrl = imageUrl;
         this.description = description;
-        this.publishedDate = publishedDate;
+        this.condition = condition;
+        this.published = published;
+        this.price = price;
     }
 
     public Long getId() {
-        return id;
+        return productId;
     }
 
     public String getTitle() {
@@ -53,8 +53,8 @@ public class Product {
         return genre;
     }
 
-    public String getVinylCondition() {
-        return vinylCondition;
+    public String getCondition() {
+        return condition;
     }
 
     public BigDecimal getPrice() {
@@ -65,15 +65,11 @@ public class Product {
         return price.divide(BigDecimal.valueOf(3), 2, java.math.RoundingMode.HALF_UP);
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
     public String getDescription() {
         return description;
     }
 
-    public LocalDate getPublishedDate() {
-        return publishedDate;
+    public LocalDate getPublished() {
+        return published;
     }
 }
