@@ -8,11 +8,11 @@ import ar.edu.itba.paw.models.Product;
 public interface ProductDao {
     Product createProduct(
         final String title,
-        final String artist,
-        final String genre,
+        final String artist,    // FIXME: id del artista
+        final String genre,     // FIXME: id de categoria
         final String vinylCondition,
         final BigDecimal price,
-        final String imageUrl,
+        final String imageUrl, // FIXME: No va a ser una URL sino un id de imagen en la base de datos
         final String description
     );
 

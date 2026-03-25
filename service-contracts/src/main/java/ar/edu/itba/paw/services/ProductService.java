@@ -12,7 +12,7 @@ public interface ProductService {
         final String genre,
         final String vinylCondition,
         final BigDecimal price,
-        final String imageUrl,
+        final String imageUrl, // FIXME: No va a ser una URL sino un id de imagen en la base de datos
         final String description
     );
 
