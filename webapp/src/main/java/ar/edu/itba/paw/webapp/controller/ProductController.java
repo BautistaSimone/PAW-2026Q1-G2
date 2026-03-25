@@ -33,7 +33,7 @@ public class ProductController {
         @RequestParam("genre") final String genre,
         @RequestParam("vinylCondition") final String vinylCondition,
         @RequestParam("price") final BigDecimal price,
-        @RequestParam(value = "imageUrl", required = false) final String imageUrl,
+        @RequestParam(value = "imageUrl", required = false) final String imageUrl, //TODO CHANGE URL TO BYTES
         @RequestParam(value = "description", required = false) final String description
     ) {
         productService.createProduct(title, artist, genre, vinylCondition, price, imageUrl, description);
