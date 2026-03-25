@@ -1,3 +1,2 @@
 .vscode
-webapp/target/
-services/target/
+**/target/
