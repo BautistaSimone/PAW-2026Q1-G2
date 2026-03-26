@@ -2,19 +2,20 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"user_id" SERIAL PRIMARY KEY,
 	"email" VARCHAR(255) NOT NULL UNIQUE,
 	"password" VARCHAR(255),
+	"username" VARCHAR(255) NOT NULL,
 	"mod" BOOLEAN NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "products" (
 	"product_id" SERIAL PRIMARY KEY,
-	"usr_id" INTEGER NOT NULL UNIQUE,
+	"user_id" INTEGER NOT NULL UNIQUE,
 	"title" VARCHAR(255) NOT NULL,
 	"artist" VARCHAR(255) NOT NULL,
 	"genre" VARCHAR(255) NOT NULL,
 	"description" TEXT NOT NULL,
 	"condition" VARCHAR(255) NOT NULL,
 	"published" DATE NOT NULL,
-	"price" MONEY NOT NULL
+	"price" NUMERIC NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "images" (
@@ -44,7 +45,7 @@ CREATE TABLE IF NOT EXISTS "purchases" (
 );
 
 ALTER TABLE "products"
-ADD FOREIGN KEY("usr_id") REFERENCES "users"("user_id")
+ADD FOREIGN KEY("user_id") REFERENCES "users"("user_id")
 ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "images"

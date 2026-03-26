@@ -14,8 +14,7 @@ public interface ProductService {
         final String genre,
         final String description,
         final String condition,
-        final BigDecimal price,
-        final File image 
+        final BigDecimal price
     );
 
     List<Product> listProducts();

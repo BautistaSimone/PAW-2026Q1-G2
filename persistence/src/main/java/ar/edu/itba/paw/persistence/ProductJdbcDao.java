@@ -52,8 +52,7 @@ public class ProductJdbcDao implements ProductDao {
         final String genre,
         final String description,
         final String condition,
-        final BigDecimal price,
-        final File image   // TODO: Allow for more than one file
+        final BigDecimal price
     ) {
         final Map<String, Object> values = new HashMap<>();
         final LocalDate published = LocalDate.now();
@@ -63,7 +62,6 @@ public class ProductJdbcDao implements ProductDao {
         values.put("genre", genre);
         values.put("condition", condition);
         values.put("price", price);
-        // values.put("image_url", imageUrl); // TODO: Implement image creation and storage in DB images table
         values.put("description", description);
         values.put("published", published);
 

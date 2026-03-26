@@ -32,12 +32,13 @@ public class ProductController {
         @RequestParam("title") final String title,
         @RequestParam("artist") final String artist,
         @RequestParam("genre") final String genre,
+        @RequestParam("description") final String description,
         @RequestParam("condition") final String condition,
-        @RequestParam("price") final BigDecimal price,
-        @RequestParam(value = "imageUrl", required = false) final String imageUrl, //TODO CHANGE URL TO BYTES
-        @RequestParam(value = "description", required = false) final String description
+        @RequestParam("price") final BigDecimal price
     ) {
-        productService.createProduct(title, artist, genre, description, condition, price, new File("file_path"));
+
+        // TODO: Hacer que acepte archivos y crear un ImageService
+        productService.createProduct(title, artist, genre, description, condition, price);
         return new ModelAndView("redirect:/?created=1");
     }
 }

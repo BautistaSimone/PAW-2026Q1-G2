@@ -27,10 +27,9 @@ public class ProductServiceImpl implements ProductService {
         final String genre,
         final String description,
         final String condition,
-        final BigDecimal price,
-        final File image
+        final BigDecimal price
     ) {
-        return productDao.createProduct(title, artist, genre, description, condition, price, image);
+        return productDao.createProduct(title, artist, genre, description, condition, price);
     }
 
     @Override
