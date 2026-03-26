@@ -34,9 +34,9 @@ public class WebConfig implements WebMvcConfigurer {
     public DataSource dataSource() {
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriverClass(org.postgresql.Driver.class);
-        dataSource.setUrl("jdbc:postgresql://localhost/nixcloud");
-        dataSource.setUsername("nixcloud");
-        dataSource.setPassword("nixcloud");
+        dataSource.setUrl("jdbc:postgresql://localhost/paw");
+        dataSource.setUsername("postgres");
+        dataSource.setPassword("postgres");
 
         return dataSource;
     }
