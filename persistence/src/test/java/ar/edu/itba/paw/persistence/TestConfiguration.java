@@ -26,7 +26,7 @@ public class TestConfiguration {
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriverClass(JDBCDriver.class);
         dataSource.setUrl("jdbc:hsqldb:mem:paw;sql.syntax_pgs=true"); // Specify postgresql syntax
-        dataSource.setUsername("sa");
+        dataSource.setUsername("ha");
         dataSource.setPassword("");
 
         return dataSource;

@@ -41,14 +41,15 @@ public class UserJdbcDaoTest {
         final String email = "[EMAIL_ADDRESS]";
         final String password = "[PASSWORD]";
         final String username = "[USERNAME]";
+        final Boolean mod = false;
 
         // 2. Exercise
-       // final User user = userDao.createUser(email, password, username);
+        final User user = userDao.createUser(email, password, username, mod);
 
         // 3. Assert
-       // Assertions.assertNotNull(user);
-       // Assertions.assertEquals(username, user.getUsername());
-       ///Assertions.assertEquals(password, user.getPassword());
-       // Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "users"));
+        Assertions.assertNotNull(user);
+        Assertions.assertEquals(username, user.getUsername());
+        Assertions.assertEquals(password, user.getPassword());
+        Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "users"));
     }
 }
