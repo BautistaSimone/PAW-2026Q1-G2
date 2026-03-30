@@ -9,10 +9,14 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+@EnableTransactionManagement
 @ComponentScan({ "ar.edu.itba.paw.persistence" })
 @Configuration
 public class TestConfiguration {
@@ -22,10 +26,15 @@ public class TestConfiguration {
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriverClass(JDBCDriver.class);
         dataSource.setUrl("jdbc:hsqldb:mem:paw;sql.syntax_pgs=true"); // Specify postgresql syntax
-        dataSource.setUsername("ha");
+        dataSource.setUsername("sa");
         dataSource.setPassword("");
 
         return dataSource;
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager() {
+        return new DataSourceTransactionManager(dataSource());
     }
 
     @Bean
@@ -38,7 +47,7 @@ public class TestConfiguration {
 
     private DatabasePopulator databasePopulator() {
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(new ClassPathResource("schema.sql"));
+        populator.addScript(new ClassPathResource("test_schema.sql")); // Use slightly different schema(HSQLDB doesn't support BYTEA)
         return populator;
     }
 

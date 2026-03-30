@@ -30,7 +30,7 @@ public class UserController {
         @RequestParam("username") final String username
     ) {
 
-        userService.createUser(email, password, username);
+        userService.createUser(email, password, username, false);   // Not a moderator
         return new ModelAndView("redirect:/?created=1");
     }
 }

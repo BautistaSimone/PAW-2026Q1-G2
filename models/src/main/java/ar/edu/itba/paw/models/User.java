@@ -6,12 +6,14 @@ public class User {
     private final String email;
     private final String password;
     private final String username;
+    private final Boolean mod;
 
-    public User(Long id, String email, String password, String username) {
+    public User(Long id, String email, String password, String username, Boolean mod) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.username = username;
+        this.mod = mod;
     }
 
     public Long getId() {
@@ -30,8 +32,18 @@ public class User {
         return username;
     }
 
+    public Boolean getMod() {
+        return mod;
+    }
+
     @Override
     public String toString() {
-        return "User [id=" + id + ", email=" + email + ", password=" + password + ", username=" + username + "]";
+        return 
+            "User [id=" + id 
+            + ", email=" + email 
+            + ", password=" + password 
+            + ", username=" + username 
+            + ", mod=" + mod 
+            + "]";
     }
 }

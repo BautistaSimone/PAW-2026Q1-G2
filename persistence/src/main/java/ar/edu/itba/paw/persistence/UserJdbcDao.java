@@ -23,7 +23,8 @@ public class UserJdbcDao implements UserDao {
             rs.getLong("user_id"),
             rs.getString("email"),
             rs.getString("password"),
-            rs.getString("username"));
+            rs.getString("username"),
+            rs.getBoolean("mod"));
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
@@ -35,16 +36,16 @@ public class UserJdbcDao implements UserDao {
     }
 
     @Override
-    public User createUser(final String email, final String password, final String username) {
+    public User createUser(final String email, final String password, final String username, Boolean mod) {
         final Map<String, Object> values = new HashMap<>();
         values.put("email", email);
         values.put("password", password);
         values.put("username", username);
-        values.put("mod", false);   // TODO: Que no este hardcodeado?
+        values.put("mod", mod); 
 
         final Number id = jdbcInsert.executeAndReturnKey(values);
         
-        return new User(id.longValue(), email, password, username); // FIXME: Agregar mod a models/User
+        return new User(id.longValue(), email, password, username, mod); // FIXME: Agregar mod al constructor
     }
 
     @Override

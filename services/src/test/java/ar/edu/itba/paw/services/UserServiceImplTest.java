@@ -32,7 +32,7 @@ public class UserServiceImplTest {
     @Test
     public void testFindByIdWhenUserExists() {
         // Arrange
-        final User user = new User(1L, "test", "test", "test");
+        final User user = new User(1L, "test", "test", "test", false);
         Mockito.when(userDao.findById(1L)).thenReturn(Optional.of(user));
 
         // Excercise
