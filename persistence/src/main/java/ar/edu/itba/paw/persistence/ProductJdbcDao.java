@@ -4,11 +4,11 @@ import javax.sql.DataSource;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.io.File;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,7 +30,7 @@ public class ProductJdbcDao implements ProductDao {
             rs.getString("genre"),
             rs.getString("description"),
             rs.getString("condition"),
-            rs.getObject("published", LocalDate.class),
+            rs.getDate("published").toLocalDate(),
             rs.getBigDecimal("price")
         );
 
@@ -47,6 +47,7 @@ public class ProductJdbcDao implements ProductDao {
 
     @Override
     public Product createProduct(
+        final Long userId,
         final String title,
         final String artist,
         final String genre,
@@ -57,28 +58,26 @@ public class ProductJdbcDao implements ProductDao {
         final Map<String, Object> values = new HashMap<>();
         final LocalDate published = LocalDate.now();
 
+        values.put("user_id", userId);
         values.put("title", title);
         values.put("artist", artist);
         values.put("genre", genre);
         values.put("condition", condition);
         values.put("price", price);
         values.put("description", description);
-        values.put("published", published);
+        values.put("published", Date.valueOf(published));
 
         final Number id = jdbcInsert.executeAndReturnKey(values);
 
-        // TODO: Fetch actual User ID
-        return new Product(id.longValue(), 1L, title, artist, genre, description, condition, published, price);
+        return new Product(id.longValue(), userId, title, artist, genre, description, condition, published, price);
     }
 
-    // TODO: Actualizar al schema
     @Override
     public List<Product> listProducts() {
-    //     return jdbcTemplate.query(
-    //         "SELECT product_id, title, artist, genre, vinyl_condition, price, image_url, description, published " +
-    //             "FROM products ORDER BY published DESC, product_id DESC",
-    //         PRODUCT_ROW_MAPPER
-    //     );
-        return List.of();
+        return jdbcTemplate.query(
+            "SELECT product_id, user_id, title, artist, genre, description, condition, published, price " +
+                "FROM products ORDER BY published DESC, product_id DESC",
+            PRODUCT_ROW_MAPPER
+        );
     }
 }

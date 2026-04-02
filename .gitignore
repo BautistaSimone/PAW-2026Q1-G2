@@ -1,3 +1,6 @@
 .vscode
 **/target/
 **/application.properties
+.m2/
+jetty.out.log
+AGENTS.md

@@ -19,6 +19,7 @@
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <spring.version>5.3.33</spring.version>
+    <commons.fileupload.version>1.5</commons.fileupload.version>
     <org.postgresql.version>42.2.5</org.postgresql.version>
     <mockito.version>5.23.0</mockito.version>
     <junit.version>5.11.0</junit.version>
@@ -60,6 +61,12 @@
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${org.postgresql.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-fileupload</groupId>
+        <artifactId>commons-fileupload</artifactId>
+        <version>${commons.fileupload.version}</version>
       </dependency>
 
       <!-- JUnit -->

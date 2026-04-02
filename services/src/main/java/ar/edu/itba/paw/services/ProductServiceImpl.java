@@ -2,7 +2,6 @@ package ar.edu.itba.paw.services;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.io.File;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product createProduct(
+        final Long userId,
         final String title,
         final String artist,
         final String genre,
@@ -29,7 +29,7 @@ public class ProductServiceImpl implements ProductService {
         final String condition,
         final BigDecimal price
     ) {
-        return productDao.createProduct(title, artist, genre, description, condition, price);
+        return productDao.createProduct(userId, title, artist, genre, description, condition, price);
     }
 
     @Override

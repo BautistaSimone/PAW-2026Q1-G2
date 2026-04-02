@@ -14,7 +14,7 @@
                     </p>
                 </div>
 
-                <form action="<c:url value="/products"/>" method="post" class="sell-form">
+                <form action="<c:url value="/products"/>" method="post" enctype="multipart/form-data" class="sell-form">
                     <div class="row g-4">
                         <div class="col-md-6">
                             <label for="title" class="form-label">Titulo del album</label>
@@ -33,7 +33,7 @@
 
                         <div class="col-md-6">
                             <label for="vinylCondition" class="form-label">Estado del vinilo</label>
-                            <select id="vinylCondition" name="vinylCondition" class="form-select" required>
+                            <select id="vinylCondition" name="condition" class="form-select" required>
                                 <option value="">Seleccionar</option>
                                 <option value="Nuevo">Nuevo</option>
                                 <option value="Como nuevo">Como nuevo</option>
@@ -48,8 +48,11 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="imageUrl" class="form-label">URL de imagen</label>
-                            <input id="imageUrl" name="imageUrl" type="url" class="form-control" placeholder="https://..." />
+                            <label for="image" class="form-label">Imagen del vinilo</label>
+                            <input id="image" name="image" type="file" class="form-control" accept="image/*" />
+                            <div class="form-text">
+                                Ya podes elegir un archivo. Por ahora el guardado final de la imagen esta desactivado para no frenar las pruebas.
+                            </div>
                         </div>
 
                         <div class="col-12">
