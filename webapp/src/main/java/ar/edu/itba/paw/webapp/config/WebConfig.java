@@ -5,14 +5,12 @@ import javax.sql.DataSource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -22,11 +20,17 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @EnableWebMvc // Use all the defaults from webmvc
 @ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.services", "ar.edu.itba.paw.persistence" })
 @Configuration
-@PropertySource("classpath:env.properties")
+@PropertySource("classpath:application.properties")
 public class WebConfig implements WebMvcConfigurer {
 
-    @Autowired
-    private Environment env;
+    @Value("${db.url}")
+    private String dbUrl;
+
+    @Value("${db.username}")
+    private String dbUsername;
+
+    @Value("${db.password}")
+    private String dbPassword;
 
     @Bean
     public ViewResolver viewResolver() {
@@ -41,9 +45,9 @@ public class WebConfig implements WebMvcConfigurer {
     public DataSource dataSource() {
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriverClass(org.postgresql.Driver.class);
-        dataSource.setUrl(env.getProperty("db.url"));
-        dataSource.setUsername(env.getProperty("db.username")); 
-        dataSource.setPassword(env.getProperty("db.password"));
+        dataSource.setUrl(dbUrl);
+        dataSource.setUsername(dbUsername); 
+        dataSource.setPassword(dbPassword);
 
         return dataSource;
     }
@@ -58,7 +62,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     private DatabasePopulator databasePopulator() {
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(new ClassPathResource("schema.sql"));
+        // populator.addScript(new ClassPathResource("schema.sql")); NO LO ESTA ENCONTRNADO TIENE QUE ESTAR EN RESOURCES O APUNTARLO
         return populator;
     }
 
