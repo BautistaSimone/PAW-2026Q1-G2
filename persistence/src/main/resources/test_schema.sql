@@ -15,13 +15,15 @@ CREATE TABLE IF NOT EXISTS products (
 	description TEXT NOT NULL,
 	condition VARCHAR(255) NOT NULL,
 	published DATE NOT NULL,
-	price NUMERIC NOT NULL
+	price NUMERIC NOT NULL,
+	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS images (
+	image_id SERIAL PRIMARY KEY,
 	product_id INTEGER NOT NULL,
 	data TEXT NOT NULL,
-	PRIMARY KEY(product_id, data)
+	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS categories (
@@ -32,7 +34,9 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS products_categories (
 	product_id INTEGER NOT NULL,
 	category_id INTEGER NOT NULL,
-	PRIMARY KEY(product_id, category_id)
+	PRIMARY KEY(product_id, category_id),
+	FOREIGN KEY(category_id) REFERENCES categories(category_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
+	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS purchases (
@@ -41,29 +45,7 @@ CREATE TABLE IF NOT EXISTS purchases (
 	date DATE NOT NULL,
 	payment_method VARCHAR(255) NOT NULL,
 	confirmed BOOLEAN NOT NULL,
-	PRIMARY KEY(product_id, user_id)
+	PRIMARY KEY(product_id, user_id),
+	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
+	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
 );
-
-ALTER TABLE products
-ADD FOREIGN KEY(user_id) REFERENCES users(user_id)
-ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE images
-ADD FOREIGN KEY(product_id) REFERENCES products(product_id)
-ON UPDATE NO ACTION ON DELETE NO ACTION;
-
-ALTER TABLE products_categories
-ADD FOREIGN KEY(category_id) REFERENCES categories(category_id)
-ON UPDATE NO ACTION ON DELETE NO ACTION;
-
-ALTER TABLE products_categories
-ADD FOREIGN KEY(product_id) REFERENCES products(product_id)
-ON UPDATE NO ACTION ON DELETE NO ACTION;
-
-ALTER TABLE purchases
-ADD FOREIGN KEY(product_id) REFERENCES products(product_id)
-ON UPDATE NO ACTION ON DELETE NO ACTION;
-
-ALTER TABLE purchases
-ADD FOREIGN KEY(user_id) REFERENCES users(user_id)
-ON UPDATE NO ACTION ON DELETE NO ACTION;

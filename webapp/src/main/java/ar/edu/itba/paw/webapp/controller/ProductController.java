@@ -36,8 +36,6 @@ public class ProductController {
         @RequestParam("condition") final String condition,
         @RequestParam("price") final BigDecimal price
     ) {
-
-        // TODO: Hacer que acepte archivos y crear un ImageService
         productService.createProduct(title, artist, genre, description, condition, price);
         return new ModelAndView("redirect:/?created=1");
     }

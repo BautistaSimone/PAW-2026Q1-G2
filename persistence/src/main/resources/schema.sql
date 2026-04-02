@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 CREATE TABLE IF NOT EXISTS images (
+	image_id SERIAL PRIMARY KEY,
 	product_id INTEGER NOT NULL,
 	data BYTEA NOT NULL,
-	PRIMARY KEY(product_id, data),
 	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
