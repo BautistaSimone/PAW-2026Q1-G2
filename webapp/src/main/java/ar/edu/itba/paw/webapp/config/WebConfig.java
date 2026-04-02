@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.config;
 
 import javax.sql.DataSource;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -62,7 +63,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     private DatabasePopulator databasePopulator() {
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        // populator.addScript(new ClassPathResource("schema.sql")); NO LO ESTA ENCONTRNADO TIENE QUE ESTAR EN RESOURCES O APUNTARLO
+        populator.addScript(new ClassPathResource("schema.sql")); // NO LO ESTA ENCONTRNADO TIENE QUE ESTAR EN RESOURCES O APUNTARLO
         return populator;
     }
 
