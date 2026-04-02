@@ -3,6 +3,7 @@
 Vinyl trading web application. Follows the **convention over configuration** paradigm 
 using the **Spring** framework.
 
+
 ## Installation
 
 First, make sure to have Java and Maven installed, then clone the github repository using:
@@ -11,7 +12,8 @@ First, make sure to have Java and Maven installed, then clone the github reposit
 git clone https://github.com/BautistaSimone/PAW-2026Q1-G2
 ```
 
-> Make sure to have the `.env` with the proper credentianls before the next step.
+> Make sure to have the `application.properties`(see properties section) with the 
+proper credentianls before the next step.
 
 Then, inside the root of the project run:
 
@@ -23,6 +25,20 @@ Once it finishes compiling just enter the `webapp/` module and run:
 
 ```
 mvn jetty:run
+```
+
+## Properties
+
+This file contains all the credentials needed for the app to work properly, 
+without it, it will be unable to access resources such as the database.
+It's located in the webapp module insisde the`resources` folder.
+
+Example `application.properties`:
+
+```
+db.url=jdbc:postgresql://localhost/paw
+db.username=postgres
+db.password=postgres
 ```
 
 ## Structure
