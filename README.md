@@ -65,6 +65,8 @@ The project consists of six modules:
 - `services` - Implementation of `service-contracts`
 - `webapp` - Holds controllers, web config and webpage
 
+See [ARCHITECTURE.md](ARCHITECTURE.md) for diagrams of the module layout, runtime request flow and application bootstrap.
+
 Note that webapp can only see the contracts and not the actual implementation, trying to 
 import something from `services/` will fail. Same thing with the persistence module 
 for the service module. 

@@ -4,3 +4,5 @@
 .m2/
 jetty.out.log
 AGENTS.md
+jetty.post.err.log
+jetty.post.out.log

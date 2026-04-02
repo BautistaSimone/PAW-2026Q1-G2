@@ -1,14 +1,18 @@
 package ar.edu.itba.paw.persistence;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.time.LocalDate;
-import java.io.File;
+import java.util.Optional;
 
 import ar.edu.itba.paw.models.Image;
 
 public interface ImageDao {
-    Image createImage(Long product_id, byte[] data);
+    Image createImage(Long productId, byte[] data, String contentType);
+
+    Optional<Image> findById(Long imageId);
+
+    Optional<Image> findByProductId(Long productId);
+
+    boolean existsByProductId(Long productId);
 
     List<Image> listImages();
 }

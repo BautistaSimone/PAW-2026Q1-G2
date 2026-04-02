@@ -42,6 +42,7 @@
                                                 artist="${product.artist}"
                                                 price="${product.price}"
                                                 installments="${product.installmentPrice}"
+                                                imageUrl="${productImageUrls[product.id]}"
                                                 href="#"/>
                                     </div>
                                 </c:forEach>

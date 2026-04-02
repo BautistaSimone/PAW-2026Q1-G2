@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.multipart.MultipartFile;
 
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.UserService;
 
@@ -22,11 +24,17 @@ public class ProductController {
     private static final String TEST_SELLER_USERNAME = "Vendedor de prueba";
 
     private final ProductService productService;
+    private final ImageService imageService;
     private final UserService userService;
 
     @Autowired
-    public ProductController(final ProductService productService, final UserService userService) {
+    public ProductController(
+        final ProductService productService,
+        final ImageService imageService,
+        final UserService userService
+    ) {
         this.productService = productService;
+        this.imageService = imageService;
         this.userService = userService;
     }
 
@@ -44,7 +52,7 @@ public class ProductController {
         @RequestParam("condition") final String condition,
         @RequestParam("price") final BigDecimal price,
         @RequestParam(value = "image", required = false) final MultipartFile image
-    ) {
+    ) throws IOException {
         final Long sellerId = userService.findByEmail(TEST_SELLER_EMAIL)
             .orElseGet(() -> userService.createUser(
                 TEST_SELLER_EMAIL,
@@ -65,8 +73,11 @@ public class ProductController {
         );
 
         if (image != null && !image.isEmpty()) {
-            // TODO: Cuando quede listo el flujo de imagenes, guardar el archivo aca:
-            // imageService.createImage(product.getId(), image.getBytes());
+            imageService.createImage(
+                product.getId(),
+                image.getBytes(),
+                image.getContentType()
+            );
         }
 
         return new ModelAndView("redirect:/?created=1");

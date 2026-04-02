@@ -4,11 +4,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class ImageForm {
 
-    private Long product_id;
+    private Long productId;
     private MultipartFile image;
 
     public Long getProductId() {
-        return product_id;
+        return productId;
+    }
+
+    public void setProductId(final Long productId) {
+        this.productId = productId;
     }
 
     public MultipartFile getImage() {

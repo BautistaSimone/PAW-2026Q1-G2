@@ -1,8 +1,7 @@
 package ar.edu.itba.paw.services;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.io.File;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,10 +21,26 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public Image createImage(
-        final Long product_id,
-        final byte[] data
+        final Long productId,
+        final byte[] data,
+        final String contentType
     ) {
-        return imageDao.createImage(product_id, data);
+        return imageDao.createImage(productId, data, contentType);
+    }
+
+    @Override
+    public Optional<Image> findById(final Long imageId) {
+        return imageDao.findById(imageId);
+    }
+
+    @Override
+    public Optional<Image> findByProductId(final Long productId) {
+        return imageDao.findByProductId(productId);
+    }
+
+    @Override
+    public boolean existsByProductId(final Long productId) {
+        return imageDao.existsByProductId(productId);
     }
 
     @Override

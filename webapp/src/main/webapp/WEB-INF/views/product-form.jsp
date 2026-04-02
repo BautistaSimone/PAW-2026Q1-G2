@@ -50,9 +50,7 @@
                         <div class="col-md-6">
                             <label for="image" class="form-label">Imagen del vinilo</label>
                             <input id="image" name="image" type="file" class="form-control" accept="image/*" />
-                            <div class="form-text">
-                                Ya podes elegir un archivo. Por ahora el guardado final de la imagen esta desactivado para no frenar las pruebas.
-                            </div>
+                        
                         </div>
 
                         <div class="col-12">

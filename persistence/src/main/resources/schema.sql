@@ -23,8 +23,13 @@ CREATE TABLE IF NOT EXISTS images (
 	image_id SERIAL PRIMARY KEY,
 	product_id INTEGER NOT NULL,
 	data BYTEA NOT NULL,
+	content_type VARCHAR(255) NOT NULL,
 	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+ALTER TABLE images ADD COLUMN IF NOT EXISTS content_type VARCHAR(255);
+UPDATE images SET content_type = 'application/octet-stream' WHERE content_type IS NULL;
+ALTER TABLE images ALTER COLUMN content_type SET NOT NULL;
 
 CREATE TABLE IF NOT EXISTS categories (
 	category_id SERIAL PRIMARY KEY,
