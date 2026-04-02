@@ -10,6 +10,9 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -19,7 +22,11 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @EnableWebMvc // Use all the defaults from webmvc
 @ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.services", "ar.edu.itba.paw.persistence" })
 @Configuration
+@PropertySource("classpath:env.properties")
 public class WebConfig implements WebMvcConfigurer {
+
+    @Autowired
+    private Environment env;
 
     @Bean
     public ViewResolver viewResolver() {
@@ -34,9 +41,9 @@ public class WebConfig implements WebMvcConfigurer {
     public DataSource dataSource() {
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriverClass(org.postgresql.Driver.class);
-        dataSource.setUrl("jdbc:postgresql://localhost/paw");
-        dataSource.setUsername("postgres");
-        dataSource.setPassword("postgres");
+        dataSource.setUrl(env.getProperty("db.url"));
+        dataSource.setUsername(env.getProperty("db.username")); 
+        dataSource.setPassword(env.getProperty("db.password"));
 
         return dataSource;
     }
