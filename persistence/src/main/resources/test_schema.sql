@@ -12,7 +12,10 @@ CREATE TABLE IF NOT EXISTS products (
 	title VARCHAR(255) NOT NULL,
 	artist VARCHAR(255) NOT NULL,
 	description TEXT NOT NULL,
-	condition VARCHAR(255) NOT NULL,
+	sleeve_condition NUMERIC NOT NULL,
+	record_condition NUMERIC NOT NULL,
+	neighborhood VARCHAR(255) NOT NULL,
+	province VARCHAR(255) NOT NULL,
 	published DATE NOT NULL,
 	price NUMERIC NOT NULL,
 	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
