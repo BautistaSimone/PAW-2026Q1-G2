@@ -18,7 +18,7 @@
                 <img
                         src="${imageUrl}"
                         alt="${artist} - ${title}"
-                        style="width: 100%; height: 100%; object-fit: cover;"
+                        style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
                 />
             </c:when>
             <c:otherwise>
