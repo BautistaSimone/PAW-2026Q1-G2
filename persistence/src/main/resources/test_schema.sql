@@ -43,14 +43,16 @@ CREATE TABLE IF NOT EXISTS products_categories (
 );
 
 CREATE TABLE IF NOT EXISTS purchases (
+	purchase_id SERIAL PRIMARY KEY,
 	product_id INTEGER NOT NULL,
-	user_id INTEGER NOT NULL,
+	buyer_user_id INTEGER NOT NULL,
+	seller_user_id INTEGER NOT NULL,
 	date DATE NOT NULL,
 	payment_method VARCHAR(255) NOT NULL,
-	confirmed BOOLEAN NOT NULL,
-	PRIMARY KEY(product_id, user_id),
+	purchase_completed BOOLEAN NOT NULL,
 	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
-	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
+	FOREIGN KEY(buyer_user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
+	FOREIGN KEY(seller_user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 -- Seed default categories (genres) for testing
