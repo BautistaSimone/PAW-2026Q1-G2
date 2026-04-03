@@ -6,7 +6,7 @@
 
 <ui:layout title="Vinyland | Productos">
     <div class="products-section">
-        <div class="container">
+        <div class="container-fluid products-shell">
             <c:if test="${param.created eq '1'}">
                 <div class="alert alert-success" role="alert">
                     El vinilo se publico correctamente.
@@ -22,22 +22,22 @@
                 </ol>
             </nav>
 
-            <div class="row">
-                <div class="col-lg-3 col-md-4 col-12">
+            <div class="products-layout-grid">
+                <aside class="products-filters-column">
                     <ui:filtersBar />
-                </div>
+                </aside>
 
-                <div class="col-lg-9 col-md-8 col-12">
-                    <div class="products-header d-flex justify-content-between align-items-center">
+                <section class="products-content-column">
+                    <div class="products-header">
                         <h2 class="products-count m-0">${fn:length(products)} productos</h2>
                         <a href="<c:url value='/products/new'/>" class="btn btn-dark">Publicar vinilo</a>
                     </div>
 
                     <c:choose>
                         <c:when test="${not empty products}">
-                            <div class="row">
+                            <div class="products-grid">
                                 <c:forEach items="${products}" var="product">
-                                    <div class="col-lg-4 col-md-6 col-12 mb-4">
+                                    <div class="products-grid-item">
                                         <ui:productCard
                                                 title="${product.title}"
                                                 artist="${product.artist}"
@@ -55,7 +55,7 @@
                             </div>
                         </c:otherwise>
                     </c:choose>
-                </div>
+                </section>
             </div>
         </div>
     </div>

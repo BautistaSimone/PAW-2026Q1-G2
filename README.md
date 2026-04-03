@@ -31,13 +31,13 @@ db.password=postgres
 4. Build the whole project from the repository root:
 
 ```bash
-mvn install
+mvn compile
 ```
 
 5. Start the web application:
 
 ```bash
-mvn -f webapp/pom.xml jetty:run
+mvn  jetty:run
 ```
 
 6. Open `http://localhost:8000`.

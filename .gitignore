@@ -4,5 +4,14 @@
 .m2/
 jetty.out.log
 AGENTS.md
+
+jetty.clean.err.log
+
+jetty.clean.out.log
+jetty.fixer.err.log
+jetty.fixer.out.log
+jetty.reactor.err.log
+jetty.reactor.out.log
+
 jetty.post.err.log
 jetty.post.out.log
