@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{email.order.subject}">Order Confirmation</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background-color: #2c3e50; color: #ffffff; padding: 20px; text-align: center; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .body-content { padding: 30px; color: #333333; line-height: 1.6; }
+        .body-content h2 { color: #2c3e50; }
+        .order-details { background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .cta-container { text-align: center; margin: 30px 0; }
+        .cta-btn { display: inline-block; background-color: #e74c3c; color: #ffffff; text-decoration: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; }
+        .footer { background-color: #eeeeee; text-align: center; padding: 15px; font-size: 12px; color: #777777; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>Vinyland</h1>
+    </div>
+
+    <!-- Body -->
+    <div class="body-content">
+        <h2 th:text="#{email.order.greeting(${username})}">Hi, User!</h2>
+        
+        <p th:text="#{email.order.body}">Thank you for your purchase. Your order has been confirmed.</p>
+        
+        <div class="order-details">
+            <p><strong><span th:text="#{email.order.label.number}">Order #</span>:</strong> <span th:text="${orderId}">12345</span></p>
+            <p><strong><span th:text="#{email.order.label.product}">Product</span>:</strong> <span th:text="${productName}">Vinyl Record Name</span></p>
+            <p><strong><span th:text="#{email.order.label.total}">Total</span>:</strong> <span th:text="${amount}">$19.99</span></p>
+        </div>
+        
+        <p th:text="#{email.order.shipping}">We will inform you once your order has shipped.</p>
+
+        <!-- Call to Action -->
+        <div class="cta-container">
+            <a th:href="${redirectUrl}" class="cta-btn" th:text="#{email.order.cta}">View Order Details</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2026 Vinyland. <span th:text="#{email.footer.rights}">All rights reserved.</span></p>
+        <p th:text="#{email.footer.unsubscribe}">If you didn't make this purchase, please contact our support team immediately.</p>
+    </div>
+</div>
+
+</body>
+</html>

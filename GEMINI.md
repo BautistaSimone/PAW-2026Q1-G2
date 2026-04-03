@@ -37,7 +37,7 @@ Alternatively, from the `webapp` directory:
 ```powershell
 mvn jetty:run
 ```
-The application will be available at `http://localhost:8000/vinyland/`.
+The application will be available at `http://localhost:8000/`.
 
 ### Testing
 Run all tests in the project:
