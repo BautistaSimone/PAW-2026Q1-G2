@@ -56,5 +56,10 @@ public class ProductServiceImpl implements ProductService {
     public Optional<Product> findById(final Long id) {
         return productDao.findById(id);
     }
+
+    @Override
+    public void markAsSold(final Long id) {
+        productDao.markAsSold(id);
+    }
 }
 

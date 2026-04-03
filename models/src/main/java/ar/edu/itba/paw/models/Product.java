@@ -51,6 +51,10 @@ public class Product {
         return productId;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
+
     public String getTitle() {
         return title;
     }

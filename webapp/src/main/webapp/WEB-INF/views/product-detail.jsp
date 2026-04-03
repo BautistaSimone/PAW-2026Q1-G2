@@ -87,8 +87,12 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <button class="btn btn-dark btn-lg">Comprar</button>
-                    <a class="btn btn-outline-secondary btn-lg" href="<c:url value='/'/>">Ver mas vinilos</a>
+                    <form action="<c:url value='/purchases'/>" method="POST" class="d-flex w-100 flex-column gap-2">
+                        <input type="hidden" name="productId" value="${product.id}" />
+                        <input type="email" name="buyerEmail" class="form-control form-control-lg" placeholder="Ingresa tu email para comprar" required />
+                        <button type="submit" class="btn btn-dark btn-lg w-100">Iniciar Compra</button>
+                    </form>
+                    <a class="btn btn-outline-secondary btn-lg" href="<c:url value='/'/>">Seguir comprando</a>
                 </div>
             </div>
         </div>

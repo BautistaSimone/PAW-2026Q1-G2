@@ -23,5 +23,7 @@ public interface ProductDao {
     List<Product> listProducts();
 
     Optional<Product> findById(final Long id);
+    
+    void markAsSold(final Long id);
 }
 

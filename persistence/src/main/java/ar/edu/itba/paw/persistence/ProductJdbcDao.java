@@ -85,6 +85,7 @@ public class ProductJdbcDao implements ProductDao {
         values.put("price", price);
         values.put("description", description);
         values.put("published", Date.valueOf(published));
+        values.put("available", true);
 
         final Number id = productInsert.executeAndReturnKey(values);
         final Long productId = id.longValue();
@@ -105,7 +106,7 @@ public class ProductJdbcDao implements ProductDao {
     public List<Product> listProducts() {
         final List<Map<String, Object>> rows = jdbcTemplate.queryForList(
             "SELECT product_id, user_id, title, artist, description, sleeve_condition, record_condition, neighborhood, province, published, price " +
-            "FROM products ORDER BY published DESC, product_id DESC"
+            "FROM products WHERE available = TRUE ORDER BY published DESC, product_id DESC"
         );
 
         return rows.stream().map(row -> mapProduct(
@@ -143,6 +144,11 @@ public class ProductJdbcDao implements ProductDao {
             ((Date) row.get("published")).toLocalDate(),
             (BigDecimal) row.get("price")
         ));
+    }
+
+    @Override
+    public void markAsSold(final Long id) {
+        jdbcTemplate.update("UPDATE products SET available = FALSE WHERE product_id = ?", id);
     }
 
 }

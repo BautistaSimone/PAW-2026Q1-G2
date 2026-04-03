@@ -6,6 +6,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.Purchase;
+import ar.edu.itba.paw.models.PurchaseStatus;
+
 import java.util.UUID;
 
 @RestController
@@ -26,11 +30,15 @@ public class TestMailController {
     public String testMail(@RequestParam(value = "email", defaultValue = "test@example.com") String email) {
         String testOrderId = UUID.randomUUID().toString().substring(0, 8);
         
-        emailService.sendOrderConfirmation(
+        Product mockProduct = new Product(1L, 1L, "Classic Vinyl: The Dark Side of the Moon", "Pink Floyd", java.util.Collections.emptyList(), "Test", java.math.BigDecimal.TEN, java.math.BigDecimal.TEN, "Test", "Test", java.time.LocalDate.now(), java.math.BigDecimal.valueOf(100));
+        Purchase mockPurchase = new Purchase(1L, 1L, 1L, java.time.LocalDate.now(), PurchaseStatus.PENDING, UUID.randomUUID().toString(), UUID.randomUUID().toString());
+
+        emailService.sendBuyerEmail(
             email, 
+            mockPurchase,
+            mockProduct,
             "Test Enthusiast", 
-            "Classic Vinyl: The Dark Side of the Moon", 
-            testOrderId
+            "Classic Vinyl: The Dark Side of the Moon - Order " + testOrderId
         );
         
         return "Mail sent to " + email + " (asynchronously)! " +
