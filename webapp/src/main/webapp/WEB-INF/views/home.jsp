@@ -38,13 +38,14 @@
                             <div class="products-grid">
                                 <c:forEach items="${products}" var="product">
                                     <div class="products-grid-item">
+                                        <c:url value="/products/${product.id}" var="productUrl"/>
                                         <ui:productCard
                                                 title="${product.title}"
                                                 artist="${product.artist}"
                                                 price="${product.price}"
                                                 installments="${product.installmentPrice}"
                                                 imageUrl="${productImageUrls[product.id]}"
-                                                href="<c:url value='/products/${product.id}'/>"/>
+                                                href="${productUrl}"/>
                                     </div>
                                 </c:forEach>
                             </div>
