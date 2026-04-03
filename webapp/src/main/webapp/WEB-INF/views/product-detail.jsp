@@ -87,8 +87,8 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <button class="btn btn-dark btn-lg">Agregar al carrito</button>
-                    <a class="btn btn-outline-secondary btn-lg" href="<c:url value='/'/>">Seguir comprando</a>
+                    <button class="btn btn-dark btn-lg">Comprar</button>
+                    <a class="btn btn-outline-secondary btn-lg" href="<c:url value='/'/>">Ver mas vinilos</a>
                 </div>
             </div>
         </div>

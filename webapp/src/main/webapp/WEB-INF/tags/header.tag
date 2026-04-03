@@ -22,11 +22,6 @@
             </div>
         </div>
 
-        <div class="header-right">
-            <button class="icon-btn" aria-label="Carrito">
-                <i class="bi bi-cart" aria-hidden="true"></i>
-                <span class="cart-badge">2</span>
-            </button>
-        </div>
+        
     </div>
 </header>
