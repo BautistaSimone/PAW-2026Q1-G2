@@ -11,7 +11,6 @@ CREATE TABLE IF NOT EXISTS products (
 	user_id INTEGER NOT NULL,
 	title VARCHAR(255) NOT NULL,
 	artist VARCHAR(255) NOT NULL,
-	genre VARCHAR(255) NOT NULL,
 	description TEXT NOT NULL,
 	condition VARCHAR(255) NOT NULL,
 	published DATE NOT NULL,
@@ -50,3 +49,12 @@ CREATE TABLE IF NOT EXISTS purchases (
 	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
 	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+-- Seed default categories (genres) for testing
+INSERT INTO categories (name) VALUES ('Rock');
+INSERT INTO categories (name) VALUES ('Pop');
+INSERT INTO categories (name) VALUES ('Jazz');
+INSERT INTO categories (name) VALUES ('Electronic');
+INSERT INTO categories (name) VALUES ('Classical');
+INSERT INTO categories (name) VALUES ('Hip Hop');
+

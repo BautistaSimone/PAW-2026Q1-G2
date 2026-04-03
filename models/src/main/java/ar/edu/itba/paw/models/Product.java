@@ -2,6 +2,7 @@ package ar.edu.itba.paw.models;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public class Product {
 
@@ -9,9 +10,12 @@ public class Product {
     private final Long userId;
     private final String title;
     private final String artist;
-    private final String genre;
+    private final List<Category> categories;
     private final String description;
-    private final String condition;
+    private final BigDecimal sleeveCondition;
+    private final BigDecimal recordCondition;
+    private final String neighborhood;
+    private final String province;
     private final LocalDate published;
     private final BigDecimal price;
 
@@ -20,9 +24,12 @@ public class Product {
         final Long userId,
         final String title,
         final String artist,
-        final String genre,
+        final List<Category> categories,
         final String description,
-        final String condition,
+        final BigDecimal sleeveCondition,
+        final BigDecimal recordCondition,
+        final String neighborhood,
+        final String province,
         final LocalDate published,
         final BigDecimal price
     ) {
@@ -30,9 +37,12 @@ public class Product {
         this.userId = userId;
         this.title = title;
         this.artist = artist;
-        this.genre = genre;
+        this.categories = categories;
         this.description = description;
-        this.condition = condition;
+        this.sleeveCondition = sleeveCondition;
+        this.recordCondition = recordCondition;
+        this.neighborhood = neighborhood;
+        this.province = province;
         this.published = published;
         this.price = price;
     }
@@ -49,12 +59,28 @@ public class Product {
         return artist;
     }
 
-    public String getGenre() {
-        return genre;
+    public List<Category> getCategories() {
+        return categories;
     }
 
-    public String getCondition() {
-        return condition;
+    public BigDecimal getSleeveCondition() {
+        return sleeveCondition;
+    }
+
+    public BigDecimal getRecordCondition() {
+        return recordCondition;
+    }
+
+    public String getNeighborhood() {
+        return neighborhood;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public String getLocation() {
+        return neighborhood + ", " + province;
     }
 
     public BigDecimal getPrice() {
@@ -72,4 +98,5 @@ public class Product {
     public LocalDate getPublished() {
         return published;
     }
+
 }

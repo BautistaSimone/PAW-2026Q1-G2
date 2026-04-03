@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 
 import javax.sql.DataSource;
 
@@ -49,18 +50,24 @@ public class ProductJdbcDaoTest {
             user.getId(),
             "Dynamo",
             "Soda Stereo",
-            "Rock",
+            Collections.emptyList(),
             "Edicion original",
-            "Muy bueno",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            "Palermo",
+            "CABA",
             BigDecimal.valueOf(32000)
         );
         final Product secondProduct = productDao.createProduct(
             user.getId(),
             "Bocanada",
             "Gustavo Cerati",
-            "Rock",
+            Collections.emptyList(),
             "Reedicion 2024",
-            "Nuevo",
+            BigDecimal.valueOf(10.0),
+            BigDecimal.valueOf(10.0),
+            "Recoleta",
+            "CABA",
             BigDecimal.valueOf(28000)
         );
 

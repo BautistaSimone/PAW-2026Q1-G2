@@ -2,9 +2,11 @@ package ar.edu.itba.paw.webapp.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,63 +14,60 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.multipart.MultipartFile;
 
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductService;
-import ar.edu.itba.paw.services.UserService;
 
 @Controller
 public class ProductController {
 
-    private static final String TEST_SELLER_EMAIL = "seller.test@vinyland.local";
-    private static final String TEST_SELLER_PASSWORD = "temporary-password";
-    private static final String TEST_SELLER_USERNAME = "Vendedor de prueba";
-
     private final ProductService productService;
+    private final CategoryService categoryService;
     private final ImageService imageService;
-    private final UserService userService;
 
     @Autowired
     public ProductController(
         final ProductService productService,
-        final ImageService imageService,
-        final UserService userService
+        final CategoryService categoryService,
+        final ImageService imageService
     ) {
         this.productService = productService;
+        this.categoryService = categoryService;
         this.imageService = imageService;
-        this.userService = userService;
     }
+
 
     @RequestMapping(value = "/products/new", method = RequestMethod.GET)
     public ModelAndView newProductForm() {
-        return new ModelAndView("product-form");
+        final ModelAndView mav = new ModelAndView("product-form");
+        mav.addObject("categories", categoryService.findAll());
+        return mav;
     }
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
     public ModelAndView createProduct(
+        @RequestParam("sellerEmail") final String sellerEmail,
         @RequestParam("title") final String title,
         @RequestParam("artist") final String artist,
-        @RequestParam("genre") final String genre,
+        @RequestParam(value = "categories", required = false) final List<Long> categoryIds,
         @RequestParam("description") final String description,
-        @RequestParam("condition") final String condition,
+        @RequestParam("sleeveCondition") final BigDecimal sleeveCondition,
+        @RequestParam("recordCondition") final BigDecimal recordCondition,
+        @RequestParam("neighborhood") final String neighborhood,
+        @RequestParam("province") final String province,
         @RequestParam("price") final BigDecimal price,
         @RequestParam(value = "image", required = false) final MultipartFile image
     ) throws IOException {
-        final Long sellerId = userService.findByEmail(TEST_SELLER_EMAIL)
-            .orElseGet(() -> userService.createUser(
-                TEST_SELLER_EMAIL,
-                TEST_SELLER_PASSWORD,
-                TEST_SELLER_USERNAME,
-                false
-            ))
-            .getId();
-
         final Product product = productService.createProduct(
-            sellerId,
+            sellerEmail,
             title,
             artist,
-            genre,
+            categoryIds,
             description,
-            condition,
+            sleeveCondition,
+            recordCondition,
+            neighborhood,
+            province,
             price
         );
 
@@ -80,6 +79,23 @@ public class ProductController {
             );
         }
 
-        return new ModelAndView("redirect:/?created=1");
+        return new ModelAndView("redirect:/products/" + product.getId() + "?created=1");
+    }
+
+
+    @RequestMapping(value = "/products/{id}", method = RequestMethod.GET)
+    public ModelAndView productDetail(@PathVariable("id") final Long id) {
+        final Product product = productService.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        final ModelAndView mav = new ModelAndView("product-detail");
+        mav.addObject("product", product);
+
+        if (imageService.existsByProductId(product.getId())) {
+            mav.addObject("productImageUrl", "/vinyland/images/product/" + product.getId());
+        }
+
+        return mav;
     }
 }
+

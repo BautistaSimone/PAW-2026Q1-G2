@@ -2042,3 +2042,45 @@ body {
         align-items: stretch;
     }
 }
+
+/* Genre Checkbox Pills */
+.genre-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.genre-check {
+    padding: 0;
+    margin: 0;
+}
+
+.genre-check .form-check-input {
+    display: none;
+}
+
+.genre-check .form-check-label {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text-main);
+    background-color: #fff;
+    transition: all 0.25s ease;
+    user-select: none;
+}
+
+.genre-check .form-check-label:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+.genre-check .form-check-input:checked + .form-check-label {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+}
+

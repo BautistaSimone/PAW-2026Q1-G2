@@ -2,6 +2,7 @@ package ar.edu.itba.paw.persistence;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -39,9 +40,12 @@ public class ImageJdbcDaoTest {
             user.getId(),
             "Dynamo",
             "Soda Stereo",
-            "Rock",
+            Collections.emptyList(),
             "Edicion original",
-            "Muy bueno",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            "Palermo",
+            "CABA",
             BigDecimal.valueOf(32000)
         );
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);

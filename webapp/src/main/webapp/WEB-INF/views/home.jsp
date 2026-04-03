@@ -28,8 +28,9 @@
                 </div>
 
                 <div class="col-lg-9 col-md-8 col-12">
-                    <div class="products-header">
-                        <h2 class="products-count">${fn:length(products)} productos</h2>
+                    <div class="products-header d-flex justify-content-between align-items-center">
+                        <h2 class="products-count m-0">${fn:length(products)} productos</h2>
+                        <a href="<c:url value='/products/new'/>" class="btn btn-dark">Publicar vinilo</a>
                     </div>
 
                     <c:choose>
@@ -43,7 +44,7 @@
                                                 price="${product.price}"
                                                 installments="${product.installmentPrice}"
                                                 imageUrl="${productImageUrls[product.id]}"
-                                                href="#"/>
+                                                href="<c:url value='/products/${product.id}'/>"/>
                                     </div>
                                 </c:forEach>
                             </div>

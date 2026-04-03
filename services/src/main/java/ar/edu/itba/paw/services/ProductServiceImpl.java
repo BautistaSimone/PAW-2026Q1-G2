@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,27 +14,47 @@ import ar.edu.itba.paw.persistence.ProductDao;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductDao productDao;
+    private final UserService userService;
 
     @Autowired
-    public ProductServiceImpl(final ProductDao productDao) {
+    public ProductServiceImpl(final ProductDao productDao, final UserService userService) {
         this.productDao = productDao;
+        this.userService = userService;
     }
 
     @Override
     public Product createProduct(
-        final Long userId,
+        final String sellerEmail,
         final String title,
         final String artist,
-        final String genre,
+        final List<Long> categoryIds,
         final String description,
-        final String condition,
+        final BigDecimal sleeveCondition,
+        final BigDecimal recordCondition,
+        final String neighborhood,
+        final String province,
         final BigDecimal price
     ) {
-        return productDao.createProduct(userId, title, artist, genre, description, condition, price);
+        final Optional<ar.edu.itba.paw.models.User> maybeUser = userService.findByEmail(sellerEmail);
+        final ar.edu.itba.paw.models.User user = maybeUser.orElseGet(() ->
+            userService.createUser(sellerEmail, "password", sellerEmail.split("@")[0], false)
+        );
+
+        return productDao.createProduct(
+            user.getId(), title, artist, categoryIds, description,
+            sleeveCondition, recordCondition, neighborhood, province, price
+        );
     }
+
 
     @Override
     public List<Product> listProducts() {
         return productDao.listProducts();
     }
+
+    @Override
+    public Optional<Product> findById(final Long id) {
+        return productDao.findById(id);
+    }
 }
+
