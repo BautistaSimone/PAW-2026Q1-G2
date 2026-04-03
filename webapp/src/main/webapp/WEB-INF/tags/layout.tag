@@ -12,6 +12,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${title}</title>
 
+    <link rel="icon" type="image/x-icon" href="<c:url value="/assets/images/vinyl_disk.png"/>">
+
     <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/style.css"/>"/>
 
     <!-- Bootstrap -->
