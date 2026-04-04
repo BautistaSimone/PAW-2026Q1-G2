@@ -55,7 +55,8 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase, 
             product, 
             "Abona tu Vinilo", 
-            "Has iniciado la compra de este rematado vinilo. Una vez abonado, entra al enlace debajo para notificar al vendedor que ya pagaste."
+            "Has iniciado la compra de este rematado vinilo. Una vez abonado, entra al enlace debajo para notificar al vendedor que ya pagaste.",
+            buyer.getUsername()
         );
 
         return purchase;
@@ -96,7 +97,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                 purchase, 
                 product, 
                 "El comprador ha pagado", 
-                "El comprador " + buyer.getUsername() + " dice haber pagado. Verifica y marca el pago como recibido."
+                "El comprador " + buyer.getUsername() + " dice haber pagado. Verifica y marca el pago como recibido.",
+                seller.getUsername()
             );
         } 
         else if (newStatus == PurchaseStatus.SHIPPED && isSeller && purchase.getStatus() == PurchaseStatus.PAID) {
@@ -107,7 +109,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                 purchase, 
                 product, 
                 "Tu vinilo ha sido enviado", 
-                "El vendedor ha despachado el vinilo. Avisanos cuando te llegue desde el detalle de la compra."
+                "El vendedor ha despachado el vinilo. Avisanos cuando te llegue desde el detalle de la compra.",
+                buyer.getUsername()
             );
         }
         else if (newStatus == PurchaseStatus.DELIVERED && isBuyer && purchase.getStatus() == PurchaseStatus.SHIPPED) {

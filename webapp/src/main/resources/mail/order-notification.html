@@ -1,44 +1,75 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
-    <title th:text="${title}">Notificacion de Compra</title>
-    <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
-        .container { background-color: #ffffff; padding: 30px; border-radius: 8px; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { color: #333333; margin: 0; }
-        .content { font-size: 16px; color: #555555; line-height: 1.5; }
-        .product-info { margin: 25px 0; padding: 15px; background-color: #f9f9f9; border-left: 4px solid #333; }
-        .product-info p { margin: 5px 0; }
-        .action { text-align: center; margin-top: 30px; }
-        .btn { display: inline-block; padding: 12px 24px; background-color: #111111; color: #ffffff !important; text-decoration: none; border-radius: 4px; font-weight: bold; }
-        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #999999; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Vinyland</title>
+    <th:block th:replace="~{email-base :: emailStyles}"></th:block>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1 th:text="${title}">Notificacion</h1>
-        </div>
-        <div class="content">
-            <p th:text="${message}">Tienes un mensaje relacionado a tu compra en Vinyland.</p>
-            
-            <div class="product-info">
-                <p><strong>Producto:</strong> <span th:text="${productName}">Vinilo</span></p>
-                <p><strong>Precio:</strong> <span th:text="${amount}">$0.00</span></p>
-            </div>
-            
-            <div class="action">
-                <a th:href="${actionUrl}" class="btn">Gestionar Compra</a>
-            </div>
-            
-            <p style="text-align: center; margin-top: 20px; font-size: 14px;">Tambien puedes pegar este enlace en tu navegador:<br/>
-                <a th:href="${actionUrl}" th:text="${actionUrl}" style="color: #666; word-break: break-all;">URL</a>
-            </p>
-        </div>
-        <div class="footer">
-            <p>&copy; 2026 Vinyland. Todos los derechos reservados.</p>
-        </div>
-    </div>
+<body style="margin:0;padding:0;background-color:#f8f9fa;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa;padding:24px 16px;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);border:1px solid #e8e8e8;">
+                <tr>
+                    <td th:replace="~{email-base :: emailHeader}"></td>
+                </tr>
+                <tr>
+                    <td class="email-body-cell" style="padding:28px 24px 32px;font-family:Arial,Helvetica,sans-serif;color:#264653;font-size:16px;line-height:1.55;">
+                        <p class="greeting" style="color:#264653;font-size:17px;font-weight:700;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">
+                            ¡Hola, <span th:text="${recipientName}">usuario</span>!
+                        </p>
+                        <h1 class="heading-accent" style="color:#e76f51;font-size:20px;font-weight:700;margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;" th:text="${title}">Título</h1>
+                        <p style="margin:0 0 18px;color:#264653;" th:text="${message}">Mensaje</p>
+
+                        <div class="order-summary" style="background-color:#f4f4f4;border:1px solid #e0e0e0;border-radius:8px;padding:18px 20px;margin:20px 0;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif;font-size:15px;">
+                                <tr>
+                                    <td style="padding:4px 0;vertical-align:top;width:38%;">
+                                        <span class="order-summary-label" style="color:#e76f51;font-weight:700;font-size:14px;">Pedido #:</span>
+                                    </td>
+                                    <td style="padding:4px 0;">
+                                        <span class="order-summary-value" style="color:#264653;background-color:#eaeaea;padding:2px 8px;border-radius:4px;font-size:14px;" th:text="${purchaseId}">1</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:10px 0 4px;vertical-align:top;">
+                                        <span class="order-summary-label" style="color:#e76f51;font-weight:700;font-size:14px;">Producto:</span>
+                                    </td>
+                                    <td style="padding:10px 0 4px;">
+                                        <span class="order-summary-value" style="color:#264653;" th:text="${productName}">Vinilo</span>
+                                    </td>
+                                </tr>
+                            </table>
+                            <hr class="order-divider" style="border:none;border-top:1px solid #d8d8d8;margin:14px 0;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif;">
+                                <tr class="order-total-row">
+                                    <td style="font-weight:700;color:#264653;font-size:16px;">Total:</td>
+                                    <td align="right" class="order-total-price" style="color:#e76f51;font-size:18px;font-weight:700;" th:text="${amount}">$0</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <table role="presentation" class="cta-table" width="100%" cellpadding="0" cellspacing="0" style="margin-top:28px;">
+                            <tr>
+                                <td align="center">
+                                    <a th:href="${actionUrl}" class="cta-link" style="display:inline-block;background-color:#264653;color:#e76f51 !important;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:700;font-family:Arial,Helvetica,sans-serif;font-size:15px;">Ver detalles del pedido</a>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p class="muted" style="color:#5a6f78;font-size:13px;margin:24px 0 0;text-align:center;">
+                            También puedes abrir este enlace en tu navegador:<br>
+                            <a th:href="${actionUrl}" th:text="${actionUrl}" style="color:#264653;word-break:break-all;">URL</a>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td th:replace="~{email-base :: emailFooter}"></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

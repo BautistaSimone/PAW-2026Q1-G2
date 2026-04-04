@@ -37,8 +37,9 @@ public class TestMailController {
             email, 
             mockPurchase,
             mockProduct,
-            "Test Enthusiast", 
-            "Classic Vinyl: The Dark Side of the Moon - Order " + testOrderId
+            "Correo de prueba — Vinyland",
+            "Este es un mensaje de prueba del sistema de notificaciones de compra. Pedido de referencia: " + testOrderId + ".",
+            "Amante del vinilo"
         );
         
         return "Mail sent to " + email + " (asynchronously)! " +

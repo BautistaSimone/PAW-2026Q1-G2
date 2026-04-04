@@ -30,25 +30,27 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendBuyerEmail(String to, Purchase purchase, Product product, String title, String message) {
+    public void sendBuyerEmail(String to, Purchase purchase, Product product, String title, String message, String recipientName) {
         String tokenUrl = baseUrl + "/purchases/" + purchase.getPurchaseId() + "?token=" + purchase.getBuyerToken();
-        sendEmail(to, product, title, message, tokenUrl);
+        sendEmail(to, product, purchase.getPurchaseId(), title, message, tokenUrl, recipientName);
     }
 
     @Async
     @Override
-    public void sendSellerEmail(String to, Purchase purchase, Product product, String title, String message) {
+    public void sendSellerEmail(String to, Purchase purchase, Product product, String title, String message, String recipientName) {
         String tokenUrl = baseUrl + "/purchases/" + purchase.getPurchaseId() + "?token=" + purchase.getSellerToken();
-        sendEmail(to, product, title, message, tokenUrl);
+        sendEmail(to, product, purchase.getPurchaseId(), title, message, tokenUrl, recipientName);
     }
 
-    private void sendEmail(String to, Product product, String title, String message, String actionUrl) {
+    private void sendEmail(String to, Product product, long purchaseId, String title, String message, String actionUrl, String recipientName) {
         final Context ctx = new Context(LocaleContextHolder.getLocale());
         ctx.setVariable("title", title);
         ctx.setVariable("message", message);
         ctx.setVariable("amount", "$" + product.getPrice());
         ctx.setVariable("productName", product.getTitle() + " - " + product.getArtist());
         ctx.setVariable("actionUrl", actionUrl);
+        ctx.setVariable("recipientName", recipientName);
+        ctx.setVariable("purchaseId", purchaseId);
 
         try {
             final MimeMessage mimeMessage = javaMailSender.createMimeMessage();

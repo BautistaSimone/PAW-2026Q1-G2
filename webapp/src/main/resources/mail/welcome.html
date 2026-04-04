@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido/a a Vinyland</title>
+    <th:block th:replace="~{email-base :: emailStyles}"></th:block>
+    <style type="text/css">
+        .welcome-heading { color: #e76f51; font-size: 22px; font-weight: 700; margin: 0 0 16px; font-family: Arial, Helvetica, sans-serif; }
+        .callout { background-color: #faf8f5; border-left: 5px solid #264653; padding: 16px 18px; margin: 22px 0;
+            font-style: italic; color: #264653; font-size: 15px; line-height: 1.55; font-family: Arial, Helvetica, sans-serif; }
+        .cta-welcome { display: inline-block; background-color: #e76f51; color: #ffffff !important; text-decoration: none;
+            padding: 14px 28px; border-radius: 8px; font-weight: 700; font-family: Arial, Helvetica, sans-serif; font-size: 15px; }
+    </style>
+</head>
+<body style="margin:0;padding:0;background-color:#f8f9fa;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa;padding:24px 16px;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);border:1px solid #e8e8e8;">
+                <tr>
+                    <td th:replace="~{email-base :: emailHeader}"></td>
+                </tr>
+                <tr>
+                    <td class="email-body-cell" style="padding:28px 24px 32px;font-family:Arial,Helvetica,sans-serif;color:#264653;font-size:16px;line-height:1.55;">
+                        <h1 class="welcome-heading" style="color:#e76f51;font-size:22px;font-weight:700;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">
+                            ¡Bienvenido/a, <span th:text="${recipientName}">vinilofan</span>!
+                        </h1>
+                        <p style="margin:0 0 18px;color:#264653;">Estamos encantados de tenerte en Vinyland.</p>
+                        <div class="callout" style="background-color:#faf8f5;border-left:5px solid #264653;padding:16px 18px;margin:22px 0;font-style:italic;color:#264653;font-size:15px;line-height:1.55;font-family:Arial,Helvetica,sans-serif;">
+                            Descubrí nuestras colecciones de vinilos clásicos y modernos, seleccionados para vos.
+                        </div>
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:28px;">
+                            <tr>
+                                <td align="center">
+                                    <a th:href="${loginUrl}" class="cta-welcome" style="display:inline-block;background-color:#e76f51;color:#ffffff !important;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:700;font-family:Arial,Helvetica,sans-serif;font-size:15px;">Iniciar sesión en Vinyland</a>
+                                </td>
+                            </tr>
+                        </table>
+                        <p class="muted" style="color:#5a6f78;font-size:13px;margin:24px 0 0;text-align:center;">
+                            ¿Problemas con el botón? Abrí este enlace:<br>
+                            <a th:href="${loginUrl}" th:text="${loginUrl}" style="color:#264653;word-break:break-all;">URL</a>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td th:replace="~{email-base :: emailFooter}"></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
