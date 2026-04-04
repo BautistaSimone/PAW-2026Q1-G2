@@ -194,4 +194,4 @@
 </form>
 
 <!-- Scripts -->
-<script src="<c:url value="${pageContext.request.contextPath}/assets/js/filtersBar.js"/>"></script> 
+<script src="<c:url value="${pageContext.request.contextPath}/assets/js/filters.js"/>"></script> 

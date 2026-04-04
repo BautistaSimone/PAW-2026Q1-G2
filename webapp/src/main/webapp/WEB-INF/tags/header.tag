@@ -44,18 +44,22 @@
 
         <div class="header-center">
             <div class="search-container">
-                <input
-                        type="text"
-                        class="search-input"
+                <form class="d-flex" method="get" action="<c:url value='/'/>" novalidate>
+                    <input id="search-input" name="search-text" 
+                        class="search-input" 
+                        type="text" 
                         placeholder="Buscar vinilos..."
-                        aria-label="Buscar"
-                />
-                <button class="search-btn" aria-label="Buscar">
-                    <i class="bi bi-search" aria-hidden="true"></i>
-                </button>
+                        aria-label="Search">
+                    <button id="search-button" class="search-btn" type="submit" aria-label="Buscar">
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                    </button>
+                </form>
             </div>
         </div>
 
         
     </div>
 </header>
+
+<!-- Scripts -->
+<script src="<c:url value="${pageContext.request.contextPath}/assets/js/search.js"/>"></script> 

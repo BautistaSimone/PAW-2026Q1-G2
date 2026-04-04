@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 public final class ProductSearchCriteria {
 
     public static final ProductSearchCriteria EMPTY = new ProductSearchCriteria(
+        null,
         Collections.emptyList(),
         null,
         null,
@@ -16,6 +17,7 @@ public final class ProductSearchCriteria {
         Collections.emptyList()
     );
 
+    private final String searchText;
     private final List<Long> categoryIds;
     private final BigDecimal minPrice;
     private final BigDecimal maxPrice;
@@ -23,12 +25,14 @@ public final class ProductSearchCriteria {
     private final List<ConditionBucket> conditionBuckets;
 
     public ProductSearchCriteria(
+        final String searchText,
         final List<Long> categoryIds,
         final BigDecimal minPrice,
         final BigDecimal maxPrice,
         final List<String> recordLabels,
         final List<ConditionBucket> conditionBuckets
     ) {
+        this.searchText = searchText;
         this.categoryIds = categoryIds == null ? Collections.emptyList() : List.copyOf(categoryIds);
         this.minPrice = minPrice;
         this.maxPrice = maxPrice;
@@ -45,6 +49,10 @@ public final class ProductSearchCriteria {
 
     public static ProductSearchCriteria empty() {
         return EMPTY;
+    }
+
+    public String getSearchText() {
+        return searchText;
     }
 
     public List<Long> getCategoryIds() {

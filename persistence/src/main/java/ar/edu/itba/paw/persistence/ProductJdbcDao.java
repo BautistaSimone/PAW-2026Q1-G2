@@ -172,6 +172,16 @@ public class ProductJdbcDao implements ProductDao {
         );
         final List<Object> args = new ArrayList<>();
 
+        if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
+            sql.append(" AND (");
+            sql.append("LOWER(p.title) LIKE LOWER(CONCAT('%', ?, '%')) OR ");
+            sql.append("LOWER(p.description) LIKE LOWER(CONCAT('%', ?, '%'))");
+            sql.append(")");
+            String searchText = criteria.getSearchText().trim();
+            args.add(searchText);
+            args.add(searchText);
+        }
+
         if (!criteria.getCategoryIds().isEmpty()) {
             sql.append(" AND EXISTS (SELECT 1 FROM products_categories pc WHERE pc.product_id = p.product_id AND pc.category_id IN (");
             sql.append(String.join(",", Collections.nCopies(criteria.getCategoryIds().size(), "?")));
@@ -183,6 +193,7 @@ public class ProductJdbcDao implements ProductDao {
             sql.append(" AND p.price >= ? ");
             args.add(criteria.getMinPrice());
         }
+
         if (criteria.getMaxPrice() != null) {
             sql.append(" AND p.price <= ? ");
             args.add(criteria.getMaxPrice());

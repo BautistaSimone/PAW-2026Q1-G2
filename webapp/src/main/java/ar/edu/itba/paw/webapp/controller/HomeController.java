@@ -53,7 +53,7 @@ public class HomeController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ModelAndView home(
-		@RequestParam(value = "search_text", required = false) final String searchText,
+		@RequestParam(value = "search-text", required = false) final String searchText,
 		@RequestParam(value = "categories", required = false) final List<Long> categoryIds,
 		@RequestParam(value = "minPrice", required = false) final String minPriceParam,
 		@RequestParam(value = "maxPrice", required = false) final String maxPriceParam,
