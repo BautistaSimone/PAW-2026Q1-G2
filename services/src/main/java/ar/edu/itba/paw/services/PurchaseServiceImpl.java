@@ -47,7 +47,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         String buyerToken = UUID.randomUUID().toString();
         String sellerToken = UUID.randomUUID().toString();
 
-        Purchase purchase = purchaseDao.createPurchase(productId, buyer.getId(), PurchaseStatus.PENDING, buyerToken, sellerToken);
+        Purchase purchase = purchaseDao.createPurchase(productId, buyer.getId(), seller.getId(), PurchaseStatus.PENDING, buyerToken, sellerToken);
 
         // Notify Buyer
         emailService.sendBuyerEmail(
