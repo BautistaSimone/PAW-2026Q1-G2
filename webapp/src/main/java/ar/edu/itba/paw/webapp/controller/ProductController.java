@@ -84,7 +84,6 @@ public class ProductController {
         return new ModelAndView("redirect:/products/" + product.getId() + "?created=1");
     }
 
-
     @RequestMapping(value = "/products/{id}", method = RequestMethod.GET)
     public ModelAndView productDetail(@PathVariable("id") final Long id) {
         final Product product = productService.findById(id)
