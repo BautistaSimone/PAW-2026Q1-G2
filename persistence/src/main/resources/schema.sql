@@ -58,6 +58,15 @@ CREATE TABLE IF NOT EXISTS purchases (
 	FOREIGN KEY(seller_user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
+-- Normalize legacy mojibake categories from older local databases
+UPDATE categories
+SET name = 'Indie'
+WHERE encode(convert_to(name, 'UTF8'), 'hex') = '456c65637472c2a26e696361';
+
+UPDATE categories
+SET name = 'Reggaeton'
+WHERE encode(convert_to(name, 'UTF8'), 'hex') = '436cc2a073696361';
+
 -- Seed default categories (genres) using more compatible EXISTS check instead of ON CONFLICT
 INSERT INTO categories (name) SELECT 'Rock'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Rock');
 INSERT INTO categories (name) SELECT 'Pop'         WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Pop');
@@ -65,7 +74,9 @@ INSERT INTO categories (name) SELECT 'Jazz'        WHERE NOT EXISTS (SELECT 1 FR
 INSERT INTO categories (name) SELECT 'Blues'       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Blues');
 INSERT INTO categories (name) SELECT 'Electrónica' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Electrónica');
 INSERT INTO categories (name) SELECT 'Hip Hop'     WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Hip Hop');
+INSERT INTO categories (name) SELECT 'Indie'       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Indie');
 INSERT INTO categories (name) SELECT 'Reggae'      WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Reggae');
+INSERT INTO categories (name) SELECT 'Reggaeton'   WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Reggaeton');
 INSERT INTO categories (name) SELECT 'Clásica'     WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Clásica');
 INSERT INTO categories (name) SELECT 'Folk'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Folk');
 INSERT INTO categories (name) SELECT 'Metal'       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Metal');

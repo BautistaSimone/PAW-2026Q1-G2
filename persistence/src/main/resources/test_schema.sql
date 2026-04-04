@@ -64,4 +64,6 @@ INSERT INTO categories (name) VALUES ('Jazz');
 INSERT INTO categories (name) VALUES ('Electronic');
 INSERT INTO categories (name) VALUES ('Classical');
 INSERT INTO categories (name) VALUES ('Hip Hop');
+INSERT INTO categories (name) VALUES ('Indie');
+INSERT INTO categories (name) VALUES ('Reggaeton');
 
