@@ -18,26 +18,32 @@ git clone https://github.com/BautistaSimone/PAW-2026Q1-G2
 cd PAW-2026Q1-G2
 ```
 
-2. Create a PostgreSQL database called `paw`.
+2. Create a PostgreSQL database called `vinyland` (or another name, but then update `application.properties` accordingly).
 
 3. Create `webapp/src/main/resources/application.properties` using the example below:
 
 ```properties
-db.url=jdbc:postgresql://localhost:5432/paw
+db.url=jdbc:postgresql://localhost:5432/vinyland
 db.username=postgres
 db.password=postgres
 ```
 
-4. Build the whole project from the repository root:
+4. Build and install all modules from the repository root:
 
 ```bash
-mvn compile
+mvn clean install -DskipTests
 ```
 
 5. Start the web application:
 
 ```bash
-mvn  jetty:run
+mvn -f webapp/pom.xml org.eclipse.jetty:jetty-maven-plugin:9.4.58.v20250814:run
+```
+
+On Windows PowerShell you can also use:
+
+```powershell
+.\compAndRun.ps1
 ```
 
 6. Open `http://localhost:8000`.
@@ -49,10 +55,14 @@ On startup, the application initializes the schema automatically from
 
 - `class path resource [application.properties] cannot be opened because it does not exist`
   Create `webapp/src/main/resources/application.properties`.
+- `503 Service Unavailable` after changing shared interfaces or implementations
+  Run `mvn clean install -DskipTests` from the repository root and restart Jetty. Running only `mvn compile` can leave stale jars in the local Maven repository when the webapp is launched on its own, and stale classes in `target/` can also break Jetty hot reloads.
 - `mvn jetty:run` does not start the app
-  Run it from the repository root with `mvn -f webapp/pom.xml jetty:run`.
+  Use `mvn -f webapp/pom.xml org.eclipse.jetty:jetty-maven-plugin:9.4.58.v20250814:run`.
+- Jetty says `Address already in use: bind`
+  Another instance is already running on port `8000`. Stop that process first, or use `.\compAndRun.ps1` on Windows to restart cleanly.
 - Database connection errors
-  Check that PostgreSQL is running, the `paw` database exists, and the credentials in `application.properties` are correct.
+  Check that PostgreSQL is running, the `vinyland` database exists, and the credentials in `application.properties` are correct.
 
 ## Structure
 

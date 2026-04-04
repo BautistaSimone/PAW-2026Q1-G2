@@ -94,7 +94,7 @@ public class ProductController {
         mav.addObject("product", product);
 
         if (imageService.existsByProductId(product.getId())) {
-            mav.addObject("productImageUrl", "/vinyland/images/product/" + product.getId());
+            mav.addObject("productImageUrl", "/images/product/" + product.getId());
         }
 
         return mav;
