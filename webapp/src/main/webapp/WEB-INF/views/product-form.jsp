@@ -26,6 +26,13 @@
                             <input id="artist" name="artist" type="text" class="form-control" required />
                         </div>
 
+                        <div class="col-md-6">
+                            <label for="recordLabel" class="form-label">Discografica / sello</label>
+                            <input id="recordLabel" name="recordLabel" type="text" class="form-control"
+                                   placeholder="Ej: Sony Music, Rough Trade" />
+                            <div class="form-text">Opcional. Asi otros pueden filtrar por sello en el catalogo.</div>
+                        </div>
+
                         <div class="col-12">
                             <label class="form-label">Generos</label>
                             <div class="genre-checkboxes d-flex flex-wrap gap-2">

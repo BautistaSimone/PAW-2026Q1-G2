@@ -30,7 +30,7 @@ public class TestMailController {
     public String testMail(@RequestParam(value = "email", defaultValue = "test@example.com") String email) {
         String testOrderId = UUID.randomUUID().toString().substring(0, 8);
         
-        Product mockProduct = new Product(1L, 1L, "Classic Vinyl: The Dark Side of the Moon", "Pink Floyd", java.util.Collections.emptyList(), "Test", java.math.BigDecimal.TEN, java.math.BigDecimal.TEN, "Test", "Test", java.time.LocalDate.now(), java.math.BigDecimal.valueOf(100));
+        Product mockProduct = new Product(1L, 1L, "Classic Vinyl: The Dark Side of the Moon", "Pink Floyd", "Harvest", java.util.Collections.emptyList(), "Test", java.math.BigDecimal.TEN, java.math.BigDecimal.TEN, "Test", "Test", java.time.LocalDate.now(), java.math.BigDecimal.valueOf(100));
         Purchase mockPurchase = new Purchase(1L, 1L, 1L, java.time.LocalDate.now(), PurchaseStatus.PENDING, UUID.randomUUID().toString(), UUID.randomUUID().toString());
 
         emailService.sendBuyerEmail(

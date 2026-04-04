@@ -1538,7 +1538,7 @@ body {
     margin-bottom: 1rem;
 }
 
-.filter-section:last-child {
+.filters-bar details.filter-section:last-of-type {
     border-bottom: none;
 }
 
@@ -1636,6 +1636,62 @@ body {
 
 .price-input::placeholder {
     color: #adb5bd;
+}
+
+details.filter-section > summary.filter-section-header {
+    list-style: none;
+    cursor: pointer;
+}
+
+details.filter-section > summary.filter-section-header::-webkit-details-marker {
+    display: none;
+}
+
+details.filter-section:not([open]) .filter-section-chevron {
+    transform: rotate(180deg);
+}
+
+.filter-section-chevron {
+    transition: transform 0.2s ease;
+}
+
+.filter-hint,
+.filter-empty-hint {
+    font-size: 0.8rem;
+    color: #6c757d;
+    line-height: 1.35;
+}
+
+.filter-price-presets {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.price-preset-btn {
+    width: 100%;
+    text-align: left;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.82rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #f8f9fa;
+    color: var(--color-text-main);
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.price-preset-btn:hover {
+    background: #fff;
+    border-color: var(--color-accent);
+}
+
+.filters-apply-btn {
+    margin-top: 0.5rem;
+}
+
+a.clear-filters-btn {
+    text-decoration: none;
 }
 
 /* AUTH MODAL */

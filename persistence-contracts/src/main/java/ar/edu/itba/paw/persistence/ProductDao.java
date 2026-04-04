@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Optional;
 
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.ProductSearchCriteria;
 
 public interface ProductDao {
     Product createProduct(
         final Long userId,
         final String title,
         final String artist,
+        final String recordLabel,
         final List<Long> categoryIds,
         final String description,
         final BigDecimal sleeveCondition,
@@ -21,6 +23,10 @@ public interface ProductDao {
     );
 
     List<Product> listProducts();
+
+    List<Product> findProducts(ProductSearchCriteria criteria);
+
+    List<String> listDistinctRecordLabels();
 
     Optional<Product> findById(final Long id);
     

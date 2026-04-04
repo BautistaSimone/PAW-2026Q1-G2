@@ -42,7 +42,13 @@
 
             <div class="col-md-6">
                 <h1 class="h2 fw-bold mb-2">${product.title}</h1>
-                <h2 class="h4 text-muted mb-4">${product.artist}</h2>
+                <h2 class="h4 text-muted ${empty product.recordLabel ? 'mb-4' : 'mb-2'}">${product.artist}</h2>
+                <c:if test="${not empty product.recordLabel}">
+                    <p class="text-muted mb-4">
+                        <span class="fw-semibold">Sello:</span>
+                        <c:out value="${product.recordLabel}" />
+                    </p>
+                </c:if>
 
                 <div class="mb-4">
                     <div class="h1 fw-bold" style="color: var(--color-accent);">$${product.price}</div>

@@ -40,6 +40,7 @@ public class ImageJdbcDaoTest {
             user.getId(),
             "Dynamo",
             "Soda Stereo",
+            "",
             Collections.emptyList(),
             "Edicion original",
             BigDecimal.valueOf(9.0),

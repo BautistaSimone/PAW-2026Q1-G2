@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.persistence.ProductDao;
 
 @Service
@@ -27,6 +28,7 @@ public class ProductServiceImpl implements ProductService {
         final String sellerEmail,
         final String title,
         final String artist,
+        final String recordLabel,
         final List<Long> categoryIds,
         final String description,
         final BigDecimal sleeveCondition,
@@ -41,7 +43,7 @@ public class ProductServiceImpl implements ProductService {
         );
 
         return productDao.createProduct(
-            user.getId(), title, artist, categoryIds, description,
+            user.getId(), title, artist, recordLabel, categoryIds, description,
             sleeveCondition, recordCondition, neighborhood, province, price
         );
     }
@@ -50,6 +52,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> listProducts() {
         return productDao.listProducts();
+    }
+
+    @Override
+    public List<Product> listProducts(final ProductSearchCriteria criteria) {
+        return productDao.findProducts(criteria);
+    }
+
+    @Override
+    public List<String> listDistinctRecordLabels() {
+        return productDao.listDistinctRecordLabels();
     }
 
     @Override

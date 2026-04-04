@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS products (
 	user_id INTEGER NOT NULL,
 	title VARCHAR(255) NOT NULL,
 	artist VARCHAR(255) NOT NULL,
+	record_label VARCHAR(255) NOT NULL DEFAULT '',
 	description TEXT NOT NULL,
 	sleeve_condition NUMERIC NOT NULL,
 	record_condition NUMERIC NOT NULL,

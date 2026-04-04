@@ -10,6 +10,7 @@ public class Product {
     private final Long userId;
     private final String title;
     private final String artist;
+    private final String recordLabel;
     private final List<Category> categories;
     private final String description;
     private final BigDecimal sleeveCondition;
@@ -24,6 +25,7 @@ public class Product {
         final Long userId,
         final String title,
         final String artist,
+        final String recordLabel,
         final List<Category> categories,
         final String description,
         final BigDecimal sleeveCondition,
@@ -37,6 +39,7 @@ public class Product {
         this.userId = userId;
         this.title = title;
         this.artist = artist;
+        this.recordLabel = recordLabel;
         this.categories = categories;
         this.description = description;
         this.sleeveCondition = sleeveCondition;
@@ -61,6 +64,10 @@ public class Product {
 
     public String getArtist() {
         return artist;
+    }
+
+    public String getRecordLabel() {
+        return recordLabel;
     }
 
     public List<Category> getCategories() {
