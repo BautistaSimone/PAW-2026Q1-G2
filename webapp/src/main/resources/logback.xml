@@ -16,6 +16,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>logs/paw2026a-02-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <maxHistory>5</maxHistory> <!-- Last 5 days get stored -->
+            <totalSizeCap>3GB</totalSizeCap>
         </rollingPolicy>
     </appender>
     
