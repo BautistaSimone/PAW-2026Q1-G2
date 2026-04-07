@@ -37,9 +37,6 @@
             <a href="<c:url value="/"/>" class="header-logo-link" aria-label="Vinyland - Ir al inicio">
                 <img src="<c:url value="/assets/images/vinyl_disk.png"/>" alt="" class="header-logo-img" width="44" height="44" decoding="async" />
             </a>
-            <button class="menu-btn" aria-label="Menu" data-action="open-sidebar">
-                <i class="bi bi-list" aria-hidden="true"></i>
-            </button>
         </div>
 
         <div class="header-center">
