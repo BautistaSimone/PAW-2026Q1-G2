@@ -26,6 +26,8 @@
     <org.hsqldb.version>2.3.1</org.hsqldb.version>
     <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
     <javax.mail.version>1.6.2</javax.mail.version>
+    <org.slf4j.version>1.7.30</org.slf4j.version>
+    <ch.qos.logback.version>1.2.6</ch.qos.logback.version>
   </properties>
 
   <dependencyManagement>
@@ -125,6 +127,18 @@
         <artifactId>mockito-junit-jupiter</artifactId>
         <version>${mockito.version}</version>
         <scope>test</scope>
+      </dependency>
+
+      <!-- Logging -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${org.slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${ch.qos.logback.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
