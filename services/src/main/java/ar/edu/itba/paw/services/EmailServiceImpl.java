@@ -20,7 +20,7 @@ public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
-    private final String baseUrl = "http://localhost:8000";
+    private final String baseUrl = "http://pawserver.it.itba.edu.ar/paw-2026a-02/";
 
     @Autowired
     public EmailServiceImpl(final JavaMailSender javaMailSender, final SpringTemplateEngine templateEngine) {

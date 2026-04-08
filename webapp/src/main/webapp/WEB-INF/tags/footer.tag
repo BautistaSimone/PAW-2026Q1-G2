@@ -13,9 +13,9 @@
                         target="_blank"
                         rel="noopener noreferrer"
                 >
-                    ingresa aca
+                    ingresá acá
                 </a>
-                . / <a href="#">Boton de arrepentimiento</a>
+                . / <a href="#">Botón de arrepentimiento</a>
             </p>
         </div>
     </div>
