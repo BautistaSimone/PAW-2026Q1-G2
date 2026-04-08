@@ -45,6 +45,5 @@
                 <div class="product-price">$${price}</div>
             </c:otherwise>
         </c:choose>
-        <p class="product-installments">3 cuotas sin interes de $${installments}</p>
     </div>
 </a>

@@ -12,6 +12,8 @@ public interface ImageDao {
 
     Optional<Image> findByProductId(Long productId);
 
+    List<Image> findAllByProductId(Long productId);
+
     boolean existsByProductId(Long productId);
 
     List<Image> listImages();

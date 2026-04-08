@@ -11,6 +11,8 @@ public class Product {
     private final String title;
     private final String artist;
     private final String recordLabel;
+    private final String catalogNumber;
+    private final String editionCountry;
     private final List<Category> categories;
     private final String description;
     private final BigDecimal sleeveCondition;
@@ -26,6 +28,8 @@ public class Product {
         final String title,
         final String artist,
         final String recordLabel,
+        final String catalogNumber,
+        final String editionCountry,
         final List<Category> categories,
         final String description,
         final BigDecimal sleeveCondition,
@@ -40,6 +44,8 @@ public class Product {
         this.title = title;
         this.artist = artist;
         this.recordLabel = recordLabel;
+        this.catalogNumber = catalogNumber;
+        this.editionCountry = editionCountry;
         this.categories = categories;
         this.description = description;
         this.sleeveCondition = sleeveCondition;
@@ -68,6 +74,14 @@ public class Product {
 
     public String getRecordLabel() {
         return recordLabel;
+    }
+
+    public String getCatalogNumber() {
+        return catalogNumber;
+    }
+
+    public String getEditionCountry() {
+        return editionCountry;
     }
 
     public List<Category> getCategories() {

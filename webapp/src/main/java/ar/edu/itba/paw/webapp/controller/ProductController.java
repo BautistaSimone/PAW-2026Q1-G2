@@ -49,7 +49,9 @@ public class ProductController {
         @RequestParam("sellerEmail") final String sellerEmail,
         @RequestParam("title") final String title,
         @RequestParam("artist") final String artist,
-        @RequestParam(value = "recordLabel", required = false) final String recordLabel,
+        @RequestParam("recordLabel") final String recordLabel,
+        @RequestParam("catalogNumber") final String catalogNumber,
+        @RequestParam("editionCountry") final String editionCountry,
         @RequestParam(value = "categories", required = false) final List<Long> categoryIds,
         @RequestParam("description") final String description,
         @RequestParam("sleeveCondition") final BigDecimal sleeveCondition,
@@ -57,13 +59,15 @@ public class ProductController {
         @RequestParam("neighborhood") final String neighborhood,
         @RequestParam("province") final String province,
         @RequestParam("price") final BigDecimal price,
-        @RequestParam(value = "image", required = false) final MultipartFile image
+        @RequestParam(value = "images", required = false) final MultipartFile[] images
     ) throws IOException {
         final Product product = productService.createProduct(
             sellerEmail,
             title,
             artist,
             recordLabel,
+            catalogNumber,
+            editionCountry,
             categoryIds,
             description,
             sleeveCondition,
@@ -73,12 +77,16 @@ public class ProductController {
             price
         );
 
-        if (image != null && !image.isEmpty()) {
-            imageService.createImage(
-                product.getId(),
-                image.getBytes(),
-                image.getContentType()
-            );
+        if (images != null) {
+            for (MultipartFile image : images) {
+                if (!image.isEmpty()) {
+                    imageService.createImage(
+                        product.getId(),
+                        image.getBytes(),
+                        image.getContentType()
+                    );
+                }
+            }
         }
 
         return new ModelAndView("redirect:/products/" + product.getId() + "?created=1");
@@ -92,8 +100,10 @@ public class ProductController {
         final ModelAndView mav = new ModelAndView("product-detail");
         mav.addObject("product", product);
 
-        if (imageService.existsByProductId(product.getId())) {
-            mav.addObject("productImageUrl", "/images/product/" + product.getId());
+        final List<ar.edu.itba.paw.models.Image> productImages = imageService.findAllByProductId(product.getId());
+        if (!productImages.isEmpty()) {
+            mav.addObject("productImages", productImages);
+            mav.addObject("productImageUrl", "/images/" + productImages.get(0).getImageId());
         }
 
         return mav;

@@ -1,12 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <ui:layout title="Vinyland | ${product.title}">
     <div class="container py-4">
         <c:if test="${param.created eq '1'}">
             <div class="alert alert-success" role="alert">
-                El vinilo se publico correctamente.
+                El vinilo se publicó correctamente.
             </div>
         </c:if>
 
@@ -28,42 +29,77 @@
 
         <div class="row">
             <div class="col-md-6 mb-4">
-                <div class="product-gallery">
-                    <c:choose>
-                        <c:when test="${not empty productImageUrl}">
-                            <img src="<c:url value='${productImageUrl}'/>" alt="${product.artist} - ${product.title}" />
-                        </c:when>
-                        <c:otherwise>
-                            <img src="https://via.placeholder.com/600x600?text=Sin+Imagen" alt="${product.artist} - ${product.title}" />
-                        </c:otherwise>
-                    </c:choose>
+                <div id="productDetailGallery" class="product-detail-gallery">
+                    <div class="product-gallery-main">
+                        <c:choose>
+                            <c:when test="${not empty productImageUrl}">
+                                <img id="productGalleryMain"
+                                     src="<c:url value='${productImageUrl}'/>"
+                                     alt="<c:out value='${product.artist}'/> — <c:out value='${product.title}'/>"
+                                     class="product-gallery-main-img" />
+                            </c:when>
+                            <c:otherwise>
+                                <img id="productGalleryMain"
+                                     src="https://via.placeholder.com/600x600?text=Sin+imagen"
+                                     alt="<c:out value='${product.artist}'/> — <c:out value='${product.title}'/>"
+                                     class="product-gallery-main-img" />
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <c:if test="${not empty productImages}">
+                        <div class="product-gallery-thumbs" role="group" aria-label="Galería de imágenes del producto">
+                            <c:forEach items="${productImages}" var="img" varStatus="st">
+                                <c:url var="galleryImgUrl" value="/images/${img.imageId}" />
+                                <button type="button"
+                                        class="product-gallery-thumb<c:if test='${st.first}'> is-active</c:if>"
+                                        data-full-src="${galleryImgUrl}"
+                                        aria-label="Ver imagen ${st.index + 1} de ${fn:length(productImages)}"
+                                        aria-pressed="${st.first}">
+                                    <img src="${galleryImgUrl}" alt="" loading="lazy" />
+                                </button>
+                            </c:forEach>
+                        </div>
+                    </c:if>
                 </div>
             </div>
 
             <div class="col-md-6">
                 <h1 class="h2 fw-bold mb-2">${product.title}</h1>
-                <h2 class="h4 text-muted ${empty product.recordLabel ? 'mb-4' : 'mb-2'}">${product.artist}</h2>
-                <c:if test="${not empty product.recordLabel}">
-                    <p class="text-muted mb-4">
-                        <span class="fw-semibold">Sello:</span>
-                        <c:out value="${product.recordLabel}" />
-                    </p>
-                </c:if>
-
-                <div class="mb-4">
-                    <div class="h1 fw-bold" style="color: var(--color-accent);">$${product.price}</div>
-                    <div class="text-muted"><small>Disponible en cuotas</small></div>
+                <h2 class="h4 text-muted mb-2">${product.artist}</h2>
+                <div class="product-metadata mb-4">
+                    <c:if test="${not empty product.recordLabel}">
+                        <p class="text-muted mb-1">
+                            <span class="fw-semibold">Sello:</span>
+                            <c:out value="${product.recordLabel}" />
+                        </p>
+                    </c:if>
+                    <c:if test="${not empty product.catalogNumber}">
+                        <p class="text-muted mb-1">
+                            <span class="fw-semibold">Número de catálogo:</span>
+                            <c:out value="${product.catalogNumber}" />
+                        </p>
+                    </c:if>
+                    <c:if test="${not empty product.editionCountry}">
+                        <p class="text-muted mb-1">
+                            <span class="fw-semibold">País de la edición:</span>
+                            <c:out value="${product.editionCountry}" />
+                        </p>
+                    </c:if>
                 </div>
 
                 <div class="mb-4">
-                    <h5 class="fw-bold">Descripcion:</h5>
+                    <div class="h1 fw-bold" style="color: var(--color-accent);">$${product.price}</div>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="fw-bold">Descripción:</h5>
                     <div class="bg-light p-3 rounded">
                         <p class="mb-3">
                             <c:out value="${product.description}" />
                         </p>
                         <c:if test="${not empty product.categories}">
                             <p class="mb-1">
-                                <strong>Generos:</strong>
+                                <strong>Géneros:</strong>
                                 <c:forEach items="${product.categories}" var="cat" varStatus="status">
                                     <span class="badge bg-secondary"><c:out value="${cat.name}" /></span>
                                 </c:forEach>
@@ -103,4 +139,30 @@
             </div>
         </div>
     </div>
+    <c:if test="${not empty productImages}">
+    <script>
+    (function () {
+        var root = document.getElementById('productDetailGallery');
+        var main = document.getElementById('productGalleryMain');
+        if (!root || !main) {
+            return;
+        }
+        var thumbs = root.querySelectorAll('.product-gallery-thumb');
+        thumbs.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var src = btn.getAttribute('data-full-src');
+                if (src) {
+                    main.src = src;
+                }
+                thumbs.forEach(function (b) {
+                    b.classList.remove('is-active');
+                    b.setAttribute('aria-pressed', 'false');
+                });
+                btn.classList.add('is-active');
+                btn.setAttribute('aria-pressed', 'true');
+            });
+        });
+    })();
+    </script>
+    </c:if>
 </ui:layout>

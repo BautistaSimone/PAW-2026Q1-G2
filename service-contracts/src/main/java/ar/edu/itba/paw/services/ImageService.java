@@ -16,6 +16,8 @@ public interface ImageService {
 
     Optional<Image> findByProductId(final Long productId);
 
+    List<Image> findAllByProductId(final Long productId);
+
     boolean existsByProductId(final Long productId);
 
     List<Image> listImages();

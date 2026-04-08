@@ -76,6 +76,8 @@ public class ProductJdbcDao implements ProductDao {
         final String title,
         final String artist,
         final String recordLabel,
+        final String catalogNumber,
+        final String editionCountry,
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
@@ -86,19 +88,23 @@ public class ProductJdbcDao implements ProductDao {
     ) {
         final List<Category> categories = findCategoriesByProductId(productId);
         return new Product(
-            productId, userId, title, artist, recordLabel, categories, description,
+            productId, userId, title, artist, recordLabel, catalogNumber, editionCountry, categories, description,
             sleeveCondition, recordCondition, neighborhood, province, published, price
         );
     }
 
     private Product mapProductFromRow(final Map<String, Object> row) {
         final String label = Optional.ofNullable((String) row.get("record_label")).orElse("");
+        final String catNum = Optional.ofNullable((String) row.get("catalog_number")).orElse("");
+        final String country = Optional.ofNullable((String) row.get("edition_country")).orElse("");
         return mapProduct(
             ((Number) row.get("product_id")).longValue(),
             ((Number) row.get("user_id")).longValue(),
             (String) row.get("title"),
             (String) row.get("artist"),
             label,
+            catNum,
+            country,
             (String) row.get("description"),
             (BigDecimal) row.get("sleeve_condition"),
             (BigDecimal) row.get("record_condition"),
@@ -115,6 +121,8 @@ public class ProductJdbcDao implements ProductDao {
         final String title,
         final String artist,
         final String recordLabel,
+        final String catalogNumber,
+        final String editionCountry,
         final List<Long> categoryIds,
         final String description,
         final BigDecimal sleeveCondition,
@@ -126,11 +134,15 @@ public class ProductJdbcDao implements ProductDao {
         final Map<String, Object> values = new HashMap<>();
         final LocalDate published = LocalDate.now();
         final String normalizedLabel = normalizeRecordLabel(recordLabel);
+        final String normalizedCatNum = normalizeRecordLabel(catalogNumber);
+        final String normalizedCountry = normalizeRecordLabel(editionCountry);
 
         values.put("user_id", userId);
         values.put("title", title);
         values.put("artist", artist);
         values.put("record_label", normalizedLabel);
+        values.put("catalog_number", normalizedCatNum);
+        values.put("edition_country", normalizedCountry);
         values.put("sleeve_condition", sleeveCondition);
         values.put("record_condition", recordCondition);
         values.put("neighborhood", neighborhood);
@@ -153,7 +165,7 @@ public class ProductJdbcDao implements ProductDao {
         }
 
         return mapProduct(
-            productId, userId, title, artist, normalizedLabel, description,
+            productId, userId, title, artist, normalizedLabel, normalizedCatNum, normalizedCountry, description,
             sleeveCondition, recordCondition, neighborhood, province, published, price
         );
     }
@@ -166,7 +178,7 @@ public class ProductJdbcDao implements ProductDao {
     @Override
     public List<Product> findProducts(final ProductSearchCriteria criteria) {
         final StringBuilder sql = new StringBuilder(
-            "SELECT p.product_id, p.user_id, p.title, p.artist, p.record_label, p.description, " +
+            "SELECT p.product_id, p.user_id, p.title, p.artist, p.record_label, p.catalog_number, p.edition_country, p.description, " +
             "p.sleeve_condition, p.record_condition, p.neighborhood, p.province, p.published, p.price " +
             "FROM products p WHERE p.available = TRUE "
         );
@@ -237,7 +249,7 @@ public class ProductJdbcDao implements ProductDao {
     @Override
     public Optional<Product> findById(final Long id) {
         final List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-            "SELECT product_id, user_id, title, artist, record_label, description, sleeve_condition, record_condition, " +
+            "SELECT product_id, user_id, title, artist, record_label, catalog_number, edition_country, description, sleeve_condition, record_condition, " +
             "neighborhood, province, published, price FROM products WHERE product_id = ?",
             id
         );

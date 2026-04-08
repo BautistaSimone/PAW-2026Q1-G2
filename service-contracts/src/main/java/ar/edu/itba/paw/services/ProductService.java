@@ -13,6 +13,8 @@ public interface ProductService {
         final String title,
         final String artist,
         final String recordLabel,
+        final String catalogNumber,
+        final String editionCountry,
         final List<Long> categoryIds,
         final String description,
         final BigDecimal sleeveCondition,

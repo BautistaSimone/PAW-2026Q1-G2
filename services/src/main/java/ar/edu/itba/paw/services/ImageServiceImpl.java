@@ -39,6 +39,11 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
+    public List<Image> findAllByProductId(final Long productId) {
+        return imageDao.findAllByProductId(productId);
+    }
+
+    @Override
     public boolean existsByProductId(final Long productId) {
         return imageDao.existsByProductId(productId);
     }

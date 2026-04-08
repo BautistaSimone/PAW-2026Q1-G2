@@ -74,6 +74,15 @@ public class ImageJdbcDao implements ImageDao {
     }
 
     @Override
+    public List<Image> findAllByProductId(final Long productId) {
+        return jdbcTemplate.query(
+            "SELECT image_id, product_id, data, content_type FROM images WHERE product_id = ? ORDER BY image_id ASC",
+            IMAGE_ROW_MAPPER,
+            productId
+        );
+    }
+
+    @Override
     public boolean existsByProductId(final Long productId) {
         final Integer imageCount = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM images WHERE product_id = ?",

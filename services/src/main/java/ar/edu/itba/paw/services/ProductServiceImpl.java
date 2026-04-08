@@ -29,6 +29,8 @@ public class ProductServiceImpl implements ProductService {
         final String title,
         final String artist,
         final String recordLabel,
+        final String catalogNumber,
+        final String editionCountry,
         final List<Long> categoryIds,
         final String description,
         final BigDecimal sleeveCondition,
@@ -43,7 +45,7 @@ public class ProductServiceImpl implements ProductService {
         );
 
         return productDao.createProduct(
-            user.getId(), title, artist, recordLabel, categoryIds, description,
+            user.getId(), title, artist, recordLabel, catalogNumber, editionCountry, categoryIds, description,
             sleeveCondition, recordCondition, neighborhood, province, price
         );
     }
