@@ -2192,3 +2192,149 @@ a.clear-filters-btn {
     color: #fff;
 }
 
+/* Header Design Update Overrides */
+
+.header-bbdiscos {
+    background-color: var(--color-header);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); /* Sombra más suave y premium */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 1.25rem 2rem !important; /* Forzamos el padding para la altura */
+}
+
+.header-content {
+    display: grid !important;
+    grid-template-columns: 1fr auto 1fr !important; /* Centrado perfecto */
+    align-items: center;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Header Left: Logo and Brand */
+.header-left {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem !important;
+}
+
+.header-logo-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.header-logo-link:hover {
+    transform: translateY(-1px);
+}
+
+.header-logo-img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.brand-name {
+    font-family: "Playfair Display", serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-main); /* #264653 */
+    letter-spacing: -0.02em;
+}
+
+/* Header Center: Flexible Search */
+.header-center {
+    width: 100% !important;
+    min-width: 350px;
+    max-width: 800px !important;
+}
+
+.search-container {
+    width: 100%;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+}
+
+.search-input {
+    width: 100% !important;
+    padding: 0.85rem 4rem 0.85rem 1.5rem !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    border-radius: 30px !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    color: var(--color-text-main);
+    font-size: 1rem !important;
+    outline: none !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.search-input::placeholder {
+    color: rgba(38, 70, 83, 0.6);
+}
+
+.search-input:focus {
+    background-color: #fff !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-1px);
+}
+
+.search-btn {
+    position: absolute !important;
+    right: 0.5rem !important;
+    background-color: var(--color-accent) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 38px !important;
+    height: 38px !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+    background-color: #d85d3f !important;
+    transform: scale(1.05) !important;
+    color: white !important;
+}
+
+.header-right {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .brand-name {
+        font-size: 1.5rem;
+    }
+    .header-center {
+        min-width: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+    .header-left, .header-right {
+        justify-content: center;
+    }
+    .brand-name {
+        display: none; /* Hide text on small screens if space is tight */
+    }
+}
+
