@@ -186,8 +186,8 @@ public class ProductJdbcDao implements ProductDao {
 
         if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
             sql.append(" AND (");
-            sql.append("LOWER(p.title) LIKE LOWER(CONCAT('%', ?, '%')) OR ");
-            sql.append("LOWER(p.description) LIKE LOWER(CONCAT('%', ?, '%'))");
+            sql.append("LOWER(p.title) LIKE LOWER(CONCAT('%', ?, '%')){escape '%'} OR ");
+            sql.append("LOWER(p.description) LIKE LOWER(CONCAT('%', ?, '%')){escape '%'}");
             sql.append(")");
             String searchText = criteria.getSearchText().trim();
             args.add(searchText);
