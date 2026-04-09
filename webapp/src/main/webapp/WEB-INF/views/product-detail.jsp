@@ -3,7 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-<ui:layout title="Vinyland | ${product.title}">
+<ui:layout title="Vinyland | <c:out value='${product.title}'/>">
     <div class="container py-4">
         <c:if test="${param.created eq '1'}">
             <div class="alert alert-success" role="alert">
@@ -16,7 +16,7 @@
                 <li class="breadcrumb-item">
                     <a href="<c:url value='/'/>">Inicio</a>
                 </li>
-                <li class="breadcrumb-item active" aria-current="page">${product.title}</li>
+                <li class="breadcrumb-item active" aria-current="page"><c:out value='${product.title}'/></li>
             </ol>
         </nav>
 
@@ -32,7 +32,7 @@
                 <div id="productDetailGallery" class="product-detail-gallery">
                     <div class="product-gallery-main">
                         <c:choose>
-                            <c:when test="${not empty productImageUrl}">
+                            <c:when test="<c:out value='${not empty productImageUrl}'/>">
                                 <img id="productGalleryMain"
                                      src="<c:url value='${productImageUrl}'/>"
                                      alt="<c:out value='${product.artist}'/> — <c:out value='${product.title}'/>"
@@ -48,14 +48,14 @@
                     </div>
                     <c:if test="${not empty productImages}">
                         <div class="product-gallery-thumbs" role="group" aria-label="Galería de imágenes del producto">
-                            <c:forEach items="${productImages}" var="img" varStatus="st">
-                                <c:url var="galleryImgUrl" value="/images/${img.imageId}" />
+                            <c:forEach items="<c:out value='${productImages}'/>" var="img" varStatus="st">
+                                <c:url var="galleryImgUrl" value="/images/<c:out value='${img.imageId}'/>" />
                                 <button type="button"
                                         class="product-gallery-thumb<c:if test='${st.first}'> is-active</c:if>"
-                                        data-full-src="${galleryImgUrl}"
+                                        data-full-src="<c:out value='${galleryImgUrl}'/>"
                                         aria-label="Ver imagen ${st.index + 1} de ${fn:length(productImages)}"
                                         aria-pressed="${st.first}">
-                                    <img src="${galleryImgUrl}" alt="" loading="lazy" />
+                                    <img src="<c:out value='${galleryImgUrl}'/>" alt="" loading="lazy" />
                                 </button>
                             </c:forEach>
                         </div>
@@ -67,19 +67,19 @@
                 <h1 class="h2 fw-bold mb-2">${product.title}</h1>
                 <h2 class="h4 text-muted mb-2">${product.artist}</h2>
                 <div class="product-metadata mb-4">
-                    <c:if test="${not empty product.recordLabel}">
+                    <c:if test="<c:out value='${not empty product.recordLabel}'/>">
                         <p class="text-muted mb-1">
                             <span class="fw-semibold">Sello:</span>
                             <c:out value="${product.recordLabel}" />
                         </p>
                     </c:if>
-                    <c:if test="${not empty product.catalogNumber}">
+                    <c:if test="<c:out value='${not empty product.catalogNumber}'/>">
                         <p class="text-muted mb-1">
                             <span class="fw-semibold">Número de catálogo:</span>
                             <c:out value="${product.catalogNumber}" />
                         </p>
                     </c:if>
-                    <c:if test="${not empty product.editionCountry}">
+                    <c:if test="<c:out value='${not empty product.editionCountry}'/>">
                         <p class="text-muted mb-1">
                             <span class="fw-semibold">País de la edición:</span>
                             <c:out value="${product.editionCountry}" />
@@ -88,7 +88,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <div class="h1 fw-bold" style="color: var(--color-accent);">$${product.price}</div>
+                    <div class="h1 fw-bold" style="color: var(--color-accent);">$<c:out value='${product.price}'></div>
                 </div>
 
                 <div class="mb-4">
@@ -97,11 +97,11 @@
                         <p class="mb-3">
                             <c:out value="${product.description}" />
                         </p>
-                        <c:if test="${not empty product.categories}">
+                        <c:if test="<c:out value='${not empty product.categories}'/>">
                             <p class="mb-1">
                                 <strong>Géneros:</strong>
-                                <c:forEach items="${product.categories}" var="cat" varStatus="status">
-                                    <span class="badge bg-secondary"><c:out value="${cat.name}" /></span>
+                                <c:forEach items="<c:out value='${product.categories}'/>" var="cat" varStatus="status">
+                                    <span class="badge bg-secondary"><c:out value="<c:out value='${cat.name}'/>" /></span>
                                 </c:forEach>
                             </p>
                         </c:if>
