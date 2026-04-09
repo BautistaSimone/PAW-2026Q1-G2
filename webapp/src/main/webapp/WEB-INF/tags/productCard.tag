@@ -14,10 +14,10 @@
 <a href="${href}" class="card product-card text-decoration-none" style="cursor: pointer;">
     <div class="product-image-placeholder" style="position: relative;">
         <c:choose>
-            <c:when test="${not empty imageUrl}">
+            <c:when test="<c:out value='${not empty imageUrl}'/>">
                 <img
                         src="<c:url value='${imageUrl}'/>"
-                        alt="${artist} - ${title}"
+                        alt="<c:out value='${artist}'/> - <c:out value='${title}'/>"
                         style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
                 />
             </c:when>
@@ -32,17 +32,17 @@
     </div>
 
     <div class="card-body">
-        <h6 class="product-title">${title}</h6>
-        <p class="product-artist">${artist}</p>
+        <h6 class="product-title"><c:out value='${title}'/></h6>
+        <p class="product-artist"><c:out value='${artist}'/></p>
         <c:choose>
             <c:when test="${isOnSale && discountPercentage ne null && discountPercentage gt 0}">
                 <div class="price-wrapper" style="margin-bottom: 0.25rem;">
-                    <span class="album-price-original">$${price}</span>
-                    <span class="product-price" style="margin-top: 0;">$${price}</span>
+                    <span class="album-price-original">$<c:out value='${price}'/></span>
+                    <span class="product-price" style="margin-top: 0;">$<c:out value='${price}'/></span>
                 </div>
             </c:when>
             <c:otherwise>
-                <div class="product-price">$${price}</div>
+                <div class="product-price">$<c:out value='${price}'/></div>
             </c:otherwise>
         </c:choose>
     </div>
