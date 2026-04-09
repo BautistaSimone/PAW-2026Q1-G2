@@ -32,7 +32,7 @@
                 <div id="productDetailGallery" class="product-detail-gallery">
                     <div class="product-gallery-main">
                         <c:choose>
-                            <c:when test="<c:out value='${not empty productImageUrl}'/>">
+                            <c:when test="${not empty productImageUrl}">
                                 <img id="productGalleryMain"
                                      src="<c:url value='${productImageUrl}'/>"
                                      alt="<c:out value='${product.artist}'/> — <c:out value='${product.title}'/>"
@@ -48,14 +48,14 @@
                     </div>
                     <c:if test="${not empty productImages}">
                         <div class="product-gallery-thumbs" role="group" aria-label="Galería de imágenes del producto">
-                            <c:forEach items="<c:out value='${productImages}'/>" var="img" varStatus="st">
-                                <c:url var="galleryImgUrl" value="/images/<c:out value='${img.imageId}'/>" />
+                            <c:forEach items="${productImages}" var="img" varStatus="st">
+                                <c:url var="galleryImgUrl" value="/images/${img.imageId}" />
                                 <button type="button"
                                         class="product-gallery-thumb<c:if test='${st.first}'> is-active</c:if>"
-                                        data-full-src="<c:out value='${galleryImgUrl}'/>"
+                                        data-full-src="${galleryImgUrl}"
                                         aria-label="Ver imagen ${st.index + 1} de ${fn:length(productImages)}"
                                         aria-pressed="${st.first}">
-                                    <img src="<c:out value='${galleryImgUrl}'/>" alt="" loading="lazy" />
+                                    <img src="<c:url value='${galleryImgUrl}'/>" alt="" loading="lazy" />
                                 </button>
                             </c:forEach>
                         </div>
@@ -88,7 +88,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <div class="h1 fw-bold" style="color: var(--color-accent);">$<c:out value='${product.price}'></div>
+                    <div class="h1 fw-bold" style="color: var(--color-accent);">$<c:out value='${product.price}'/></div>
                 </div>
 
                 <div class="mb-4">

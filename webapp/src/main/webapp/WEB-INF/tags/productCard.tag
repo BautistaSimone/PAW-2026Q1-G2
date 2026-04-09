@@ -14,7 +14,7 @@
 <a href="${href}" class="card product-card text-decoration-none" style="cursor: pointer;">
     <div class="product-image-placeholder" style="position: relative;">
         <c:choose>
-            <c:when test="<c:out value='${not empty imageUrl}'/>">
+            <c:when test="${not empty imageUrl}">
                 <img
                         src="<c:url value='${imageUrl}'/>"
                         alt="<c:out value='${artist}'/> - <c:out value='${title}'/>"
