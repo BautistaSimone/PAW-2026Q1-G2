@@ -2,6 +2,17 @@
     const form = document.querySelector('form.navbar-search');
     const searchInput = document.getElementById('search-input');
 
+    // Get last search
+    const urlParams = new URL(window.location.toLocaleString()).searchParams;
+    const currentSearch = urlParams.get('search-text');
+    console.log(currentSearch);
+
+    // Show last search
+    if (searchInput && currentSearch) {
+        searchInput.setAttribute('value', currentSearch);
+    }
+
+
     if (!form || !searchInput) return;
 
     // Prevent empty search submissions
