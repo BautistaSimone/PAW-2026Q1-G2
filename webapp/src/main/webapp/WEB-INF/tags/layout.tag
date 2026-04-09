@@ -10,7 +10,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${title}</title>
+    <title><c:out value='${title}'/></title>
 
     <link rel="icon" type="image/x-icon" href="<c:url value="/assets/images/vinyl_disk.png"/>">
 

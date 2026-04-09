@@ -3,7 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-<ui:layout title="Vinyland | <c:out value='${product.title}'/>">
+<ui:layout title="Vinyland | ${product.title}">
     <div class="container py-4">
         <c:if test="${param.created eq '1'}">
             <div class="alert alert-success" role="alert">
