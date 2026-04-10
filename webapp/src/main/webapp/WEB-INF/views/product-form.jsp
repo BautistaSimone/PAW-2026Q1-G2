@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <ui:layout title="Vinyland | Publicar vinilo">
     <div class="sell-page">
@@ -14,33 +15,39 @@
                     </p>
                 </div>
 
-                <form action="<c:url value="/products"/>" method="post" enctype="multipart/form-data" class="sell-form">
+                <c:url var="postUrl" value="/products"/>
+                <form:form modelAttribute="productForm" action="${postUrl}" method="post" enctype="multipart/form-data" cssClass="sell-form" novalidate="novalidate">
                     <div class="row g-4">
                         <div class="col-md-6">
                             <label for="title" class="form-label">Título del álbum *</label>
-                            <input id="title" name="title" type="text" class="form-control" required />
+                            <form:input path="title" cssClass="form-control" required="required" />
+                            <form:errors path="title" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
                             <label for="artist" class="form-label">Artista *</label>
-                            <input id="artist" name="artist" type="text" class="form-control" required />
+                            <form:input path="artist" cssClass="form-control" required="required" />
+                            <form:errors path="artist" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-12">
                             <label class="form-label">Sello – Número de catálogo *</label>
                             <div class="input-group">
-                                <input id="recordLabel" name="recordLabel" type="text" class="form-control"
-                                       placeholder="Ej: Sony Music, Rough Trade" required />
+                                <form:input path="recordLabel" cssClass="form-control"
+                                       placeholder="Ej: Sony Music, Rough Trade" required="required" />
                                 <span class="input-group-text">–</span>
-                                <input id="catalogNumber" name="catalogNumber" type="text" class="form-control"
-                                       placeholder="Ej: EPC 85930" required />
+                                <form:input path="catalogNumber" cssClass="form-control"
+                                       placeholder="Ej: EPC 85930" required="required" />
                             </div>
+                            <form:errors path="recordLabel" cssClass="text-danger" element="div" />
+                            <form:errors path="catalogNumber" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
                             <label for="editionCountry" class="form-label">País de la Edición *</label>
-                            <input id="editionCountry" name="editionCountry" type="text" class="form-control"
-                                   placeholder="Ej: Argentina, USA, UK" required />
+                            <form:input path="editionCountry" cssClass="form-control"
+                                   placeholder="Ej: Argentina, USA, UK" required="required" />
+                            <form:errors path="editionCountry" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
@@ -48,57 +55,63 @@
                             <div class="genre-checkboxes d-flex flex-wrap gap-2">
                                 <c:forEach items="${categories}" var="cat">
                                     <div class="form-check genre-check">
-                                        <input class="form-check-input" type="checkbox"
-                                               name="categories" value="${cat.id}"
-                                               id="cat-${cat.id}" />
+                                        <form:checkbox path="categories" value="${cat.id}" cssClass="form-check-input" id="cat-${cat.id}" />
                                         <label class="form-check-label" for="cat-${cat.id}">
                                             <c:out value="${cat.name}" />
                                         </label>
                                     </div>
                                 </c:forEach>
                             </div>
+                            <form:errors path="categories" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-12">
                             <label for="sellerEmail" class="form-label">Email del vendedor (asociado a tu cuenta) *</label>
-                            <input id="sellerEmail" name="sellerEmail" type="email" class="form-control" 
-                                   placeholder="ejemplo@mail.com" required />
+                            <form:input type="email" path="sellerEmail" cssClass="form-control" 
+                                   placeholder="ejemplo@mail.com" required="required" />
                             <div class="form-text">Usaremos este email para contactarte hasta que tengamos sistema de usuarios completo.</div>
+                            <form:errors path="sellerEmail" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
                             <label for="sleeveCondition" class="form-label">Estado de la tapa (1 a 10) *</label>
-                            <input id="sleeveCondition" name="sleeveCondition" type="number" min="1" max="10" step="0.1" 
-                                   class="form-control" placeholder="Ej: 8.5" required />
+                            <form:input type="number" path="sleeveCondition" min="1" max="10" step="0.1" 
+                                   cssClass="form-control" placeholder="Ej: 8.5" required="required" />
+                            <form:errors path="sleeveCondition" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
                             <label for="recordCondition" class="form-label">Estado del disco (1 a 10) *</label>
-                            <input id="recordCondition" name="recordCondition" type="number" min="1" max="10" step="0.1" 
-                                   class="form-control" placeholder="Ej: 9.0" required />
+                            <form:input type="number" path="recordCondition" min="1" max="10" step="0.1" 
+                                   cssClass="form-control" placeholder="Ej: 9.0" required="required" />
+                            <form:errors path="recordCondition" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
                             <label for="neighborhood" class="form-label">Barrio / Ciudad *</label>
-                            <input id="neighborhood" name="neighborhood" type="text" class="form-control" 
-                                   placeholder="Ej: Palermo" required />
+                            <form:input path="neighborhood" cssClass="form-control" 
+                                   placeholder="Ej: Palermo" required="required" />
+                            <form:errors path="neighborhood" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
                             <label for="province" class="form-label">Provincia *</label>
-                            <input id="province" name="province" type="text" class="form-control" 
-                                   placeholder="Ej: Buenos Aires" required />
+                            <form:input path="province" cssClass="form-control" 
+                                   placeholder="Ej: Buenos Aires" required="required" />
+                            <form:errors path="province" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
                             <label for="price" class="form-label">Precio *</label>
-                            <input id="price" name="price" type="number" min="0" step="0.01" class="form-control" required />
+                            <form:input type="number" path="price" min="0" step="0.01" cssClass="form-control" required="required" />
+                            <form:errors path="price" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-12">
                             <label for="images" class="form-label">Imágenes del vinilo *</label>
-                            <input id="images" name="images" type="file" class="form-control sell-images-input" accept="image/*" multiple="multiple" required />
+                            <form:input type="file" path="images" cssClass="form-control sell-images-input" accept="image/*" multiple="true" id="images" />
                             <div class="form-text">Podés cargar varias fotos del disco. La imagen principal es la primera; tocá las miniaturas de abajo para elegir otra como portada.</div>
+                            <form:errors path="images" cssClass="text-danger" element="div" />
                             <div id="sell-images-preview" class="sell-images-preview" hidden>
                                 <div class="sell-img-main-wrap">
                                     <img id="sell-img-main" class="sell-img-main" alt="Vista previa principal del vinilo" />
@@ -109,9 +122,10 @@
 
                         <div class="col-12">
                             <label for="description" class="form-label">Descripción</label>
-                            <textarea id="description" name="description" class="form-control" rows="5"
-                                      placeholder="Contá detalles adicionales del disco, edición, etc."></textarea>
+                            <form:textarea path="description" cssClass="form-control" rows="5"
+                                      placeholder="Contá detalles adicionales del disco, edición, etc." />
                             <div class="form-text">Opcional.</div>
+                            <form:errors path="description" cssClass="text-danger" element="div" />
                         </div>
 
                     </div>
@@ -120,7 +134,7 @@
                         <a href="<c:url value="/"/>" class="btn btn-outline-secondary">Volver al catálogo</a>
                         <button type="submit" class="btn btn-dark">Publicar vinilo</button>
                     </div>
-                </form>
+                </form:form>
             </div>
         </div>
     </div>

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <ui:layout title="Vinyland | Gestionar Compra">
     <div class="container py-5">
@@ -42,21 +43,25 @@
                                         <div class="alert alert-info">
                                             Abona la suma de $<c:out value="${product.price}"/> acordandolo con el vendedor. Una vez transferido, haz clic abajo.
                                         </div>
-                                        <form method="POST" action="<c:url value='/purchases/${purchase.purchaseId}/status'/>">
+                                        <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
+                                        <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}">
                                             <input type="hidden" name="token" value="${token}" />
                                             <input type="hidden" name="newStatus" value="PAID" />
                                             <button type="submit" class="btn btn-primary w-100 btn-lg">Notificar que ya he Pagado</button>
-                                        </form>
+                                            <form:errors path="newStatus" cssClass="text-danger mt-2" element="div" />
+                                        </form:form>
                                     </c:when>
                                     <c:when test="${purchase.status eq 'SHIPPED'}">
                                         <div class="alert alert-warning">
                                             El vendedor ya envíó el pedido. Cuando tengas tu vinilo en tus manos, confirmalo.
                                         </div>
-                                        <form method="POST" action="<c:url value='/purchases/${purchase.purchaseId}/status'/>">
+                                        <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
+                                        <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}">
                                             <input type="hidden" name="token" value="${token}" />
                                             <input type="hidden" name="newStatus" value="DELIVERED" />
                                             <button type="submit" class="btn btn-success w-100 btn-lg">Marcar como Recibido</button>
-                                        </form>
+                                            <form:errors path="newStatus" cssClass="text-danger mt-2" element="div" />
+                                        </form:form>
                                     </c:when>
                                     <c:when test="${purchase.status eq 'DELIVERED'}">
                                         <div class="alert alert-success mb-0 text-center">
@@ -77,11 +82,13 @@
                                         <div class="alert alert-info">
                                             El comprador dice que ya pagó. Verifica en tu cuenta bancaria y confirma recepción.
                                         </div>
-                                        <form method="POST" action="<c:url value='/purchases/${purchase.purchaseId}/status'/>">
+                                        <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
+                                        <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}">
                                             <input type="hidden" name="token" value="${token}" />
                                             <input type="hidden" name="newStatus" value="SHIPPED" />
                                             <button type="submit" class="btn btn-primary w-100 btn-lg">Confirmar Pago y Marcar Enviado</button>
-                                        </form>   
+                                            <form:errors path="newStatus" cssClass="text-danger mt-2" element="div" />
+                                        </form:form>   
                                     </c:when>
                                     <c:when test="${purchase.status eq 'DELIVERED'}">
                                         <div class="alert alert-success mb-0 text-center">

@@ -6,14 +6,19 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.validation.BindingResult;
+import javax.validation.Valid;
 
+import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.webapp.form.ProductForm;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductService;
@@ -37,60 +42,58 @@ public class ProductController {
     }
 
 
+    @ModelAttribute("categories")
+    public List<Category> categories() {
+        return categoryService.findAll();
+    }
+
     @RequestMapping(value = "/products/new", method = RequestMethod.GET)
-    public ModelAndView newProductForm() {
-        final ModelAndView mav = new ModelAndView("product-form");
-        mav.addObject("categories", categoryService.findAll());
-        return mav;
+    public ModelAndView newProductForm(@ModelAttribute("productForm") final ProductForm form) {
+        return new ModelAndView("product-form");
     }
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
     public ModelAndView createProduct(
-        @RequestParam("sellerEmail") final String sellerEmail,
-        @RequestParam("title") final String title,
-        @RequestParam("artist") final String artist,
-        @RequestParam("recordLabel") final String recordLabel,
-        @RequestParam("catalogNumber") final String catalogNumber,
-        @RequestParam("editionCountry") final String editionCountry,
-        @RequestParam(value = "categories", required = false) final List<Long> categoryIds,
-        @RequestParam("description") final String description,
-        @RequestParam("sleeveCondition") final BigDecimal sleeveCondition,
-        @RequestParam("recordCondition") final BigDecimal recordCondition,
-        @RequestParam("neighborhood") final String neighborhood,
-        @RequestParam("province") final String province,
-        @RequestParam("price") final BigDecimal price,
-        @RequestParam(value = "images", required = false) final MultipartFile[] images
+        @Valid @ModelAttribute("productForm") final ProductForm form,
+        final BindingResult errors
     ) throws IOException {
 
+        if (errors.hasErrors()) {
+            return new ModelAndView("product-form");
+        }
+
+        final MultipartFile[] images = form.getImages();
         // Validate images before creating the product
         if (images != null) {
             for (MultipartFile image : images) {
                 if (!image.isEmpty()) {
                     if (image.getSize() > 5 * 1024 * 1024) {
-                        throw new IllegalArgumentException("Image size must be less than 5MB");
+                        errors.rejectValue("images", "Size.productForm.images", "La imagen no puede pesar más de 5MB.");
+                        return new ModelAndView("product-form");
                     }
                     String contentType = image.getContentType();
                     if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png") && !contentType.equals("image/webp"))) {
-                        throw new IllegalArgumentException("Invalid image content type. Only JPEG, PNG, and WebP are allowed.");
+                        errors.rejectValue("images", "ContentType.productForm.images", "Formato de imagen inválido. Solo se admiten JPEG, PNG y WebP.");
+                        return new ModelAndView("product-form");
                     }
                 }
             }
         }
 
         final Product product = productService.createProduct(
-            sellerEmail,
-            title,
-            artist,
-            recordLabel,
-            catalogNumber,
-            editionCountry,
-            categoryIds,
-            description,
-            sleeveCondition,
-            recordCondition,
-            neighborhood,
-            province,
-            price
+            form.getSellerEmail(),
+            form.getTitle(),
+            form.getArtist(),
+            form.getRecordLabel(),
+            form.getCatalogNumber(),
+            form.getEditionCountry(),
+            form.getCategories(),
+            form.getDescription(),
+            form.getSleeveCondition(),
+            form.getRecordCondition(),
+            form.getNeighborhood(),
+            form.getProvince(),
+            form.getPrice()
         );
 
         if (images != null) {
@@ -109,7 +112,10 @@ public class ProductController {
     }
 
     @RequestMapping(value = "/products/{id}", method = RequestMethod.GET)
-    public ModelAndView productDetail(@PathVariable("id") final Long id) {
+    public ModelAndView productDetail(
+        @PathVariable("id") final Long id,
+        @ModelAttribute("purchaseCreateForm") final ar.edu.itba.paw.webapp.form.PurchaseCreateForm purchaseForm
+    ) {
         final Product product = productService.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 

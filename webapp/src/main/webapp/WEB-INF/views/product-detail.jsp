@@ -2,6 +2,7 @@
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <ui:layout title="Vinyland | ${product.title}">
     <div class="container py-4">
@@ -129,11 +130,13 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <form action="<c:url value='/purchases'/>" method="POST" class="d-flex w-100 flex-column gap-2">
+                    <c:url var="purchasePostUrl" value='/purchases'/>
+                    <form:form modelAttribute="purchaseCreateForm" action="${purchasePostUrl}" method="POST" cssClass="d-flex w-100 flex-column gap-2">
                         <input type="hidden" name="productId" value="${product.id}" />
-                        <input type="email" name="buyerEmail" class="form-control form-control-lg" placeholder="Ingresa tu email para comprar" required />
+                        <form:input type="email" path="buyerEmail" cssClass="form-control form-control-lg" placeholder="Ingresa tu email para comprar" required="required" />
+                        <form:errors path="buyerEmail" cssClass="text-danger" element="div" />
                         <button type="submit" class="btn btn-dark btn-lg w-100">Iniciar Compra</button>
-                    </form>
+                    </form:form>
                     <a class="btn btn-outline-secondary btn-lg" href="<c:url value='/'/>">Seguir comprando</a>
                 </div>
             </div>
