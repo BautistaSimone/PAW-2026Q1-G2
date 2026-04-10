@@ -14,7 +14,7 @@
     style="background-image: url(<c:url value="${img}"/>);"
     >
     
-    <h3>${title}</h3>
-    <p>${text}</p>
+    <h3><c:out value="${title}"/></h3>
+    <p><c:out value="${text}"/></p>
 
 </button>

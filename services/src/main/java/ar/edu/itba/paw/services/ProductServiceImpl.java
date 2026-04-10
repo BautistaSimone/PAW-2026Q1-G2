@@ -39,6 +39,34 @@ public class ProductServiceImpl implements ProductService {
         final String province,
         final BigDecimal price
     ) {
+        if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Price must be strictly positive");
+        }
+        if (sleeveCondition == null || sleeveCondition.compareTo(BigDecimal.ONE) < 0 || sleeveCondition.compareTo(BigDecimal.TEN) > 0) {
+            throw new IllegalArgumentException("Sleeve condition must be between 1 and 10");
+        }
+        if (recordCondition == null || recordCondition.compareTo(BigDecimal.ONE) < 0 || recordCondition.compareTo(BigDecimal.TEN) > 0) {
+            throw new IllegalArgumentException("Record condition must be between 1 and 10");
+        }
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be empty");
+        }
+        if (artist == null || artist.trim().isEmpty()) {
+            throw new IllegalArgumentException("Artist cannot be empty");
+        }
+        if (description == null || description.trim().isEmpty()) {
+            throw new IllegalArgumentException("Description cannot be empty");
+        }
+        if (sellerEmail == null || sellerEmail.trim().isEmpty() || !sellerEmail.contains("@")) {
+            throw new IllegalArgumentException("Valid seller email is required");
+        }
+        if (neighborhood == null || neighborhood.trim().isEmpty()) {
+            throw new IllegalArgumentException("Neighborhood cannot be empty");
+        }
+        if (province == null || province.trim().isEmpty()) {
+            throw new IllegalArgumentException("Province cannot be empty");
+        }
+
         final Optional<ar.edu.itba.paw.models.User> maybeUser = userService.findByEmail(sellerEmail);
         final ar.edu.itba.paw.models.User user = maybeUser.orElseGet(() ->
             userService.createUser(sellerEmail, "password", sellerEmail.split("@")[0], false)

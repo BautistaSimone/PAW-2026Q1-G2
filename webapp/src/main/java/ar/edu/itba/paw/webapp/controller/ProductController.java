@@ -61,6 +61,22 @@ public class ProductController {
         @RequestParam("price") final BigDecimal price,
         @RequestParam(value = "images", required = false) final MultipartFile[] images
     ) throws IOException {
+
+        // Validate images before creating the product
+        if (images != null) {
+            for (MultipartFile image : images) {
+                if (!image.isEmpty()) {
+                    if (image.getSize() > 5 * 1024 * 1024) {
+                        throw new IllegalArgumentException("Image size must be less than 5MB");
+                    }
+                    String contentType = image.getContentType();
+                    if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png") && !contentType.equals("image/webp"))) {
+                        throw new IllegalArgumentException("Invalid image content type. Only JPEG, PNG, and WebP are allowed.");
+                    }
+                }
+            }
+        }
+
         final Product product = productService.createProduct(
             sellerEmail,
             title,

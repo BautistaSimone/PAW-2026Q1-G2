@@ -12,7 +12,7 @@
 
                 <div class="card shadow-sm">
                     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0">Pedido #${purchase.purchaseId}</h4>
+                        <h4 class="mb-0">Pedido #<c:out value="${purchase.purchaseId}"/></h4>
                         <span class="badge bg-secondary">${purchase.status.description}</span>
                     </div>
                     <div class="card-body p-4">
@@ -25,9 +25,9 @@
                                      onerror="this.src='https://via.placeholder.com/150?text=Sin+Imagen';"/>
                             </div>
                             <div class="col-md-9">
-                                <h5>${product.title}</h5>
-                                <p class="text-muted mb-1">${product.artist}</p>
-                                <h4 class="fw-bold">$${product.price}</h4>
+                                <h5><c:out value="${product.title}"/></h5>
+                                <p class="text-muted mb-1"><c:out value="${product.artist}"/></p>
+                                <h4 class="fw-bold">$<c:out value="${product.price}"/></h4>
                             </div>
                         </div>
 
@@ -40,7 +40,7 @@
                                 <c:choose>
                                     <c:when test="${purchase.status eq 'PENDING'}">
                                         <div class="alert alert-info">
-                                            Abona la suma de $${product.price} acordandolo con el vendedor. Una vez transferido, haz clic abajo.
+                                            Abona la suma de $<c:out value="${product.price}"/> acordandolo con el vendedor. Una vez transferido, haz clic abajo.
                                         </div>
                                         <form method="POST" action="<c:url value='/purchases/${purchase.purchaseId}/status'/>">
                                             <input type="hidden" name="token" value="${token}" />

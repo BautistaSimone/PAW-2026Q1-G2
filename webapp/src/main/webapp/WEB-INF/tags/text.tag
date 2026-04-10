@@ -11,27 +11,27 @@
 <c:choose>
 
     <c:when test="${textType eq 'h1'}">
-        <h1 class="${textClass}">${value}</h1>
+        <h1 class="${textClass}"><c:out value="${value}"/></h1>
     </c:when>
 
     <c:when test="${textType eq 'h2'}">
-        <h2 class="${textClass}">${value}</h2>
+        <h2 class="${textClass}"><c:out value="${value}"/></h2>
     </c:when>
 
     <c:when test="${textType eq 'h3'}">
-        <h3 class="${textClass}">${value}</h3>
+        <h3 class="${textClass}"><c:out value="${value}"/></h3>
     </c:when>
 
     <c:when test="${textType eq 'h4'}">
-        <h4 class="${textClass}">${value}</h4>
+        <h4 class="${textClass}"><c:out value="${value}"/></h4>
     </c:when>
 
     <c:when test="${textType eq 'span'}">
-        <span class="${textClass}">${value}</span>
+        <span class="${textClass}"><c:out value="${value}"/></span>
     </c:when>
 
     <c:otherwise>
-        <p class="${textClass}">${value}</p>
+        <p class="${textClass}"><c:out value="${value}"/></p>
     </c:otherwise>
 
 </c:choose>

@@ -29,7 +29,7 @@
 
                 <section class="products-content-column">
                     <div class="products-header">
-                        <h2 class="products-count m-0">${fn:length(products)} productos</h2>
+                        <h2 class="products-count m-0"><c:out value="${fn:length(products)}" /> productos</h2>
                         <a href="<c:url value='/products/new'/>" class="btn btn-dark">Publicar vinilo</a>
                     </div>
 

@@ -64,8 +64,8 @@
             </div>
 
             <div class="col-md-6">
-                <h1 class="h2 fw-bold mb-2">${product.title}</h1>
-                <h2 class="h4 text-muted mb-2">${product.artist}</h2>
+                <h1 class="h2 fw-bold mb-2"><c:out value="${product.title}"/></h1>
+                <h2 class="h4 text-muted mb-2"><c:out value="${product.artist}"/></h2>
                 <div class="product-metadata mb-4">
                     <c:if test="<c:out value='${not empty product.recordLabel}'/>">
                         <p class="text-muted mb-1">

@@ -6,6 +6,9 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.PurchaseStatus;
@@ -34,6 +37,10 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     public Purchase createPurchase(Long productId, String buyerEmail) {
+        if (buyerEmail == null || buyerEmail.trim().isEmpty() || !buyerEmail.contains("@")) {
+            throw new IllegalArgumentException("Valid buyer email is required");
+        }
+
         final Product product = productService.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
@@ -81,8 +88,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         final User buyer = userService.findById(purchase.getBuyerId())
             .orElseThrow(() -> new IllegalStateException("Buyer missing"));
 
-        boolean isBuyer = token.equals(purchase.getBuyerToken());
-        boolean isSeller = token.equals(purchase.getSellerToken());
+        boolean isBuyer = MessageDigest.isEqual(token.getBytes(StandardCharsets.UTF_8), purchase.getBuyerToken().getBytes(StandardCharsets.UTF_8));
+        boolean isSeller = MessageDigest.isEqual(token.getBytes(StandardCharsets.UTF_8), purchase.getSellerToken().getBytes(StandardCharsets.UTF_8));
 
         if (!isBuyer && !isSeller) {
             throw new IllegalArgumentException("Invalid token for this purchase");

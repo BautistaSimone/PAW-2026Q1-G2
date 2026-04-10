@@ -75,3 +75,32 @@ mvn test
 - **Dependency Management**: The root `pom.xml` must use `<dependencyManagement>` to declare all project dependencies, including their versions and scopes.
 - **Module Dependencies**: Individual modules should reference dependencies without specifying the `<version>`. This ensures alignment across the entire project and simplifies version upgrades.
 - **Library Sets**: For library sets with multiple artifacts (e.g., Spring), use a single property in the root `pom.xml` to align versions across all related dependencies.
+
+## Security Guidelines
+
+When generating new code, always strictly adhere to the following rules to ensure the application's robustness and security:
+
+### 1. Cross-Site Scripting (XSS) Prevention
+- In the frontend (JSP and tag files), never print model objects or String variables directly using `${variable}` inside HTML structures. 
+- ALWAYS wrap dynamic evaluations that print text or attributes with `<c:out value="${variable}" />`.
+
+### 2. File Upload Validations
+- Ensure validation logic runs on uploaded `MultipartFile`.
+- Check file sizes strictly (e.g., limit to 5MB max).
+- Perform logical MIME type verification (e.g., `image/jpeg` or `image/png`), never trust extension names solely. 
+- Reject unexpected payloads with `IllegalArgumentException`.
+
+### 3. Business Logic Validation
+- Always validate business rules in the `Service` layer (e.g., positive numbers for prices/stock, boundary checking for enums or thresholds).
+- Perform strict string sanitation: no empty strings or nulls unless conditionally supported by DB constraints, use `.trim()` appropriately.
+
+### 4. Exception Handling
+- The Web layer uses a `GlobalExceptionHandler` (`@ControllerAdvice`) to intercept `RuntimeExceptions` globally.
+- Throw custom exceptions like `ResourceNotFoundException` (mapped to 404) or `IllegalArgumentException`/`IllegalStateException` (mapped to 400).
+- Never return stacktraces or framework defaults to the browser. Provide generic messages to avoid disclosing DB engines or table names.
+
+### 5. Secure Identity Matching
+- Tokens or non-password secrets should be compared using `MessageDigest.isEqual(...)` in the service layer if used for authorization rules. Ensure constant-time comparisons when validating unpredictable input buffers.
+
+### 6. SQL Injection Prevention
+- All user-submitted text evaluated within `LIKE` wildcard searches (e.g., `CONCAT('%', ?, '%')`) must be escaped upstream before parameterization to prevent wildcards like `%` and `_` from being exploited.

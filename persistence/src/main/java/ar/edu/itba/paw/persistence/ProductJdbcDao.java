@@ -189,7 +189,7 @@ public class ProductJdbcDao implements ProductDao {
             sql.append("LOWER(p.title) LIKE LOWER(CONCAT('%', ?, '%')){escape '%'} OR ");
             sql.append("LOWER(p.description) LIKE LOWER(CONCAT('%', ?, '%')){escape '%'}");
             sql.append(")");
-            String searchText = criteria.getSearchText().trim();
+            String searchText = criteria.getSearchText().trim().replace("%", "%%").replace("_", "%_");
             args.add(searchText);
             args.add(searchText);
         }

@@ -18,15 +18,15 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">${title}</h5>
+                <h5 class="modal-title" id="exampleModalLabel"><c:out value="${title}"/></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                ${text}
+                <c:out value="${text}"/>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${secondary}</button>
-                <button type="button" class="btn btn-primary">${primary}</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><c:out value="${secondary}"/></button>
+                <button type="button" class="btn btn-primary"><c:out value="${primary}"/></button>
             </div>
         </div>
     </div>
