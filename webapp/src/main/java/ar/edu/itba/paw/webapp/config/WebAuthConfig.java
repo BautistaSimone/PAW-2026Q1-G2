@@ -14,15 +14,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
-
 @Configuration
 @EnableWebSecurity
 @ComponentScan("ar.edu.itba.paw.webapp.auth")
 public class WebAuthConfig{
 
     @Autowired
-    private PawUserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -33,32 +31,33 @@ public class WebAuthConfig{
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         http.sessionManagement()
                 .invalidSessionUrl("/login")
-            .and().authorizeRequests()
-                .antMatchers("/login").anonymous()
-                .antMatchers("/").anonymous()
-                .antMatchers("/profile/**").hasRole("ROLE_USER")
-                .antMatchers("/css/**", "/js/**", "/img/**", "/favicon.ico", "/403").permitAll()
-                .antMatchers("/**").permitAll()
-            .and().authorizeRequests()
-                .antMatchers("/login").anonymous()
-                .antMatchers("/admin/**").hasRole("ROLE_ADMIN")
-                .antMatchers("/**").authenticated()
+            .and().authorizeHttpRequests()
+                .requestMatchers("/login").anonymous()
+                .requestMatchers("/").anonymous()
+                // Role based routes
+                .requestMatchers("/profile/**").hasRole("USER")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                // Public routes
+                .requestMatchers("/css/**", "/js/**", "/img/**", "/favicon.ico", "/403").permitAll()
+                .requestMatchers("/**").permitAll()
             .and().formLogin()
+                .loginPage("/login")
                 .usernameParameter("username")
                 .passwordParameter("password")
                 .defaultSuccessUrl("/", false)
-                .loginPage("/login")
             .and().rememberMe()
                 .rememberMeParameter("rememberme")
                 .userDetailsService(userDetailsService)
-                .key("mysupersecretketthatnobodyknowsabout")
+                .key("mysupersecretkeythatnobodyknowsabout")
                 .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30))
             .and().logout()
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login")
+                .permitAll()
             .and().exceptionHandling()
                 .accessDeniedPage("/403")
-            .and().csrf().disable();
+            .and()
+            .csrf().disable();
 
         return http.build();
     }

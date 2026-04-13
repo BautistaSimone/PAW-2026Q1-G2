@@ -50,6 +50,4 @@ public class TestConfiguration {
         populator.addScript(new ClassPathResource("test_schema.sql")); // Use slightly different schema(HSQLDB doesn't support BYTEA)
         return populator;
     }
-
-
 }
