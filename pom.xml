@@ -30,6 +30,8 @@
     <ch.qos.logback.version>1.2.6</ch.qos.logback.version>
     <javax.validation.version>2.0.1.Final</javax.validation.version>
     <hibernate.validator.version>6.2.4.Final</hibernate.validator.version>
+    <spring-security.version>5.3.13.RELEASE</spring-security.version>
+    <bcrypt.version>0.10.2</bcrypt.version>
   </properties>
 
   <dependencyManagement>
@@ -152,6 +154,33 @@
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>${ch.qos.logback.version}</version>
+      </dependency>
+
+      <!-- Spring Security -->
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-core</artifactId>
+        <version>${spring-security.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-web</artifactId>
+        <version>${spring-security.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-config</artifactId>
+        <version>${spring-security.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-crypto</artifactId>
+        <version>${spring-security.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>at.favre.lib</groupId>
+        <artifactId>bcrypt</artifactId>
+        <version>${bcrypt.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
