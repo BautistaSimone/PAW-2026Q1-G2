@@ -77,10 +77,19 @@ public class HomeController {
 			}
 		}
 
+		final String trimmedSearch = searchText != null ? searchText.trim() : "";
+		final boolean hasActiveSearch = !trimmedSearch.isEmpty();
+		final boolean hasActiveFilters = hasActiveSearch
+			|| (categoryIds != null && !categoryIds.isEmpty())
+			|| minPrice != null
+			|| maxPrice != null
+			|| (recordLabels != null && !recordLabels.isEmpty())
+			|| !buckets.isEmpty();
+
 		final ProductSortOrder sortOrder = ProductSortOrder.parse(sortParam).orElse(ProductSortOrder.NEWEST);
 
 		final ProductSearchCriteria criteria = new ProductSearchCriteria(
-			searchText,
+			hasActiveSearch ? trimmedSearch : null,
 			categoryIds,
 			minPrice,
 			maxPrice,
@@ -129,6 +138,8 @@ public class HomeController {
 		mav.addObject("filterMaxPrice", maxPriceParam != null ? maxPriceParam : "");
 		mav.addObject("sortOptions", ProductSortOrder.values());
 		mav.addObject("selectedSort", sortOrder.name());
+		mav.addObject("activeSearchText", hasActiveSearch ? trimmedSearch : null);
+		mav.addObject("noProductsMatchFilters", products.isEmpty() && hasActiveFilters);
 		return mav;
 	}
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -58,6 +59,15 @@ public class ProductJdbcDao implements ProductDao {
 
     private static String normalizeRecordLabel(final String recordLabel) {
         return recordLabel == null ? "" : recordLabel.trim();
+    }
+
+    /**
+     * Escapes {@code \}, {@code %} and {@code _} for use inside a LIKE pattern with {@code ESCAPE '\\'}.
+     */
+    private static String escapeForLike(final String raw) {
+        return raw.replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_");
     }
 
     private static void appendConditionBucketSql(final StringBuilder sql, final ConditionBucket bucket) {
@@ -185,13 +195,15 @@ public class ProductJdbcDao implements ProductDao {
         final List<Object> args = new ArrayList<>();
 
         if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
+            final String likeNeedle = escapeForLike(criteria.getSearchText().trim()).toLowerCase(Locale.ROOT);
             sql.append(" AND (");
-            sql.append("LOWER(p.title) LIKE LOWER(CONCAT('%', ?, '%')){escape '%'} OR ");
-            sql.append("LOWER(p.description) LIKE LOWER(CONCAT('%', ?, '%')){escape '%'}");
+            sql.append("LOWER(p.title) LIKE '%' || ? || '%' ESCAPE '\\' OR ");
+            sql.append("LOWER(p.artist) LIKE '%' || ? || '%' ESCAPE '\\' OR ");
+            sql.append("LOWER(p.description) LIKE '%' || ? || '%' ESCAPE '\\'");
             sql.append(")");
-            String searchText = criteria.getSearchText().trim().replace("%", "%%").replace("_", "%_");
-            args.add(searchText);
-            args.add(searchText);
+            args.add(likeNeedle);
+            args.add(likeNeedle);
+            args.add(likeNeedle);
         }
 
         if (!criteria.getCategoryIds().isEmpty()) {

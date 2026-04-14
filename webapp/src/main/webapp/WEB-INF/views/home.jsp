@@ -29,7 +29,14 @@
 
                 <section class="products-content-column">
                     <div class="products-header">
-                        <h2 class="products-count m-0"><c:out value="${fn:length(products)}" /> productos</h2>
+                        <div class="products-header-titles">
+                            <h2 class="products-count m-0"><c:out value="${fn:length(products)}" /> productos</h2>
+                            <c:if test="${not empty activeSearchText}">
+                                <p class="products-search-context m-0" role="status">
+                                    Resultados para <span class="products-search-query">"<c:out value="${activeSearchText}" />"</span>
+                                </p>
+                            </c:if>
+                        </div>
                         <div class="products-header-actions">
                             <select id="sortSelect" class="sort-select" aria-label="Ordenar por">
                                 <c:forEach items="${sortOptions}" var="opt">
@@ -61,7 +68,14 @@
                         </c:when>
                         <c:otherwise>
                             <div class="alert alert-secondary" role="alert">
-                                Todavia no hay productos cargados. Publica un vinilo para probar el alta.
+                                <c:choose>
+                                    <c:when test="${noProductsMatchFilters}">
+                                        No hay productos que coincidan con tu búsqueda o filtros.
+                                    </c:when>
+                                    <c:otherwise>
+                                        Todavia no hay productos cargados. Publica un vinilo para probar el alta.
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                         </c:otherwise>
                     </c:choose>

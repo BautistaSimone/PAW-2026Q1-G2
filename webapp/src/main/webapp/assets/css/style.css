@@ -2101,16 +2101,35 @@ a.clear-filters-btn {
 .products-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     flex-wrap: wrap;
     gap: 1rem;
     margin-bottom: 2rem;
+}
+
+.products-header-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.products-search-context {
+    font-size: 0.95rem;
+    color: #6c757d;
+    line-height: 1.35;
+}
+
+.products-search-query {
+    color: var(--color-text-main, #264653);
+    font-weight: 600;
 }
 
 .products-header-actions {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    align-self: center;
 }
 
 .sort-select {

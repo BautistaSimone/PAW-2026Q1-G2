@@ -1,35 +1,24 @@
 (function () {
-    const form = document.querySelector('form.navbar-search');
+    const form = document.querySelector('form.search-form');
     const searchInput = document.getElementById('search-input');
-
-    // Get last search
-    const urlParams = new URL(window.location.toLocaleString()).searchParams;
-    const currentSearch = urlParams.get('search-text');
-    console.log(currentSearch);
-
-    // Show last search
-    if (searchInput && currentSearch) {
-        searchInput.setAttribute('value', currentSearch);
+    if (!searchInput) {
+        return;
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentSearch = urlParams.get('search-text');
+    if (currentSearch && !searchInput.value) {
+        searchInput.value = currentSearch;
+    }
 
-    if (!form || !searchInput) return;
+    if (!form) {
+        return;
+    }
 
-    // Prevent empty search submissions
     form.addEventListener('submit', function (e) {
         const query = searchInput.value.trim();
         if (!query) {
-            e.preventDefault();  // stop submission
-            // TODO: Error handling
-        }
-    });
-
-    const searchButton = document.getElementById('search-button');
-    searchButton.addEventListener('click', function () {
-        const query = searchInput.value.trim();
-        if (!query) {
-            // TODO: Error handling
-            searchInput.focus();
+            e.preventDefault();
         }
     });
 })();

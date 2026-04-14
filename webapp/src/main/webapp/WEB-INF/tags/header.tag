@@ -1,6 +1,8 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<c:set var="headerSearchText" value="${param['search-text']}" />
+
 <link rel="stylesheet" href="<c:url value="/assets/css/style.css"/>">
 
 <header class="header-bbdiscos">
@@ -19,7 +21,8 @@
                         class="search-input" 
                         type="text" 
                         placeholder="Buscar vinilos..."
-                        aria-label="Search">
+                        aria-label="Buscar vinilos"
+                        value="<c:out value='${headerSearchText}' />">
                     <button id="search-button" class="search-btn" type="submit" aria-label="Buscar">
                         <i class="bi bi-search" aria-hidden="true"></i>
                     </button>
@@ -34,4 +37,4 @@
 </header>
 
 <!-- Scripts -->
-<script src="<c:url value="${pageContext.request.contextPath}/assets/js/search.js"/>"></script> 
+<script src="<c:url value="/assets/js/search.js"/>"></script>
