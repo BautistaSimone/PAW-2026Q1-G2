@@ -3,47 +3,56 @@
 <%@ attribute name="method" required="true" %>
 <%@ attribute name="buttonLabel" required="true" %>
 
-<%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<form action="${action}" method="${method}" class="p-4 border rounded shadow-sm bg-light">
+<form:form modelAttribute="loginForm"
+           action="${action}"
+           method="${method}"
+           class="p-4 border rounded shadow-sm bg-light">
 
-    <!-- email -->
+    <!-- Email -->
     <div class="mb-3">
-        <label for="email" class="form-label">email / Email</label>
-        <input
-            type="text"
-            name="email"
+        <label for="email" class="form-label">Email</label>
+
+        <form:input
+            path="email"
             id="email"
-            class="form-control"
-            placeholder="Enter email or email"
-            autocomplete="email"
-            required />
+            cssClass="form-control"
+            placeholder="Enter email"
+            autocomplete="email" />
+
+        <form:errors path="email" cssClass="text-danger small"/>
     </div>
 
     <!-- Password -->
     <div class="mb-3">
         <label for="password" class="form-label">Password</label>
-        <input
-            type="password"
-            name="password"
+
+        <form:password
+            path="password"
             id="password"
-            class="form-control"
+            cssClass="form-control"
             placeholder="Enter password"
-            autocomplete="current-password"
-            required />
+            autocomplete="current-password" />
+
+        <form:errors path="password" cssClass="text-danger small"/>
     </div>
 
     <!-- Remember Me -->
     <div class="form-check mb-3">
-        <input
-            class="form-check-input"
-            type="checkbox"
-            value="true"
+        <form:checkbox
+            path="rememberMe"
             id="rememberMe"
-            name="rememberMe">
+            cssClass="form-check-input" />
+
         <label class="form-check-label" for="rememberMe">
             Remember me
         </label>
+    </div>
+
+    <!-- Global errors -->
+    <div class="mb-3">
+        <form:errors path="*" cssClass="text-danger"/>
     </div>
 
     <!-- Submit -->
@@ -53,4 +62,11 @@
         </button>
     </div>
 
-</form>
+    <!-- Not registered link -->
+    <div class="text-center mt-3">
+        <a href="${pageContext.request.contextPath}/register">
+            Not registered? Create an account
+        </a>
+    </div>
+
+</form:form>

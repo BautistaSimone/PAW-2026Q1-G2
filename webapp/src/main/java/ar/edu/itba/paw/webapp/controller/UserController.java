@@ -63,11 +63,11 @@ public class UserController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ModelAndView createUser(@ModelAttribute RegisterForm form, 
+    public ModelAndView createUser(@Valid @ModelAttribute RegisterForm form, 
         final BindingResult errors) {
 
         if (errors.hasErrors()) {
-            return register(form);
+            return new ModelAndView("register");
         }
 
         LOGGER.atDebug().addArgument(form.getEmail()).log("About to attempt register email {}");
@@ -86,7 +86,7 @@ public class UserController {
             authorities,
             user
         );
-        
+
         Authentication auth = new UsernamePasswordAuthenticationToken(
             authUser,
             null,
