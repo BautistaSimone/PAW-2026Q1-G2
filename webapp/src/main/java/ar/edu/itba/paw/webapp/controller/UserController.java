@@ -23,17 +23,23 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.webapp.forms.RegisterForm;
+import ar.edu.itba.paw.webapp.forms.LoginForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.models.User;
 
 
 @Controller
 public class UserController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
 
@@ -44,14 +50,16 @@ public class UserController {
 
 	@RequestMapping(value = "/login")
 	public ModelAndView login() {
-		return new ModelAndView("login");
+        ModelAndView mv = new ModelAndView("login");
+        mv.addObject("loginForm", new LoginForm());
+        return mv;
 	}
 
 	@RequestMapping(value = "/register")
 	public ModelAndView register(@ModelAttribute RegisterForm form) {
-
-        // Return the form too so the user won't have to write it again
-        return new ModelAndView("login");
+        ModelAndView mv = new ModelAndView("register");
+        mv.addObject("registerForm", form);
+        return mv;
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
@@ -61,6 +69,8 @@ public class UserController {
         if (errors.hasErrors()) {
             return register(form);
         }
+
+        LOGGER.atDebug().addArgument(form.getEmail()).log("About to attempt register email {}");
 
         final User user = userService.createUser(form.getEmail(), form.getPassword(), form.getUsername(), false);
 
@@ -76,7 +86,12 @@ public class UserController {
             authorities,
             user
         );
-        Authentication auth = new UsernamePasswordAuthenticationToken(authUser, authUser.getPassword());
+        
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+            authUser,
+            null,
+            authorities
+        );
 
         SecurityContextHolder.getContext().setAuthentication(auth);
 

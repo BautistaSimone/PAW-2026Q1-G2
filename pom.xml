@@ -26,8 +26,8 @@
     <org.hsqldb.version>2.3.1</org.hsqldb.version>
     <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
     <javax.mail.version>1.6.2</javax.mail.version>
-    <org.slf4j.version>1.7.30</org.slf4j.version>
-    <ch.qos.logback.version>1.2.6</ch.qos.logback.version>
+    <org.slf4j.version>2.0.9</org.slf4j.version>
+    <ch.qos.logback.version>1.4.14</ch.qos.logback.version>
     <javax.validation.version>2.0.1.Final</javax.validation.version>
     <hibernate.validator.version>6.2.4.Final</hibernate.validator.version>
     <spring-security.version>5.8.0</spring-security.version>

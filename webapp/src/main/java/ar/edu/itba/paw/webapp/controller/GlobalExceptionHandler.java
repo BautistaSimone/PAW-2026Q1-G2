@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
+import ar.edu.itba.paw.webapp.exception.AccessDeniedException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -26,6 +27,15 @@ public class GlobalExceptionHandler {
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("errorCode", "400");
         mav.addObject("errorMessage", "Petición inválida.");
+        return mav;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ModelAndView handleForbidden(final AccessDeniedException e) {
+        final ModelAndView mav = new ModelAndView("error");
+        mav.addObject("errorCode", "403");
+        mav.addObject("errorMessage", "No tienes permisos para acceder a esta página.");
         return mav;
     }
 

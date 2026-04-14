@@ -6,11 +6,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ar.edu.itba.paw.persistence.UserDao;
 import ar.edu.itba.paw.models.User;
 
 @Service
 public class UserServiceImpl implements UserService{
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+
 	private UserDao userDao;
     private final PasswordEncoder passwordEncoder;
 
@@ -25,7 +31,10 @@ public class UserServiceImpl implements UserService{
 
 		// Encode password before storing
 		final String encodedPassword = passwordEncoder.encode(password);
-		return userDao.createUser(email, password, username, mod);
+
+        LOGGER.atDebug().addArgument(encodedPassword).log("About to attempt register user {}");
+
+		return userDao.createUser(email, encodedPassword, username, mod);
 	}
 
 	@Override

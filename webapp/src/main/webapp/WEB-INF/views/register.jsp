@@ -3,16 +3,15 @@
 
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 
-<ui:layout title="Vinyland | Login">
+<ui:layout title="Vinyland | Register">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-12 col-md-6 col-lg-4">
-                <ui:login-form 
-                    action="${pageContext.request.contextPath}/login"
+                <ui:register-form 
+                    action="${pageContext.request.contextPath}/register"
                     method="POST"
-                    buttonLabel="Login"
+                    buttonLabel="Register"
                 />
-
             </div>
         </div>
     </div>
