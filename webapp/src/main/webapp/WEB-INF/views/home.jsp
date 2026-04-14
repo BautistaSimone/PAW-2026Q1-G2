@@ -30,7 +30,16 @@
                 <section class="products-content-column">
                     <div class="products-header">
                         <h2 class="products-count m-0"><c:out value="${fn:length(products)}" /> productos</h2>
-                        <a href="<c:url value='/products/new'/>" class="btn btn-dark">Publicar vinilo</a>
+                        <div class="products-header-actions">
+                            <select id="sortSelect" class="sort-select" aria-label="Ordenar por">
+                                <c:forEach items="${sortOptions}" var="opt">
+                                    <option value="${opt.name()}" ${opt.name() eq selectedSort ? 'selected' : ''}>
+                                        <c:out value="${opt.label}" />
+                                    </option>
+                                </c:forEach>
+                            </select>
+                            <a href="<c:url value='/products/new'/>" class="btn btn-dark">Publicar vinilo</a>
+                        </div>
                     </div>
 
                     <c:choose>
@@ -60,4 +69,17 @@
             </div>
         </div>
     </div>
+
+    <script>
+    (function () {
+        var sortSelect = document.getElementById('sortSelect');
+        if (!sortSelect) return;
+
+        sortSelect.addEventListener('change', function () {
+            var params = new URLSearchParams(window.location.search);
+            params.set('sort', sortSelect.value);
+            window.location.search = params.toString();
+        });
+    })();
+    </script>
 </ui:layout>

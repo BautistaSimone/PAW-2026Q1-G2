@@ -231,7 +231,7 @@ public class ProductJdbcDao implements ProductDao {
             sql.append(") ");
         }
 
-        sql.append(" ORDER BY p.published DESC, p.product_id DESC ");
+        sql.append(" ORDER BY ").append(criteria.getSortOrder().getSqlOrderBy()).append(' ');
 
         final List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql.toString(), args.toArray());
         return rows.stream().map(this::mapProductFromRow).collect(Collectors.toList());

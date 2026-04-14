@@ -18,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ar.edu.itba.paw.models.ConditionBucket;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
+import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductService;
@@ -58,7 +59,8 @@ public class HomeController {
 		@RequestParam(value = "minPrice", required = false) final String minPriceParam,
 		@RequestParam(value = "maxPrice", required = false) final String maxPriceParam,
 		@RequestParam(value = "label", required = false) final List<String> recordLabels,
-		@RequestParam(value = "estado", required = false) final List<String> estadoParams
+		@RequestParam(value = "estado", required = false) final List<String> estadoParams,
+		@RequestParam(value = "sort", required = false) final String sortParam
 	) {
 		BigDecimal minPrice = parsePriceParam(minPriceParam);
 		BigDecimal maxPrice = parsePriceParam(maxPriceParam);
@@ -75,13 +77,16 @@ public class HomeController {
 			}
 		}
 
+		final ProductSortOrder sortOrder = ProductSortOrder.parse(sortParam).orElse(ProductSortOrder.NEWEST);
+
 		final ProductSearchCriteria criteria = new ProductSearchCriteria(
 			searchText,
 			categoryIds,
 			minPrice,
 			maxPrice,
 			recordLabels,
-			buckets
+			buckets,
+			sortOrder
 		);
 
 		final List<Product> products = productService.listProducts(criteria);
@@ -122,6 +127,8 @@ public class HomeController {
 		mav.addObject("selectedEstados", selectedEstados);
 		mav.addObject("filterMinPrice", minPriceParam != null ? minPriceParam : "");
 		mav.addObject("filterMaxPrice", maxPriceParam != null ? maxPriceParam : "");
+		mav.addObject("sortOptions", ProductSortOrder.values());
+		mav.addObject("selectedSort", sortOrder.name());
 		return mav;
 	}
 }

@@ -73,6 +73,7 @@
 </style>
 
 <form class="filters-bar" method="get" action="<c:url value="/"/>" novalidate>
+    <input type="hidden" name="sort" value="<c:out value="${selectedSort}" />" />
     <div class="filters-header">
         <h3 class="filters-title">Filtros</h3>
         <a href="<c:url value="/"/>" class="clear-filters-btn">Limpiar todo</a>
