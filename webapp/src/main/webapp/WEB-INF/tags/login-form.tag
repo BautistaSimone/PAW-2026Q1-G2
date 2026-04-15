@@ -3,6 +3,8 @@
 <%@ attribute name="method" required="true" %>
 <%@ attribute name="buttonLabel" required="true" %>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix = "spring" uri = "http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <div class="container">
@@ -53,10 +55,12 @@
                     </label>
                 </div>
 
-                <!-- Global errors -->
-                <div class="mb-3">
-                    <form:errors path="*" cssClass="text-danger"/>
-                </div>
+                <!-- Error message -->
+                <c:if test="${param.error != null}">
+                    <div class="text-danger">
+                        <spring:message code = "Error.authForm.input" />
+                    </div>
+                </c:if>
 
                 <!-- Submit -->
                 <div class="d-grid">
