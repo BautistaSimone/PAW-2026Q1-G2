@@ -2,17 +2,24 @@ package ar.edu.itba.paw.webapp.forms;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-
+import javax.validation.constraints.Pattern;
 
 public class LoginForm {
 
-    @Email
-    @NotBlank
+    @Email(message = "{Email.authForm.email}")
+    @NotBlank(message = "{NotBlank.authForm.email}")
+    @NotEmpty(message = "{NotEmpty.authForm.email}")
+    @Size(max = 254)
     private String email;
 
-    @NotBlank
-    @Size(min = 6, max = 100)
+    @NotBlank(message = "{NotBlank.authForm.password}")
+    @Size(min = 8, max = 100, message = "{Size.authForm.password}")
+    @Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$",
+        message = "{Pattern.authForm.password}"
+    )
     private String password;
     private boolean rememberMe;
 

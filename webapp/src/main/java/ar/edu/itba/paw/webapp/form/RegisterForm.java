@@ -2,32 +2,35 @@ package ar.edu.itba.paw.webapp.forms;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.Pattern;
 
 public class RegisterForm {
 
-    @Email
-    @NotBlank
+    @Email(message = "{Email.authForm.email}")
+    @NotBlank(message = "{NotBlank.authForm.email}")
+    @NotEmpty(message = "{NotEmpty.authForm.email}")
     @Size(max = 254)
     private String email;
 
-    @NotBlank
-    @Size(min = 3, max = 30)
+    @NotBlank(message = "{NotBlank.authForm.username}")
+    @Size(min = 3, max = 30, message = "{Size.authForm.username}")
     @Pattern(
-        regexp = "^[a-zA-Z0-9_.-]+$"
+        regexp = "^[a-zA-Z0-9_.-]+$", 
+        message = "{Pattern.authForm.username}"
     )
     private String username;
 
-    @NotBlank
-    @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
+    @NotBlank(message = "{NotBlank.authForm.password}")
+    @Size(min = 8, max = 100, message = "{Size.authForm.password}")
     @Pattern(
         regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$",
-        message = "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+        message = "{Pattern.authForm.password}"
     )
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "{NotBlank.authForm.password}")
     private String confirmPassword;
 
     public RegisterForm() {}
