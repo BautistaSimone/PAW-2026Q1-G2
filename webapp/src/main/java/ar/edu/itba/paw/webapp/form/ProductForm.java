@@ -38,6 +38,10 @@ public class ProductForm {
     @NotEmpty
     private List<Long> categories;
 
+    @NotBlank
+    @Email
+    private String sellerEmail;
+
     @NotNull
     @DecimalMin("1.0")
     @DecimalMax("10.0")
@@ -111,6 +115,14 @@ public class ProductForm {
 
     public void setCategories(List<Long> categories) {
         this.categories = categories;
+    }
+
+    public String getSellerEmail() {
+        return sellerEmail;
+    }
+
+    public void setSellerEmail(String sellerEmail) {
+        this.sellerEmail = sellerEmail;
     }
 
     public BigDecimal getSleeveCondition() {

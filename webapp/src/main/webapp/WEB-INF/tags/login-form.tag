@@ -72,7 +72,7 @@
                 <!-- Not registered link -->
                 <div class="text-center mt-3">
                     <a href="${pageContext.request.contextPath}/register">
-                        Not registered? Create an account
+                        <spring:message code = "NotRegistered.loginForm" />
                     </a>
                 </div>
 
