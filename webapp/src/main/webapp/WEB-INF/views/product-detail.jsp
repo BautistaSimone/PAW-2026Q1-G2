@@ -136,7 +136,6 @@
                         <c:url var="purchasePostUrl" value='/purchases'/>
                         <form:form modelAttribute="purchaseCreateForm" action="${purchasePostUrl}" method="POST" cssClass="d-flex w-100 flex-column gap-2">
                             <input type="hidden" name="productId" value="${product.id}" />
-                            <form:errors path="buyerEmail" cssClass="text-danger" element="div" />
                             <button type="submit" class="btn btn-retro btn-retro-dark btn-lg w-100">
                                 <i class="bi bi-cart-plus" aria-hidden="true"></i> Iniciar Compra
                             </button>
