@@ -5,7 +5,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.Pattern;
+import ar.edu.itba.paw.webapp.validation.FieldMatch;
 
+@FieldMatch(
+    first = "password", 
+    second = "confirmPassword", 
+    message = "{Mismatch.authForm.password}"
+)
 public class RegisterForm {
 
     @Email(message = "{Email.authForm.email}")
