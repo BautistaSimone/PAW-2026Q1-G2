@@ -91,13 +91,32 @@
     <script>
     (function () {
         var sortSelect = document.getElementById('sortSelect');
-        if (!sortSelect) return;
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function () {
+                var params = new URLSearchParams(window.location.search);
+                params.set('sort', sortSelect.value);
+                window.location.search = params.toString();
+            });
+        }
 
-        sortSelect.addEventListener('change', function () {
-            var params = new URLSearchParams(window.location.search);
-            params.set('sort', sortSelect.value);
-            window.location.search = params.toString();
-        });
+        var filterBar = document.querySelector('.filters-bar');
+        if (filterBar) {
+            var adjustSticky = function() {
+                var viewportHeight = window.innerHeight;
+                var filterHeight = filterBar.offsetHeight;
+                if (filterHeight > viewportHeight - 120) {
+                    var topVal = viewportHeight - filterHeight - 20;
+                    filterBar.style.top = topVal + 'px';
+                } else {
+                    filterBar.style.top = '100px';
+                }
+            };
+            window.addEventListener('resize', adjustSticky);
+            if (window.ResizeObserver) {
+                new ResizeObserver(adjustSticky).observe(filterBar);
+            }
+            adjustSticky();
+        }
     })();
     </script>
 </ui:layout>

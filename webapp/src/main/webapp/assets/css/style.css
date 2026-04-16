@@ -1478,27 +1478,9 @@ body {
     position: sticky;
     top: 100px;
     margin-bottom: 2rem;
-    max-height: calc(100vh - 120px);
-    overflow-y: auto;
 }
 
-.filters-bar::-webkit-scrollbar {
-    width: 6px;
-}
 
-.filters-bar::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-.filters-bar::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 10px;
-}
-
-.filters-bar::-webkit-scrollbar-thumb:hover {
-    background: #aaa;
-}
 
 .filters-header {
     display: flex;
