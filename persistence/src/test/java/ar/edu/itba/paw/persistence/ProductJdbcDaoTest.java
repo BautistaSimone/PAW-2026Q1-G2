@@ -111,6 +111,7 @@ public class ProductJdbcDaoTest {
             null,
             Collections.emptyList(),
             Collections.emptyList(),
+            null,
             null
         );
         final List<Product> found = productDao.findProducts(criteria);
@@ -144,6 +145,7 @@ public class ProductJdbcDaoTest {
             null,
             Collections.emptyList(),
             Collections.emptyList(),
+            null,
             null
         );
         Assertions.assertTrue(productDao.findProducts(criteria).isEmpty());

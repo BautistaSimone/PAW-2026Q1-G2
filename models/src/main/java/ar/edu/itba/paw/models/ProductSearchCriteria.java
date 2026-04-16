@@ -15,6 +15,7 @@ public final class ProductSearchCriteria {
         null,
         Collections.emptyList(),
         Collections.emptyList(),
+        null,
         null
     );
 
@@ -25,6 +26,7 @@ public final class ProductSearchCriteria {
     private final List<String> recordLabels;
     private final List<ConditionBucket> conditionBuckets;
     private final ProductSortOrder sortOrder;
+    private final Long userId;
 
     public ProductSearchCriteria(
         final String searchText,
@@ -33,7 +35,8 @@ public final class ProductSearchCriteria {
         final BigDecimal maxPrice,
         final List<String> recordLabels,
         final List<ConditionBucket> conditionBuckets,
-        final ProductSortOrder sortOrder
+        final ProductSortOrder sortOrder,
+        final Long userId
     ) {
         this.searchText = searchText;
         this.categoryIds = categoryIds == null ? Collections.emptyList() : List.copyOf(categoryIds);
@@ -49,6 +52,7 @@ public final class ProductSearchCriteria {
                 .collect(Collectors.toUnmodifiableList());
         this.conditionBuckets = conditionBuckets == null ? Collections.emptyList() : List.copyOf(conditionBuckets);
         this.sortOrder = sortOrder == null ? ProductSortOrder.NEWEST : sortOrder;
+        this.userId = userId;
     }
 
     public static ProductSearchCriteria empty() {
@@ -81,5 +85,9 @@ public final class ProductSearchCriteria {
 
     public ProductSortOrder getSortOrder() {
         return sortOrder;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 }

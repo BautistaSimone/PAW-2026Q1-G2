@@ -5,6 +5,9 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <ui:layout title="Vinyland | ${product.title}">
+
+    <ui:header />
+
     <div class="container py-4">
         <c:if test="${param.created eq '1'}">
             <div class="alert alert-success" role="alert">

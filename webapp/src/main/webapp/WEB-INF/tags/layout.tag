@@ -26,8 +26,6 @@
 </head>
 <body class="${not empty bodyClass ? bodyClass : ''}">
 <div class="app-container">
-    <ui:sidebar />
-    <ui:header />
     <main class="page-content">
         <jsp:doBody />
     </main>

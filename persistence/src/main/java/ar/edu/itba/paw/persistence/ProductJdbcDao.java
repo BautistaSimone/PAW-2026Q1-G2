@@ -243,6 +243,11 @@ public class ProductJdbcDao implements ProductDao {
             sql.append(") ");
         }
 
+        if (criteria.getUserId() != null) {
+            sql.append(" AND p.user_id = ? ");
+            args.add(criteria.getUserId());
+        }
+
         sql.append(" ORDER BY ").append(criteria.getSortOrder().getSqlOrderBy()).append(' ');
 
         final List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql.toString(), args.toArray());

@@ -95,7 +95,8 @@ public class HomeController {
 			maxPrice,
 			recordLabels,
 			buckets,
-			sortOrder
+			sortOrder,
+			null
 		);
 
 		final List<Product> products = productService.listProducts(criteria);

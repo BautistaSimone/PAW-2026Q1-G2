@@ -5,6 +5,10 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <ui:layout title="Vinyland | Productos">
+
+    <ui:sidebar />
+    <ui:header showHeaderActions="true"/>
+
     <div class="products-section">
         <div class="container-fluid products-shell">
             <c:if test="${param.created eq '1'}">

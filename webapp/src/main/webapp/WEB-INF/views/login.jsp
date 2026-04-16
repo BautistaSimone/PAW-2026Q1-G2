@@ -4,6 +4,8 @@
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 
 <ui:layout title="Vinyland | Login">
+
+    <ui:header showHeaderActions="false"/>
     <ui:login-form 
         action="${pageContext.request.contextPath}/login"
         method="POST"

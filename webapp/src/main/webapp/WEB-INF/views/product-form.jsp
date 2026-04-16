@@ -4,6 +4,9 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <ui:layout title="Vinyland | Publicar vinilo">
+
+    <ui:header />
+
     <div class="sell-page">
         <div class="container py-5">
             <div class="sell-form-card">

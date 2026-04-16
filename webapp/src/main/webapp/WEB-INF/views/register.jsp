@@ -4,6 +4,7 @@
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 
 <ui:layout title="Vinyland | Register">
+    <ui:header showHeaderActions="false"/>
     <ui:register-form 
         action="${pageContext.request.contextPath}/register"
         method="POST"

@@ -5,21 +5,18 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <ui:layout title="Vinyland | Productos">
+
+    <ui:header showHeaderActions="true"/>
+    
     <div class="profile-section">
         <div class="container-fluid profile-shell">
-
-            <c:if test="${param.updated eq '1'}">
-                <div class="alert alert-success" role="alert">
-                    El perfil se actualizó correctamente.
-                </div>
-            </c:if>
 
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
                         <a href="<c:url value="/"/>">Inicio</a>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">Mi perfil</li>
+                    <li class="breadcrumb-item active" aria-current="page">Perfil</li>
                 </ol>
             </nav>
 
@@ -27,9 +24,6 @@
                 <!-- Sidebar -->
                 <aside class="profile-sidebar-column">
                     <div class="profile-card">
-                        <div class="profile-avatar">
-                            <img src="${user.avatarUrl}" alt="Avatar" class="img-fluid rounded-circle"/>
-                        </div>
                         <div class="profile-info">
                             <h3 class="profile-name m-0">
                                 <c:out value="${user.username}" />

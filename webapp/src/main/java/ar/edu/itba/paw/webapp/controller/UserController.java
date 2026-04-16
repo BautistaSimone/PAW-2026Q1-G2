@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.controller;
 
 import java.math.BigDecimal;
 import java.io.File;
+import java.util.Collections;
 
 import javax.validation.Valid;
 
@@ -31,10 +32,12 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import ar.edu.itba.paw.services.UserService;
+import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.webapp.forms.RegisterForm;
 import ar.edu.itba.paw.webapp.forms.LoginForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.ProductSearchCriteria;
 
 
 @Controller
@@ -43,10 +46,12 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
+    private final ProductService productService;
 
     @Autowired
-    public UserController(final UserService userService) {
+    public UserController(final UserService userService, final ProductService productService) {
         this.userService = userService;
+        this.productService = productService;
     }
 
 	@RequestMapping(value = "/login")
@@ -109,8 +114,21 @@ public class UserController {
         User user = authUser.getUser();
 
         ModelAndView mv = new ModelAndView("profile");
+
+        // Get the products corresponding to out user
+		final ProductSearchCriteria criteria = new ProductSearchCriteria(
+            null,
+            Collections.emptyList(),
+            null,
+            null,
+            Collections.emptyList(),
+            Collections.emptyList(),
+            null,
+            user.getId()
+		);
+
         mv.addObject("user", user);
-        //mv.addObject("userProducts", userService.getUserProducts(user.getId()));
+        mv.addObject("userProducts", productService.listProducts(criteria));
         //mv.addObject("productImageUrls", userService.getUserProductImages(user.getId()));
 
         return mv;
