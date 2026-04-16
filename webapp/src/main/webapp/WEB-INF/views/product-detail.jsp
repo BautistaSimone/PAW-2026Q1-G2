@@ -16,51 +16,45 @@
             </div>
         </c:if>
 
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="<c:url value='/'/>">Inicio</a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page"><c:out value='${product.title}'/></li>
-            </ol>
-        </nav>
-
-        <div class="product-detail-header">
-            <a class="product-detail-back" href="<c:url value='/'/>">
-                <i class="bi bi-arrow-left" aria-hidden="true"></i>
-                Volver
+        <div class="mb-4">
+            <a href="<c:url value='/'/>" style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--color-accent)';" onmouseout="this.style.color='var(--color-text-muted)';">
+                <i class="bi bi-arrow-left" aria-hidden="true" style="font-size: 1.1rem;"></i> <span>Volver</span>
             </a>
         </div>
 
-        <div class="row g-4">
+        <div class="row g-5">
+            <!-- Left Side: Image Gallery -->
             <div class="col-lg-6 mb-4">
                 <div id="productDetailGallery" class="product-detail-gallery">
-                    <div class="product-gallery-main">
+                    <div class="product-gallery-main" style="background: linear-gradient(135deg, #ffffff 0%, #f4f1ec 100%); border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,1); padding: 1rem; position: relative;">
                         <c:choose>
                             <c:when test="${not empty productImageUrl}">
                                 <img id="productGalleryMain"
                                      src="<c:url value='${productImageUrl}'/>"
                                      alt="<c:out value='${product.artist}'/> — <c:out value='${product.title}'/>"
-                                     class="product-gallery-main-img" />
+                                     class="product-gallery-main-img" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
                             </c:when>
                             <c:otherwise>
                                 <img id="productGalleryMain"
                                      src="https://via.placeholder.com/600x600?text=Sin+imagen"
                                      alt="<c:out value='${product.artist}'/> — <c:out value='${product.title}'/>"
-                                     class="product-gallery-main-img" />
+                                     class="product-gallery-main-img" style="border-radius: 12px;" />
                             </c:otherwise>
                         </c:choose>
                     </div>
                     <c:if test="${not empty productImages}">
-                        <div class="product-gallery-thumbs" role="group" aria-label="Galeria de imagenes del producto">
+                        <div class="product-gallery-thumbs mt-4" role="group" aria-label="Galeria de imagenes del producto">
                             <c:forEach items="${productImages}" var="img" varStatus="st">
                                 <c:url var="galleryImgUrl" value="/images/${img.imageId}" />
                                 <button type="button"
                                         class="product-gallery-thumb<c:if test='${st.first}'> is-active</c:if>"
                                         data-full-src="${galleryImgUrl}"
+                                        style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.2s;"
+                                        onmouseover="this.style.transform='scale(1.05)'"
+                                        onmouseout="this.style.transform='scale(1)'"
                                         aria-label="Ver imagen ${st.index + 1} de ${fn:length(productImages)}"
                                         aria-pressed="${st.first}">
-                                    <img src="<c:url value='${galleryImgUrl}'/>" alt="" loading="lazy" />
+                                    <img src="<c:url value='${galleryImgUrl}'/>" alt="" loading="lazy" style="border-radius: 8px;" />
                                 </button>
                             </c:forEach>
                         </div>
@@ -68,83 +62,108 @@
                 </div>
             </div>
 
+            <!-- Right Side: Details -->
             <div class="col-lg-6">
-                <div style="background: var(--color-card-bg); border-radius: var(--radius-xl); padding: 2rem; border: 1.5px solid var(--color-border); box-shadow: var(--shadow-sm);">
-                    <h1 style="font-family: var(--font-heading); font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem;"><c:out value="${product.title}"/></h1>
-                    <h2 style="font-size: 1.1rem; font-weight: 400; color: var(--color-text-muted); margin-bottom: 1rem;"><c:out value="${product.artist}"/></h2>
+                <!-- Main Info Card -->
+                <div style="background: #ffffff; border-radius: 24px; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; margin-bottom: 2rem;">
+                    <!-- Decorative accent top -->
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--color-accent) 0%, #ff9f43 100%);"></div>
 
-                    <div style="margin-bottom: 1.25rem;">
-                        <c:if test="<c:out value='${not empty product.recordLabel}'/>">
-                            <p style="color: var(--color-text-muted); margin-bottom: 0.3rem; font-size: 0.92rem;">
-                                <span style="font-weight: 600;">Sello:</span>
-                                <c:out value="${product.recordLabel}" />
-                            </p>
-                        </c:if>
-                        <c:if test="<c:out value='${not empty product.catalogNumber}'/>">
-                            <p style="color: var(--color-text-muted); margin-bottom: 0.3rem; font-size: 0.92rem;">
-                                <span style="font-weight: 600;">Catalogo:</span>
-                                <c:out value="${product.catalogNumber}" />
-                            </p>
-                        </c:if>
-                        <c:if test="<c:out value='${not empty product.editionCountry}'/>">
-                            <p style="color: var(--color-text-muted); margin-bottom: 0.3rem; font-size: 0.92rem;">
-                                <span style="font-weight: 600;">Pais:</span>
-                                <c:out value="${product.editionCountry}" />
-                            </p>
-                        </c:if>
-                    </div>
+                    <h1 style="font-family: var(--font-heading); font-size: 2.5rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--color-text-main); line-height: 1.1;"><c:out value="${product.title}"/></h1>
+                    <h2 style="font-size: 1.25rem; font-weight: 500; color: var(--color-text-muted); margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="bi bi-mic" style="color: var(--color-accent); opacity: 0.7;"></i> <c:out value="${product.artist}"/>
+                    </h2>
 
-                    <div style="margin-bottom: 1.5rem; padding: 1rem 0; border-top: 1.5px solid var(--color-border); border-bottom: 1.5px solid var(--color-border);">
-                        <div style="font-family: var(--font-mono); font-size: 2.25rem; font-weight: 700; color: var(--color-accent);">$<c:out value='${product.price}'/></div>
-                    </div>
-
-                    <div style="margin-bottom: 1.5rem;">
-                        <h5 style="font-family: var(--font-heading); font-weight: 700; margin-bottom: 0.75rem;">Descripcion</h5>
-                        <div style="background: var(--color-bg-light); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
-                            <p style="margin-bottom: 0.75rem; line-height: 1.6; font-size: 0.95rem;">
-                                <c:out value="${product.description}" />
-                            </p>
-                            <c:if test="<c:out value='${not empty product.categories}'/>">
-                                <div style="margin-bottom: 0.75rem;">
-                                    <strong style="font-size: 0.85rem;">Generos:</strong>
-                                    <c:forEach items="<c:out value='${product.categories}'/>" var="cat" varStatus="status">
-                                        <span class="badge" style="background: var(--color-accent); color: #fff; font-size: 0.78rem; padding: 0.25rem 0.6rem; border-radius: var(--radius-pill);"><c:out value="<c:out value='${cat.name}'/>" /></span>
-                                    </c:forEach>
+                    <c:if test="${not empty product.recordLabel or not empty product.catalogNumber or not empty product.editionCountry}">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; background: #fcfaf8; padding: 1.5rem; border-radius: 16px; border: 1px dashed rgba(231,111,81,0.2);">
+                            <c:if test="${not empty product.recordLabel or not empty product.catalogNumber}">
+                                <div>
+                                    <span style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.2rem; font-weight: 700;">Sello - Nro. de catálogo</span>
+                                    <span style="font-weight: 600; color: var(--color-text-main); font-size: 0.95rem;">
+                                        <c:choose>
+                                            <c:when test="${not empty product.recordLabel and not empty product.catalogNumber}">
+                                                <c:out value="${product.recordLabel}" /> - <c:out value="${product.catalogNumber}" />
+                                            </c:when>
+                                            <c:when test="${not empty product.recordLabel}">
+                                                <c:out value="${product.recordLabel}" />
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:out value="${product.catalogNumber}" />
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </span>
                                 </div>
                             </c:if>
-                            <div class="row g-2 mt-2">
-                                <div class="col-6">
-                                    <div class="condition-badge">
-                                        <span class="condition-badge-label">Estado Disco</span>
-                                        <span class="condition-badge-value"><c:out value="${product.recordCondition}" /></span><span class="condition-badge-max">/10</span>
-                                    </div>
+                            <c:if test="${not empty product.editionCountry}">
+                                <div>
+                                    <span style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.2rem; font-weight: 700;">Origen</span>
+                                    <span style="font-weight: 600; color: var(--color-text-main); font-size: 0.95rem;"><c:out value="${product.editionCountry}" /></span>
                                 </div>
-                                <div class="col-6">
-                                    <div class="condition-badge">
-                                        <span class="condition-badge-label">Estado Tapa</span>
-                                        <span class="condition-badge-value"><c:out value="${product.sleeveCondition}" /></span><span class="condition-badge-max">/10</span>
-                                    </div>
-                                </div>
+                            </c:if>
+                        </div>
+                    </c:if>
+
+                    <div style="margin-bottom: 2rem; display: flex; align-items: flex-end; gap: 0.5rem;">
+                        <span style="font-family: var(--font-mono); font-size: 3rem; font-weight: 700; color: var(--color-accent); line-height: 1; letter-spacing: -1px;">$<c:out value='${product.price}'/></span>
+                        <span style="font-size: 1rem; color: var(--color-text-muted); font-weight: 600; padding-bottom: 0.4rem;">ARS</span>
+                    </div>
+
+                    <div class="d-grid">
+                        <c:url var="purchasePostUrl" value='/purchases'/>
+                        <form:form modelAttribute="purchaseCreateForm" action="${purchasePostUrl}" method="POST" cssClass="w-100">
+                            <input type="hidden" name="productId" value="${product.id}" />
+                            <button type="submit" class="btn w-100" style="background: var(--color-accent); color: #fff; font-size: 1.15rem; padding: 1.1rem; border-radius: 99px; box-shadow: 0 8px 24px rgba(231, 111, 81, 0.4); border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: center; align-items: center; gap: 0.75rem; font-weight: 700;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 28px rgba(231, 111, 81, 0.5)'; this.style.background='var(--color-accent-hover)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 8px 24px rgba(231, 111, 81, 0.4)'; this.style.background='var(--color-accent)';">
+                                <i class="bi bi-cart-fill" aria-hidden="true" style="font-size: 1.3rem;"></i> Iniciar Compra
+                            </button>
+                        </form:form>
+                    </div>
+                </div> <!-- End Main Info Card -->
+
+                <!-- Details & Description Card -->
+                <div style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px); border-radius: 20px; padding: 2rem; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 8px 32px rgba(0,0,0,0.03);">
+                    <h5 style="font-family: var(--font-heading); font-weight: 700; margin-bottom: 1.5rem; font-size: 1.3rem; color: var(--color-text-main); display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 1rem;">
+                        <i class="bi bi-music-note-list" style="color: var(--color-accent);"></i> Más detalles
+                    </h5>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <p style="margin-bottom: 0; line-height: 1.8; font-size: 0.98rem; color: var(--color-text-main);">
+                            <c:out value="${product.description}" />
+                        </p>
+                    </div>
+                    
+                    <c:if test="<c:out value='${not empty product.categories}'/>">
+                        <div style="margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;">
+                            <c:forEach items="<c:out value='${product.categories}'/>" var="cat" varStatus="status">
+                                <span style="background: #fff; color: var(--color-accent); font-weight: 600; font-size: 0.8rem; padding: 0.4rem 1rem; border-radius: 50px; border: 1.5px solid rgba(231, 111, 81, 0.2); transition: all 0.25s; box-shadow: 0 2px 8px rgba(231,111,81,0.05);" onmouseover="this.style.background='var(--color-accent)'; this.style.color='#fff'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='#fff'; this.style.color='var(--color-accent)'; this.style.transform='none';"><c:out value="${cat.name}" /></span>
+                            </c:forEach>
+                        </div>
+                    </c:if>
+
+                    <div class="row g-3 mt-2 mb-4">
+                        <div class="col-6">
+                            <div style="background: #fff; padding: 1.25rem 1rem; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                                <span style="display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.5rem;">Estado Disco</span>
+                                <span style="font-family: var(--font-mono); font-size: 1.85rem; font-weight: 700; color: var(--color-text-main);"><c:out value="${product.recordCondition}" /></span><span style="font-family: var(--font-mono); font-size: 0.95rem; color: #a0a0a0; font-weight: 600;">/10</span>
                             </div>
-                            <p style="margin-top: 1rem; margin-bottom: 0; color: var(--color-text-muted); font-size: 0.9rem;">
-                                <i class="bi bi-geo-alt-fill" aria-hidden="true" style="color: var(--color-accent);"></i> <c:out value="${product.location}" />
-                            </p>
+                        </div>
+                        <div class="col-6">
+                            <div style="background: #fff; padding: 1.25rem 1rem; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                                <span style="display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.5rem;">Estado Tapa</span>
+                                <span style="font-family: var(--font-mono); font-size: 1.85rem; font-weight: 700; color: var(--color-text-main);"><c:out value="${product.sleeveCondition}" /></span><span style="font-family: var(--font-mono); font-size: 0.95rem; color: #a0a0a0; font-weight: 600;">/10</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <c:url var="purchasePostUrl" value='/purchases'/>
-                        <form:form modelAttribute="purchaseCreateForm" action="${purchasePostUrl}" method="POST" cssClass="d-flex w-100 flex-column gap-2">
-                            <input type="hidden" name="productId" value="${product.id}" />
-                            <button type="submit" class="btn btn-retro btn-retro-dark btn-lg w-100">
-                                <i class="bi bi-cart-plus" aria-hidden="true"></i> Iniciar Compra
-                            </button>
-                        </form:form>
-                        <a class="btn btn-retro btn-retro-outline btn-lg" href="<c:url value='/'/>">
-                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Seguir comprando
-                        </a>
+                    <div style="display: flex; align-items: center; gap: 1rem; background: #fff; padding: 1.25rem; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                        <div style="width: 44px; height: 44px; background: rgba(231, 111, 81, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="bi bi-geo-alt-fill" aria-hidden="true" style="color: var(--color-accent); font-size: 1.2rem;"></i> 
+                        </div>
+                        <div>
+                            <span style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem;">Ubicación</span>
+                            <span style="font-size: 1rem; font-weight: 600; color: var(--color-text-main);"><c:out value="${product.location}" /></span>
+                        </div>
                     </div>
-                </div>
+                </div> <!-- End Details Card -->
             </div>
         </div>
     </div>

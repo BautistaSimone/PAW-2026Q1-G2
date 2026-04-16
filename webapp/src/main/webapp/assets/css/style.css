@@ -1634,11 +1634,6 @@ details.filter-section:not([open]) .filter-section-chevron {
     transition: all var(--transition);
 }
 
-.condition-badge:hover {
-    border-color: var(--color-accent);
-    box-shadow: 0 2px 8px rgba(231, 111, 81, 0.1);
-}
-
 .condition-badge-label {
     display: block;
     font-size: 0.65rem;
@@ -2470,6 +2465,7 @@ details.filter-section:not([open]) .filter-section-chevron {
     cursor: pointer;
     font-size: 0.92rem;
     border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08); /* Added shadow for better button affordance */
 }
 
 .btn-retro-primary {
@@ -2485,27 +2481,28 @@ details.filter-section:not([open]) .filter-section-chevron {
 }
 
 .btn-retro-dark {
-    background: var(--color-vinyl-dark);
+    background: var(--color-text-main);
     color: #fff;
 }
 
 .btn-retro-dark:hover {
-    background: #333;
+    background: #1d3540;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(38, 70, 83, 0.3);
     color: #fff;
 }
 
 .btn-retro-outline {
     background: transparent;
-    color: var(--color-text-main);
-    border: 1.5px solid var(--color-border);
+    color: var(--color-accent);
+    border: 1.5px solid var(--color-accent);
 }
 
 .btn-retro-outline:hover {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-    background: rgba(231, 111, 81, 0.04);
+    background: var(--color-accent);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(231, 111, 81, 0.2);
 }
 
 /* ===== Responsive ===== */

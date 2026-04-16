@@ -18,14 +18,6 @@
                 </div>
             </c:if>
 
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="<c:url value="/"/>">Inicio</a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Productos</li>
-                </ol>
-            </nav>
 
             <div class="products-layout-grid">
                 <aside class="products-filters-column">
@@ -50,7 +42,7 @@
                                     </option>
                                 </c:forEach>
                             </select>
-                            <a href="<c:url value='/products/new'/>" class="btn btn-retro btn-retro-dark">
+                            <a href="<c:url value='/products/new'/>" class="btn btn-retro btn-retro-primary">
                                 <i class="bi bi-plus-lg" aria-hidden="true"></i> Publicar vinilo
                             </a>
                         </div>

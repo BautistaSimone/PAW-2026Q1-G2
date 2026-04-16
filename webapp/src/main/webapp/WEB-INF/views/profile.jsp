@@ -10,16 +10,6 @@
 
     <div class="profile-page">
         <div class="container py-4">
-
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="<c:url value="/"/>">Inicio</a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Perfil</li>
-                </ol>
-            </nav>
-
             <div class="profile-user-card">
                 <div class="profile-avatar">
                     <c:out value="${fn:substring(user.username, 0, 1)}" />

@@ -129,7 +129,7 @@
                         <a href="<c:url value="/"/>" class="btn btn-retro btn-retro-outline">
                             <i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al catalogo
                         </a>
-                        <button type="submit" class="btn btn-retro btn-retro-dark">
+                        <button type="submit" class="btn btn-retro btn-retro-primary">
                             <i class="bi bi-vinyl" aria-hidden="true"></i> Publicar vinilo
                         </button>
                     </div>
