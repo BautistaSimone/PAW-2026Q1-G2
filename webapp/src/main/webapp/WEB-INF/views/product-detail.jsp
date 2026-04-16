@@ -6,7 +6,7 @@
 
 <ui:layout title="Vinyland | ${product.title}">
 
-    <ui:header />
+    <ui:header showHeaderActions="true"/>
 
     <div class="container py-4">
         <c:if test="${param.created eq '1'}">
@@ -136,7 +136,6 @@
                     <c:url var="purchasePostUrl" value='/purchases'/>
                     <form:form modelAttribute="purchaseCreateForm" action="${purchasePostUrl}" method="POST" cssClass="d-flex w-100 flex-column gap-2">
                         <input type="hidden" name="productId" value="${product.id}" />
-                        <form:input type="email" path="buyerEmail" cssClass="form-control form-control-lg" placeholder="Ingresa tu email para comprar" required="required" />
                         <form:errors path="buyerEmail" cssClass="text-danger" element="div" />
                         <button type="submit" class="btn btn-dark btn-lg w-100">Iniciar Compra</button>
                     </form:form>

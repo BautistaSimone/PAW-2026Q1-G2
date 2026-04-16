@@ -36,9 +36,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public Purchase createPurchase(Long productId, String buyerEmail) {
-        if (buyerEmail == null || buyerEmail.trim().isEmpty() || !buyerEmail.contains("@")) {
-            throw new IllegalArgumentException("Valid buyer email is required");
+    public Purchase createPurchase(Long productId, Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("Valid user is required");
         }
 
         final Product product = productService.findById(productId)
@@ -47,14 +47,13 @@ public class PurchaseServiceImpl implements PurchaseService {
         final User seller = userService.findById(product.getUserId())
             .orElseThrow(() -> new IllegalArgumentException("Seller not found"));
 
-        final User buyer = userService.findByEmail(buyerEmail).orElseGet(() ->
-            userService.createUser(buyerEmail, "password", buyerEmail.split("@")[0], false)
-        );
+        final User buyer = userService.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("Buyer not found"));
 
         String buyerToken = UUID.randomUUID().toString();
         String sellerToken = UUID.randomUUID().toString();
 
-        Purchase purchase = purchaseDao.createPurchase(productId, buyer.getId(), seller.getId(), PurchaseStatus.PENDING, buyerToken, sellerToken);
+        Purchase purchase = purchaseDao.createPurchase(productId, userId, seller.getId(), PurchaseStatus.PENDING, buyerToken, sellerToken);
 
         // Notify Buyer
         emailService.sendBuyerEmail(

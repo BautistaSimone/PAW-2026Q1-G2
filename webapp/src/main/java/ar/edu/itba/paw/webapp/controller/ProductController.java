@@ -88,7 +88,7 @@ public class ProductController {
             }
         }
 
-        // Get the current logged in user, return error if not found
+        // Get the current logged in user
         User user = authUser.getUser();
 
         final Product product = productService.createProduct(

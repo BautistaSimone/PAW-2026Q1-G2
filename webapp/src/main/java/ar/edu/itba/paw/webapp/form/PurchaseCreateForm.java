@@ -9,10 +9,6 @@ public class PurchaseCreateForm {
     @NotNull
     private Long productId;
 
-    @NotBlank
-    @Email
-    private String buyerEmail;
-
     public Long getProductId() {
         return productId;
     }
@@ -21,11 +17,4 @@ public class PurchaseCreateForm {
         this.productId = productId;
     }
 
-    public String getBuyerEmail() {
-        return buyerEmail;
-    }
-
-    public void setBuyerEmail(String buyerEmail) {
-        this.buyerEmail = buyerEmail;
-    }
 }

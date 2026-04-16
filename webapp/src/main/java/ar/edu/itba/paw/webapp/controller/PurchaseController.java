@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -9,14 +11,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
-import javax.validation.Valid;
-
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.PurchaseStatus;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.PurchaseService;
+import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.form.PurchaseCreateForm;
 import ar.edu.itba.paw.webapp.form.PurchaseStatusForm;
 
@@ -34,13 +37,22 @@ public class PurchaseController {
 
     @RequestMapping(value = "/purchases", method = RequestMethod.POST)
     public ModelAndView createPurchase(
+        @AuthenticationPrincipal PawAuthUser authUser,
         @Valid @ModelAttribute("purchaseCreateForm") final PurchaseCreateForm form,
         final BindingResult errors
     ) {
+
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
         if (errors.hasErrors()) {
             return new ModelAndView("redirect:/products/" + form.getProductId() + "?error=1");
         }
-        Purchase purchase = purchaseService.createPurchase(form.getProductId(), form.getBuyerEmail());
+        
+        User user = authUser.getUser();
+
+        Purchase purchase = purchaseService.createPurchase(form.getProductId(), user.getId());
         return new ModelAndView("redirect:/purchases/" + purchase.getPurchaseId() + "?token=" + purchase.getBuyerToken());
     }
 

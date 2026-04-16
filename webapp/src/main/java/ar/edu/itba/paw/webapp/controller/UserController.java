@@ -3,6 +3,10 @@ package ar.edu.itba.paw.webapp.controller;
 import java.math.BigDecimal;
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -33,9 +37,11 @@ import java.util.Collection;
 
 import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.ProductService;
+import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.webapp.forms.RegisterForm;
 import ar.edu.itba.paw.webapp.forms.LoginForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
+import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 
@@ -47,11 +53,17 @@ public class UserController {
 
     private final UserService userService;
     private final ProductService productService;
+	private final ImageService imageService;
 
     @Autowired
-    public UserController(final UserService userService, final ProductService productService) {
+    public UserController(
+        final UserService userService, 
+        final ProductService productService, 
+        final ImageService imageService) {
+
         this.userService = userService;
         this.productService = productService;
+        this.imageService = imageService;
     }
 
 	@RequestMapping(value = "/login")
@@ -127,9 +139,21 @@ public class UserController {
             user.getId()
 		);
 
+        // Get the products
+		final List<Product> products = productService.listProducts(criteria);
+
+        // Get the images
+        final Map<Long, String> productImageUrls = new HashMap<>();
+
+		for (Product product : products) {
+			if (imageService.existsByProductId(product.getId())) {
+				productImageUrls.put(product.getId(), "/images/product/" + product.getId());
+			}
+		}
+
         mv.addObject("user", user);
-        mv.addObject("userProducts", productService.listProducts(criteria));
-        //mv.addObject("productImageUrls", userService.getUserProductImages(user.getId()));
+        mv.addObject("userProducts", products);
+        mv.addObject("productImageUrls", productImageUrls);
 
         return mv;
     }
