@@ -3,11 +3,11 @@
 
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 
-<ui:layout title="Vinyland | Register">
+<ui:layout title="Vinyland | Registro" bodyClass="auth-page-bg">
     <ui:header showHeaderActions="false"/>
-    <ui:register-form 
+    <ui:register-form
         action="${pageContext.request.contextPath}/register"
         method="POST"
-        buttonLabel="Register"
+        buttonLabel="Crear cuenta"
     />
 </ui:layout>

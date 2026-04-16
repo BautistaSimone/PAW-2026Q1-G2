@@ -15,10 +15,10 @@
     <link rel="icon" type="image/x-icon" href="<c:url value="/assets/images/vinyl_disk.png"/>">
 
     <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/style.css"/>"/>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/components.css"/>"/>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="<c:url value="/assets/bootstrap/css/bootstrap.min.css"/>">
-    <!-- TODO: Hacer que saque de los assets, no del internet, lo de bootstrap -->
+    <link rel="stylesheet" href="<c:url value="/assets/bootstrap/css/bootstrap.css"/>">
     <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
@@ -32,7 +32,6 @@
     <ui:footer />
 </div>
 
-<!-- FIXME: Que haria este script? -->
-<script src="${pageContext.request.contextPath}/assets/app.js"></script>
+<script src="<c:url value="/assets/bootstrap/js/bootstrap.bundle.js"/>"></script>
 </body>
 </html>

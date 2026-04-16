@@ -5,8 +5,6 @@
 
 <c:set var="headerSearchText" value="${param['search-text']}" />
 
-<link rel="stylesheet" href="<c:url value="/assets/css/style.css"/>">
-
 <header class="header-bbdiscos">
     <div class="header-content">
         <div class="header-left">
@@ -20,10 +18,10 @@
             <div class="header-center">
                 <div class="search-container">
                     <form class="search-form" method="get" action="<c:url value='/'/>" novalidate>
-                        <input id="search-input" name="search-text" 
-                            class="search-input" 
-                            type="text" 
-                            placeholder="Buscar vinilos..."
+                        <input id="search-input" name="search-text"
+                            class="search-input"
+                            type="text"
+                            placeholder="Buscar vinilos, artistas, sellos..."
                             aria-label="Buscar vinilos"
                             value="<c:out value='${headerSearchText}' />">
                         <button id="search-button" class="search-btn" type="submit" aria-label="Buscar">
@@ -34,10 +32,9 @@
             </div>
 
             <div class="header-right">
-                <!-- Space for future navigation items or balancing -->
                 <a href="<c:url value='/profile'/>" class="profile-btn" aria-label="Ver perfil">
-                    <i class="bi bi-person" aria-hidden="true"></i>
-                    <span>Perfil</span>
+                    <i class="bi bi-person-fill" aria-hidden="true"></i>
+                    <span>Mi Perfil</span>
                 </a>
             </div>
         </c:if>

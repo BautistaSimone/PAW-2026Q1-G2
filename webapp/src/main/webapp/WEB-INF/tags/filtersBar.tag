@@ -1,84 +1,13 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<style>
-/* Category filter chips (toggle pills, wrap on one row when space allows) */
-.filter-options.filter-category-chips {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 0.35rem;
-    padding-top: 0.35rem;
-}
-
-.filter-category-chip {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-    cursor: pointer;
-    border-radius: 999px;
-    user-select: none;
-}
-
-.filter-category-chip:hover input:not(:checked) + .filter-chip-text {
-    border-color: var(--color-accent);
-    background-color: #fff;
-}
-
-.filter-category-chip:hover input:checked + .filter-chip-text {
-    filter: brightness(0.94);
-}
-
-.filter-category-chip input {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-.filter-category-chip .filter-chip-text {
-    display: inline-block;
-    padding: 0.32rem 0.7rem;
-    border-radius: 999px;
-    border: 1px solid #dee2e6;
-    background-color: #f1f3f5;
-    font-size: 0.78rem;
-    font-weight: 500;
-    line-height: 1.25;
-    color: var(--color-text-main);
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-}
-
-.filter-category-chip input:focus-visible + .filter-chip-text {
-    outline: none;
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--color-accent);
-}
-
-.filter-category-chip input:checked + .filter-chip-text {
-    background-color: var(--color-accent);
-    border-color: var(--color-accent);
-    color: #fff;
-}
-
-.filter-category-chip input:checked:focus-visible + .filter-chip-text {
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(231, 111, 81, 0.45);
-}
-</style>
-
 <form class="filters-bar" method="get" action="<c:url value="/"/>" novalidate>
     <input type="hidden" name="sort" value="<c:out value="${selectedSort}" />" />
     <c:if test="${not empty activeSearchText}">
         <input type="hidden" name="search-text" value="<c:out value="${activeSearchText}" />" />
     </c:if>
     <div class="filters-header">
-        <h3 class="filters-title">Filtros</h3>
+        <h3 class="filters-title"><i class="bi bi-sliders2" aria-hidden="true"></i> Filtros</h3>
         <a href="<c:url value="/"/>" class="clear-filters-btn">Limpiar todo</a>
     </div>
 
@@ -233,4 +162,4 @@
         });
     });
 })();
-</script> 
+</script>

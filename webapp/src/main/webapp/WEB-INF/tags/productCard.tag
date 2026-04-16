@@ -22,7 +22,7 @@
                 />
             </c:when>
             <c:otherwise>
-                <i class="bi bi-camera" aria-hidden="true" style="font-size: 2rem; color: #adb5bd;"></i>
+                <i class="bi bi-vinyl" aria-hidden="true" style="font-size: 2.5rem; color: #ccc;"></i>
             </c:otherwise>
         </c:choose>
 
@@ -31,14 +31,14 @@
         </c:if>
     </div>
 
-    <div class="card-body">
+    <div class="card-body" style="padding: 1rem 1.15rem;">
         <h6 class="product-title"><c:out value='${title}'/></h6>
         <p class="product-artist"><c:out value='${artist}'/></p>
         <c:choose>
             <c:when test="${isOnSale && discountPercentage ne null && discountPercentage gt 0}">
-                <div class="price-wrapper" style="margin-bottom: 0.25rem;">
+                <div class="price-wrapper">
                     <span class="album-price-original">$<c:out value='${price}'/></span>
-                    <span class="product-price" style="margin-top: 0;">$<c:out value='${price}'/></span>
+                    <span class="product-price" style="margin: 0;">$<c:out value='${price}'/></span>
                 </div>
             </c:when>
             <c:otherwise>

@@ -8,13 +8,13 @@
     <ui:header />
 
     <div class="sell-page">
-        <div class="container py-5">
+        <div class="container py-4">
             <div class="sell-form-card">
                 <div class="sell-form-header">
-                    <span class="sell-form-eyebrow">Panel de vendedor</span>
+                    <span class="sell-form-eyebrow"><i class="bi bi-vinyl" aria-hidden="true"></i> Panel de vendedor</span>
                     <h1>Publicar un vinilo</h1>
                     <p>
-                        Carga la información principal del disco para que quede disponible en el catálogo.
+                        Carga la informacion principal del disco para que quede disponible en el catalogo.
                     </p>
                 </div>
 
@@ -22,7 +22,7 @@
                 <form:form modelAttribute="productForm" action="${postUrl}" method="post" enctype="multipart/form-data" cssClass="sell-form" novalidate="novalidate">
                     <div class="row g-4">
                         <div class="col-md-6">
-                            <label for="title" class="form-label">Título del álbum *</label>
+                            <label for="title" class="form-label">Titulo del album *</label>
                             <form:input path="title" cssClass="form-control" required="required" />
                             <form:errors path="title" cssClass="text-danger" element="div" />
                         </div>
@@ -34,11 +34,11 @@
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label">Sello – Número de catálogo *</label>
+                            <label class="form-label">Sello – Numero de catalogo *</label>
                             <div class="input-group">
                                 <form:input path="recordLabel" cssClass="form-control"
                                        placeholder="Ej: Sony Music, Rough Trade" required="required" />
-                                <span class="input-group-text">–</span>
+                                <span class="input-group-text" style="border-color: var(--color-border);">–</span>
                                 <form:input path="catalogNumber" cssClass="form-control"
                                        placeholder="Ej: EPC 85930" required="required" />
                             </div>
@@ -47,14 +47,14 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="editionCountry" class="form-label">País de la Edición *</label>
+                            <label for="editionCountry" class="form-label">Pais de la Edicion *</label>
                             <form:input path="editionCountry" cssClass="form-control"
                                    placeholder="Ej: Argentina, USA, UK" required="required" />
                             <form:errors path="editionCountry" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">Géneros *</label>
+                            <label class="form-label">Generos *</label>
                             <div class="genre-checkboxes d-flex flex-wrap gap-2">
                                 <c:forEach items="${categories}" var="cat">
                                     <div class="form-check genre-check">
@@ -70,28 +70,28 @@
 
                         <div class="col-md-6">
                             <label for="sleeveCondition" class="form-label">Estado de la tapa (1 a 10) *</label>
-                            <form:input type="number" path="sleeveCondition" min="1" max="10" step="0.1" 
+                            <form:input type="number" path="sleeveCondition" min="1" max="10" step="0.1"
                                    cssClass="form-control" placeholder="Ej: 8.5" required="required" />
                             <form:errors path="sleeveCondition" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
                             <label for="recordCondition" class="form-label">Estado del disco (1 a 10) *</label>
-                            <form:input type="number" path="recordCondition" min="1" max="10" step="0.1" 
+                            <form:input type="number" path="recordCondition" min="1" max="10" step="0.1"
                                    cssClass="form-control" placeholder="Ej: 9.0" required="required" />
                             <form:errors path="recordCondition" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
                             <label for="neighborhood" class="form-label">Barrio / Ciudad *</label>
-                            <form:input path="neighborhood" cssClass="form-control" 
+                            <form:input path="neighborhood" cssClass="form-control"
                                    placeholder="Ej: Palermo" required="required" />
                             <form:errors path="neighborhood" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
                             <label for="province" class="form-label">Provincia *</label>
-                            <form:input path="province" cssClass="form-control" 
+                            <form:input path="province" cssClass="form-control"
                                    placeholder="Ej: Buenos Aires" required="required" />
                             <form:errors path="province" cssClass="text-danger" element="div" />
                         </div>
@@ -103,9 +103,9 @@
                         </div>
 
                         <div class="col-12">
-                            <label for="images" class="form-label">Imágenes del vinilo *</label>
+                            <label for="images" class="form-label">Imagenes del vinilo *</label>
                             <form:input type="file" path="images" cssClass="form-control sell-images-input" accept="image/*" multiple="true" id="images" />
-                            <div class="form-text">Podés cargar varias fotos del disco. La imagen principal es la primera; tocá las miniaturas de abajo para elegir otra como portada.</div>
+                            <div class="form-text">Podes cargar varias fotos del disco. La imagen principal es la primera; toca las miniaturas de abajo para elegir otra como portada.</div>
                             <form:errors path="images" cssClass="text-danger" element="div" />
                             <div id="sell-images-preview" class="sell-images-preview" hidden>
                                 <div class="sell-img-main-wrap">
@@ -116,9 +116,9 @@
                         </div>
 
                         <div class="col-12">
-                            <label for="description" class="form-label">Descripción</label>
+                            <label for="description" class="form-label">Descripcion</label>
                             <form:textarea path="description" cssClass="form-control" rows="5"
-                                      placeholder="Contá detalles adicionales del disco, edición, etc." />
+                                      placeholder="Conta detalles adicionales del disco, edicion, etc." />
                             <div class="form-text">Opcional.</div>
                             <form:errors path="description" cssClass="text-danger" element="div" />
                         </div>
@@ -126,8 +126,12 @@
                     </div>
 
                     <div class="sell-form-actions">
-                        <a href="<c:url value="/"/>" class="btn btn-outline-secondary">Volver al catálogo</a>
-                        <button type="submit" class="btn btn-dark">Publicar vinilo</button>
+                        <a href="<c:url value="/"/>" class="btn btn-retro btn-retro-outline">
+                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al catalogo
+                        </a>
+                        <button type="submit" class="btn btn-retro btn-retro-dark">
+                            <i class="bi bi-vinyl" aria-hidden="true"></i> Publicar vinilo
+                        </button>
                     </div>
                 </form:form>
             </div>

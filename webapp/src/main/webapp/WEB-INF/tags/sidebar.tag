@@ -5,7 +5,7 @@
 <div class="sidebar-menu">
     <div class="sidebar-header">
         <div class="sidebar-title">
-            <i class="bi bi-disc" aria-hidden="true"></i>
+            <i class="bi bi-vinyl" aria-hidden="true"></i>
             <h3>Categorias</h3>
         </div>
         <button class="sidebar-close" data-action="close-sidebar" aria-label="Cerrar menu">
@@ -16,27 +16,35 @@
     <div class="sidebar-content">
         <nav class="category-nav">
             <button class="category-item">
+                <i class="bi bi-collection category-icon" aria-hidden="true"></i>
                 <span class="category-name">Todos los Vinilos</span>
             </button>
             <button class="category-item">
+                <i class="bi bi-globe2 category-icon" aria-hidden="true"></i>
                 <span class="category-name">Bandas Internacionales</span>
             </button>
             <button class="category-item">
+                <i class="bi bi-person category-icon" aria-hidden="true"></i>
                 <span class="category-name">Solistas Masculinos</span>
             </button>
             <button class="category-item">
+                <i class="bi bi-person-hearts category-icon" aria-hidden="true"></i>
                 <span class="category-name">Solistas Femeninas</span>
             </button>
             <button class="category-item">
+                <i class="bi bi-music-note-beamed category-icon" aria-hidden="true"></i>
                 <span class="category-name">Jazz</span>
             </button>
             <button class="category-item">
+                <i class="bi bi-flag category-icon" aria-hidden="true"></i>
                 <span class="category-name">Musica Nacional</span>
             </button>
             <button class="category-item">
+                <i class="bi bi-tropical-storm category-icon" aria-hidden="true"></i>
                 <span class="category-name">Musica Brasilera</span>
             </button>
             <button class="category-item">
+                <i class="bi bi-three-dots category-icon" aria-hidden="true"></i>
                 <span class="category-name">Otros</span>
             </button>
         </nav>

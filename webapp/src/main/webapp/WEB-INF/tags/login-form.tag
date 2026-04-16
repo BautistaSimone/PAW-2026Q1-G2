@@ -7,76 +7,78 @@
 <%@ taglib prefix = "spring" uri = "http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-6 col-lg-4">
-            <form:form modelAttribute="loginForm"
-                    action="${action}"
-                    method="${method}"
-                    class="p-4 border rounded shadow-sm bg-light">
-
-                <!-- Email -->
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-
-                    <form:input
-                        path="email"
-                        id="email"
-                        cssClass="form-control"
-                        placeholder="Enter email"
-                        autocomplete="email" />
-
-                    <form:errors path="email" cssClass="text-danger small"/>
+<div class="container py-5" style="min-height: 70vh; display: flex; align-items: center;">
+    <div class="row justify-content-center w-100">
+        <div class="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
+            <div class="auth-card">
+                <div class="auth-card-header">
+                    <h2><i class="bi bi-vinyl" aria-hidden="true"></i> Vinyland</h2>
+                    <p>Inicia sesion para comprar y vender vinilos</p>
                 </div>
+                <div class="auth-card-body">
+                    <form:form modelAttribute="loginForm"
+                            action="${action}"
+                            method="${method}">
 
-                <!-- Password -->
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <form:input
+                                path="email"
+                                id="email"
+                                cssClass="form-control"
+                                placeholder="tu@email.com"
+                                autocomplete="email" />
+                            <form:errors path="email" cssClass="text-danger small"/>
+                        </div>
 
-                    <form:password
-                        path="password"
-                        id="password"
-                        cssClass="form-control"
-                        placeholder="Enter password"
-                        autocomplete="current-password" />
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <form:password
+                                path="password"
+                                id="password"
+                                cssClass="form-control"
+                                placeholder="Tu contraseña"
+                                autocomplete="current-password" />
+                            <form:errors path="password" cssClass="text-danger small"/>
+                        </div>
 
-                    <form:errors path="password" cssClass="text-danger small"/>
-                </div>
+                        <!-- Remember Me -->
+                        <div class="form-check mb-3">
+                            <form:checkbox
+                                path="rememberMe"
+                                id="rememberMe"
+                                cssClass="form-check-input" />
+                            <label class="form-check-label" for="rememberMe">
+                                Recordarme
+                            </label>
+                        </div>
 
-                <!-- Remember Me -->
-                <div class="form-check mb-3">
-                    <form:checkbox
-                        path="rememberMe"
-                        id="rememberMe"
-                        cssClass="form-check-input" />
+                        <!-- Error message -->
+                        <c:if test="${param.error != null}">
+                            <div class="alert-retro alert-retro-warning mb-3" role="alert">
+                                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                                <spring:message code = "Error.authForm.input" />
+                            </div>
+                        </c:if>
 
-                    <label class="form-check-label" for="rememberMe">
-                        Remember me
-                    </label>
-                </div>
-
-                <!-- Error message -->
-                <c:if test="${param.error != null}">
-                    <div class="text-danger">
-                        <spring:message code = "Error.authForm.input" />
-                    </div>
-                </c:if>
-
-                <!-- Submit -->
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">
-                        ${buttonLabel}
-                    </button>
+                        <!-- Submit -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn-accent">
+                                ${buttonLabel}
+                            </button>
+                        </div>
+                    </form:form>
                 </div>
 
                 <!-- Not registered link -->
-                <div class="text-center mt-3">
+                <div class="auth-card-footer">
                     <a href="${pageContext.request.contextPath}/register">
                         <spring:message code = "NotRegistered.loginForm" />
                     </a>
                 </div>
-
-            </form:form>
+            </div>
         </div>
     </div>
 </div>

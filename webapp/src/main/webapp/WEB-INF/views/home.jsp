@@ -12,7 +12,8 @@
     <div class="products-section">
         <div class="container-fluid products-shell">
             <c:if test="${param.created eq '1'}">
-                <div class="alert alert-success" role="alert">
+                <div class="alert-retro alert-retro-success mb-3" role="alert">
+                    <i class="bi bi-check-circle" aria-hidden="true"></i>
                     El vinilo se publico correctamente.
                 </div>
             </c:if>
@@ -49,7 +50,9 @@
                                     </option>
                                 </c:forEach>
                             </select>
-                            <a href="<c:url value='/products/new'/>" class="btn btn-dark">Publicar vinilo</a>
+                            <a href="<c:url value='/products/new'/>" class="btn btn-retro btn-retro-dark">
+                                <i class="bi bi-plus-lg" aria-hidden="true"></i> Publicar vinilo
+                            </a>
                         </div>
                     </div>
 
@@ -71,13 +74,14 @@
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <div class="alert alert-secondary" role="alert">
+                            <div class="empty-products-state">
+                                <i class="bi bi-vinyl" style="font-size: 3rem; color: var(--color-border);"></i>
                                 <c:choose>
                                     <c:when test="${noProductsMatchFilters}">
-                                        No hay productos que coincidan con tu búsqueda o filtros.
+                                        <p style="color: var(--color-text-muted); font-size: 1.05rem;">No hay productos que coincidan con tu busqueda o filtros.</p>
                                     </c:when>
                                     <c:otherwise>
-                                        Todavia no hay productos cargados. Publica un vinilo para probar el alta.
+                                        <p style="color: var(--color-text-muted); font-size: 1.05rem;">Todavia no hay productos cargados. Publica un vinilo para probar el alta.</p>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
@@ -108,7 +112,7 @@
                     var topVal = viewportHeight - filterHeight - 20;
                     filterBar.style.top = topVal + 'px';
                 } else {
-                    filterBar.style.top = '100px';
+                    filterBar.style.top = '90px';
                 }
             };
             window.addEventListener('resize', adjustSticky);

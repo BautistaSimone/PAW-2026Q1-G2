@@ -3,12 +3,12 @@
 
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 
-<ui:layout title="Vinyland | Login">
+<ui:layout title="Vinyland | Login" bodyClass="auth-page-bg">
 
     <ui:header showHeaderActions="false"/>
-    <ui:login-form 
+    <ui:login-form
         action="${pageContext.request.contextPath}/login"
         method="POST"
-        buttonLabel="Login"
+        buttonLabel="Iniciar sesion"
     />
 </ui:layout>
