@@ -9,7 +9,7 @@ import ar.edu.itba.paw.models.ProductSearchCriteria;
 
 public interface ProductService {
     Product createProduct(
-        final String sellerEmail,
+        final Long userId,
         final String title,
         final String artist,
         final String recordLabel,

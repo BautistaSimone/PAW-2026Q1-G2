@@ -65,14 +65,6 @@
                             <form:errors path="categories" cssClass="text-danger" element="div" />
                         </div>
 
-                        <div class="col-12">
-                            <label for="sellerEmail" class="form-label">Email del vendedor (asociado a tu cuenta) *</label>
-                            <form:input type="email" path="sellerEmail" cssClass="form-control" 
-                                   placeholder="ejemplo@mail.com" required="required" />
-                            <div class="form-text">Usaremos este email para contactarte hasta que tengamos sistema de usuarios completo.</div>
-                            <form:errors path="sellerEmail" cssClass="text-danger" element="div" />
-                        </div>
-
                         <div class="col-md-6">
                             <label for="sleeveCondition" class="form-label">Estado de la tapa (1 a 10) *</label>
                             <form:input type="number" path="sleeveCondition" min="1" max="10" step="0.1" 

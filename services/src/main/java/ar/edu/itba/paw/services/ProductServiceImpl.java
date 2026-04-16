@@ -25,7 +25,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product createProduct(
-        final String sellerEmail,
+        final Long userId,
         final String title,
         final String artist,
         final String recordLabel,
@@ -54,12 +54,6 @@ public class ProductServiceImpl implements ProductService {
         if (artist == null || artist.trim().isEmpty()) {
             throw new IllegalArgumentException("Artist cannot be empty");
         }
-        if (description == null || description.trim().isEmpty()) {
-            throw new IllegalArgumentException("Description cannot be empty");
-        }
-        if (sellerEmail == null || sellerEmail.trim().isEmpty() || !sellerEmail.contains("@")) {
-            throw new IllegalArgumentException("Valid seller email is required");
-        }
         if (neighborhood == null || neighborhood.trim().isEmpty()) {
             throw new IllegalArgumentException("Neighborhood cannot be empty");
         }
@@ -67,13 +61,8 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Province cannot be empty");
         }
 
-        final Optional<ar.edu.itba.paw.models.User> maybeUser = userService.findByEmail(sellerEmail);
-        final ar.edu.itba.paw.models.User user = maybeUser.orElseGet(() ->
-            userService.createUser(sellerEmail, "password", sellerEmail.split("@")[0], false)
-        );
-
         return productDao.createProduct(
-            user.getId(), title, artist, recordLabel, catalogNumber, editionCountry, categoryIds, description,
+            userId, title, artist, recordLabel, catalogNumber, editionCountry, categoryIds, description,
             sleeveCondition, recordCondition, neighborhood, province, price
         );
     }

@@ -22,6 +22,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,5 +97,22 @@ public class UserController {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         return new ModelAndView("redirect:/");
+    }
+
+	@RequestMapping(value = "/profile")
+    public ModelAndView profile(@AuthenticationPrincipal PawAuthUser authUser) {
+
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        User user = authUser.getUser();
+
+        ModelAndView mv = new ModelAndView("profile");
+        mv.addObject("user", user);
+        //mv.addObject("userProducts", userService.getUserProducts(user.getId()));
+        //mv.addObject("productImageUrls", userService.getUserProductImages(user.getId()));
+
+        return mv;
     }
 }

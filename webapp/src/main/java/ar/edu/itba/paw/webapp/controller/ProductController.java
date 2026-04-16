@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.validation.BindingResult;
@@ -18,7 +19,9 @@ import javax.validation.Valid;
 
 import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.form.ProductForm;
+import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductService;
@@ -54,9 +57,14 @@ public class ProductController {
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
     public ModelAndView createProduct(
+        @AuthenticationPrincipal PawAuthUser authUser,
         @Valid @ModelAttribute("productForm") final ProductForm form,
         final BindingResult errors
     ) throws IOException {
+
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
 
         if (errors.hasErrors()) {
             return new ModelAndView("product-form");
@@ -80,8 +88,11 @@ public class ProductController {
             }
         }
 
+        // Get the current logged in user, return error if not found
+        User user = authUser.getUser();
+
         final Product product = productService.createProduct(
-            form.getSellerEmail(),
+            user.getId(),
             form.getTitle(),
             form.getArtist(),
             form.getRecordLabel(),
