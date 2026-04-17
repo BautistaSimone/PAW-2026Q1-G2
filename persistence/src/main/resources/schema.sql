@@ -25,15 +25,6 @@ CREATE TABLE IF NOT EXISTS products (
 	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS reviews (
-	seller_id INTEGER NOT NULL,
-	buyer_id INTEGER NOT NULL,
-	score INTEGER NOT NULL CHECK (score >= 0 AND score <= 5),
-	review TEXT,
-	FOREIGN KEY(seller_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
-	FOREIGN KEY(buyer_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS images (
 	image_id SERIAL PRIMARY KEY,
 	product_id INTEGER NOT NULL,
@@ -66,6 +57,19 @@ CREATE TABLE IF NOT EXISTS purchases (
 	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
 	FOREIGN KEY(buyer_user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
 	FOREIGN KEY(seller_user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS reviews (
+	review_id SERIAL PRIMARY KEY,
+	purchase_id INTEGER NOT NULL UNIQUE,
+	seller_id INTEGER NOT NULL,
+	buyer_id INTEGER NOT NULL,
+	score INTEGER NOT NULL CHECK (score >= 0 AND score <= 5),
+	review TEXT,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY(purchase_id) REFERENCES purchases(purchase_id) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(seller_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(buyer_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 -- Normalize legacy mojibake categories from older local databases

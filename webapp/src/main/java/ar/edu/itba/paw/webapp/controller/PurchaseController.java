@@ -19,6 +19,7 @@ import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.PurchaseStatus;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.PurchaseService;
+import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.form.PurchaseCreateForm;
 import ar.edu.itba.paw.webapp.form.PurchaseStatusForm;
@@ -28,11 +29,13 @@ public class PurchaseController {
 
     private final PurchaseService purchaseService;
     private final ProductService productService;
+    private final ReviewService reviewService;
 
     @Autowired
-    public PurchaseController(final PurchaseService purchaseService, final ProductService productService) {
+    public PurchaseController(final PurchaseService purchaseService, final ProductService productService, final ReviewService reviewService) {
         this.purchaseService = purchaseService;
         this.productService = productService;
+        this.reviewService = reviewService;
     }
 
     @RequestMapping(value = "/purchases", method = RequestMethod.POST)
@@ -75,9 +78,15 @@ public class PurchaseController {
         ModelAndView mav = new ModelAndView("purchase-panel");
         mav.addObject("purchase", purchase);
         mav.addObject("product", product);
-        mav.addObject("isBuyer", token.equals(purchase.getBuyerToken()));
+        boolean isBuyer = token.equals(purchase.getBuyerToken());
+        mav.addObject("isBuyer", isBuyer);
         mav.addObject("isSeller", token.equals(purchase.getSellerToken()));
         mav.addObject("token", token);
+
+        if (isBuyer && purchase.getStatus() == PurchaseStatus.DELIVERED) {
+            mav.addObject("hasReview", reviewService.findByPurchaseId(id).isPresent());
+        }
+
         return mav;
     }
 
@@ -99,7 +108,12 @@ public class PurchaseController {
             return getPurchase(id, form.getToken(), form);
         }
 
-        purchaseService.updateStatus(id, form.getToken(), statusObj);
+        Purchase updated = purchaseService.updateStatus(id, form.getToken(), statusObj);
+
+        if (statusObj == PurchaseStatus.DELIVERED && form.getToken().equals(updated.getBuyerToken())) {
+            return new ModelAndView("redirect:/purchases/" + id + "/review?token=" + form.getToken());
+        }
+
         return new ModelAndView("redirect:/purchases/" + id + "?token=" + form.getToken() + "&updated=1");
     }
 }

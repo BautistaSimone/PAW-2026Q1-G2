@@ -77,9 +77,29 @@
                     <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--color-accent) 0%, #ff9f43 100%);"></div>
 
                     <h1 style="font-family: var(--font-heading); font-size: 2.5rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--color-text-main); line-height: 1.1;"><c:out value="${product.title}"/></h1>
-                    <h2 style="font-size: 1.25rem; font-weight: 500; color: var(--color-text-muted); margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <h2 style="font-size: 1.25rem; font-weight: 500; color: var(--color-text-muted); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
                         <i class="bi bi-mic" style="color: var(--color-accent); opacity: 0.7;"></i> <c:out value="${product.artist}"/>
                     </h2>
+
+                    <c:if test="${seller != null}">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; padding: 0.75rem 1rem; background: #fcfaf8; border-radius: 12px; border: 1px solid rgba(0,0,0,0.04);">
+                            <div style="width: 32px; height: 32px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;">
+                                <c:out value="${fn:substring(seller.username, 0, 1)}"/>
+                            </div>
+                            <div style="flex: 1;">
+                                <a href="<c:url value='/profile?userId=${seller.id}'/>" style="font-weight: 600; color: var(--color-text-main); text-decoration: none; font-size: 0.95rem;" onmouseover="this.style.color='var(--color-accent)';" onmouseout="this.style.color='var(--color-text-main)';">
+                                    <c:out value="${seller.username}"/>
+                                </a>
+                            </div>
+                            <c:if test="${sellerRating.count > 0}">
+                                <a href="<c:url value='/profile?userId=${seller.id}'/>" style="display: flex; align-items: center; gap: 0.35rem; text-decoration: none; color: var(--color-accent); font-weight: 600; font-size: 0.9rem;">
+                                    <i class="bi bi-star-fill"></i>
+                                    <c:out value="${sellerRating.formattedAvg}"/>
+                                    <span style="color: var(--color-text-muted); font-weight: 400;">(<c:out value="${sellerRating.count}"/>)</span>
+                                </a>
+                            </c:if>
+                        </div>
+                    </c:if>
 
                     <c:if test="${not empty product.recordLabel or not empty product.catalogNumber or not empty product.editionCountry}">
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; background: #fcfaf8; padding: 1.5rem; border-radius: 16px; border: 1px dashed rgba(231,111,81,0.2);">

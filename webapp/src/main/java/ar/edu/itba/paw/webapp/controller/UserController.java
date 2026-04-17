@@ -38,10 +38,13 @@ import java.util.Collection;
 import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.ImageService;
+import ar.edu.itba.paw.services.PurchaseService;
+import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.webapp.form.RegisterForm;
 import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 
@@ -54,16 +57,22 @@ public class UserController {
     private final UserService userService;
     private final ProductService productService;
 	private final ImageService imageService;
+    private final PurchaseService purchaseService;
+    private final ReviewService reviewService;
 
     @Autowired
     public UserController(
         final UserService userService, 
         final ProductService productService, 
-        final ImageService imageService) {
+        final ImageService imageService,
+        final PurchaseService purchaseService,
+        final ReviewService reviewService) {
 
         this.userService = userService;
         this.productService = productService;
         this.imageService = imageService;
+        this.purchaseService = purchaseService;
+        this.reviewService = reviewService;
     }
 
 	@RequestMapping(value = "/login")
@@ -117,17 +126,27 @@ public class UserController {
     }
 
 	@RequestMapping(value = "/profile")
-    public ModelAndView profile(@AuthenticationPrincipal PawAuthUser authUser) {
+    public ModelAndView profile(
+        @AuthenticationPrincipal PawAuthUser authUser,
+        @RequestParam(value = "userId", required = false) final Long userId
+    ) {
+        final boolean isOwnProfile;
+        final User profileUser;
 
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
+        if (userId != null) {
+            profileUser = userService.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            isOwnProfile = (authUser != null && authUser.getUser().getId().equals(userId));
+        } else {
+            if (authUser == null) {
+                return new ModelAndView("redirect:/login");
+            }
+            profileUser = authUser.getUser();
+            isOwnProfile = true;
         }
-
-        User user = authUser.getUser();
 
         ModelAndView mv = new ModelAndView("profile");
 
-        // Get the products corresponding to out user
 		final ProductSearchCriteria criteria = new ProductSearchCriteria(
             null,
             Collections.emptyList(),
@@ -136,24 +155,42 @@ public class UserController {
             Collections.emptyList(),
             Collections.emptyList(),
             null,
-            user.getId()
+            profileUser.getId()
 		);
 
-        // Get the products
 		final List<Product> products = productService.listProducts(criteria);
 
-        // Get the images
         final Map<Long, String> productImageUrls = new HashMap<>();
-
 		for (Product product : products) {
 			if (imageService.existsByProductId(product.getId())) {
 				productImageUrls.put(product.getId(), "/images/product/" + product.getId());
 			}
 		}
 
-        mv.addObject("user", user);
+        mv.addObject("user", profileUser);
+        mv.addObject("isOwnProfile", isOwnProfile);
         mv.addObject("userProducts", products);
         mv.addObject("productImageUrls", productImageUrls);
+
+        mv.addObject("receivedReviews", reviewService.findBySellerId(profileUser.getId()));
+        mv.addObject("sellerRating", reviewService.summaryForSeller(profileUser.getId()));
+
+        if (isOwnProfile && authUser != null) {
+            final List<Purchase> purchases = purchaseService.findByBuyerId(profileUser.getId());
+
+            final Map<Long, Product> purchaseProducts = new HashMap<>();
+            final Map<Long, Boolean> purchaseHasReview = new HashMap<>();
+            for (Purchase p : purchases) {
+                productService.findById(p.getProductId()).ifPresent(prod ->
+                    purchaseProducts.put(p.getPurchaseId(), prod)
+                );
+                purchaseHasReview.put(p.getPurchaseId(), reviewService.findByPurchaseId(p.getPurchaseId()).isPresent());
+            }
+
+            mv.addObject("purchases", purchases);
+            mv.addObject("purchaseProducts", purchaseProducts);
+            mv.addObject("purchaseHasReview", purchaseHasReview);
+        }
 
         return mv;
     }

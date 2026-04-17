@@ -8,9 +8,28 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8 col-xl-7">
+                    <div class="mb-3 d-flex align-items-center justify-content-between w-100 flex-wrap">
+                        <a href="<c:url value='/'/>"
+                           style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none; transition: color 0.2s;"
+                           onmouseover="this.style.color='var(--color-accent)';" onmouseout="this.style.color='var(--color-text-muted)';">
+                            <i class="bi bi-arrow-left" aria-hidden="true" style="font-size: 1.1rem;"></i>
+                            <span>Volver al inicio</span>
+                        </a>
+                        <a href="<c:url value='/profile'/>"
+                           style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none; transition: color 0.2s;"
+                           onmouseover="this.style.color='var(--color-accent)';" onmouseout="this.style.color='var(--color-text-muted)';">
+                            <i class="bi bi-person" aria-hidden="true" style="font-size: 1rem;"></i>
+                            <span>Mi perfil</span>
+                        </a>
+                    </div>
                     <c:if test="${param.updated eq '1'}">
                         <div class="alert-retro alert-retro-success mb-3">
                             <i class="bi bi-check-circle" aria-hidden="true"></i> Estado actualizado correctamente.
+                        </div>
+                    </c:if>
+                    <c:if test="${param.reviewed eq '1'}">
+                        <div class="alert-retro alert-retro-success mb-3">
+                            <i class="bi bi-star-fill" aria-hidden="true"></i> Tu reseña fue enviada. ¡Gracias!
                         </div>
                     </c:if>
 
@@ -75,6 +94,12 @@
                                                 <i class="bi bi-check-circle-fill" style="font-size: 1.5rem;" aria-hidden="true"></i>
                                                 <br/>Compra completada exitosamente!
                                             </div>
+                                            <c:if test="${not hasReview}">
+                                                <a href="<c:url value='/purchases/${purchase.purchaseId}/review?token=${token}'/>"
+                                                   class="btn btn-retro btn-retro-primary w-100 btn-lg mt-3">
+                                                    <i class="bi bi-star" aria-hidden="true"></i> Dejar reseña al vendedor
+                                                </a>
+                                            </c:if>
                                         </c:when>
                                         <c:otherwise>
                                             <p style="color: var(--color-text-muted); text-align: center;">Esperando que el vendedor actualice el estado...</p>

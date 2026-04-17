@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -70,6 +71,13 @@ public class PurchaseJdbcDao implements PurchaseDao {
     public Optional<Purchase> findById(Long purchaseId) {
         return jdbcTemplate.query("SELECT * FROM purchases WHERE purchase_id = ?", PURCHASE_ROW_MAPPER, purchaseId)
             .stream().findAny();
+    }
+
+    @Override
+    public List<Purchase> findByBuyerId(Long buyerId) {
+        return jdbcTemplate.query(
+            "SELECT * FROM purchases WHERE buyer_user_id = ? ORDER BY date DESC",
+            PURCHASE_ROW_MAPPER, buyerId);
     }
 
     @Override

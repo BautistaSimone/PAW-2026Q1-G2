@@ -2214,7 +2214,11 @@ details.filter-section:not([open]) .filter-section-chevron {
 }
 
 .profile-data {
-    width: 20%;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
 }
 
 .profile-user-card {
@@ -2260,6 +2264,41 @@ details.filter-section:not([open]) .filter-section-chevron {
     font-weight: 400;
     color: var(--color-text-muted);
     margin: 0;
+}
+
+.profile-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-rating-row {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    max-width: 100%;
+}
+
+.profile-rating-row .profile-rating-stars {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    gap: 0.05rem;
+    color: var(--color-accent);
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+.profile-rating-row .profile-rating-stars .bi {
+    flex-shrink: 0;
+}
+
+.profile-rating-row .profile-rating-caption {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .profile-section-title {

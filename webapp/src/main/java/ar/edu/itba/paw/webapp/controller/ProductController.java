@@ -30,6 +30,8 @@ import ar.edu.itba.paw.services.EmailService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductReportRemovalTokenService;
 import ar.edu.itba.paw.services.ProductService;
+import ar.edu.itba.paw.services.ReviewService;
+import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
 
 @Controller
@@ -40,6 +42,8 @@ public class ProductController {
     private final ImageService imageService;
     private final EmailService emailService;
     private final ProductReportRemovalTokenService reportRemovalTokenService;
+    private final ReviewService reviewService;
+    private final UserService userService;
 
     @Autowired
     public ProductController(
@@ -47,13 +51,17 @@ public class ProductController {
         final CategoryService categoryService,
         final ImageService imageService,
         final EmailService emailService,
-        final ProductReportRemovalTokenService reportRemovalTokenService
+        final ProductReportRemovalTokenService reportRemovalTokenService,
+        final ReviewService reviewService,
+        final UserService userService
     ) {
         this.productService = productService;
         this.categoryService = categoryService;
         this.imageService = imageService;
         this.emailService = emailService;
         this.reportRemovalTokenService = reportRemovalTokenService;
+        this.reviewService = reviewService;
+        this.userService = userService;
     }
 
 
@@ -150,6 +158,11 @@ public class ProductController {
             mav.addObject("productImages", productImages);
             mav.addObject("productImageUrl", "/images/" + productImages.get(0).getImageId());
         }
+
+        mav.addObject("sellerRating", reviewService.summaryForSeller(product.getUserId()));
+        userService.findById(product.getUserId()).ifPresent(seller ->
+            mav.addObject("seller", seller)
+        );
 
         return mav;
     }

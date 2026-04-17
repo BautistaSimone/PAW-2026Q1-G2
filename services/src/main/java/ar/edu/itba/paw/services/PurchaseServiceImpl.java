@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -128,5 +129,10 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         return purchaseDao.findById(purchaseId).get();
+    }
+
+    @Override
+    public List<Purchase> findByBuyerId(Long buyerId) {
+        return purchaseDao.findByBuyerId(buyerId);
     }
 }
