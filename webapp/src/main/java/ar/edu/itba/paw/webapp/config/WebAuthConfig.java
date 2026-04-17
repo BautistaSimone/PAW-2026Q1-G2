@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.config;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -18,6 +19,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @ComponentScan("ar.edu.itba.paw.webapp.auth")
 public class WebAuthConfig{
+
+
+    @Value("${auth.rememberme}")
+    private String authRemeberMe;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -46,9 +51,9 @@ public class WebAuthConfig{
                 .passwordParameter("password")
                 .defaultSuccessUrl("/", false)
             .and().rememberMe()
-                .rememberMeParameter("rememberme")
+                .rememberMeParameter("rememberMe")
                 .userDetailsService(userDetailsService)
-                .key("mysupersecretkeythatnobodyknowsabout")
+                .key(authRemeberMe)
                 .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30))
             .and().logout()
                 .logoutUrl("/logout")
