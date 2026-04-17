@@ -2213,6 +2213,10 @@ details.filter-section:not([open]) .filter-section-chevron {
     padding: 1.5rem 0 4rem;
 }
 
+.profile-data {
+    width: 20%;
+}
+
 .profile-user-card {
     background: var(--color-card-bg);
     border-radius: var(--radius-xl);
@@ -2226,6 +2230,8 @@ details.filter-section:not([open]) .filter-section-chevron {
 }
 
 .profile-avatar {
+
+    border-right: 50px;
     width: 80px;
     height: 80px;
     border-radius: 50%;

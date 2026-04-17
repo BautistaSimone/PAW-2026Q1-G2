@@ -10,14 +10,23 @@
 
     <div class="profile-page">
         <div class="container py-4">
-            <div class="profile-user-card">
-                <div class="profile-avatar">
-                    <c:out value="${fn:substring(user.username, 0, 1)}" />
+            <div class="profile-user-card d-flex justify-content-between">
+            
+                <div class="d-flex justify-content-between profile-data ">
+                    <div class="profile-avatar">
+                        <c:out value="${fn:substring(user.username, 0, 1)}" />
+                    </div>
+                    <div class="profile-user-info">
+                        <h1><c:out value="${user.username}" /></h1>
+                        <h2><c:out value="${user.email}" /></h2>
+                    </div>
                 </div>
-                <div class="profile-user-info">
-                    <h1><c:out value="${user.username}" /></h1>
-                    <h2><c:out value="${user.email}" /></h2>
-                </div>
+
+                <form action="<c:url value='/logout' />" method="post" style="margin-top: 1rem;">
+                    <button type="submit" class="btn btn-retro btn-retro-secondary">
+                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión
+                    </button>
+                </form>
             </div>
 
             <h3 class="profile-section-title">
