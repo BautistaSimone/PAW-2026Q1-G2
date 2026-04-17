@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +26,11 @@ import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.form.ProductForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.services.CategoryService;
+import ar.edu.itba.paw.services.EmailService;
 import ar.edu.itba.paw.services.ImageService;
+import ar.edu.itba.paw.services.ProductReportRemovalTokenService;
 import ar.edu.itba.paw.services.ProductService;
+import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
 
 @Controller
 public class ProductController {
@@ -32,16 +38,22 @@ public class ProductController {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final ImageService imageService;
+    private final EmailService emailService;
+    private final ProductReportRemovalTokenService reportRemovalTokenService;
 
     @Autowired
     public ProductController(
         final ProductService productService,
         final CategoryService categoryService,
-        final ImageService imageService
+        final ImageService imageService,
+        final EmailService emailService,
+        final ProductReportRemovalTokenService reportRemovalTokenService
     ) {
         this.productService = productService;
         this.categoryService = categoryService;
         this.imageService = imageService;
+        this.emailService = emailService;
+        this.reportRemovalTokenService = reportRemovalTokenService;
     }
 
 
@@ -127,8 +139,8 @@ public class ProductController {
         @PathVariable("id") final Long id,
         @ModelAttribute("purchaseCreateForm") final ar.edu.itba.paw.webapp.form.PurchaseCreateForm purchaseForm
     ) {
-        final Product product = productService.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        final Product product = productService.findByIdIfAvailable(id)
+            .orElseThrow(ResourceNotFoundException::new);
 
         final ModelAndView mav = new ModelAndView("product-detail");
         mav.addObject("product", product);
@@ -140,6 +152,42 @@ public class ProductController {
         }
 
         return mav;
+    }
+
+    @RequestMapping(value = "/products/{id}/report", method = RequestMethod.POST)
+    public ModelAndView reportProduct(
+        @AuthenticationPrincipal final PawAuthUser authUser,
+        @PathVariable("id") final Long id
+    ) {
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        final Product product = productService.findByIdIfAvailable(id)
+            .orElseThrow(ResourceNotFoundException::new);
+
+        emailService.sendProductReportEmail(product, authUser.getUser());
+        return new ModelAndView("redirect:/products/" + id + "?reported=1");
+    }
+
+    @RequestMapping(value = "/products/{id}/moderate-hide", method = RequestMethod.GET)
+    public ModelAndView moderateHideFromReportMail(
+        @PathVariable("id") final Long id,
+        @RequestParam("token") final String token
+    ) {
+        if (!reportRemovalTokenService.isValid(id, token)) {
+            throw new IllegalArgumentException("Invalid or expired moderation link");
+        }
+        productService.hideProductFromCatalog(id);
+        return redirectAfterModerationHide();
+    }
+
+    private static ModelAndView redirectAfterModerationHide() {
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            return new ModelAndView("redirect:/?moderated=1");
+        }
+        return new ModelAndView("redirect:/login?moderated=1");
     }
 }
 

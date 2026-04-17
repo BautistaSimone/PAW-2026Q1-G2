@@ -275,7 +275,23 @@ public class ProductJdbcDao implements ProductDao {
     }
 
     @Override
+    public Optional<Product> findByIdIfAvailable(final Long id) {
+        final List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+            "SELECT product_id, user_id, title, artist, record_label, catalog_number, edition_country, description, sleeve_condition, record_condition, " +
+            "neighborhood, province, published, price FROM products WHERE product_id = ? AND available = TRUE",
+            id
+        );
+
+        return rows.stream().findFirst().map(this::mapProductFromRow);
+    }
+
+    @Override
     public void markAsSold(final Long id) {
+        markAsUnavailable(id);
+    }
+
+    @Override
+    public void markAsUnavailable(final Long id) {
         jdbcTemplate.update("UPDATE products SET available = FALSE WHERE product_id = ?", id);
     }
 

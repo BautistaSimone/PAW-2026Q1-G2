@@ -32,6 +32,10 @@ public interface ProductService {
 
     Optional<Product> findById(final Long id);
 
+    Optional<Product> findByIdIfAvailable(final Long id);
+
     void markAsSold(final Long id);
+
+    void hideProductFromCatalog(final Long id);
 }
 

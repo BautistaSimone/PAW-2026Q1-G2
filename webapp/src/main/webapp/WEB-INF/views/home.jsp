@@ -17,6 +17,12 @@
                     El vinilo se publico correctamente.
                 </div>
             </c:if>
+            <c:if test="${param.moderated eq '1'}">
+                <div class="alert-retro alert-retro-success mb-3" role="alert">
+                    <i class="bi bi-check-circle" aria-hidden="true"></i>
+                    La publicación fue ocultada del catálogo.
+                </div>
+            </c:if>
 
 
             <div class="products-layout-grid">

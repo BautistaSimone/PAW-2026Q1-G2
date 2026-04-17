@@ -16,6 +16,12 @@
                     <p>Inicia sesion para comprar y vender vinilos</p>
                 </div>
                 <div class="auth-card-body">
+                    <c:if test="${param.moderated eq '1'}">
+                        <div class="alert-retro alert-retro-success mb-3" role="alert">
+                            <i class="bi bi-check-circle" aria-hidden="true"></i>
+                            La publicación fue ocultada del catálogo.
+                        </div>
+                    </c:if>
                     <form:form modelAttribute="loginForm"
                             action="${action}"
                             method="${method}">

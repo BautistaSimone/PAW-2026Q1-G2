@@ -31,7 +31,11 @@ public interface ProductDao {
     List<String> listDistinctRecordLabels();
 
     Optional<Product> findById(final Long id);
-    
+
+    Optional<Product> findByIdIfAvailable(final Long id);
+
     void markAsSold(final Long id);
+
+    void markAsUnavailable(final Long id);
 }
 

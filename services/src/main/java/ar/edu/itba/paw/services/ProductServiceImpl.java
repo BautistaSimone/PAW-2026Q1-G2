@@ -89,8 +89,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Optional<Product> findByIdIfAvailable(final Long id) {
+        return productDao.findByIdIfAvailable(id);
+    }
+
+    @Override
     public void markAsSold(final Long id) {
         productDao.markAsSold(id);
+    }
+
+    @Override
+    public void hideProductFromCatalog(final Long id) {
+        productDao.markAsUnavailable(id);
     }
 }
 

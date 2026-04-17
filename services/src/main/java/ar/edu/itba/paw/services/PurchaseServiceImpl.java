@@ -41,7 +41,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             throw new IllegalArgumentException("Valid user is required");
         }
 
-        final Product product = productService.findById(productId)
+        final Product product = productService.findByIdIfAvailable(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         final User seller = userService.findById(product.getUserId())

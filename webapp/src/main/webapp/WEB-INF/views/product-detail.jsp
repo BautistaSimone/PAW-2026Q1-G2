@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <ui:layout title="Vinyland | ${product.title}">
 
@@ -13,6 +14,12 @@
             <div class="alert-retro alert-retro-success mb-3" role="alert">
                 <i class="bi bi-check-circle" aria-hidden="true"></i>
                 El vinilo se publico correctamente.
+            </div>
+        </c:if>
+        <c:if test="${param.reported eq '1'}">
+            <div class="alert-retro alert-retro-success mb-3" role="alert">
+                <i class="bi bi-check-circle" aria-hidden="true"></i>
+                Gracias por el reporte. Nuestro equipo lo revisará.
             </div>
         </c:if>
 
@@ -117,6 +124,16 @@
                             </button>
                         </form:form>
                     </div>
+                    <sec:authorize access="isAuthenticated()">
+                        <div class="d-grid mt-3">
+                            <c:url var="reportPostUrl" value="/products/${product.id}/report"/>
+                            <form action="${reportPostUrl}" method="POST" class="w-100">
+                                <button type="submit" class="btn w-100" style="background: transparent; color: var(--color-accent); font-size: 1rem; padding: 0.8rem; border-radius: 99px; border: 1px solid rgba(231, 111, 81, 0.5); transition: all 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-weight: 600;" onmouseover="this.style.background='rgba(231, 111, 81, 0.08)'; this.style.borderColor='var(--color-accent)';" onmouseout="this.style.background='transparent'; this.style.borderColor='rgba(231, 111, 81, 0.5)';">
+                                    <i class="bi bi-flag" aria-hidden="true"></i> Reportar publicación
+                                </button>
+                            </form>
+                        </div>
+                    </sec:authorize>
                 </div> <!-- End Main Info Card -->
 
                 <!-- Details & Description Card -->
