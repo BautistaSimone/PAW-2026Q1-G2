@@ -1,6 +1,6 @@
 <configuration debug="true">
     <appender name="errors" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        
+        <file>logs/errors.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>logs/paw-2026a-02.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>5</maxHistory> <!-- Last 5 days get stored -->
@@ -11,7 +11,7 @@
     </appender>
 
     <appender name="general" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        
+        <file>logs/general.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>logs/paw-2026a-02.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>5</maxHistory> <!-- Last 5 days get stored -->
