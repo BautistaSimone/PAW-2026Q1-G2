@@ -61,7 +61,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase, 
             product, 
             "Comunicate con " + seller.getEmail() + " para abonar tu vinilo", 
-            "Has iniciado la compra de este rematado vinilo. Una vez abonado, entra al enlace debajo para notificar al vendedor que ya pagaste.",
+            "Has iniciado la compra de este vinilo. Una vez abonado, entra al enlace debajo para notificar al vendedor que ya pagaste.",
             buyer.getUsername()
         );
 

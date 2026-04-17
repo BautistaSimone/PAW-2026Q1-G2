@@ -105,7 +105,7 @@
                         <div class="col-12">
                             <label for="images" class="form-label">Imagenes del vinilo *</label>
                             <form:input type="file" path="images" cssClass="form-control sell-images-input" accept="image/*" multiple="true" id="images" />
-                            <div class="form-text">Podes cargar varias fotos del disco. La imagen principal es la primera; toca las miniaturas de abajo para elegir otra como portada.</div>
+                            <div class="form-text">Podes cargar varias fotos del disco (hasta 5 MB cada una). La imagen principal es la primera; toca las miniaturas de abajo para elegir otra como portada.</div>
                             <form:errors path="images" cssClass="text-danger" element="div" />
                             <div id="sell-images-preview" class="sell-images-preview" hidden>
                                 <div class="sell-img-main-wrap">
