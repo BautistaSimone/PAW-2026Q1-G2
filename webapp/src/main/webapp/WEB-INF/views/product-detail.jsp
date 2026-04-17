@@ -168,9 +168,9 @@
                         </p>
                     </div>
                     
-                    <c:if test="<c:out value='${not empty product.categories}'/>">
+                    <c:if test="${not empty product.categories}">
                         <div style="margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;">
-                            <c:forEach items="<c:out value='${product.categories}'/>" var="cat" varStatus="status">
+                            <c:forEach items="${product.categories}" var="cat" varStatus="status">
                                 <span style="background: #fff; color: var(--color-accent); font-weight: 600; font-size: 0.8rem; padding: 0.4rem 1rem; border-radius: 50px; border: 1.5px solid rgba(231, 111, 81, 0.2); transition: all 0.25s; box-shadow: 0 2px 8px rgba(231,111,81,0.05);" onmouseover="this.style.background='var(--color-accent)'; this.style.color='#fff'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='#fff'; this.style.color='var(--color-accent)'; this.style.transform='none';"><c:out value="${cat.name}" /></span>
                             </c:forEach>
                         </div>

@@ -7,6 +7,7 @@
 <%@ attribute name="imageUrl" required="false" %>
 <%@ attribute name="onSale" required="false" type="java.lang.Boolean" %>
 <%@ attribute name="discountPercentage" required="false" type="java.lang.Integer" %>
+<%@ attribute name="categories" required="false" rtexprvalue="true" type="java.util.List" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <c:set var="isOnSale" value="${onSale ne null ? onSale : false}" />
@@ -34,6 +35,13 @@
     <div class="card-body" style="padding: 1rem 1.15rem;">
         <h6 class="product-title"><c:out value='${title}'/></h6>
         <p class="product-artist"><c:out value='${artist}'/></p>
+        <c:if test="${not empty categories}">
+            <div class="product-card-categories" aria-label="Géneros">
+                <c:forEach items="${categories}" var="cat">
+                    <span class="product-card-category-pill"><c:out value="${cat.name}"/></span>
+                </c:forEach>
+            </div>
+        </c:if>
         <c:choose>
             <c:when test="${isOnSale && discountPercentage ne null && discountPercentage gt 0}">
                 <div class="price-wrapper">

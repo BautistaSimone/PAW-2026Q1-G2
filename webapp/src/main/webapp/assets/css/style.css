@@ -691,6 +691,31 @@ img {
     margin-bottom: 0.6rem;
 }
 
+.product-card-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.55rem;
+}
+
+.product-card-category-pill {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-accent);
+    background: rgba(231, 111, 81, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(231, 111, 81, 0.2);
+    line-height: 1.2;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .product-price {
     font-family: var(--font-mono);
     font-size: 1.4rem;
@@ -2201,7 +2226,8 @@ details.filter-section:not([open]) .filter-section-chevron {
     color: var(--color-accent);
 }
 
-.genre-check .form-check-input:checked + .form-check-label {
+/* Spring form:checkbox inserts a hidden field after the checkbox; use ~ not + */
+.genre-check .form-check-input:checked ~ .form-check-label {
     background-color: var(--color-accent);
     border-color: var(--color-accent);
     color: #fff;

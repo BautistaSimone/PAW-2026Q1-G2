@@ -66,6 +66,7 @@
                                                 price="${product.price}"
                                                 installments="${product.installmentPrice}"
                                                 imageUrl="${productImageUrls[product.id]}"
+                                                categories="${product.categories}"
                                                 href="${productUrl}"/>
                                     </div>
                                 </c:forEach>
