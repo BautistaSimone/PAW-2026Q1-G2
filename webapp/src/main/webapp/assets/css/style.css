@@ -2576,6 +2576,48 @@ details.filter-section:not([open]) .filter-section-chevron {
     box-shadow: 0 4px 12px rgba(231, 111, 81, 0.2);
 }
 
+.btn-retro-secondary {
+    background: #e9ecef;
+    color: var(--color-text-main);
+}
+
+.btn-retro-secondary:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(231, 111, 81, 0.3);
+    color: #fff;
+}
+
+/* Password Toggle */
+.password-toggle-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle-wrapper .form-control {
+    padding-right: 3rem;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    z-index: 10;
+}
+
+.password-toggle-btn:hover {
+    color: var(--color-accent);
+}
+
 /* ===== Responsive ===== */
 
 @media (max-width: 991.98px) {

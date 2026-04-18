@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.controller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -22,6 +23,8 @@ import javax.validation.Valid;
 
 import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.ProductSearchCriteria;
+import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.form.ProductForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
@@ -163,6 +166,24 @@ public class ProductController {
         userService.findById(product.getUserId()).ifPresent(seller ->
             mav.addObject("seller", seller)
         );
+
+        List<Product> sellerProducts = productService.listProducts(
+            new ProductSearchCriteria(null, null, null, null, null, null, ProductSortOrder.NEWEST, product.getUserId())
+        ).stream().filter(p -> !p.getId().equals(product.getId())).limit(10).collect(Collectors.toList());
+
+        List<Product> relatedProducts = productService.listProducts(
+            new ProductSearchCriteria(product.getArtist(), null, null, null, null, null, ProductSortOrder.NEWEST, null)
+        ).stream().filter(p -> !p.getId().equals(product.getId())).limit(10).collect(Collectors.toList());
+
+        if (relatedProducts.isEmpty()) {
+            relatedProducts = productService.listProducts().stream()
+                .filter(p -> !p.getId().equals(product.getId()))
+                .filter(p -> sellerProducts.stream().noneMatch(sp -> sp.getId().equals(p.getId())))
+                .limit(10).collect(Collectors.toList());
+        }
+
+        mav.addObject("sellerProducts", sellerProducts);
+        mav.addObject("relatedProducts", relatedProducts);
 
         return mav;
     }

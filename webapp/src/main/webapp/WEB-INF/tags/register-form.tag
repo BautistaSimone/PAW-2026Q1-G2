@@ -43,24 +43,52 @@
                         <!-- Password -->
                         <div class="mb-3">
                             <label for="password" class="form-label">Contraseña</label>
-                            <form:password path="password"
-                                        id="password"
-                                        cssClass="form-control"
-                                        placeholder="Crea una contraseña"
-                                        autocomplete="new-password" />
+                            <div class="password-toggle-wrapper">
+                                <form:password path="password"
+                                            id="password"
+                                            cssClass="form-control"
+                                            placeholder="Crea una contraseña"
+                                            autocomplete="new-password" />
+                                <button type="button" class="password-toggle-btn" aria-label="Mostrar contraseña" onclick="togglePassword('password', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                             <form:errors path="password" cssClass="text-danger small"/>
                         </div>
 
                         <!-- Confirm Password -->
                         <div class="mb-3">
                             <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
-                            <form:password path="confirmPassword"
-                                        id="confirmPassword"
-                                        cssClass="form-control"
-                                        placeholder="Repeti la contraseña"
-                                        autocomplete="new-password" />
+                            <div class="password-toggle-wrapper">
+                                <form:password path="confirmPassword"
+                                            id="confirmPassword"
+                                            cssClass="form-control"
+                                            placeholder="Repeti la contraseña"
+                                            autocomplete="new-password" />
+                                <button type="button" class="password-toggle-btn" aria-label="Mostrar contraseña" onclick="togglePassword('confirmPassword', this)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                             <form:errors path="confirmPassword" cssClass="text-danger small"/>
                         </div>
+
+                        <script>
+                            function togglePassword(inputId, btn) {
+                                const input = document.getElementById(inputId);
+                                const icon = btn.querySelector('i');
+                                if (input.type === 'password') {
+                                    input.type = 'text';
+                                    icon.classList.remove('bi-eye');
+                                    icon.classList.add('bi-eye-slash');
+                                    btn.setAttribute('aria-label', 'Ocultar contraseña');
+                                } else {
+                                    input.type = 'password';
+                                    icon.classList.remove('bi-eye-slash');
+                                    icon.classList.add('bi-eye');
+                                    btn.setAttribute('aria-label', 'Mostrar contraseña');
+                                }
+                            }
+                        </script>
 
                         <!-- Submit -->
                         <div class="d-grid">
