@@ -150,4 +150,29 @@ public class ProductJdbcDaoTest {
         );
         Assertions.assertTrue(productDao.findProducts(criteria).isEmpty());
     }
+
+    @Test
+    public void reserveIfAvailableHidesProductAndOnlySucceedsOnce() {
+        final User user = userDao.createUser("seller4@test.com", "password", "seller4", false);
+        final Product product = productDao.createProduct(
+            user.getId(),
+            "Artaud",
+            "Pescado Rabioso",
+            "Talent",
+            "SE-515",
+            "Argentina",
+            Collections.emptyList(),
+            "Original",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            "Belgrano",
+            "CABA",
+            BigDecimal.valueOf(45000)
+        );
+
+        Assertions.assertTrue(productDao.reserveIfAvailable(product.getId()));
+        Assertions.assertFalse(productDao.reserveIfAvailable(product.getId()));
+        Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isEmpty());
+        Assertions.assertTrue(productDao.findProducts(ProductSearchCriteria.empty()).isEmpty());
+    }
 }

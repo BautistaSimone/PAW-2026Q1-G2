@@ -5,7 +5,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -37,13 +41,21 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @Transactional
     public Purchase createPurchase(Long productId, Long userId) {
+        if (productId == null) {
+            throw new IllegalArgumentException("Valid product is required");
+        }
         if (userId == null) {
             throw new IllegalArgumentException("Valid user is required");
         }
 
-        final Product product = productService.findByIdIfAvailable(productId)
+        final Product product = productService.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        if (product.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("Users cannot buy their own products");
+        }
 
         final User seller = userService.findById(product.getUserId())
             .orElseThrow(() -> new IllegalArgumentException("Seller not found"));
@@ -51,22 +63,45 @@ public class PurchaseServiceImpl implements PurchaseService {
         final User buyer = userService.findById(userId)
             .orElseThrow(() -> new IllegalArgumentException("Buyer not found"));
 
-        String buyerToken = UUID.randomUUID().toString();
-        String sellerToken = UUID.randomUUID().toString();
+        if (!productService.reserveIfAvailable(productId)) {
+            throw new IllegalStateException("Product is no longer available");
+        }
 
-        Purchase purchase = purchaseDao.createPurchase(productId, userId, seller.getId(), PurchaseStatus.PENDING, buyerToken, sellerToken);
+        final String buyerToken = UUID.randomUUID().toString();
+        final String sellerToken = UUID.randomUUID().toString();
 
-        // Notify Buyer
-        emailService.sendBuyerEmail(
-            buyer.getEmail(), 
-            purchase, 
-            product, 
-            "Comunicate con " + seller.getEmail() + " para abonar tu vinilo", 
-            "Has iniciado la compra de este vinilo. Una vez abonado, entra al enlace debajo para notificar al vendedor que ya pagaste.",
-            buyer.getUsername()
+        final Purchase purchase;
+        try {
+            purchase = purchaseDao.createPurchase(productId, userId, seller.getId(), PurchaseStatus.PENDING, buyerToken, sellerToken);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalStateException("Product is no longer available", e);
+        }
+
+        runAfterCommit(() ->
+            emailService.sendBuyerEmail(
+                buyer.getEmail(),
+                purchase,
+                product,
+                "Comunicate con " + seller.getEmail() + " para abonar tu vinilo",
+                "Has iniciado la compra de este vinilo. Una vez abonado, entra al enlace debajo para notificar al vendedor que ya pagaste.",
+                buyer.getUsername()
+            )
         );
 
         return purchase;
+    }
+
+    private static void runAfterCommit(final Runnable task) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    task.run();
+                }
+            });
+        } else {
+            task.run();
+        }
     }
 
     @Override

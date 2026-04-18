@@ -34,6 +34,8 @@ public interface ProductService {
 
     Optional<Product> findByIdIfAvailable(final Long id);
 
+    boolean reserveIfAvailable(final Long id);
+
     void markAsSold(final Long id);
 
     void hideProductFromCatalog(final Long id);

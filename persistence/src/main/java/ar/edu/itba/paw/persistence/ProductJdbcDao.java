@@ -286,6 +286,14 @@ public class ProductJdbcDao implements ProductDao {
     }
 
     @Override
+    public boolean reserveIfAvailable(final Long id) {
+        return jdbcTemplate.update(
+            "UPDATE products SET available = FALSE WHERE product_id = ? AND available = TRUE",
+            id
+        ) == 1;
+    }
+
+    @Override
     public void markAsSold(final Long id) {
         markAsUnavailable(id);
     }

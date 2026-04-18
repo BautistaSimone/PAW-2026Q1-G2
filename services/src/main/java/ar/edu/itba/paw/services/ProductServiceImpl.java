@@ -94,6 +94,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public boolean reserveIfAvailable(final Long id) {
+        return productDao.reserveIfAvailable(id);
+    }
+
+    @Override
     public void markAsSold(final Long id) {
         productDao.markAsSold(id);
     }

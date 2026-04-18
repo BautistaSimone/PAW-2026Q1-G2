@@ -23,6 +23,18 @@
                     La publicación fue ocultada del catálogo.
                 </div>
             </c:if>
+            <c:if test="${param.purchaseUnavailable eq '1'}">
+                <div class="alert-retro alert-retro-warning mb-3" role="alert">
+                    <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                    Ese vinilo ya fue reservado por otra persona.
+                </div>
+            </c:if>
+            <c:if test="${param.purchaseError eq '1'}">
+                <div class="alert-retro alert-retro-warning mb-3" role="alert">
+                    <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                    No pudimos iniciar la compra. Intentalo nuevamente.
+                </div>
+            </c:if>
 
 
             <div class="products-layout-grid">

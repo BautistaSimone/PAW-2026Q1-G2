@@ -22,6 +22,12 @@
                                         Gracias por el reporte. Nuestro equipo lo revisará.
                                     </div>
                                 </c:if>
+                                <c:if test="${param.purchaseError eq '1'}">
+                                    <div class="alert-retro alert-retro-warning mb-3" role="alert">
+                                        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                                        No pudimos iniciar la compra de este vinilo.
+                                    </div>
+                                </c:if>
 
                                 <div class="mb-4">
                                     <a href="<c:url value='/'/>"

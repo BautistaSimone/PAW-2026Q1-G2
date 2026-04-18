@@ -50,12 +50,22 @@ public class PurchaseController {
         }
 
         if (errors.hasErrors()) {
-            return new ModelAndView("redirect:/products/" + form.getProductId() + "?error=1");
+            if (form.getProductId() == null) {
+                return new ModelAndView("redirect:/?purchaseError=1");
+            }
+            return new ModelAndView("redirect:/products/" + form.getProductId() + "?purchaseError=1");
         }
         
         User user = authUser.getUser();
 
-        Purchase purchase = purchaseService.createPurchase(form.getProductId(), user.getId());
+        final Purchase purchase;
+        try {
+            purchase = purchaseService.createPurchase(form.getProductId(), user.getId());
+        } catch (IllegalStateException e) {
+            return new ModelAndView("redirect:/?purchaseUnavailable=1");
+        } catch (IllegalArgumentException e) {
+            return new ModelAndView("redirect:/products/" + form.getProductId() + "?purchaseError=1");
+        }
         return new ModelAndView("redirect:/purchases/" + purchase.getPurchaseId() + "?token=" + purchase.getBuyerToken());
     }
 

@@ -34,6 +34,8 @@ public interface ProductDao {
 
     Optional<Product> findByIdIfAvailable(final Long id);
 
+    boolean reserveIfAvailable(final Long id);
+
     void markAsSold(final Long id);
 
     void markAsUnavailable(final Long id);
