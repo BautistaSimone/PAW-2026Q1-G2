@@ -93,12 +93,23 @@ public class UserController {
     public ModelAndView createUser(@Valid @ModelAttribute RegisterForm form, 
         final BindingResult errors) {
 
+        ModelAndView mv = new ModelAndView("register");
+        mv.addObject("registerForm", form);
+
         if (errors.hasErrors()) {
-            return new ModelAndView("register");
+            // field-level errors will now show
+            return mv;
         }
 
         LOGGER.atDebug().addArgument(form.getEmail()).log("About to attempt register email {}");
 
+        if (userService.findByEmail(form.getEmail()).isPresent()) {
+            LOGGER.atDebug().addArgument(form.getEmail()).log("The email {} is already in use");
+
+            errors.rejectValue("email", "EmailInUse.authForm.email");
+            return mv;
+        }
+        
         final User user = userService.createUser(form.getEmail(), form.getPassword(), form.getUsername(), false);
 
         Collection<? extends GrantedAuthority> authorities =
