@@ -2507,6 +2507,32 @@ details.filter-section:not([open]) .filter-section-chevron {
     border-bottom: 2px solid var(--color-border);
 }
 
+/* Profile tabs: override Bootstrap default link blue */
+.profile-page #profileTabs.nav-tabs .nav-link {
+    color: var(--color-text-muted);
+    transition: color var(--transition);
+}
+
+.profile-page #profileTabs.nav-tabs .nav-link:hover,
+.profile-page #profileTabs.nav-tabs .nav-link:focus {
+    color: var(--color-text-main);
+}
+
+.profile-page #profileTabs.nav-tabs .nav-link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+.profile-page #profileTabs.nav-tabs .nav-link.active,
+.profile-page #profileTabs.nav-tabs .nav-item.show .nav-link {
+    color: var(--color-accent);
+}
+
+.profile-page #profileTabs.nav-tabs .nav-link.active:hover,
+.profile-page #profileTabs.nav-tabs .nav-item.show .nav-link:hover {
+    color: var(--color-accent-hover);
+}
+
 /* ===== Purchase Panel ===== */
 
 .purchase-page {
