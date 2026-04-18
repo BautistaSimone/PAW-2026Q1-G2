@@ -291,27 +291,40 @@
 
                                 <!-- Carousels: Más de y También te podría interesar -->
                                 <div class="mt-5">
+                                <div class="recommendations-wrapper">
                                     <div class="mb-5">
-                                        <h4
-                                            style="font-family: var(--font-heading); font-weight: 700; color: var(--color-text-main); margin-bottom: 1.5rem; border-bottom: 2px solid var(--color-border); padding-bottom: 0.5rem; font-size: 1.5rem;">
+                                        <h4 class="recommendations-title">
                                             Más de
                                             <c:out value="${seller.username}" />
                                         </h4>
                                         <c:choose>
                                             <c:when test="${not empty sellerProducts}">
-                                                <div class="d-flex gap-4 overflow-x-auto pb-4"
-                                                    style="scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: var(--color-accent) transparent;">
-                                                    <c:forEach items="${sellerProducts}" var="sp">
-                                                        <div style="flex: 0 0 280px; scroll-snap-align: start;">
-                                                            <c:url value="/products/${sp.id}" var="spUrl" />
-                                                            <c:url value="/images/product/${sp.id}" var="spImageUrl" />
-                                                            <ui:productCard title="${sp.title}" artist="${sp.artist}"
-                                                                price="${sp.price}"
-                                                                installments="${sp.installmentPrice}"
-                                                                imageUrl="${spImageUrl}" categories="${sp.categories}"
-                                                                href="${spUrl}" />
-                                                        </div>
-                                                    </c:forEach>
+                                                <div id="sellerCarousel" class="recommendations-carousel">
+                                                    <div class="carousel-fade-edge left"></div>
+                                                    <div class="carousel-fade-edge right"></div>
+
+                                                    <button class="carousel-control-btn prev" aria-label="Anterior">
+                                                        <i class="bi bi-chevron-left"></i>
+                                                    </button>
+
+                                                    <div class="carousel-track">
+                                                        <c:forEach items="${sellerProducts}" var="sp">
+                                                            <div class="carousel-item-wrapper">
+                                                                <c:url value="/products/${sp.id}" var="spUrl" />
+                                                                <c:url value="/images/product/${sp.id}"
+                                                                    var="spImageUrl" />
+                                                                <ui:productCard title="${sp.title}"
+                                                                    artist="${sp.artist}" price="${sp.price}"
+                                                                    installments="${sp.installmentPrice}"
+                                                                    imageUrl="${spImageUrl}"
+                                                                    categories="${sp.categories}" href="${spUrl}" />
+                                                            </div>
+                                                        </c:forEach>
+                                                    </div>
+
+                                                    <button class="carousel-control-btn next" aria-label="Siguiente">
+                                                        <i class="bi bi-chevron-right"></i>
+                                                    </button>
                                                 </div>
                                             </c:when>
                                             <c:otherwise>
@@ -327,25 +340,35 @@
                                     </div>
 
                                     <div class="mb-5">
-                                        <h4
-                                            style="font-family: var(--font-heading); font-weight: 700; color: var(--color-text-main); margin-bottom: 1.5rem; border-bottom: 2px solid var(--color-border); padding-bottom: 0.5rem; font-size: 1.5rem;">
-                                            También te podría interesar
-                                        </h4>
+                                        <h4 class="recommendations-title">También te podría interesar</h4>
                                         <c:choose>
                                             <c:when test="${not empty relatedProducts}">
-                                                <div class="d-flex gap-4 overflow-x-auto pb-4"
-                                                    style="scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: var(--color-accent) transparent;">
-                                                    <c:forEach items="${relatedProducts}" var="rp">
-                                                        <div style="flex: 0 0 280px; scroll-snap-align: start;">
-                                                            <c:url value="/products/${rp.id}" var="rpUrl" />
-                                                            <c:url value="/images/product/${rp.id}" var="rpImageUrl" />
-                                                            <ui:productCard title="${rp.title}" artist="${rp.artist}"
-                                                                price="${rp.price}"
-                                                                installments="${rp.installmentPrice}"
-                                                                imageUrl="${rpImageUrl}" categories="${rp.categories}"
-                                                                href="${rpUrl}" />
-                                                        </div>
-                                                    </c:forEach>
+                                                <div id="relatedCarousel" class="recommendations-carousel">
+                                                    <div class="carousel-fade-edge left"></div>
+                                                    <div class="carousel-fade-edge right"></div>
+
+                                                    <button class="carousel-control-btn prev" aria-label="Anterior">
+                                                        <i class="bi bi-chevron-left"></i>
+                                                    </button>
+
+                                                    <div class="carousel-track">
+                                                        <c:forEach items="${relatedProducts}" var="rp">
+                                                            <div class="carousel-item-wrapper">
+                                                                <c:url value="/products/${rp.id}" var="rpUrl" />
+                                                                <c:url value="/images/product/${rp.id}"
+                                                                    var="rpImageUrl" />
+                                                                <ui:productCard title="${rp.title}"
+                                                                    artist="${rp.artist}" price="${rp.price}"
+                                                                    installments="${rp.installmentPrice}"
+                                                                    imageUrl="${rpImageUrl}"
+                                                                    categories="${rp.categories}" href="${rpUrl}" />
+                                                            </div>
+                                                        </c:forEach>
+                                                    </div>
+
+                                                    <button class="carousel-control-btn next" aria-label="Siguiente">
+                                                        <i class="bi bi-chevron-right"></i>
+                                                    </button>
                                                 </div>
                                             </c:when>
                                             <c:otherwise>
@@ -388,4 +411,56 @@
                                     })();
                                 </script>
                             </c:if>
+
+                            <script>
+                                (function () {
+                                    function initCarousel(id) {
+                                        const carousel = document.getElementById(id);
+                                        if (!carousel) return;
+
+                                        const track = carousel.querySelector('.carousel-track');
+                                        const prevBtn = carousel.querySelector('.carousel-control-btn.prev');
+                                        const nextBtn = carousel.querySelector('.carousel-control-btn.next');
+                                        const fadeLeft = carousel.querySelector('.carousel-fade-edge.left');
+                                        const fadeRight = carousel.querySelector('.carousel-fade-edge.right');
+
+                                        if (!track || !prevBtn || !nextBtn) return;
+
+                                        const updateControls = () => {
+                                            const scrollLeft = track.scrollLeft;
+                                            const maxScrollLeft = track.scrollWidth - track.clientWidth;
+
+                                            if (prevBtn) {
+                                                prevBtn.style.opacity = scrollLeft > 10 ? '1' : '0';
+                                                prevBtn.style.pointerEvents = scrollLeft > 10 ? 'auto' : 'none';
+                                            }
+
+                                            if (nextBtn) {
+                                                nextBtn.style.opacity = scrollLeft < maxScrollLeft - 10 ? '1' : '0';
+                                                nextBtn.style.pointerEvents = scrollLeft < maxScrollLeft - 10 ? 'auto' : 'none';
+                                            }
+
+                                            if (fadeLeft) fadeLeft.style.opacity = scrollLeft > 20 ? '1' : '0';
+                                            if (fadeRight) fadeRight.style.opacity = scrollLeft < maxScrollLeft - 20 ? '1' : '0';
+                                        };
+
+                                        prevBtn.addEventListener('click', () => {
+                                            track.scrollBy({ left: -(track.clientWidth * 0.8), behavior: 'smooth' });
+                                        });
+
+                                        nextBtn.addEventListener('click', () => {
+                                            track.scrollBy({ left: (track.clientWidth * 0.8), behavior: 'smooth' });
+                                        });
+
+                                        track.addEventListener('scroll', updateControls);
+                                        window.addEventListener('resize', updateControls);
+
+                                        // Initial check
+                                        setTimeout(updateControls, 150);
+                                    }
+
+                                    initCarousel('sellerCarousel');
+                                    initCarousel('relatedCarousel');
+                                })();
+                            </script>
                         </ui:layout>

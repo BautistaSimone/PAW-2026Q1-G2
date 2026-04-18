@@ -124,26 +124,56 @@
         </div>
     </details>
 
+    <div class="filters-actions-sticky">
+        <button type="submit" class="btn-retro filters-apply-btn" id="applyFiltersBtn" disabled>
+            <i class="bi bi-check2-all" aria-hidden="true"></i> Aplicar Filtros
+        </button>
+    </div>
+
 </form>
 
 <!-- Scripts -->
 <script>
 (function () {
     var form = document.querySelector('form.filters-bar');
-    if (!form) {
+    var applyBtn = document.getElementById('applyFiltersBtn');
+    if (!form || !applyBtn) {
         return;
     }
 
-    function submitFilters() {
-        if (typeof form.requestSubmit === 'function') {
-            form.requestSubmit();
+    // Function to serialize form state for comparison
+    function getSerializedState() {
+        var formData = new FormData(form);
+        // Sort keys to ensure consistent comparison regardless of order
+        var params = new URLSearchParams();
+        Array.from(formData.entries()).sort().forEach(function(pair) {
+            params.append(pair[0], pair[1]);
+        });
+        return params.toString();
+    }
+
+    // Store initial state to detect changes
+    var initialState = getSerializedState();
+    
+    function checkChanges() {
+        var currentState = getSerializedState();
+        if (currentState !== initialState) {
+            applyBtn.disabled = false;
+            applyBtn.classList.add('is-active');
         } else {
-            form.submit();
+            applyBtn.disabled = true;
+            applyBtn.classList.remove('is-active');
         }
     }
 
     form.addEventListener('change', function () {
-        submitFilters();
+        checkChanges();
+    });
+
+    form.addEventListener('input', function(e) {
+        if (e.target.tagName === 'INPUT') {
+            checkChanges();
+        }
     });
 
     document.querySelectorAll('.price-preset-btn').forEach(function (btn) {
@@ -158,8 +188,17 @@
             if (maxEl) {
                 maxEl.value = dMax !== null && dMax !== '' ? dMax : '';
             }
-            submitFilters();
+            checkChanges();
         });
     });
+
+    // Expose sort update function for home.jsp
+    window.updateFiltersSort = function(newSort) {
+        var sortInput = form.querySelector('input[name="sort"]');
+        if (sortInput) {
+            sortInput.value = newSort;
+            checkChanges();
+        }
+    };
 })();
 </script>

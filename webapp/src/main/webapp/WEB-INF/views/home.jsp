@@ -96,9 +96,14 @@
         var sortSelect = document.getElementById('sortSelect');
         if (sortSelect) {
             sortSelect.addEventListener('change', function () {
-                var params = new URLSearchParams(window.location.search);
-                params.set('sort', sortSelect.value);
-                window.location.search = params.toString();
+                if (window.updateFiltersSort) {
+                    window.updateFiltersSort(sortSelect.value);
+                } else {
+                    // Fallback
+                    var params = new URLSearchParams(window.location.search);
+                    params.set('sort', sortSelect.value);
+                    window.location.search = params.toString();
+                }
             });
         }
 

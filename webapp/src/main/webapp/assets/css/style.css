@@ -976,8 +976,59 @@ details.filter-section:not([open]) .filter-section-chevron {
     color: #bbb;
 }
 
+/* Filter Actions - Batch Mode */
+.filters-actions-sticky {
+    position: sticky;
+    bottom: 0;
+    margin-top: 1.5rem;
+    padding: 1.25rem 0; /* Removed horizontal padding so button hits the edges if margin-left/right not enough */
+    background: var(--color-card-bg);
+    z-index: 20;
+    border-top: 2px solid var(--color-border);
+}
+
 .filters-apply-btn {
-    margin-top: 0.5rem;
+    width: 100%;
+    padding: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.filters-apply-btn:disabled {
+    background: #e9ecef !important;
+    color: #adb5bd !important;
+    border-color: var(--color-border) !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    box-shadow: none !important;
+}
+
+.filters-apply-btn:not(:disabled) {
+    background: var(--color-accent);
+    color: #fff;
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px rgba(231, 111, 81, 0.25);
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.filters-apply-btn:not(:disabled):hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(231, 111, 81, 0.35);
+}
+
+.filters-apply-btn:not(:disabled):active {
+    transform: translateY(0);
 }
 
 /* Category filter chips */
@@ -1647,6 +1698,125 @@ details.filter-section:not([open]) .filter-section-chevron {
     object-fit: cover;
     display: block;
     pointer-events: none;
+}
+
+/* Recommendation Carousels Redesign */
+.recommendations-wrapper {
+    position: relative;
+    padding: 1.5rem 0;
+}
+
+.recommendations-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin-bottom: 2rem;
+    padding-bottom: 0.75rem;
+    font-size: 1.75rem;
+    border-bottom: 3px solid rgba(231, 111, 81, 0.15);
+    display: inline-block;
+}
+
+.recommendations-carousel {
+    position: relative;
+    margin: 0 -1rem;
+    padding: 0.5rem 1rem;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 1.75rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 0.5rem 0 1.5rem;
+}
+
+.carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-item-wrapper {
+    flex: 0 0 300px;
+    scroll-snap-align: start;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carousel-control-btn {
+    position: absolute;
+    top: calc(50% - 24px);
+    width: 48px;
+    height: 48px;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 50%;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    cursor: pointer;
+    color: var(--color-accent);
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.recommendations-carousel:hover .carousel-control-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.carousel-control-btn:hover {
+    background: var(--color-accent);
+    color: #fff;
+    transform: scale(1.1);
+    box-shadow: 0 10px 30px rgba(231,111,81,0.3);
+}
+
+.carousel-control-btn.prev {
+    left: -10px;
+}
+
+.carousel-control-btn.next {
+    right: -10px;
+}
+
+.carousel-fade-edge {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    z-index: 5;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.carousel-fade-edge.left {
+    left: 0;
+    background: linear-gradient(to right, var(--color-bg-light) 0%, transparent 100%);
+    opacity: 0;
+}
+
+.carousel-fade-edge.right {
+    right: 0;
+    background: linear-gradient(to left, var(--color-bg-light) 0%, transparent 100%);
+}
+
+@media (max-width: 992px) {
+    .carousel-control-btn, .carousel-fade-edge {
+        display: none;
+    }
+    .carousel-track {
+        gap: 1.25rem;
+        padding-left: 0.5rem;
+    }
+    .carousel-item-wrapper {
+        flex: 0 0 260px;
+    }
 }
 
 /* Condition badges */
