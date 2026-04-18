@@ -106,7 +106,8 @@ public class PurchaseServiceImplTest {
             Mockito.eq(product),
             Mockito.anyString(),
             Mockito.anyString(),
-            Mockito.eq("buyer")
+            Mockito.eq("buyer"),
+            Mockito.eq(PurchaseStatus.PENDING)
         );
     }
 

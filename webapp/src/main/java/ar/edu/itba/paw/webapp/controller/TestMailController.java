@@ -39,7 +39,8 @@ public class TestMailController {
             mockProduct,
             "Correo de prueba — Vinyland",
             "Este es un mensaje de prueba del sistema de notificaciones de compra. Pedido de referencia: " + testOrderId + ".",
-            "Amante del vinilo"
+            "Amante del vinilo",
+            PurchaseStatus.PENDING
         );
         
         return "Mail sent to " + email + " (asynchronously)! " +

@@ -22,6 +22,89 @@
                         <h1 class="heading-accent" style="color:#e76f51;font-size:20px;font-weight:700;margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;" th:text="${title}">Título</h1>
                         <p style="margin:0 0 18px;color:#264653;" th:text="${message}">Mensaje</p>
 
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0 24px;font-family:Arial,Helvetica,sans-serif;">
+                            <tr>
+                                <td align="center" style="padding:0;">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                                        <tr>
+                                            <!-- Step 1: Pendiente -->
+                                            <td align="center" style="padding:0 2px;vertical-align:top;">
+                                                <table role="presentation" cellpadding="0" cellspacing="0">
+                                                    <tr>
+                                                        <td align="center" style="padding:0;">
+                                                            <div th:style="${currentStep >= 0 ? 'width:32px;height:32px;border-radius:50%;background-color:#e76f51;border:2px solid #e76f51;color:#ffffff;font-size:13px;font-weight:700;line-height:28px;text-align:center;' : 'width:32px;height:32px;border-radius:50%;background-color:#f4f4f4;border:2px solid #d8d8d8;color:#999999;font-size:13px;font-weight:700;line-height:28px;text-align:center;'}">1</div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td align="center" style="padding:6px 0 0;">
+                                                            <span th:style="${currentStep >= 0 ? 'font-size:11px;font-weight:700;color:#e76f51;' : 'font-size:11px;font-weight:600;color:#999999;'}">Pendiente</span>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                            <!-- Connector 1-2 -->
+                                            <td style="vertical-align:top;padding-top:14px;">
+                                                <div th:style="${currentStep >= 1 ? 'width:40px;height:3px;background-color:#e76f51;border-radius:2px;' : 'width:40px;height:3px;background-color:#d8d8d8;border-radius:2px;'}"></div>
+                                            </td>
+                                            <!-- Step 2: Pagado -->
+                                            <td align="center" style="padding:0 2px;vertical-align:top;">
+                                                <table role="presentation" cellpadding="0" cellspacing="0">
+                                                    <tr>
+                                                        <td align="center" style="padding:0;">
+                                                            <div th:style="${currentStep >= 1 ? 'width:32px;height:32px;border-radius:50%;background-color:#e76f51;border:2px solid #e76f51;color:#ffffff;font-size:13px;font-weight:700;line-height:28px;text-align:center;' : 'width:32px;height:32px;border-radius:50%;background-color:#f4f4f4;border:2px solid #d8d8d8;color:#999999;font-size:13px;font-weight:700;line-height:28px;text-align:center;'}">2</div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td align="center" style="padding:6px 0 0;">
+                                                            <span th:style="${currentStep >= 1 ? 'font-size:11px;font-weight:700;color:#e76f51;' : 'font-size:11px;font-weight:600;color:#999999;'}">Pagado</span>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                            <!-- Connector 2-3 -->
+                                            <td style="vertical-align:top;padding-top:14px;">
+                                                <div th:style="${currentStep >= 2 ? 'width:40px;height:3px;background-color:#e76f51;border-radius:2px;' : 'width:40px;height:3px;background-color:#d8d8d8;border-radius:2px;'}"></div>
+                                            </td>
+                                            <!-- Step 3: Enviado -->
+                                            <td align="center" style="padding:0 2px;vertical-align:top;">
+                                                <table role="presentation" cellpadding="0" cellspacing="0">
+                                                    <tr>
+                                                        <td align="center" style="padding:0;">
+                                                            <div th:style="${currentStep >= 2 ? 'width:32px;height:32px;border-radius:50%;background-color:#e76f51;border:2px solid #e76f51;color:#ffffff;font-size:13px;font-weight:700;line-height:28px;text-align:center;' : 'width:32px;height:32px;border-radius:50%;background-color:#f4f4f4;border:2px solid #d8d8d8;color:#999999;font-size:13px;font-weight:700;line-height:28px;text-align:center;'}">3</div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td align="center" style="padding:6px 0 0;">
+                                                            <span th:style="${currentStep >= 2 ? 'font-size:11px;font-weight:700;color:#e76f51;' : 'font-size:11px;font-weight:600;color:#999999;'}">Enviado</span>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                            <!-- Connector 3-4 -->
+                                            <td style="vertical-align:top;padding-top:14px;">
+                                                <div th:style="${currentStep >= 3 ? 'width:40px;height:3px;background-color:#e76f51;border-radius:2px;' : 'width:40px;height:3px;background-color:#d8d8d8;border-radius:2px;'}"></div>
+                                            </td>
+                                            <!-- Step 4: Entregado -->
+                                            <td align="center" style="padding:0 2px;vertical-align:top;">
+                                                <table role="presentation" cellpadding="0" cellspacing="0">
+                                                    <tr>
+                                                        <td align="center" style="padding:0;">
+                                                            <div th:style="${currentStep >= 3 ? 'width:32px;height:32px;border-radius:50%;background-color:#e76f51;border:2px solid #e76f51;color:#ffffff;font-size:13px;font-weight:700;line-height:28px;text-align:center;' : 'width:32px;height:32px;border-radius:50%;background-color:#f4f4f4;border:2px solid #d8d8d8;color:#999999;font-size:13px;font-weight:700;line-height:28px;text-align:center;'}">4</div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td align="center" style="padding:6px 0 0;">
+                                                            <span th:style="${currentStep >= 3 ? 'font-size:11px;font-weight:700;color:#e76f51;' : 'font-size:11px;font-weight:600;color:#999999;'}">Entregado</span>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
                         <div class="order-summary" style="background-color:#f4f4f4;border:1px solid #e0e0e0;border-radius:8px;padding:18px 20px;margin:20px 0;">
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif;font-size:15px;">
                                 <tr>

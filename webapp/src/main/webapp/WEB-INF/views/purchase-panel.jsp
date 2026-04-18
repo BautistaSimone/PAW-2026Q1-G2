@@ -8,20 +8,15 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8 col-xl-7">
-                    <div class="mb-3 d-flex align-items-center justify-content-between w-100 flex-wrap">
-                        <a href="<c:url value='/'/>"
-                           style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none; transition: color 0.2s;"
-                           onmouseover="this.style.color='var(--color-accent)';" onmouseout="this.style.color='var(--color-text-muted)';">
-                            <i class="bi bi-arrow-left" aria-hidden="true" style="font-size: 1.1rem;"></i>
-                            <span>Volver al inicio</span>
-                        </a>
-                        <a href="<c:url value='/profile'/>"
-                           style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none; transition: color 0.2s;"
-                           onmouseover="this.style.color='var(--color-accent)';" onmouseout="this.style.color='var(--color-text-muted)';">
-                            <i class="bi bi-person" aria-hidden="true" style="font-size: 1rem;"></i>
-                            <span>Mi perfil</span>
-                        </a>
-                    </div>
+                    <nav aria-label="breadcrumb" class="mb-3">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="<c:url value='/'/>">Inicio</a></li>
+                            <c:if test="${isBuyer}">
+                                <li class="breadcrumb-item"><a href="<c:url value='/profile'/>">Mi Perfil</a></li>
+                            </c:if>
+                            <li class="breadcrumb-item active" aria-current="page">Pedido #<c:out value="${purchase.purchaseId}"/></li>
+                        </ol>
+                    </nav>
                     <c:if test="${param.updated eq '1'}">
                         <div class="alert-retro alert-retro-success mb-3">
                             <i class="bi bi-check-circle" aria-hidden="true"></i> Estado actualizado correctamente.
@@ -38,6 +33,7 @@
                             <h4><i class="bi bi-receipt" aria-hidden="true"></i> Pedido #<c:out value="${purchase.purchaseId}"/></h4>
                             <span class="purchase-status-badge">${purchase.status.description}</span>
                         </div>
+                        <ui:purchase-stepper status="${purchase.status}" />
                         <div class="purchase-card-body">
 
                             <div class="purchase-product-row">

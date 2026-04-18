@@ -17,6 +17,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import ar.edu.itba.paw.models.Purchase;
+import ar.edu.itba.paw.models.PurchaseStatus;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.User;
 
@@ -46,16 +47,16 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendBuyerEmail(String to, Purchase purchase, Product product, String title, String message, String recipientName) {
+    public void sendBuyerEmail(String to, Purchase purchase, Product product, String title, String message, String recipientName, PurchaseStatus currentStatus) {
         String tokenUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId() + "?token=" + purchase.getBuyerToken());
-        sendEmail(to, product, purchase.getPurchaseId(), title, message, tokenUrl, recipientName);
+        sendEmail(to, product, purchase.getPurchaseId(), title, message, tokenUrl, recipientName, currentStatus);
     }
 
     @Async
     @Override
-    public void sendSellerEmail(String to, Purchase purchase, Product product, String title, String message, String recipientName) {
+    public void sendSellerEmail(String to, Purchase purchase, Product product, String title, String message, String recipientName, PurchaseStatus currentStatus) {
         String tokenUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId() + "?token=" + purchase.getSellerToken());
-        sendEmail(to, product, purchase.getPurchaseId(), title, message, tokenUrl, recipientName);
+        sendEmail(to, product, purchase.getPurchaseId(), title, message, tokenUrl, recipientName, currentStatus);
     }
 
     @Async
@@ -96,7 +97,7 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    private void sendEmail(String to, Product product, long purchaseId, String title, String message, String actionUrl, String recipientName) {
+    private void sendEmail(String to, Product product, long purchaseId, String title, String message, String actionUrl, String recipientName, PurchaseStatus currentStatus) {
         final Context ctx = new Context(LocaleContextHolder.getLocale());
         ctx.setVariable("title", title);
         ctx.setVariable("message", message);
@@ -105,6 +106,7 @@ public class EmailServiceImpl implements EmailService {
         ctx.setVariable("actionUrl", actionUrl);
         ctx.setVariable("recipientName", recipientName);
         ctx.setVariable("purchaseId", purchaseId);
+        ctx.setVariable("currentStep", currentStatus.ordinal());
 
         try {
             final MimeMessage mimeMessage = javaMailSender.createMimeMessage();

@@ -2533,6 +2533,123 @@ details.filter-section:not([open]) .filter-section-chevron {
     color: var(--color-accent-hover);
 }
 
+/* ===== Purchase Stepper ===== */
+
+.purchase-stepper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1.5rem 1.75rem;
+    gap: 0;
+    border-bottom: 1.5px solid var(--color-border);
+    background: var(--color-card-bg);
+}
+
+.purchase-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.purchase-step-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    border: 2.5px solid var(--color-border);
+    background: var(--color-card-bg);
+    color: var(--color-text-muted);
+    transition: all 0.3s ease;
+}
+
+.purchase-step-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-align: center;
+    max-width: 72px;
+    line-height: 1.2;
+    transition: color 0.3s ease;
+}
+
+.purchase-step-connector {
+    flex: 1;
+    height: 3px;
+    background: var(--color-border);
+    align-self: center;
+    margin-top: -0.85rem;
+    min-width: 32px;
+    border-radius: 2px;
+    transition: background 0.3s ease;
+}
+
+.purchase-step-connector--filled {
+    background: var(--color-accent);
+}
+
+.purchase-step--completed .purchase-step-icon {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+}
+
+.purchase-step--completed .purchase-step-label {
+    color: var(--color-accent);
+}
+
+.purchase-step--current .purchase-step-icon {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    box-shadow: 0 0 0 4px rgba(231, 111, 81, 0.15);
+    animation: stepPulse 2s ease-in-out infinite;
+}
+
+.purchase-step--current .purchase-step-label {
+    color: var(--color-text);
+    font-weight: 700;
+}
+
+@keyframes stepPulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(231, 111, 81, 0.15); }
+    50% { box-shadow: 0 0 0 8px rgba(231, 111, 81, 0.08); }
+}
+
+.purchase-step--pending .purchase-step-icon {
+    opacity: 0.5;
+}
+
+.purchase-step--pending .purchase-step-label {
+    opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+    .purchase-stepper {
+        padding: 1rem 1rem;
+    }
+
+    .purchase-step-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 0.95rem;
+    }
+
+    .purchase-step-label {
+        font-size: 0.7rem;
+        max-width: 60px;
+    }
+
+    .purchase-step-connector {
+        min-width: 20px;
+        margin-top: -1rem;
+    }
+}
+
 /* ===== Purchase Panel ===== */
 
 .purchase-page {

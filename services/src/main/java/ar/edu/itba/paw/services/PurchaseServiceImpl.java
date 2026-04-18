@@ -84,7 +84,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                 product,
                 "Comunicate con " + seller.getEmail() + " para abonar tu vinilo",
                 "Has iniciado la compra de este vinilo. Una vez abonado, entra al enlace debajo para notificar al vendedor que ya pagaste.",
-                buyer.getUsername()
+                buyer.getUsername(),
+                PurchaseStatus.PENDING
             )
         );
 
@@ -140,7 +141,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                 product, 
                 "El comprador ha pagado", 
                 "El comprador " + buyer.getUsername() + " dice haber pagado. Verifica y marca el pago como recibido.",
-                seller.getUsername()
+                seller.getUsername(),
+                PurchaseStatus.PAID
             );
         } 
         else if (newStatus == PurchaseStatus.SHIPPED && isSeller && purchase.getStatus() == PurchaseStatus.PAID) {
@@ -152,7 +154,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                 product, 
                 "Tu vinilo ha sido enviado", 
                 "El vendedor ha despachado el vinilo. Avisanos cuando te llegue desde el detalle de la compra.",
-                buyer.getUsername()
+                buyer.getUsername(),
+                PurchaseStatus.SHIPPED
             );
         }
         else if (newStatus == PurchaseStatus.DELIVERED && isBuyer && purchase.getStatus() == PurchaseStatus.SHIPPED) {
