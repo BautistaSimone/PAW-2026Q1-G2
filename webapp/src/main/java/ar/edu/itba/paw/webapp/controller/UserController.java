@@ -201,6 +201,18 @@ public class UserController {
             mv.addObject("purchases", purchases);
             mv.addObject("purchaseProducts", purchaseProducts);
             mv.addObject("purchaseHasReview", purchaseHasReview);
+
+            final List<Purchase> sales = purchaseService.findBySellerId(profileUser.getId());
+
+            final Map<Long, Product> saleProducts = new HashMap<>();
+            for (Purchase s : sales) {
+                productService.findById(s.getProductId()).ifPresent(prod ->
+                    saleProducts.put(s.getPurchaseId(), prod)
+                );
+            }
+
+            mv.addObject("sales", sales);
+            mv.addObject("saleProducts", saleProducts);
         }
 
         return mv;

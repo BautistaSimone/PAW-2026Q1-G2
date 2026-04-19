@@ -11,9 +11,15 @@
                     <nav aria-label="breadcrumb" class="mb-3">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="<c:url value='/'/>">Inicio</a></li>
-                            <c:if test="${isBuyer}">
-                                <li class="breadcrumb-item"><a href="<c:url value='/profile'/>">Mi Perfil</a></li>
-                            </c:if>
+                            <li class="breadcrumb-item"><a href="<c:url value='/profile'/>">Mi Perfil</a></li>
+                            <c:choose>
+                                <c:when test="${isBuyer}">
+                                    <li class="breadcrumb-item"><a href="<c:url value='/profile#purchases'/>">Mis compras</a></li>
+                                </c:when>
+                                <c:when test="${isSeller}">
+                                    <li class="breadcrumb-item"><a href="<c:url value='/profile#sales'/>">Mis ventas</a></li>
+                                </c:when>
+                            </c:choose>
                             <li class="breadcrumb-item active" aria-current="page">Pedido #<c:out value="${purchase.purchaseId}"/></li>
                         </ol>
                     </nav>

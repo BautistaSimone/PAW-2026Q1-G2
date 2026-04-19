@@ -61,6 +61,11 @@
                             <i class="bi bi-bag" aria-hidden="true"></i> Mis compras
                         </button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="sales-tab" data-bs-toggle="tab" data-bs-target="#sales" type="button" role="tab" aria-controls="sales" aria-selected="false" style="font-weight: 600;">
+                            <i class="bi bi-shop" aria-hidden="true"></i> Mis ventas
+                        </button>
+                    </li>
                 </c:if>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false" style="font-weight: 600;">
@@ -156,6 +161,53 @@
                                 <div class="empty-products-state">
                                     <i class="bi bi-bag" style="font-size: 2.5rem; color: var(--color-border);"></i>
                                     <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;">Aún no realizaste ninguna compra.</p>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </c:if>
+
+                <!-- Tab: Mis ventas (only own profile) -->
+                <c:if test="${isOwnProfile}">
+                    <div class="tab-pane fade" id="sales" role="tabpanel" aria-labelledby="sales-tab">
+                        <c:choose>
+                            <c:when test="${not empty sales}">
+                                <div class="d-flex flex-column gap-3">
+                                    <c:forEach items="${sales}" var="sale">
+                                        <c:set var="sProduct" value="${saleProducts[sale.purchaseId]}"/>
+                                        <div style="background: #fff; border-radius: 16px; padding: 1.25rem; border: 1px solid var(--color-border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 1rem;">
+                                            <c:if test="${sProduct != null}">
+                                                <img src="<c:url value='/images/product/${sProduct.id}'/>"
+                                                     alt="" style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover;"
+                                                     onerror="this.src='https://via.placeholder.com/60?text=—';"/>
+                                            </c:if>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <c:if test="${sProduct != null}">
+                                                    <div style="font-weight: 600; font-size: 1rem; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                        <c:out value="${sProduct.title}"/>
+                                                    </div>
+                                                    <div style="font-size: 0.85rem; color: var(--color-text-muted);">
+                                                        <c:out value="${sProduct.artist}"/> · $<c:out value="${sProduct.price}"/>
+                                                    </div>
+                                                </c:if>
+                                                <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.2rem;">
+                                                    <c:out value="${sale.date}"/> · <span style="font-weight: 600;">${sale.status.description}</span>
+                                                </div>
+                                            </div>
+                                            <div style="display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0;">
+                                                <a href="<c:url value='/purchases/${sale.purchaseId}?token=${sale.sellerToken}'/>"
+                                                   class="btn btn-retro btn-retro-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                                                    <i class="bi bi-eye" aria-hidden="true"></i> Ver
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="empty-products-state">
+                                    <i class="bi bi-shop" style="font-size: 2.5rem; color: var(--color-border);"></i>
+                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;">Aún no realizaste ninguna venta.</p>
                                 </div>
                             </c:otherwise>
                         </c:choose>

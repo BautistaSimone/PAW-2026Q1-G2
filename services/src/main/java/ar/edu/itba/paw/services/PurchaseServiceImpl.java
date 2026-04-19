@@ -173,4 +173,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     public List<Purchase> findByBuyerId(Long buyerId) {
         return purchaseDao.findByBuyerId(buyerId);
     }
+
+    @Override
+    public List<Purchase> findBySellerId(Long sellerId) {
+        return purchaseDao.findBySellerId(sellerId);
+    }
 }

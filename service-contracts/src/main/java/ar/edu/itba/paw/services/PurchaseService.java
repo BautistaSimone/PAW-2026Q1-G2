@@ -11,4 +11,5 @@ public interface PurchaseService {
     Optional<Purchase> findById(Long purchaseId);
     Purchase updateStatus(Long purchaseId, String token, PurchaseStatus newStatus);
     List<Purchase> findByBuyerId(Long buyerId);
+    List<Purchase> findBySellerId(Long sellerId);
 }

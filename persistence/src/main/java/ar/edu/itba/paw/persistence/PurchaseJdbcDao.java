@@ -81,6 +81,13 @@ public class PurchaseJdbcDao implements PurchaseDao {
     }
 
     @Override
+    public List<Purchase> findBySellerId(Long sellerId) {
+        return jdbcTemplate.query(
+            "SELECT * FROM purchases WHERE seller_user_id = ? ORDER BY date DESC",
+            PURCHASE_ROW_MAPPER, sellerId);
+    }
+
+    @Override
     public void updateStatus(Long purchaseId, PurchaseStatus status) {
         final Purchase current = findById(purchaseId)
             .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));

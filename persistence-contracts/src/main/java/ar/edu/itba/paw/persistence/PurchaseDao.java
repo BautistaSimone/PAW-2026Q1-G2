@@ -10,4 +10,5 @@ public interface PurchaseDao {
     Optional<Purchase> findById(Long purchaseId);
     void updateStatus(Long purchaseId, PurchaseStatus status);
     List<Purchase> findByBuyerId(Long buyerId);
+    List<Purchase> findBySellerId(Long sellerId);
 }
