@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.validation.BindingResult;
 import javax.validation.Valid;
 
@@ -28,6 +27,9 @@ import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.form.ProductForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
+import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
+import ar.edu.itba.paw.webapp.validation.ImageUploadValidator.InvalidImageUploadException;
+import ar.edu.itba.paw.webapp.validation.ImageUploadValidator.ValidatedImage;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.EmailService;
 import ar.edu.itba.paw.services.ImageService;
@@ -83,7 +85,7 @@ public class ProductController {
         @AuthenticationPrincipal PawAuthUser authUser,
         @Valid @ModelAttribute("productForm") final ProductForm form,
         final BindingResult errors
-    ) throws IOException {
+    ) {
 
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
@@ -93,22 +95,15 @@ public class ProductController {
             return new ModelAndView("product-form");
         }
 
-        final MultipartFile[] images = form.getImages();
-        // Validate images before creating the product
-        if (images != null) {
-            for (MultipartFile image : images) {
-                if (!image.isEmpty()) {
-                    if (image.getSize() > 5 * 1024 * 1024) {
-                        errors.rejectValue("images", "Size.productForm.images", "La imagen no puede pesar más de 5MB.");
-                        return new ModelAndView("product-form");
-                    }
-                    String contentType = image.getContentType();
-                    if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png") && !contentType.equals("image/webp"))) {
-                        errors.rejectValue("images", "ContentType.productForm.images", "Formato de imagen inválido. Solo se admiten JPEG, PNG y WebP.");
-                        return new ModelAndView("product-form");
-                    }
-                }
-            }
+        final List<ValidatedImage> validatedImages;
+        try {
+            validatedImages = ImageUploadValidator.validateAll(form.getImages());
+        } catch (InvalidImageUploadException e) {
+            errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
+            return new ModelAndView("product-form");
+        } catch (IOException e) {
+            errors.rejectValue("images", "Read.productForm.images", "No pudimos leer la imagen enviada.");
+            return new ModelAndView("product-form");
         }
 
         // Get the current logged in user
@@ -130,16 +125,12 @@ public class ProductController {
             form.getPrice()
         );
 
-        if (images != null) {
-            for (MultipartFile image : images) {
-                if (!image.isEmpty()) {
-                    imageService.createImage(
-                        product.getId(),
-                        image.getBytes(),
-                        image.getContentType()
-                    );
-                }
-            }
+        for (ValidatedImage image : validatedImages) {
+            imageService.createImage(
+                product.getId(),
+                image.getData(),
+                image.getContentType()
+            );
         }
 
         return new ModelAndView("redirect:/products/" + product.getId() + "?created=1");

@@ -1,23 +1,19 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 import ar.edu.itba.paw.models.Image;
 import ar.edu.itba.paw.services.ImageService;
-import ar.edu.itba.paw.webapp.form.ImageForm;
+import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
 
 @Controller
 public class ImageController {
@@ -41,42 +37,21 @@ public class ImageController {
         return buildImageResponse(imageService.findByProductId(productId));
     }
 
-    @RequestMapping(value = "/images", method = RequestMethod.POST)
-    public ModelAndView createImage(@ModelAttribute final ImageForm form) throws IOException {
-        if (form.getProductId() != null && form.getImage() != null && !form.getImage().isEmpty()) {
-            imageService.createImage(
-                form.getProductId(),
-                form.getImage().getBytes(),
-                form.getImage().getContentType()
-            );
-        }
-
-        return new ModelAndView("redirect:/?created=1");
-    }
-
     private ResponseEntity<byte[]> buildImageResponse(final Optional<Image> image) {
         if (image.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         final Image storedImage = image.get();
-        final MediaType contentType = resolveContentType(storedImage.getContentType());
+        final Optional<String> safeContentType = ImageUploadValidator.detectSafeContentType(storedImage.getData());
+        if (safeContentType.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
         return ResponseEntity.ok()
-            .contentType(contentType)
+            .header("X-Content-Type-Options", "nosniff")
+            .contentType(MediaType.parseMediaType(safeContentType.get()))
             .contentLength(storedImage.getData().length)
             .body(storedImage.getData());
-    }
-
-    private MediaType resolveContentType(final String contentType) {
-        if (contentType == null || contentType.isBlank()) {
-            return MediaType.APPLICATION_OCTET_STREAM;
-        }
-
-        try {
-            return MediaType.parseMediaType(contentType);
-        } catch (InvalidMediaTypeException e) {
-            return MediaType.APPLICATION_OCTET_STREAM;
-        }
     }
 }

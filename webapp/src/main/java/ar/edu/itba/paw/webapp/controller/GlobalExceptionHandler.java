@@ -5,6 +5,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.slf4j.Logger;
@@ -55,6 +56,16 @@ public class GlobalExceptionHandler {
         mav.addObject("errorCode", "400");
         mav.addObject("errorMessage", "Petición inválida.");
         mav.addObject("errorDescription", "Los datos enviados no son correctos. Revisá e intentá nuevamente.");
+        return mav;
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ModelAndView handleInvalidUpload(final MultipartException e) {
+        final ModelAndView mav = new ModelAndView("error");
+        mav.addObject("errorCode", "400");
+        mav.addObject("errorMessage", "Archivo invÃ¡lido.");
+        mav.addObject("errorDescription", "El archivo enviado no cumple con los lÃ­mites permitidos.");
         return mav;
     }
 

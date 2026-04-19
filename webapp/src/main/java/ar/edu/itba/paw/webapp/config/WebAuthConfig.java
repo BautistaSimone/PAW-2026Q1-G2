@@ -8,6 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -42,6 +43,7 @@ public class WebAuthConfig{
                 // Role based routes
                 .requestMatchers("/profile/**").hasRole("USER")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/images", "/images/**").denyAll()
                 // Public routes
                 .requestMatchers("/css/**", "/js/**", "/img/**", "/favicon.ico", "/403").permitAll()
                 .requestMatchers("/**").permitAll()

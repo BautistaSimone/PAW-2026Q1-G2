@@ -27,6 +27,8 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
+
 @EnableWebMvc // Use all the defaults from webmvc
 @EnableTransactionManagement
 @ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.services", "ar.edu.itba.paw.persistence" })
@@ -56,6 +58,8 @@ public class WebConfig implements WebMvcConfigurer {
     public MultipartResolver multipartResolver() {
         final CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
         multipartResolver.setDefaultEncoding("UTF-8");
+        multipartResolver.setMaxUploadSize(ImageUploadValidator.MAX_REQUEST_BYTES);
+        multipartResolver.setMaxUploadSizePerFile(ImageUploadValidator.MAX_IMAGE_BYTES);
         return multipartResolver;
     }
 
