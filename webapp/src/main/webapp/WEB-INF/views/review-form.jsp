@@ -48,6 +48,7 @@
                                 <c:param name="token" value="${token}"/>
                             </c:url>
                             <form:form modelAttribute="reviewForm" method="POST" action="${reviewPostUrl}">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                                 <div class="mb-4">
                                     <label class="form-label" style="font-weight: 600; color: var(--color-text-main); font-size: 1rem;">

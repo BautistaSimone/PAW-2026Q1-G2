@@ -68,6 +68,7 @@
                                             </div>
                                             <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
                                             <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}">
+                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                 <input type="hidden" name="token" value="${token}" />
                                                 <input type="hidden" name="newStatus" value="PAID" />
                                                 <button type="submit" class="btn btn-retro btn-retro-primary w-100 btn-lg">
@@ -83,6 +84,7 @@
                                             </div>
                                             <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
                                             <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}">
+                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                 <input type="hidden" name="token" value="${token}" />
                                                 <input type="hidden" name="newStatus" value="DELIVERED" />
                                                 <button type="submit" class="btn btn-retro btn-retro-primary w-100 btn-lg" style="background: #2e7d32;">
@@ -122,6 +124,7 @@
                                             </div>
                                             <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
                                             <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}">
+                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                 <input type="hidden" name="token" value="${token}" />
                                                 <input type="hidden" name="newStatus" value="SHIPPED" />
                                                 <button type="submit" class="btn btn-retro btn-retro-primary w-100 btn-lg">

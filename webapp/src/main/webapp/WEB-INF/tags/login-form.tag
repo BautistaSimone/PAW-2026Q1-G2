@@ -25,6 +25,7 @@
                     <form:form modelAttribute="loginForm"
                             action="${action}"
                             method="${method}">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                         <!-- Email -->
                         <div class="mb-3">

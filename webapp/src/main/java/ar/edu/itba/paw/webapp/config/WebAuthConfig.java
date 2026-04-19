@@ -43,6 +43,7 @@ public class WebAuthConfig{
                 // Role based routes
                 .requestMatchers("/profile/**").hasRole("USER")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/test-mail", "/test-mail/**").denyAll()
                 .requestMatchers(HttpMethod.POST, "/images", "/images/**").denyAll()
                 // Public routes
                 .requestMatchers("/css/**", "/js/**", "/img/**", "/favicon.ico", "/403").permitAll()
@@ -62,9 +63,7 @@ public class WebAuthConfig{
                 .logoutSuccessUrl("/login")
                 .permitAll()
             .and().exceptionHandling()
-                .accessDeniedPage("/403")
-            .and()
-            .csrf().disable();
+                .accessDeniedPage("/403");
 
         return http.build();
     }

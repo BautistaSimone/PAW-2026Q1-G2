@@ -189,6 +189,7 @@
                                                 <c:url var="purchasePostUrl" value='/purchases' />
                                                 <form:form modelAttribute="purchaseCreateForm"
                                                     action="${purchasePostUrl}" method="POST" cssClass="w-100">
+                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                     <input type="hidden" name="productId" value="${product.id}" />
                                                     <button type="submit" class="btn w-100"
                                                         style="background: var(--color-accent); color: #fff; font-size: 1.15rem; padding: 1.1rem; border-radius: 99px; box-shadow: 0 8px 24px rgba(231, 111, 81, 0.4); border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: center; align-items: center; gap: 0.75rem; font-weight: 700;"
@@ -203,6 +204,7 @@
                                                 <div class="d-grid mt-3">
                                                     <c:url var="reportPostUrl" value="/products/${product.id}/report" />
                                                     <form action="${reportPostUrl}" method="POST" class="w-100">
+                                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                         <button type="submit" class="btn w-100"
                                                             style="background: transparent; color: var(--color-accent); font-size: 1rem; padding: 0.8rem; border-radius: 99px; border: 1px solid rgba(231, 111, 81, 0.5); transition: all 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-weight: 600;"
                                                             onmouseover="this.style.background='rgba(231, 111, 81, 0.08)'; this.style.borderColor='var(--color-accent)';"

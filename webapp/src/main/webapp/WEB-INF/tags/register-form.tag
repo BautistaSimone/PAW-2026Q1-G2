@@ -17,6 +17,7 @@
                     <form:form modelAttribute="registerForm"
                             action="${action}"
                             method="${method}">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                         <!-- Username -->
                         <div class="mb-3">

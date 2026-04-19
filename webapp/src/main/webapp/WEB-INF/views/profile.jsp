@@ -41,6 +41,7 @@
 
                 <c:if test="${isOwnProfile}">
                     <form action="<c:url value='/logout' />" method="post" style="margin-top: 1rem;">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                         <button type="submit" class="btn btn-retro btn-retro-secondary">
                             <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión
                         </button>

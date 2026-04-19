@@ -20,6 +20,7 @@
 
                 <c:url var="postUrl" value="/products"/>
                 <form:form modelAttribute="productForm" action="${postUrl}" method="post" enctype="multipart/form-data" cssClass="sell-form" novalidate="novalidate">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                     <div class="row g-4">
                         <div class="col-md-6">
                             <label for="title" class="form-label">Titulo del album *</label>
