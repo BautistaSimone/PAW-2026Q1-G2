@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.models;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 public class PasswordToken {
  
@@ -9,9 +9,9 @@ public class PasswordToken {
     private Long tokenId;
     private String token;
     private Long userId;
-    private LocalDate expirationDate;
+    private Date expirationDate;
 
-    public PasswordToken(final Long tokenId, final Long userId, final String token, final LocalDate expirationDate) {
+    public PasswordToken(final Long tokenId, final Long userId, final String token, final Date expirationDate) {
         this.tokenId = tokenId;
         this.userId = userId;
         this.token = token;
@@ -30,7 +30,7 @@ public class PasswordToken {
         return token;
     }
 
-    public LocalDate getExpirationDate() {
+    public Date getExpirationDate() {
         return expirationDate;
     }
 }

@@ -1,8 +1,10 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.io.File;
 import java.util.Collections;
+import java.util.UUID;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -39,6 +41,7 @@ import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.PurchaseService;
+import ar.edu.itba.paw.services.PasswordTokenService;
 import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.webapp.form.RegisterForm;
 import ar.edu.itba.paw.webapp.form.LoginForm;
@@ -59,6 +62,7 @@ public class UserController {
 	private final ImageService imageService;
     private final PurchaseService purchaseService;
     private final ReviewService reviewService;
+    private final PasswordTokenService passwordTokenService;
 
     @Autowired
     public UserController(
@@ -66,30 +70,58 @@ public class UserController {
         final ProductService productService, 
         final ImageService imageService,
         final PurchaseService purchaseService,
-        final ReviewService reviewService) {
+        final ReviewService reviewService,
+        final PasswordTokenService passwordTokenService) {
 
         this.userService = userService;
         this.productService = productService;
         this.imageService = imageService;
         this.purchaseService = purchaseService;
         this.reviewService = reviewService;
+        this.passwordTokenService = passwordTokenService;
     }
 
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     public ModelAndView resetPassword(@RequestParam("email") String userEmail) {
-        // User user = userService.findByEmail(userEmail);
 
-        // if (!user.isPresent()) {
-        //     throw new UserNotFoundException();
-        // }
+        ModelAndView mv = new ModelAndView("login");
 
-        //String token = UUID.randomUUID().toString();
+        final Optional<User> userOpt = userService.findByEmail(userEmail);
 
-        // userService.createPasswordResetTokenForUser(user, token);
-        // mailSender.send(constructResetTokenEmail(getAppUrl(request), 
-        // request.getLocale(), token, user));
-        return new ModelAndView("redirect:/login");
-    }    
+        if (!userOpt.isPresent()) {
+            mv.addObject("error", "UserNotFound.authForm.email");
+            return mv;
+        }
+
+        final User user = userOpt.get();
+
+        final String token = UUID.randomUUID().toString();
+
+        passwordTokenService.createPasswordResetTokenForUser(user.getId(), token);
+
+        // TODO: send email here
+        // mailSender.send(...)
+
+        mv.addObject("message", "EmailSent.authForm.email");
+
+        return mv;
+    }
+
+    @RequestMapping(value = "/changePassword")
+    public ModelAndView showChangePasswordPage(@RequestParam("token") String token) {
+
+        ModelAndView mv = new ModelAndView();
+
+        if(!passwordTokenService.isValidPasswordResetToken(token)) {
+            mv.setViewName("redirect:/login");
+            return mv;
+        }
+
+        mv.setViewName("updatePassword");
+        mv.addObject("token", token);
+
+        return mv;
+    }
 
 	@RequestMapping(value = "/login")
 	public ModelAndView login() {
