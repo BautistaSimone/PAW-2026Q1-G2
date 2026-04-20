@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService{
 		// Encode password before storing
 		final String encodedPassword = passwordEncoder.encode(password);
 
-        LOGGER.atDebug().addArgument(encodedPassword).log("About to attempt register user {}");
+        LOGGER.atDebug().addArgument(email).log("About to attempt register user {}");
 
 		return userDao.createUser(email, encodedPassword, username, mod);
 	}
@@ -46,4 +46,5 @@ public class UserServiceImpl implements UserService{
 	public Optional<User> findById(final Long id) {
 		return userDao.findById(id);
 	}
+	
 }

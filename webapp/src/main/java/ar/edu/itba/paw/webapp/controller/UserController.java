@@ -75,6 +75,22 @@ public class UserController {
         this.reviewService = reviewService;
     }
 
+    @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
+    public ModelAndView resetPassword(@RequestParam("email") String userEmail) {
+        // User user = userService.findByEmail(userEmail);
+
+        // if (!user.isPresent()) {
+        //     throw new UserNotFoundException();
+        // }
+
+        //String token = UUID.randomUUID().toString();
+
+        // userService.createPasswordResetTokenForUser(user, token);
+        // mailSender.send(constructResetTokenEmail(getAppUrl(request), 
+        // request.getLocale(), token, user));
+        return new ModelAndView("redirect:/login");
+    }    
+
 	@RequestMapping(value = "/login")
 	public ModelAndView login() {
         ModelAndView mv = new ModelAndView("login");
