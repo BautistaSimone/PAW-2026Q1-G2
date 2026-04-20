@@ -31,11 +31,6 @@ public interface UserService {
             final String extraAddressInfo,
             final String cbuCvu);
 
-    Optional<User> findByEmail(final String email);
-
-    Optional<User> findById(final Long id);
-    User createUser(final String email, final String password, final String username, Boolean mod);
-	
     void updatePassword(final Long userId, final String newPassword);
 
 	Optional<User> findByEmail(final String email);

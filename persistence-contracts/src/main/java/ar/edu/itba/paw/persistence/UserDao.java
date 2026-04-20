@@ -31,7 +31,6 @@ public interface UserDao {
             final String extraAddressInfo,
             final String cbuCvu);
 
-    User createUser(final String email, final String password, final String username, Boolean mod);
     void updatePassword(final Long userId, final String encodedPassword);
     Optional<User> findByEmail(final String email);
 

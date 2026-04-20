@@ -151,7 +151,6 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    private void sendEmail(String to, Product product, long purchaseId, String title, String message, String actionUrl, String recipientName, PurchaseStatus currentStatus) {
     private void sendOrderEmail(
             final String to,
             final Product product,
