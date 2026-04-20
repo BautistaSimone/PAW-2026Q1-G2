@@ -83,6 +83,11 @@
 
     <dependency>
       <groupId>ar.edu.itba.paw</groupId>
+      <artifactId>models</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ar.edu.itba.paw</groupId>
       <artifactId>service-contracts</artifactId>
       <version>${project.version}</version>
     </dependency>

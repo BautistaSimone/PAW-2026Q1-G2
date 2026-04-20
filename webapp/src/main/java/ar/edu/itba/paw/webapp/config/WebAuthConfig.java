@@ -41,7 +41,7 @@ public class WebAuthConfig{
                 .requestMatchers("/login", "/register").anonymous()
                 .requestMatchers("/").authenticated()
                 // Role based routes
-                .requestMatchers("/profile/**").hasRole("USER")
+                .requestMatchers("/profile", "/profile/**").hasRole("USER")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/test-mail", "/test-mail/**").denyAll()
                 .requestMatchers(HttpMethod.POST, "/images", "/images/**").denyAll()

@@ -18,7 +18,10 @@
                     </p>
                 </div>
 
-                <c:url var="postUrl" value="/products"/>
+                <%-- CSRF on query string: CommonsMultipartResolver parses the body after the security chain, so a hidden _csrf inside multipart is invisible to CsrfFilter. --%>
+                <c:url var="postUrl" value="/products">
+                    <c:param name="${_csrf.parameterName}" value="${_csrf.token}" />
+                </c:url>
                 <form:form modelAttribute="productForm" action="${postUrl}" method="post" enctype="multipart/form-data" cssClass="sell-form" novalidate="novalidate">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                     <div class="row g-4">

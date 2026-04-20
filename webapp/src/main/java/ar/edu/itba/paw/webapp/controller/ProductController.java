@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.controller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,8 +77,11 @@ public class ProductController {
     }
 
     @RequestMapping(value = "/products/new", method = RequestMethod.GET)
-    public ModelAndView newProductForm(@ModelAttribute("productForm") final ProductForm form) {
-        return new ModelAndView("product-form");
+    public ModelAndView newProductForm(
+        @AuthenticationPrincipal final PawAuthUser authUser,
+        @ModelAttribute("productForm") final ProductForm form
+    ) {
+        return redirectIfCannotPublish(authUser).orElseGet(() -> new ModelAndView("product-form"));
     }
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
@@ -87,8 +91,9 @@ public class ProductController {
         final BindingResult errors
     ) {
 
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
+        final Optional<ModelAndView> publishGuard = redirectIfCannotPublish(authUser);
+        if (publishGuard.isPresent()) {
+            return publishGuard.get();
         }
 
         if (errors.hasErrors()) {
@@ -213,6 +218,19 @@ public class ProductController {
             return new ModelAndView("redirect:/?moderated=1");
         }
         return new ModelAndView("redirect:/login?moderated=1");
+    }
+
+    /** Not logged in → login; no CBU/CVU → profile Mis datos with warning. Empty if OK to show or submit the publish form. */
+    private Optional<ModelAndView> redirectIfCannotPublish(final PawAuthUser authUser) {
+        if (authUser == null) {
+            return Optional.of(new ModelAndView("redirect:/login"));
+        }
+        final User publisher = userService.findById(authUser.getUser().getId())
+            .orElseThrow(() -> new IllegalStateException("User not found"));
+        if (!publisher.hasCbuCvu()) {
+            return Optional.of(new ModelAndView("redirect:/profile?tab=mydata&missingData=publish"));
+        }
+        return Optional.empty();
     }
 }
 

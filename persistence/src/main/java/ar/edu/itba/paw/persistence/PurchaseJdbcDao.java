@@ -33,6 +33,7 @@ public class PurchaseJdbcDao implements PurchaseDao {
             rs.getLong("purchase_id"),
             rs.getLong("product_id"),
             rs.getLong("buyer_user_id"),
+            rs.getLong("seller_user_id"),
             rs.getDate("date").toLocalDate(),
             PurchaseStatus.valueOf(parts[0]),
             parts[1],
@@ -64,7 +65,7 @@ public class PurchaseJdbcDao implements PurchaseDao {
 
         final Number id = jdbcInsert.executeAndReturnKey(values);
 
-        return new Purchase(id.longValue(), productId, buyerId, LocalDate.now(), status, buyerToken, sellerToken);
+        return new Purchase(id.longValue(), productId, buyerId, sellerId, LocalDate.now(), status, buyerToken, sellerToken);
     }
 
     @Override
