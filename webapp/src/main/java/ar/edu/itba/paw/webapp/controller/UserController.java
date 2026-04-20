@@ -49,6 +49,7 @@ import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.PasswordToken;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 
 
@@ -81,10 +82,17 @@ public class UserController {
         this.passwordTokenService = passwordTokenService;
     }
 
+    @RequestMapping(value = "/resetPassword")
+    public ModelAndView showResetPasswordPage() {
+        ModelAndView mv = new ModelAndView("forgot-password");
+        return mv;
+    }
+
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     public ModelAndView resetPassword(@RequestParam("email") String userEmail) {
 
         ModelAndView mv = new ModelAndView("login");
+        mv.addObject("loginForm", new LoginForm());
 
         final Optional<User> userOpt = userService.findByEmail(userEmail);
 
@@ -99,10 +107,40 @@ public class UserController {
 
         passwordTokenService.createPasswordResetTokenForUser(user.getId(), token);
 
-        // TODO: send email here
-        // mailSender.send(...)
-
         mv.addObject("message", "EmailSent.authForm.email");
+
+        return mv;
+    }
+
+    @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
+    public ModelAndView changePassword(
+        @RequestParam("token") String token,
+        @RequestParam("newPassword") String newPassword
+        ) {
+
+        ModelAndView mv = new ModelAndView();
+
+        if (!passwordTokenService.isValidPasswordResetToken(token)) {
+            mv.setViewName("redirect:/login");
+            return mv;
+        }
+
+        final Optional<PasswordToken> passTokenOpt = passwordTokenService.findByToken(token);
+
+        // We already know it exists
+        final PasswordToken passToken = passTokenOpt.get();
+
+        try {
+            userService.updatePassword(passToken.getUserId(), newPassword);
+        } catch (IllegalArgumentException e) {
+            mv.setViewName("update-password");
+            mv.addObject("token", token);
+            mv.addObject("error", "Invalid password reset attempt");
+            return mv;
+        }
+
+        mv.setViewName("redirect:/login");
+        mv.addObject("message", "Password updated successfully");
 
         return mv;
     }
@@ -113,11 +151,12 @@ public class UserController {
         ModelAndView mv = new ModelAndView();
 
         if(!passwordTokenService.isValidPasswordResetToken(token)) {
+            
             mv.setViewName("redirect:/login");
             return mv;
         }
 
-        mv.setViewName("updatePassword");
+        mv.setViewName("update-password");
         mv.addObject("token", token);
 
         return mv;

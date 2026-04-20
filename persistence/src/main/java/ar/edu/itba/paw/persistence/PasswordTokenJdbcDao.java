@@ -67,4 +67,5 @@ public class PasswordTokenJdbcDao implements PasswordTokenDao {
     public Optional<PasswordToken> findByToken(final String token) {
         return jdbcTemplate.query("SELECT * FROM password_tokens WHERE token = ?", PASSWORD_TOKEN_ROW_MAPPER, token).stream().findAny();
     }
+
 }

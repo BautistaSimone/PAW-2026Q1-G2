@@ -49,6 +49,15 @@ public class UserJdbcDao implements UserDao {
     }
 
     @Override
+    public void updatePassword(final Long userId, final String encodedPassword) {
+        jdbcTemplate.update(
+            "UPDATE users SET password = ? WHERE user_id = ?",
+            encodedPassword,
+            userId
+        );
+    }
+
+    @Override
     public Optional<User> findByEmail(final String email) {
         return jdbcTemplate.query("SELECT * FROM users WHERE email = ?", USER_ROW_MAPPER, email).stream().findAny();
     }

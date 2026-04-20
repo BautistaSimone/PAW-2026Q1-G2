@@ -102,6 +102,13 @@
                     </form:form>
                 </div>
 
+                <!-- Change password link -->
+                <div class="auth-card-footer">
+                    <a href="${pageContext.request.contextPath}/resetPassword">
+                        <spring:message code="ResetPassword.loginForm" />
+                    </a>
+                </div>
+
                 <!-- Not registered link -->
                 <div class="auth-card-footer">
                     <a href="${pageContext.request.contextPath}/register">

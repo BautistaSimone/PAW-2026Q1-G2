@@ -35,10 +35,12 @@ public class WebAuthConfig{
 
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
-        http.sessionManagement()
-                .invalidSessionUrl("/login")
-            .and().authorizeHttpRequests()
-                .requestMatchers("/login", "/register").anonymous()
+
+          //      .invalidSessionUrl("/login")
+          //  .and()
+        http.sessionManagement().and()
+            .authorizeHttpRequests()
+                .requestMatchers("/login", "/register", "/updatePassword").permitAll()
                 .requestMatchers("/").authenticated()
                 // Role based routes
                 .requestMatchers("/profile/**").hasRole("USER")
@@ -47,7 +49,6 @@ public class WebAuthConfig{
                 .requestMatchers(HttpMethod.POST, "/images", "/images/**").denyAll()
                 // Public routes
                 .requestMatchers("/css/**", "/js/**", "/img/**", "/favicon.ico", "/403").permitAll()
-                .requestMatchers("/**").permitAll()
             .and().formLogin()
                 .loginPage("/login")
                 .usernameParameter("email")

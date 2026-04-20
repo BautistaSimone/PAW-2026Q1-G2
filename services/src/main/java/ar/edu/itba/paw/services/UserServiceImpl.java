@@ -37,6 +37,14 @@ public class UserServiceImpl implements UserService{
 		return userDao.createUser(email, encodedPassword, username, mod);
 	}
 
+    @Override
+	public void updatePassword(final Long userId, final String newPassword) {
+		// Encode password before storing
+		final String encodedPassword = passwordEncoder.encode(newPassword);
+
+		userDao.updatePassword(userId, encodedPassword);
+	}
+
 	@Override
 	public Optional<User> findByEmail(final String email) {
 		return userDao.findByEmail(email);
