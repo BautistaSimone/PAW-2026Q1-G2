@@ -7,7 +7,7 @@
 
 <div class="container py-5" style="min-height: 70vh; display: flex; align-items: center;">
     <div class="row justify-content-center w-100">
-        <div class="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
+        <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-6">
             <div class="auth-card">
                 <div class="auth-card-header">
                     <h2><i class="bi bi-vinyl" aria-hidden="true"></i> Crear cuenta</h2>
@@ -19,7 +19,19 @@
                             method="${method}">
                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
-                        <!-- Username -->
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">Nombre <span class="text-danger">*</span></label>
+                                <form:input path="firstName" id="firstName" cssClass="form-control" placeholder="Nombre" autocomplete="given-name" />
+                                <form:errors path="firstName" cssClass="text-danger small"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Apellido <span class="text-danger">*</span></label>
+                                <form:input path="lastName" id="lastName" cssClass="form-control" placeholder="Apellido" autocomplete="family-name" />
+                                <form:errors path="lastName" cssClass="text-danger small"/>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label for="username" class="form-label">Nombre de usuario</label>
                             <form:input path="username"
@@ -30,7 +42,6 @@
                             <form:errors path="username" cssClass="text-danger small"/>
                         </div>
 
-                        <!-- Email -->
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <form:input path="email"
@@ -41,7 +52,6 @@
                             <form:errors path="email" cssClass="text-danger small"/>
                         </div>
 
-                        <!-- Password -->
                         <div class="mb-3">
                             <label for="password" class="form-label">Contraseña</label>
                             <div class="password-toggle-wrapper">
@@ -57,7 +67,6 @@
                             <form:errors path="password" cssClass="text-danger small"/>
                         </div>
 
-                        <!-- Confirm Password -->
                         <div class="mb-3">
                             <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
                             <div class="password-toggle-wrapper">
@@ -71,6 +80,42 @@
                                 </button>
                             </div>
                             <form:errors path="confirmPassword" cssClass="text-danger small"/>
+                        </div>
+
+                        <hr class="my-4" style="border-color: var(--color-border); opacity: 0.6;" />
+                        <p class="small text-muted mb-3" style="font-weight: 600;">Datos adicionales (opcional — podés omitirlos y completarlos después en tu perfil)</p>
+
+                        <div class="mb-3">
+                            <label for="streetName" class="form-label">Calle</label>
+                            <form:input path="streetName" id="streetName" cssClass="form-control" placeholder="Nombre de la calle" />
+                            <form:errors path="streetName" cssClass="text-danger small"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="streetNumber" class="form-label">Número</label>
+                            <form:input path="streetNumber" id="streetNumber" cssClass="form-control" placeholder="Número" />
+                            <form:errors path="streetNumber" cssClass="text-danger small"/>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-3">
+                                <label for="neighborhood" class="form-label">Barrio</label>
+                                <form:input path="neighborhood" id="neighborhood" cssClass="form-control" placeholder="Barrio o localidad" />
+                                <form:errors path="neighborhood" cssClass="text-danger small"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="province" class="form-label">Provincia</label>
+                                <form:input path="province" id="province" cssClass="form-control" placeholder="Provincia" />
+                                <form:errors path="province" cssClass="text-danger small"/>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="extraAddressInfo" class="form-label">Comentario (piso, depto, edificio…)</label>
+                            <form:input path="extraAddressInfo" id="extraAddressInfo" cssClass="form-control" placeholder="Ej.: 3º B, timbre roto, etc." />
+                            <form:errors path="extraAddressInfo" cssClass="text-danger small"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cbuCvu" class="form-label">CBU/CVU (22 dígitos)</label>
+                            <form:input path="cbuCvu" id="cbuCvu" cssClass="form-control" placeholder="Opcional" inputmode="numeric" maxlength="22" />
+                            <form:errors path="cbuCvu" cssClass="text-danger small"/>
                         </div>
 
                         <script>
@@ -91,7 +136,6 @@
                             }
                         </script>
 
-                        <!-- Submit -->
                         <div class="d-grid">
                             <button type="submit" class="btn-accent">
                                 ${buttonLabel}

@@ -3,7 +3,15 @@ CREATE TABLE IF NOT EXISTS users (
 	email VARCHAR(255) NOT NULL UNIQUE,
 	password VARCHAR(255),
 	username VARCHAR(255) NOT NULL,
-	mod BOOLEAN NOT NULL
+	mod BOOLEAN NOT NULL,
+	first_name VARCHAR(100),
+	last_name VARCHAR(100),
+	street_name VARCHAR(255),
+	street_number VARCHAR(20),
+	neighborhood VARCHAR(100),
+	province VARCHAR(100),
+	extra_address_info VARCHAR(500),
+	cbu_cvu VARCHAR(22)
 );
 
 CREATE TABLE IF NOT EXISTS password_tokens (

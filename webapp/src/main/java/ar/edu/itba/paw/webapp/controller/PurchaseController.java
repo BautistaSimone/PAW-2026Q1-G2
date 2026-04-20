@@ -20,6 +20,7 @@ import ar.edu.itba.paw.models.PurchaseStatus;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.PurchaseService;
 import ar.edu.itba.paw.services.ReviewService;
+import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.form.PurchaseCreateForm;
 import ar.edu.itba.paw.webapp.form.PurchaseStatusForm;
@@ -30,12 +31,19 @@ public class PurchaseController {
     private final PurchaseService purchaseService;
     private final ProductService productService;
     private final ReviewService reviewService;
+    private final UserService userService;
 
     @Autowired
-    public PurchaseController(final PurchaseService purchaseService, final ProductService productService, final ReviewService reviewService) {
+    public PurchaseController(
+        final PurchaseService purchaseService,
+        final ProductService productService,
+        final ReviewService reviewService,
+        final UserService userService
+    ) {
         this.purchaseService = purchaseService;
         this.productService = productService;
         this.reviewService = reviewService;
+        this.userService = userService;
     }
 
     @RequestMapping(value = "/purchases", method = RequestMethod.POST)
@@ -55,8 +63,13 @@ public class PurchaseController {
             }
             return new ModelAndView("redirect:/products/" + form.getProductId() + "?purchaseError=1");
         }
-        
-        User user = authUser.getUser();
+
+        final User user = userService.findById(authUser.getUser().getId())
+            .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        if (!user.hasCompleteBuyerDataForPurchase()) {
+            return new ModelAndView("redirect:/profile?tab=mydata&missingData=purchase&productId=" + form.getProductId());
+        }
 
         final Purchase purchase;
         try {
@@ -85,9 +98,18 @@ public class PurchaseController {
         Product product = productService.findById(purchase.getProductId())
             .orElseThrow(() -> new IllegalStateException("Product missing"));
 
+        final User orderBuyer = userService.findById(purchase.getBuyerId())
+            .orElseThrow(() -> new IllegalStateException("Buyer missing"));
+        /* seller_user_id en la compra (no solo product.user_id) + nombres explícitos para evitar sombras en EL/JSP */
+        final User orderSeller = userService.findById(purchase.getSellerId())
+            .orElseGet(() -> userService.findById(product.getUserId())
+                .orElseThrow(() -> new IllegalStateException("Seller missing")));
+
         ModelAndView mav = new ModelAndView("purchase-panel");
         mav.addObject("purchase", purchase);
         mav.addObject("product", product);
+        mav.addObject("orderBuyer", orderBuyer);
+        mav.addObject("orderSeller", orderSeller);
         boolean isBuyer = token.equals(purchase.getBuyerToken());
         mav.addObject("isBuyer", isBuyer);
         mav.addObject("isSeller", token.equals(purchase.getSellerToken()));

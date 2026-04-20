@@ -82,9 +82,11 @@ public class PurchaseServiceImpl implements PurchaseService {
                 buyer.getEmail(),
                 purchase,
                 product,
-                "Comunicate con " + seller.getEmail() + " para abonar tu vinilo",
-                "Has iniciado la compra de este vinilo. Una vez abonado, entra al enlace debajo para notificar al vendedor que ya pagaste.",
-                buyer.getUsername(),
+                "Confirmación de compra — datos para pagar",
+                "Reservamos el vinilo para vos. Transferí el monto indicado al CBU/CVU del vendedor (o coordiná por email si no figura). "
+                    + "Guardá el comprobante. Cuando pagues, entrá al detalle del pedido con el botón de abajo y tocá «Notificar que ya he pagado».",
+                buyer,
+                seller,
                 PurchaseStatus.PENDING
             )
         );
@@ -136,12 +138,15 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchaseDao.updateStatus(purchaseId, newStatus);
             // Notify seller to confirm payment
             emailService.sendSellerEmail(
-                seller.getEmail(), 
-                purchase, 
-                product, 
-                "El comprador ha pagado", 
-                "El comprador " + buyer.getUsername() + " dice haber pagado. Verifica y marca el pago como recibido.",
-                seller.getUsername(),
+                seller.getEmail(),
+                purchase,
+                product,
+                "El comprador ha pagado",
+                "El comprador " + buyer.getUsername() + " indicó que ya realizó la transferencia. "
+                    + "Verificá el ingreso en tu banco antes de despachar. En el correo tenés su nombre, email y dirección completa de envío. "
+                    + "Cuando esté todo listo, entrá al detalle del pedido y confirmá el envío.",
+                buyer,
+                seller,
                 PurchaseStatus.PAID
             );
         } 
@@ -149,12 +154,14 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchaseDao.updateStatus(purchaseId, newStatus);
             // Notify buyer
             emailService.sendBuyerEmail(
-                buyer.getEmail(), 
-                purchase, 
-                product, 
-                "Tu vinilo ha sido enviado", 
-                "El vendedor ha despachado el vinilo. Avisanos cuando te llegue desde el detalle de la compra.",
-                buyer.getUsername(),
+                buyer.getEmail(),
+                purchase,
+                product,
+                "Tu vinilo ha sido enviado",
+                "El vendedor marcó el pedido como enviado. Si te pasó un código de seguimiento, guardalo. "
+                    + "Cuando recibas el disco, entrá al detalle de la compra y confirmá la entrega para cerrar la operación.",
+                buyer,
+                seller,
                 PurchaseStatus.SHIPPED
             );
         }

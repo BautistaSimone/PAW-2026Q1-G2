@@ -34,7 +34,7 @@ public class ReviewServiceImplTest {
     private ProductService productService;
 
     private Purchase makePurchase(PurchaseStatus status, long buyerId) {
-        return new Purchase(1L, 10L, buyerId, LocalDate.now(), status, "bt", "st");
+        return new Purchase(1L, 10L, buyerId, 99L, LocalDate.now(), status, "bt", "st");
     }
 
     private Product makeProduct(long userId) {

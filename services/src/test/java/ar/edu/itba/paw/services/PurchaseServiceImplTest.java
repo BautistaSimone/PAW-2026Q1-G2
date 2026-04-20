@@ -71,7 +71,7 @@ public class PurchaseServiceImplTest {
         final Product product = product();
         final User seller = new User(SELLER_ID, "seller@test.com", "password", "seller", false);
         final User buyer = new User(BUYER_ID, "buyer@test.com", "password", "buyer", false);
-        final Purchase purchase = new Purchase(99L, PRODUCT_ID, BUYER_ID, LocalDate.now(), PurchaseStatus.PENDING, "buyer-token", "seller-token");
+        final Purchase purchase = new Purchase(99L, PRODUCT_ID, BUYER_ID, SELLER_ID, LocalDate.now(), PurchaseStatus.PENDING, "buyer-token", "seller-token");
 
         Mockito.when(productService.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         Mockito.when(userService.findById(SELLER_ID)).thenReturn(Optional.of(seller));
@@ -106,7 +106,8 @@ public class PurchaseServiceImplTest {
             Mockito.eq(product),
             Mockito.anyString(),
             Mockito.anyString(),
-            Mockito.eq("buyer"),
+            Mockito.eq(buyer),
+            Mockito.eq(seller),
             Mockito.eq(PurchaseStatus.PENDING)
         );
     }

@@ -44,7 +44,19 @@ public class UserJdbcDaoTest {
         final Boolean mod = false;
 
         // 2. Exercise
-        final User user = userDao.createUser(email, password, username, mod);
+        final User user = userDao.createUser(
+                email,
+                password,
+                username,
+                mod,
+                "Juan",
+                "Perez",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
 
         // 3. Assert
         Assertions.assertNotNull(user);

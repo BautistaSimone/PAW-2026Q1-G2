@@ -3,6 +3,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<c:set var="activeMyData" value="${isOwnProfile and param.tab eq 'mydata'}"/>
 
 <ui:layout title="Vinyland | Perfil">
 
@@ -17,6 +19,11 @@
                     </div>
                     <div class="profile-user-info">
                         <h1><c:out value="${user.username}" /></h1>
+                        <c:if test="${not empty user.firstName or not empty user.lastName}">
+                            <p style="margin: 0.15rem 0 0.35rem; color: var(--color-text-muted); font-size: 1rem; font-weight: 500;">
+                                <c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/>
+                            </p>
+                        </c:if>
                         <c:if test="${isOwnProfile}">
                             <h2><c:out value="${user.email}" /></h2>
                         </c:if>
@@ -49,14 +56,42 @@
                 </c:if>
             </div>
 
+            <c:if test="${isOwnProfile}">
+                <c:if test="${param.updated eq '1'}">
+                    <div class="alert-retro alert-retro-success mt-3" role="alert">
+                        <i class="bi bi-check-circle" aria-hidden="true"></i> Tus datos se guardaron correctamente.
+                    </div>
+                </c:if>
+                <c:if test="${param.missingData eq 'purchase'}">
+                    <div class="alert-retro alert-retro-warning mt-3" role="alert">
+                        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                        Para comprar necesitás completar tu nombre, apellido y dirección de envío (calle, número, barrio y provincia).
+                        <c:if test="${not empty param.productId}">
+                            <a href="<c:url value='/products/${param.productId}'/>" class="alert-link" style="margin-left: 0.5rem;">Volver al producto</a>
+                        </c:if>
+                    </div>
+                </c:if>
+                <c:if test="${param.missingData eq 'publish'}">
+                    <div class="alert-retro alert-retro-warning mt-3" role="alert">
+                        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                        Para publicar un vinilo necesitás cargar tu CBU/CVU (22 dígitos) en Mis datos.
+                    </div>
+                </c:if>
+            </c:if>
+
             <!-- Tabs -->
             <ul class="nav nav-tabs mt-4" id="profileTabs" role="tablist" style="border-bottom: 2px solid var(--color-border);">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications" type="button" role="tab" aria-controls="publications" aria-selected="true" style="font-weight: 600;">
+                    <button class="nav-link<c:if test='${not activeMyData}'> active</c:if>" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications" type="button" role="tab" aria-controls="publications" aria-selected="${not activeMyData}" style="font-weight: 600;">
                         <i class="bi bi-vinyl" aria-hidden="true"></i> Publicaciones
                     </button>
                 </li>
                 <c:if test="${isOwnProfile}">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link<c:if test='${activeMyData}'> active</c:if>" id="mydata-tab" data-bs-toggle="tab" data-bs-target="#mydata" type="button" role="tab" aria-controls="mydata" aria-selected="${activeMyData}" style="font-weight: 600;">
+                            <i class="bi bi-person-lines-fill" aria-hidden="true"></i> Mis datos
+                        </button>
+                    </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="purchases-tab" data-bs-toggle="tab" data-bs-target="#purchases" type="button" role="tab" aria-controls="purchases" aria-selected="false" style="font-weight: 600;">
                             <i class="bi bi-bag" aria-hidden="true"></i> Mis compras
@@ -77,7 +112,7 @@
 
             <div class="tab-content mt-3" id="profileTabContent">
                 <!-- Tab: Publicaciones -->
-                <div class="tab-pane fade show active" id="publications" role="tabpanel" aria-labelledby="publications-tab">
+                <div class="tab-pane fade<c:if test='${not activeMyData}'> show active</c:if>" id="publications" role="tabpanel" aria-labelledby="publications-tab">
                     <c:choose>
                         <c:when test="${not empty userProducts}">
                             <div class="products-grid">
@@ -114,6 +149,68 @@
                         </c:otherwise>
                     </c:choose>
                 </div>
+
+                <!-- Tab: Mis datos (solo perfil propio) -->
+                <c:if test="${isOwnProfile}">
+                    <div class="tab-pane fade<c:if test='${activeMyData}'> show active</c:if>" id="mydata" role="tabpanel" aria-labelledby="mydata-tab">
+                        <div style="background: #fff; border-radius: 16px; padding: 1.5rem 1.25rem; border: 1px solid var(--color-border); max-width: 640px;">
+                            <p style="color: var(--color-text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+                                Nombre y apellido son obligatorios. El resto es opcional; podés dejarlo vacío si preferís completarlo más tarde.
+                            </p>
+                            <c:url var="profileUpdateUrl" value="/profile/update"/>
+                            <form:form modelAttribute="userProfileForm" action="${profileUpdateUrl}" method="post" cssClass="user-profile-form">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                <div class="row g-2">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="pfFirstName">Nombre <span class="text-danger">*</span></label>
+                                        <form:input path="firstName" id="pfFirstName" cssClass="form-control" autocomplete="given-name" />
+                                        <form:errors path="firstName" cssClass="text-danger small d-block"/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="pfLastName">Apellido <span class="text-danger">*</span></label>
+                                        <form:input path="lastName" id="pfLastName" cssClass="form-control" autocomplete="family-name" />
+                                        <form:errors path="lastName" cssClass="text-danger small d-block"/>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="pfStreet">Calle</label>
+                                    <form:input path="streetName" id="pfStreet" cssClass="form-control" placeholder="Opcional"/>
+                                    <form:errors path="streetName" cssClass="text-danger small d-block"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="pfStreetNum">Número</label>
+                                    <form:input path="streetNumber" id="pfStreetNum" cssClass="form-control" placeholder="Opcional"/>
+                                    <form:errors path="streetNumber" cssClass="text-danger small d-block"/>
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="pfNeighborhood">Barrio</label>
+                                        <form:input path="neighborhood" id="pfNeighborhood" cssClass="form-control" placeholder="Opcional"/>
+                                        <form:errors path="neighborhood" cssClass="text-danger small d-block"/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="pfProvince">Provincia</label>
+                                        <form:input path="province" id="pfProvince" cssClass="form-control" placeholder="Opcional"/>
+                                        <form:errors path="province" cssClass="text-danger small d-block"/>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="pfExtra">Comentario (edificio, piso, etc.)</label>
+                                    <form:input path="extraAddressInfo" id="pfExtra" cssClass="form-control" placeholder="Opcional"/>
+                                    <form:errors path="extraAddressInfo" cssClass="text-danger small d-block"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="pfCbu">CBU/CVU (22 dígitos)</label>
+                                    <form:input path="cbuCvu" id="pfCbu" cssClass="form-control" placeholder="Opcional" inputmode="numeric" maxlength="22"/>
+                                    <form:errors path="cbuCvu" cssClass="text-danger small d-block"/>
+                                </div>
+                                <button type="submit" class="btn btn-retro btn-retro-primary">
+                                    <i class="bi bi-save" aria-hidden="true"></i> Guardar cambios
+                                </button>
+                            </form:form>
+                        </div>
+                    </div>
+                </c:if>
 
                 <!-- Tab: Mis compras (only own profile) -->
                 <c:if test="${isOwnProfile}">

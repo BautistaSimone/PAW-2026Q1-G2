@@ -7,9 +7,25 @@ import ar.edu.itba.paw.models.User;
 
 public interface EmailService {
 
-    void sendBuyerEmail(String to, Purchase purchase, Product product, String title, String message, String recipientName, PurchaseStatus currentStatus);
+    void sendBuyerEmail(
+            String to,
+            Purchase purchase,
+            Product product,
+            String title,
+            String message,
+            User buyer,
+            User seller,
+            PurchaseStatus currentStatus);
 
-    void sendSellerEmail(String to, Purchase purchase, Product product, String title, String message, String recipientName, PurchaseStatus currentStatus);
+    void sendSellerEmail(
+            String to,
+            Purchase purchase,
+            Product product,
+            String title,
+            String message,
+            User buyer,
+            User seller,
+            PurchaseStatus currentStatus);
 
     void sendProductReportEmail(Product product, User reporter);
     

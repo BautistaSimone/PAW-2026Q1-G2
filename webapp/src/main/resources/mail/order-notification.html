@@ -123,7 +123,65 @@
                                         <span class="order-summary-value" style="color:#264653;" th:text="${productName}">Vinilo</span>
                                     </td>
                                 </tr>
+                                <tr th:if="${formattedPurchaseDate != null and !#strings.isEmpty(formattedPurchaseDate)}">
+                                    <td style="padding:10px 0 4px;vertical-align:top;">
+                                        <span class="order-summary-label" style="color:#e76f51;font-weight:700;font-size:14px;">Fecha del pedido:</span>
+                                    </td>
+                                    <td style="padding:10px 0 4px;">
+                                        <span class="order-summary-value" style="color:#264653;" th:text="${formattedPurchaseDate}">01/01/2026</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:10px 0 4px;vertical-align:top;">
+                                        <span class="order-summary-label" style="color:#e76f51;font-weight:700;font-size:14px;">Estado en Vinyland:</span>
+                                    </td>
+                                    <td style="padding:10px 0 4px;">
+                                        <span class="order-summary-value" style="color:#264653;" th:text="${purchaseStatusDescription}">Pendiente</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${recordLabel != null and !#strings.isEmpty(recordLabel)}">
+                                    <td style="padding:10px 0 4px;vertical-align:top;">
+                                        <span class="order-summary-label" style="color:#e76f51;font-weight:700;font-size:14px;">Sello / catálogo:</span>
+                                    </td>
+                                    <td style="padding:10px 0 4px;">
+                                        <span class="order-summary-value" style="color:#264653;">
+                                            <span th:text="${recordLabel}">Sello</span>
+                                            <span th:if="${catalogNumber != null and !#strings.isEmpty(catalogNumber)}"> — <span th:text="${catalogNumber}">CAT</span></span>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${editionCountry != null and !#strings.isEmpty(editionCountry)}">
+                                    <td style="padding:10px 0 4px;vertical-align:top;">
+                                        <span class="order-summary-label" style="color:#e76f51;font-weight:700;font-size:14px;">País de edición:</span>
+                                    </td>
+                                    <td style="padding:10px 0 4px;">
+                                        <span class="order-summary-value" style="color:#264653;" th:text="${editionCountry}">AR</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${productLocation != null and !#strings.isEmpty(productLocation)}">
+                                    <td style="padding:10px 0 4px;vertical-align:top;">
+                                        <span class="order-summary-label" style="color:#e76f51;font-weight:700;font-size:14px;">Ubicación (publicación):</span>
+                                    </td>
+                                    <td style="padding:10px 0 4px;">
+                                        <span class="order-summary-value" style="color:#264653;" th:text="${productLocation}">Barrio, Prov</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${(sleeveCondition != null and !#strings.isEmpty(sleeveCondition)) or (recordCondition != null and !#strings.isEmpty(recordCondition))}">
+                                    <td style="padding:10px 0 4px;vertical-align:top;">
+                                        <span class="order-summary-label" style="color:#e76f51;font-weight:700;font-size:14px;">Estado tapa / disco:</span>
+                                    </td>
+                                    <td style="padding:10px 0 4px;">
+                                        <span class="order-summary-value" style="color:#264653;">
+                                            <span th:if="${sleeveCondition != null and !#strings.isEmpty(sleeveCondition)}">Tapa <span th:text="${sleeveCondition}">9</span>/10</span>
+                                            <span th:if="${(sleeveCondition != null and !#strings.isEmpty(sleeveCondition)) and (recordCondition != null and !#strings.isEmpty(recordCondition))}"> · </span>
+                                            <span th:if="${recordCondition != null and !#strings.isEmpty(recordCondition)}">Disco <span th:text="${recordCondition}">9</span>/10</span>
+                                        </span>
+                                    </td>
+                                </tr>
                             </table>
+                            <p th:if="${productUrl != null and !#strings.isEmpty(productUrl)}" style="margin:0 0 12px;font-size:14px;">
+                                <a th:href="${productUrl}" style="color:#264653;font-weight:600;">Ver la publicación en Vinyland</a>
+                            </p>
                             <hr class="order-divider" style="border:none;border-top:1px solid #d8d8d8;margin:14px 0;">
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,Helvetica,sans-serif;">
                                 <tr class="order-total-row">
@@ -131,6 +189,72 @@
                                     <td align="right" class="order-total-price" style="color:#e76f51;font-size:18px;font-weight:700;" th:text="${amount}">$0</td>
                                 </tr>
                             </table>
+                        </div>
+
+                        <!-- Próximo paso según etapa -->
+                        <div th:if="${purchaseStatusKey == 'PENDING' and recipientIsBuyer}" style="background-color:#e8f4fc;border:1px solid #b8d4e8;border-radius:8px;padding:14px 18px;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#264653;">
+                            <p style="margin:0 0 6px;font-weight:700;color:#264653;">Qué tenés que hacer ahora</p>
+                            <p style="margin:0;">Transferí <strong th:text="${amount}">$0</strong> usando los datos del vendedor más abajo. Luego entrá al detalle del pedido y avisá que ya pagaste.</p>
+                        </div>
+                        <div th:if="${purchaseStatusKey == 'PAID' and !recipientIsBuyer}" style="background-color:#e8f4fc;border:1px solid #b8d4e8;border-radius:8px;padding:14px 18px;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#264653;">
+                            <p style="margin:0 0 6px;font-weight:700;color:#264653;">Qué tenés que hacer ahora</p>
+                            <p style="margin:0;">Confirmá el pago en tu banco, prepará el envío con la dirección del comprador y cuando despaches, marcá el pedido como enviado desde el enlace del mail.</p>
+                        </div>
+                        <div th:if="${purchaseStatusKey == 'SHIPPED' and recipientIsBuyer}" style="background-color:#e8f4fc;border:1px solid #b8d4e8;border-radius:8px;padding:14px 18px;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#264653;">
+                            <p style="margin:0 0 6px;font-weight:700;color:#264653;">Qué tenés que hacer ahora</p>
+                            <p style="margin:0;">Cuando tengas el vinilo, entrá al detalle del pedido y confirmá la recepción para cerrar la compra y poder dejar una reseña.</p>
+                        </div>
+
+                        <!-- Datos del vendedor para el comprador (pago + contacto) -->
+                        <div th:if="${recipientIsBuyer}" style="background-color:#fff8f5;border:1px solid #f0d4c9;border-radius:8px;padding:16px 18px;margin:16px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#264653;">
+                            <p style="margin:0 0 10px;font-weight:700;color:#e76f51;">Datos del vendedor</p>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
+                                <tr>
+                                    <td style="padding:4px 0;vertical-align:top;width:42%;font-weight:600;">Usuario:</td>
+                                    <td style="padding:4px 0;" th:text="${sellerUsername}">vendedor</td>
+                                </tr>
+                                <tr th:if="${sellerCbuCvu != null and !#strings.isEmpty(sellerCbuCvu)}">
+                                    <td style="padding:4px 0;vertical-align:top;width:42%;font-weight:600;">CBU/CVU:</td>
+                                    <td style="padding:4px 0;word-break:break-all;font-family:monospace;" th:text="${sellerCbuCvu}">000</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:8px 0 4px;vertical-align:top;font-weight:600;">Email del vendedor:</td>
+                                    <td style="padding:8px 0 4px;">
+                                        <a th:href="'mailto:' + ${sellerEmail}" th:text="${sellerEmail}" style="color:#264653;word-break:break-all;">vendedor@mail.com</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p th:if="${sellerCbuCvu == null or #strings.isEmpty(sellerCbuCvu)}" style="margin:10px 0 0;font-size:13px;color:#5a6f78;">
+                                El vendedor no cargó un CBU/CVU en Vinyland. Podés coordinar el pago por email.
+                            </p>
+                        </div>
+
+                        <!-- Datos del comprador para el vendedor (envío) -->
+                        <div th:if="${!recipientIsBuyer}" style="background-color:#f0f7fa;border:1px solid #cfe3ea;border-radius:8px;padding:16px 18px;margin:16px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#264653;">
+                            <p style="margin:0 0 10px;font-weight:700;color:#e76f51;">Datos del comprador (envío)</p>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
+                                <tr>
+                                    <td style="padding:4px 0;vertical-align:top;width:42%;font-weight:600;">Usuario:</td>
+                                    <td style="padding:4px 0;" th:text="${buyerUsername}">comprador</td>
+                                </tr>
+                                <tr th:if="${buyerFullName != null and !#strings.isEmpty(buyerFullName)}">
+                                    <td style="padding:4px 0;vertical-align:top;width:42%;font-weight:600;">Nombre:</td>
+                                    <td style="padding:4px 0;" th:text="${buyerFullName}">Nombre</td>
+                                </tr>
+                                <tr th:if="${buyerShippingAddress != null and !#strings.isEmpty(buyerShippingAddress)}">
+                                    <td style="padding:8px 0 4px;vertical-align:top;font-weight:600;">Dirección:</td>
+                                    <td style="padding:8px 0 4px;" th:text="${buyerShippingAddress}">Dirección</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:8px 0 4px;vertical-align:top;font-weight:600;">Email:</td>
+                                    <td style="padding:8px 0 4px;">
+                                        <a th:href="'mailto:' + ${buyerEmail}" th:text="${buyerEmail}" style="color:#264653;word-break:break-all;">comprador@mail.com</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p th:if="${buyerShippingAddress == null or #strings.isEmpty(buyerShippingAddress)}" style="margin:10px 0 0;font-size:13px;color:#5a6f78;">
+                                El comprador no completó la dirección en Vinyland. Coordiná el envío por email si hace falta.
+                            </p>
                         </div>
 
                         <table role="presentation" class="cta-table" width="100%" cellpadding="0" cellspacing="0" style="margin-top:28px;">

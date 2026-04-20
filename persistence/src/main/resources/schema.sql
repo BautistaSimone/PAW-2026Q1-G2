@@ -3,7 +3,15 @@ CREATE TABLE IF NOT EXISTS users (
 	email VARCHAR(255) NOT NULL UNIQUE,
 	password VARCHAR(255) NOT NULL,
 	username VARCHAR(255) NOT NULL,
-	mod BOOLEAN NOT NULL
+	mod BOOLEAN NOT NULL,
+	first_name VARCHAR(100),
+	last_name VARCHAR(100),
+	street_name VARCHAR(255),
+	street_number VARCHAR(20),
+	neighborhood VARCHAR(100),
+	province VARCHAR(100),
+	extra_address_info VARCHAR(500),
+	cbu_cvu VARCHAR(22)
 );
 
 CREATE TABLE IF NOT EXISTS password_tokens (
@@ -82,14 +90,6 @@ CREATE TABLE IF NOT EXISTS reviews (
 	FOREIGN KEY(buyer_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- Normalize legacy mojibake categories from older local databases
-UPDATE categories
-SET name = 'Indie'
-WHERE encode(convert_to(name, 'UTF8'), 'hex') = '456c65637472c2a26e696361';
-
-UPDATE categories
-SET name = 'Reggaeton'
-WHERE encode(convert_to(name, 'UTF8'), 'hex') = '436cc2a073696361';
 
 -- Seed default categories (genres) using more compatible EXISTS check instead of ON CONFLICT
 INSERT INTO categories (name) SELECT 'Rock'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Rock');

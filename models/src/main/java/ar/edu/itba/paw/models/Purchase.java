@@ -6,23 +6,27 @@ public class Purchase {
     private final Long purchaseId;
     private final Long productId;
     private final Long buyerId;
+    /** Seller at the time of purchase (matches {@code purchases.seller_user_id}). */
+    private final Long sellerId;
     private final LocalDate date;
     private final PurchaseStatus status;
     private final String buyerToken;
     private final String sellerToken;
 
     public Purchase(
-        final Long purchaseId, 
-        final Long productId, 
-        final Long buyerId, 
+        final Long purchaseId,
+        final Long productId,
+        final Long buyerId,
+        final Long sellerId,
         final LocalDate date,
-        final PurchaseStatus status, 
-        final String buyerToken, 
+        final PurchaseStatus status,
+        final String buyerToken,
         final String sellerToken
     ) {
         this.purchaseId = purchaseId;
         this.productId = productId;
         this.buyerId = buyerId;
+        this.sellerId = sellerId;
         this.date = date;
         this.status = status;
         this.buyerToken = buyerToken;
@@ -39,6 +43,10 @@ public class Purchase {
 
     public Long getBuyerId() {
         return buyerId;
+    }
+
+    public Long getSellerId() {
+        return sellerId;
     }
 
     public LocalDate getDate() {
