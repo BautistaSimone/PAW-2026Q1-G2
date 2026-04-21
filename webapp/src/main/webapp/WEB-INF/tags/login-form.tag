@@ -96,7 +96,7 @@
                         <!-- Submit -->
                         <div class="d-grid">
                             <button type="submit" class="btn-accent">
-                                ${buttonLabel}
+                                <c:out value="${buttonLabel}" />
                             </button>
                         </div>
                     </form:form>
@@ -104,14 +104,14 @@
 
                 <!-- Change password link -->
                 <div class="auth-card-footer">
-                    <a href="${pageContext.request.contextPath}/resetPassword">
+                    <a href="<c:url value='/resetPassword'/>">
                         <spring:message code="ResetPassword.loginForm" />
                     </a>
                 </div>
 
                 <!-- Not registered link -->
                 <div class="auth-card-footer">
-                    <a href="${pageContext.request.contextPath}/register">
+                    <a href="<c:url value='/register'/>">
                         <spring:message code = "NotRegistered.loginForm" />
                     </a>
                 </div>

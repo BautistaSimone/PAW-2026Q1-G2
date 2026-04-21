@@ -138,14 +138,14 @@
 
                         <div class="d-grid">
                             <button type="submit" class="btn-accent">
-                                ${buttonLabel}
+                                <c:out value="${buttonLabel}" />
                             </button>
                         </div>
                     </form:form>
                 </div>
 
                 <div class="auth-card-footer">
-                    <a href="${pageContext.request.contextPath}/login">
+                    <a href="<c:url value='/login'/>">
                         Ya tengo cuenta, iniciar sesion
                     </a>
                 </div>

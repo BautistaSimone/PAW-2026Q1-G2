@@ -38,7 +38,7 @@
 
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger py-2">
-                        ${error}
+                        <c:out value="${error}" />
                     </div>
                 </c:if>
 

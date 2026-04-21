@@ -39,7 +39,7 @@
                     <div class="purchase-card">
                         <div class="purchase-card-header">
                             <h4><i class="bi bi-receipt" aria-hidden="true"></i> Pedido #<c:out value="${purchase.purchaseId}"/></h4>
-                            <span class="purchase-status-badge">${purchase.status.description}</span>
+                            <span class="purchase-status-badge"><c:out value="${purchase.status.description}"/></span>
                         </div>
                         <ui:purchase-stepper status="${purchase.status}" />
                         <div class="purchase-card-body">
@@ -112,7 +112,7 @@
                                                 <ul class="purchase-inset-list mb-0">
                                                     <li><strong>Usuario:</strong> <c:out value="${orderSeller.username}" default="—"/></li>
                                                     <li><strong>Email:</strong>
-                                                        <a href="mailto:${orderSeller.email}" style="color: inherit; font-weight: 600;"><c:out value="${orderSeller.email}"/></a>
+                                                        <a href="mailto:<c:out value='${orderSeller.email}'/>" style="color: inherit; font-weight: 600;"><c:out value="${orderSeller.email}"/></a>
                                                     </li>
                                                     <c:choose>
                                                         <c:when test="${not empty orderSeller.cbuCvu}">
@@ -191,7 +191,7 @@
                                                 <p class="mb-2" style="margin:0 0 0.5rem;font-size:0.95rem;">Monto: <strong style="color: var(--color-accent);">$<c:out value="${product.price}"/></strong></p>
                                                 <ul class="purchase-inset-list mb-2">
                                                     <li><strong>Comprador:</strong> <c:out value="${orderBuyer.username}" default="—"/></li>
-                                                    <li><strong>Email:</strong> <a href="mailto:${orderBuyer.email}" style="color: var(--color-accent); font-weight: 600;"><c:out value="${orderBuyer.email}"/></a></li>
+                                                    <li><strong>Email:</strong> <a href="mailto:<c:out value='${orderBuyer.email}'/>" style="color: var(--color-accent); font-weight: 600;"><c:out value="${orderBuyer.email}"/></a></li>
                                                 </ul>
                                                 <p class="small text-muted mb-0">Cuando notifique el pago, vas a poder confirmar el envío desde esta misma página.</p>
                                             </div>
@@ -209,7 +209,7 @@
                                                             <li style="color: #b45309;">Sin dirección cargada en Vinyland — pedila por email antes de enviar.</li>
                                                         </c:otherwise>
                                                     </c:choose>
-                                                    <li><strong>Email:</strong> <a href="mailto:${orderBuyer.email}" style="color: inherit; font-weight: 600;"><c:out value="${orderBuyer.email}"/></a></li>
+                                                    <li><strong>Email:</strong> <a href="mailto:<c:out value='${orderBuyer.email}'/>" style="color: inherit; font-weight: 600;"><c:out value="${orderBuyer.email}"/></a></li>
                                                 </ul>
                                             </div>
                                             <div class="alert-retro alert-retro-info">

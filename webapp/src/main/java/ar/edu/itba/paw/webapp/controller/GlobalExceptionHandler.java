@@ -59,13 +59,24 @@ public class GlobalExceptionHandler {
         return mav;
     }
 
+    @ExceptionHandler(org.springframework.dao.DataAccessException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ModelAndView handleDataAccessException(final org.springframework.dao.DataAccessException e) {
+        LOGGER.error("Database access error", e);
+        final ModelAndView mav = new ModelAndView("error");
+        mav.addObject("errorCode", "500");
+        mav.addObject("errorMessage", "Error en el servidor de datos.");
+        mav.addObject("errorDescription", "No pudimos procesar tu solicitud en este momento. Por favor intentá más tarde.");
+        return mav;
+    }
+
     @ExceptionHandler(MultipartException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ModelAndView handleInvalidUpload(final MultipartException e) {
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("errorCode", "400");
-        mav.addObject("errorMessage", "Archivo invÃ¡lido.");
-        mav.addObject("errorDescription", "El archivo enviado no cumple con los lÃ­mites permitidos.");
+        mav.addObject("errorMessage", "Archivo inválido.");
+        mav.addObject("errorDescription", "El archivo enviado no cumple con los límites permitidos.");
         return mav;
     }
 

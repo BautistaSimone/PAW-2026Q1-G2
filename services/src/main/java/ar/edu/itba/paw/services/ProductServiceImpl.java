@@ -23,6 +23,14 @@ public class ProductServiceImpl implements ProductService {
         this.userService = userService;
     }
 
+    private static String trimToNull(final String s) {
+        if (s == null) {
+            return null;
+        }
+        final String t = s.trim();
+        return t.isEmpty() ? null : t;
+    }
+
     @Override
     public Product createProduct(
         final Long userId,
@@ -62,8 +70,9 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return productDao.createProduct(
-            userId, title, artist, recordLabel, catalogNumber, editionCountry, categoryIds, description,
-            sleeveCondition, recordCondition, neighborhood, province, price
+            userId, trimToNull(title), trimToNull(artist), trimToNull(recordLabel), 
+            trimToNull(catalogNumber), trimToNull(editionCountry), categoryIds, trimToNull(description), 
+            sleeveCondition, recordCondition, trimToNull(neighborhood), trimToNull(province), price
         );
     }
 

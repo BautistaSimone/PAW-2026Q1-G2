@@ -54,9 +54,9 @@ public class UserServiceImpl implements UserService {
         LOGGER.atDebug().addArgument(email).log("About to attempt register user {}");
 
         return userDao.createUser(
-                email,
+                trimToNull(email),
                 encodedPassword,
-                username,
+                trimToNull(username),
                 mod,
                 trimToNull(firstName),
                 trimToNull(lastName),

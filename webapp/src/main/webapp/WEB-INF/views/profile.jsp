@@ -158,7 +158,7 @@
                                 Nombre y apellido son obligatorios. El resto es opcional; podés dejarlo vacío si preferís completarlo más tarde.
                             </p>
                             <c:url var="profileUpdateUrl" value="/profile/update"/>
-                            <form:form modelAttribute="userProfileForm" action="${profileUpdateUrl}" method="post" cssClass="user-profile-form">
+                            <form:form modelAttribute="userProfileForm" action="${profileUpdateUrl}" method="post" cssClass="user-profile-form" id="profileForm">
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                 <div class="row g-2">
                                     <div class="col-md-6 mb-3">
@@ -204,7 +204,7 @@
                                     <form:input path="cbuCvu" id="pfCbu" cssClass="form-control" placeholder="Opcional" inputmode="numeric" maxlength="22"/>
                                     <form:errors path="cbuCvu" cssClass="text-danger small d-block"/>
                                 </div>
-                                <button type="submit" class="btn btn-retro btn-retro-primary">
+                                <button type="submit" class="btn btn-retro btn-retro-primary" id="profileSaveBtn" disabled="true">
                                     <i class="bi bi-save" aria-hidden="true"></i> Guardar cambios
                                 </button>
                             </form:form>
@@ -236,7 +236,7 @@
                                                     </div>
                                                 </c:if>
                                                 <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.2rem;">
-                                                    <c:out value="${purchase.date}"/> · <span style="font-weight: 600;">${purchase.status.description}</span>
+                                                    <c:out value="${purchase.date}"/> · <span style="font-weight: 600;"><c:out value="${purchase.status.description}"/></span>
                                                 </div>
                                             </div>
                                             <div style="display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0;">
@@ -289,7 +289,7 @@
                                                     </div>
                                                 </c:if>
                                                 <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.2rem;">
-                                                    <c:out value="${sale.date}"/> · <span style="font-weight: 600;">${sale.status.description}</span>
+                                                    <c:out value="${sale.date}"/> · <span style="font-weight: 600;"><c:out value="${sale.status.description}"/></span>
                                                 </div>
                                             </div>
                                             <div style="display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0;">
@@ -360,4 +360,38 @@
             </div>
         </div>
     </div>
+    <script>
+    (function () {
+        var form = document.getElementById('profileForm');
+        var saveBtn = document.getElementById('profileSaveBtn');
+        if (!form || !saveBtn) return;
+
+        function getSerializedState() {
+            var formData = new FormData(form);
+            var params = new URLSearchParams();
+            Array.from(formData.entries()).sort().forEach(function(pair) {
+                params.append(pair[0], pair[1]);
+            });
+            return params.toString();
+        }
+
+        var initialState = getSerializedState();
+
+        function checkChanges() {
+            var currentState = getSerializedState();
+            if (currentState !== initialState) {
+                saveBtn.disabled = false;
+            } else {
+                saveBtn.disabled = true;
+            }
+        }
+
+        form.addEventListener('change', checkChanges);
+        form.addEventListener('input', function(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                checkChanges();
+            }
+        });
+    })();
+    </script>
 </ui:layout>
