@@ -44,7 +44,7 @@
 
             <div class="text-center mt-3">
                 <a href="${pageContext.request.contextPath}/login">
-                    Volver al login
+                    Volver
                 </a>
             </div>
 

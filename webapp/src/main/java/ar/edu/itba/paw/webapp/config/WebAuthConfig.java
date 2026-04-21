@@ -36,11 +36,12 @@ public class WebAuthConfig{
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
 
-          //      .invalidSessionUrl("/login")
-          //  .and()
-        http.sessionManagement().and()
+        http.sessionManagement()
+                .invalidSessionUrl("/login")
+            .and()
             .authorizeHttpRequests()
-                .requestMatchers("/login", "/register", "/updatePassword").permitAll()
+                .requestMatchers("/login", "/register").anonymous()
+                .requestMatchers("/changePassword", "/resetPassword").permitAll()
                 .requestMatchers("/").authenticated()
                 // Role based routes
                 .requestMatchers("/profile", "/profile/**").hasRole("USER")

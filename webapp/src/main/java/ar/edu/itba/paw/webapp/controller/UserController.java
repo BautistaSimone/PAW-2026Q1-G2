@@ -161,14 +161,27 @@ public class UserController {
     }
 
     @RequestMapping(value = "/login")
-    public ModelAndView login() {
+    public ModelAndView login(@AuthenticationPrincipal PawAuthUser authUser) {
+
+        // Don't allow logged in users
+        if (authUser != null)
+            return new ModelAndView("redirect:/");
+
         ModelAndView mv = new ModelAndView("login");
         mv.addObject("loginForm", new LoginForm());
         return mv;
     }
 
     @RequestMapping(value = "/register")
-    public ModelAndView register(@ModelAttribute RegisterForm form) {
+    public ModelAndView register(
+        @AuthenticationPrincipal PawAuthUser authUser,
+        @ModelAttribute RegisterForm form
+        ) {
+
+        // Don't allow logged in users
+        if (authUser != null)
+            return new ModelAndView("redirect:/");
+
         ModelAndView mv = new ModelAndView("register");
         mv.addObject("registerForm", form);
         return mv;
