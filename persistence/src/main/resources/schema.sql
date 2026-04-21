@@ -75,8 +75,6 @@ CREATE TABLE IF NOT EXISTS purchases (
 	FOREIGN KEY(seller_user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS purchases_product_id_unique_idx ON purchases(product_id);
-
 CREATE TABLE IF NOT EXISTS reviews (
 	review_id SERIAL PRIMARY KEY,
 	purchase_id INTEGER NOT NULL UNIQUE,
