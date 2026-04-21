@@ -119,6 +119,7 @@ public class UserController {
 
     @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
     public ModelAndView changePassword(
+        @AuthenticationPrincipal PawAuthUser authUser,
         @RequestParam("token") String token,
         @Valid @ModelAttribute UpdatePasswordForm form
         ) {
@@ -136,9 +137,14 @@ public class UserController {
         final PasswordToken passToken = passTokenOpt.get();
 
         userService.updatePassword(passToken.getUserId(), form.getNewPassword());
+        if (authUser == null) {
+            // If no user, go to login
+            mv.setViewName("redirect:/login");
+            mv.addObject("message", "Password updated successfully");
+            return mv;
+        }
 
-        mv.setViewName("redirect:/login");
-        mv.addObject("message", "Password updated successfully");
+        mv.setViewName("redirect:/");
 
         return mv;
     }
