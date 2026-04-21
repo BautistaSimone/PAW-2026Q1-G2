@@ -3,6 +3,7 @@
 <%@ attribute name="method" required="true" %>
 <%@ attribute name="buttonLabel" required="true" %>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <div class="container py-5" style="min-height: 70vh; display: flex; align-items: center;">
