@@ -77,8 +77,17 @@ public class UserController {
     }
 
     @RequestMapping(value = "/resetPassword")
-    public ModelAndView showResetPasswordPage() {
+    public ModelAndView showResetPasswordPage(
+        @AuthenticationPrincipal PawAuthUser authUser
+        ) {
+
         ModelAndView mv = new ModelAndView("forgot-password");
+
+        // If logged in, fill in the mail
+        if (authUser != null) {
+            mv.addObject("userEmail", authUser.getUser().getEmail());
+        }
+
         return mv;
     }
 

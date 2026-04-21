@@ -22,6 +22,7 @@
                     <label class="form-label">Email</label>
                     <input type="email"
                            name="email"
+                           value="${userEmail}"
                            class="form-control"
                            placeholder="tu@email.com"
                            required />

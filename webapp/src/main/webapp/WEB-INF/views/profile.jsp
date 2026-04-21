@@ -47,12 +47,17 @@
                 </div>
 
                 <c:if test="${isOwnProfile}">
-                    <form action="<c:url value='/logout' />" method="post" style="margin-top: 1rem;">
-                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                        <button type="submit" class="btn btn-retro btn-retro-secondary">
-                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión
-                        </button>
-                    </form>
+                    <div>
+                        <a href="<c:url value='/resetPassword'/>" class="btn btn-retro btn-retro-secondary" role="button">
+                            Cambiar contraseña
+                        </a>
+                        <form action="<c:url value='/logout' />" method="post" style="margin-top: 1rem;">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                            <button type="submit" class="btn btn-retro btn-retro-secondary">
+                                <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión
+                            </button>
+                        </form>
+                    </div>
                 </c:if>
             </div>
 
