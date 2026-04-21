@@ -25,15 +25,19 @@
                             class="form-control"
                             placeholder="Nueva contraseña"
                             required />
+
+                    <form:errors path="newPassword" cssClass="text-danger small"/>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Confirmar contraseña</label>
                     <input type="password"
-                           name="confirmPassword"
+                           name="newPasswordConfirm"
                            class="form-control"
                            placeholder="Confirmar contraseña"
                            required />
+
+                    <form:errors path="newPasswordConfirm" cssClass="text-danger small"/>
                 </div>
 
                 <c:if test="${not empty error}">
@@ -42,7 +46,7 @@
                     </div>
                 </c:if>
 
-                <button type="submit" class="btn btn-primary w-100">
+                <button type="submit" class="btn-accent w-100">
                     Cambiar contraseña
                 </button>
 

@@ -1934,7 +1934,7 @@ details.filter-section:not([open]) .filter-section-chevron {
     box-shadow: 0 0 0 3px rgba(231, 111, 81, 0.1);
 }
 
-.auth-card-body .btn-accent {
+.btn-accent {
     background: var(--color-accent);
     color: #fff;
     border: none;
@@ -1947,7 +1947,7 @@ details.filter-section:not([open]) .filter-section-chevron {
     width: 100%;
 }
 
-.auth-card-body .btn-accent:hover {
+.btn-accent:hover {
     background: var(--color-accent-hover);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(231, 111, 81, 0.3);

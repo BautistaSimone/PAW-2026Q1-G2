@@ -40,6 +40,7 @@ import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.webapp.form.RegisterForm;
 import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
+import ar.edu.itba.paw.webapp.form.UpdatePasswordForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
@@ -94,15 +95,16 @@ public class UserController {
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     public ModelAndView resetPassword(@RequestParam("email") String userEmail) {
 
-        ModelAndView mv = new ModelAndView("login");
-        mv.addObject("loginForm", new LoginForm());
-
         final Optional<User> userOpt = userService.findByEmail(userEmail);
 
         if (!userOpt.isPresent()) {
+            ModelAndView mv = new ModelAndView("forgot-password");
             mv.addObject("error", "UserNotFound.authForm.email");
             return mv;
         }
+
+        ModelAndView mv = new ModelAndView("login");
+        mv.addObject("loginForm", new LoginForm());
 
         final User user = userOpt.get();
 
@@ -118,7 +120,7 @@ public class UserController {
     @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
     public ModelAndView changePassword(
         @RequestParam("token") String token,
-        @RequestParam("newPassword") String newPassword
+        @Valid @ModelAttribute UpdatePasswordForm form
         ) {
 
         ModelAndView mv = new ModelAndView();
@@ -133,14 +135,7 @@ public class UserController {
         // We already know it exists
         final PasswordToken passToken = passTokenOpt.get();
 
-        try {
-            userService.updatePassword(passToken.getUserId(), newPassword);
-        } catch (IllegalArgumentException e) {
-            mv.setViewName("update-password");
-            mv.addObject("token", token);
-            mv.addObject("error", "Invalid password reset attempt");
-            return mv;
-        }
+        userService.updatePassword(passToken.getUserId(), form.getNewPassword());
 
         mv.setViewName("redirect:/login");
         mv.addObject("message", "Password updated successfully");

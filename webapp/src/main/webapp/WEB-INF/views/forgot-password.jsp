@@ -28,7 +28,15 @@
                            required />
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100">
+                <!-- Error message -->
+                <c:if test="${not empty error}">
+                    <div class="alert-retro alert-retro-warning mb-3" role="alert">
+                        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                        <spring:message code = "UserNotFound.authForm.email" />
+                    </div>
+                </c:if>
+
+                <button type="submit" class="btn-accent w-100">
                     Enviar enlace
                 </button>
 

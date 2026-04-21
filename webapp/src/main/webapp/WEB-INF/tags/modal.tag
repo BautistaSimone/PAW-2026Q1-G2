@@ -29,7 +29,7 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><c:out value="${secondary}"/></button>
                 </c:if>
                 
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><c:out value="${primary}"/></button>
+                <button type="button" class="btn-accent" data-bs-dismiss="modal"><c:out value="${primary}"/></button>
             </div>
         </div>
     </div>
