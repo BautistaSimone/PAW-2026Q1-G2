@@ -12,7 +12,6 @@
 <c:set var="modalCssClass" value="${not empty cssClass ? cssClass : ''}" />
 <c:set var="classes" value="modal ${modalCssClass}" />
 <c:set var="primary" value="${primaryBtn ne null ? primaryBtn : 'Aceptar'}" />
-<c:set var="secondary" value="${secondaryBtn ne null ? secondaryBtn : 'Cancelar'}" />
 
 <div class="modal fade ${classes}" id="${id}" tabindex="-1" aria-labelledby="${id}Label" aria-hidden="true">
     <div class="modal-dialog">
@@ -25,8 +24,12 @@
                 <c:out value="${text}"/>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><c:out value="${secondary}"/></button>
-                <button type="button" class="btn btn-primary"><c:out value="${primary}"/></button>
+
+                <c:if test="${secondaryBtn ne null}">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><c:out value="${secondary}"/></button>
+                </c:if>
+                
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><c:out value="${primary}"/></button>
             </div>
         </div>
     </div>

@@ -9,6 +9,14 @@
     <ui:sidebar />
     <ui:header showHeaderActions="true"/>
 
+    <!-- Tell user to change its password -->
+    <c:if test="${changePsswdModal}">
+        <ui:modal 
+            id="psswd" 
+            title="Cambie su contraseña inmediatamente" 
+            text="Corre riesgo de que un actor maligno tenga acceso a la misma, vaya a su perfil y cambiela" />
+    </c:if>
+
     <div class="products-section">
         <div class="container-fluid products-shell">
             <c:if test="${param.created eq '1'}">
@@ -112,6 +120,13 @@
 
     <script>
     (function () {
+        document.addEventListener("DOMContentLoaded", function () {
+            var modalEl = document.getElementById('psswd');
+            if (modalEl) {
+                var modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        });
         var sortSelect = document.getElementById('sortSelect');
         if (sortSelect) {
             sortSelect.addEventListener('change', function () {

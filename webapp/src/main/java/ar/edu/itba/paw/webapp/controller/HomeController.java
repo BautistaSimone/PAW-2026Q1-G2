@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,14 +15,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import ar.edu.itba.paw.models.ConditionBucket;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductSortOrder;
+import ar.edu.itba.paw.models.PasswordToken;
+import ar.edu.itba.paw.services.PasswordTokenService;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductService;
+import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 
 @Controller
 public class HomeController {
@@ -29,16 +34,19 @@ public class HomeController {
 	private final ImageService imageService;
 	private final ProductService productService;
 	private final CategoryService categoryService;
+    private final PasswordTokenService passwordTokenService;
 
 	@Autowired
 	public HomeController(
 		final ProductService productService,
 		final ImageService imageService,
-		final CategoryService categoryService
+		final CategoryService categoryService,
+		final PasswordTokenService passwordTokenService
 	) {
 		this.productService = productService;
 		this.imageService = imageService;
 		this.categoryService = categoryService;
+		this.passwordTokenService = passwordTokenService;
 	}
 
 	private static BigDecimal parsePriceParam(final String raw) {
@@ -54,6 +62,7 @@ public class HomeController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ModelAndView home(
+        @AuthenticationPrincipal PawAuthUser authUser,
 		@RequestParam(value = "search-text", required = false) final String searchText,
 		@RequestParam(value = "categories", required = false) final List<Long> categoryIds,
 		@RequestParam(value = "minPrice", required = false) final String minPriceParam,
@@ -128,6 +137,17 @@ public class HomeController {
 		}
 
 		final ModelAndView mav = new ModelAndView("home");
+
+        final Optional<PasswordToken> passTokenOpt = passwordTokenService.findByUserId(authUser.getUser().getId());
+
+		// If password was never changed, tell the user
+		if (!passTokenOpt.isPresent()) {
+			mav.addObject("changePsswdModal", true);
+		} else {
+			mav.addObject("changePsswdModal", false);
+		}
+
+
 		mav.addObject("products", products);
 		mav.addObject("productImageUrls", productImageUrls);
 		mav.addObject("categories", categoryService.findAll());
