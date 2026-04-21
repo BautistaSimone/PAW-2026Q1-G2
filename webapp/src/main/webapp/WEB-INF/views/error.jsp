@@ -8,7 +8,7 @@
         <div class="error-code"><c:out value="${errorCode}" default="Error" /></div>
         <h2 class="error-message"><c:out value="${errorMessage}" default="Ocurrió un error inesperado" /></h2>
         <p class="error-description"><c:out value="${errorDescription}" default="Lo sentimos, no pudimos completar tu solicitud." /></p>
-        <a href="<c:url value='/'/>" class="btn btn-retro btn-retro-dark">
+        <a href="<c:url value='/'/>" class="btn btn-retro btn-retro-primary">
             <i class="bi bi-house" aria-hidden="true"></i> Volver al inicio
         </a>
     </div>
