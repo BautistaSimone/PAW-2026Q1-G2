@@ -137,7 +137,7 @@
                         <a href="<c:url value="/"/>" class="btn btn-retro btn-retro-outline">
                             <i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al catalogo
                         </a>
-                        <button type="submit" class="btn btn-retro btn-retro-primary">
+                        <button type="submit" class="btn btn-retro btn-retro-primary" id="publishBtn">
                             <i class="bi bi-vinyl" aria-hidden="true"></i> Publicar vinilo
                         </button>
                     </div>
@@ -146,6 +146,17 @@
         </div>
     </div>
     <script>
+    (function () {
+        var form = document.querySelector('form.sell-form');
+        var publishBtn = document.getElementById('publishBtn');
+        if (form && publishBtn) {
+            form.addEventListener('submit', function () {
+                publishBtn.disabled = true;
+                publishBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Publicando...';
+            });
+        }
+    })();
+
     (function () {
         var priceDisplay = document.getElementById('priceDisplay');
         var price = document.getElementById('price');

@@ -52,10 +52,11 @@
 
 <!-- Messages -->
 <c:if test="${message != null}">
-    <div class="alert-retro alert-retro-info mb-3 text-break d-flex align-items-start" role="alert">
-        <i class="bi bi-info-circle me-2 fs-4" aria-hidden="true"></i>
-        <div>
-            <spring:message code="${message}" />
+    <div class="container mt-3">
+        <div class="alert-retro alert-retro-info text-break d-flex align-items-start" role="alert">
+            <div>
+                <spring:message code="${message}" />
+            </div>
         </div>
     </div>
 </c:if>

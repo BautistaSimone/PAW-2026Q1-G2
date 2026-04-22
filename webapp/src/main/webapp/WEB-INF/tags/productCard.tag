@@ -10,6 +10,7 @@
 <%@ attribute name="categories" required="false" rtexprvalue="true" type="java.util.List" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <c:set var="isOnSale" value="${onSale ne null ? onSale : false}" />
 
@@ -38,9 +39,12 @@
         <p class="product-artist"><c:out value='${artist}'/></p>
         <c:if test="${not empty categories}">
             <div class="product-card-categories" aria-label="Géneros">
-                <c:forEach items="${categories}" var="cat">
+                <c:forEach items="${categories}" var="cat" varStatus="st" end="2">
                     <span class="product-card-category-pill"><c:out value="${cat.name}"/></span>
                 </c:forEach>
+                <c:if test="${fn:length(categories) > 3}">
+                    <span class="product-card-category-overflow">+${fn:length(categories) - 3}</span>
+                </c:if>
             </div>
         </c:if>
         <c:choose>

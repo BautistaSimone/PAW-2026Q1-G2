@@ -26,6 +26,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.i18n.FixedLocaleResolver;
+import java.util.Locale;
 
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
 
@@ -121,5 +124,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    public LocaleResolver localeResolver() {
+        return new FixedLocaleResolver(new Locale("es", "AR"));
     }
 }

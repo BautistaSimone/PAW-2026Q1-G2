@@ -69,13 +69,13 @@
                                                         <c:url var="galleryImgUrl" value="/images/${img.imageId}" />
                                                         <button type="button"
                                                             class="product-gallery-thumb<c:if test='${st.first}'> is-active</c:if>"
-                                                            data-full-src="${galleryImgUrl}"
+                                                            data-full-src="<c:out value='${galleryImgUrl}'/>"
                                                             style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.2s;"
                                                             onmouseover="this.style.transform='scale(1.05)'"
                                                             onmouseout="this.style.transform='scale(1)'"
                                                             aria-label="Ver imagen ${st.index + 1} de ${fn:length(productImages)}"
                                                             aria-pressed="${st.first}">
-                                                            <img src="<c:url value='${galleryImgUrl}'/>" alt=""
+                                                            <img src="<c:out value='${galleryImgUrl}'/>" alt=""
                                                                 loading="lazy" style="border-radius: 8px;" />
                                                         </button>
                                                     </c:forEach>
@@ -189,8 +189,8 @@
                                                 <c:url var="purchasePostUrl" value='/purchases' />
                                                 <form:form modelAttribute="purchaseCreateForm"
                                                     action="${purchasePostUrl}" method="POST" cssClass="w-100">
-                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                                    <input type="hidden" name="productId" value="${product.id}" />
+                                                    <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
+                                                    <input type="hidden" name="productId" value="<c:out value='${product.id}'/>" />
                                                     <button type="submit" class="btn w-100"
                                                         style="background: var(--color-accent); color: #fff; font-size: 1.15rem; padding: 1.1rem; border-radius: 99px; box-shadow: 0 8px 24px rgba(231, 111, 81, 0.4); border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: center; align-items: center; gap: 0.75rem; font-weight: 700;"
                                                         onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 28px rgba(231, 111, 81, 0.5)'; this.style.background='var(--color-accent-hover)';"
@@ -203,8 +203,8 @@
                                             <sec:authorize access="isAuthenticated()">
                                                 <div class="d-grid mt-3">
                                                     <c:url var="reportPostUrl" value="/products/${product.id}/report" />
-                                                    <form action="${reportPostUrl}" method="POST" class="w-100">
-                                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                    <form action="<c:out value='${reportPostUrl}'/>" method="POST" class="w-100">
+                                                        <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
                                                         <button type="submit" class="btn w-100"
                                                             style="background: transparent; color: var(--color-accent); font-size: 1rem; padding: 0.8rem; border-radius: 99px; border: 1px solid rgba(231, 111, 81, 0.5); transition: all 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-weight: 600;"
                                                             onmouseover="this.style.background='rgba(231, 111, 81, 0.08)'; this.style.borderColor='var(--color-accent)';"
@@ -238,12 +238,15 @@
                                                     style="margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;">
                                                     <c:forEach items="${product.categories}" var="cat"
                                                         varStatus="status">
-                                                        <span
-                                                            style="background: #fff; color: var(--color-accent); font-weight: 600; font-size: 0.8rem; padding: 0.4rem 1rem; border-radius: 50px; border: 1.5px solid rgba(231, 111, 81, 0.2); transition: all 0.25s; box-shadow: 0 2px 8px rgba(231,111,81,0.05);"
+                                                        <c:url var="catFilterUrl" value="/">
+                                                            <c:param name="categories" value="${cat.id}" />
+                                                        </c:url>
+                                                        <a href="<c:out value='${catFilterUrl}'/>"
+                                                            style="background: #fff; color: var(--color-accent); font-weight: 600; font-size: 0.8rem; padding: 0.4rem 1rem; border-radius: 50px; border: 1.5px solid rgba(231, 111, 81, 0.2); transition: all 0.25s; box-shadow: 0 2px 8px rgba(231,111,81,0.05); text-decoration: none;"
                                                             onmouseover="this.style.background='var(--color-accent)'; this.style.color='#fff'; this.style.transform='translateY(-2px)';"
                                                             onmouseout="this.style.background='#fff'; this.style.color='var(--color-accent)'; this.style.transform='none';">
                                                             <c:out value="${cat.name}" />
-                                                        </span>
+                                                        </a>
                                                     </c:forEach>
                                                 </div>
                                             </c:if>
@@ -316,15 +319,13 @@
                                                     </button>
 
                                                     <div class="carousel-track">
-                                                        <c:forEach items="${sellerProducts}" var="sp">
+                                                    <c:forEach items="${sellerProducts}" var="sp">
                                                             <div class="carousel-item-wrapper">
                                                                 <c:url value="/products/${sp.id}" var="spUrl" />
-                                                                <c:url value="/images/product/${sp.id}"
-                                                                    var="spImageUrl" />
                                                                 <ui:productCard title="${sp.title}"
                                                                     artist="${sp.artist}" price="${sp.price}"
                                                                     installments="${sp.installmentPrice}"
-                                                                    imageUrl="${spImageUrl}"
+                                                                    imageUrl="/images/product/${sp.id}"
                                                                     categories="${sp.categories}" href="${spUrl}" />
                                                             </div>
                                                         </c:forEach>
@@ -363,12 +364,10 @@
                                                         <c:forEach items="${relatedProducts}" var="rp">
                                                             <div class="carousel-item-wrapper">
                                                                 <c:url value="/products/${rp.id}" var="rpUrl" />
-                                                                <c:url value="/images/product/${rp.id}"
-                                                                    var="rpImageUrl" />
                                                                 <ui:productCard title="${rp.title}"
                                                                     artist="${rp.artist}" price="${rp.price}"
                                                                     installments="${rp.installmentPrice}"
-                                                                    imageUrl="${rpImageUrl}"
+                                                                    imageUrl="/images/product/${rp.id}"
                                                                     categories="${rp.categories}" href="${rpUrl}" />
                                                             </div>
                                                         </c:forEach>

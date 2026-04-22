@@ -649,6 +649,8 @@ img {
     margin-bottom: 1.5rem;
     overflow: hidden;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .product-card:hover {
@@ -691,11 +693,30 @@ img {
     margin-bottom: 0.6rem;
 }
 
+.product-card .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .product-card-categories {
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem;
     margin-bottom: 0.55rem;
+}
+
+.product-card-category-overflow {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    background: rgba(38, 70, 83, 0.07);
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(38, 70, 83, 0.15);
+    line-height: 1.2;
+    white-space: nowrap;
 }
 
 .product-card-category-pill {
@@ -3000,6 +3021,12 @@ details.filter-section:not([open]) .filter-section-chevron {
 
 .password-toggle-btn:hover {
     color: var(--color-accent);
+}
+
+/* Hide native browser password-reveal button (Edge/Chrome) */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
 }
 
 /* ===== Responsive ===== */

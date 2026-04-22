@@ -41,9 +41,8 @@ public class EmailServiceImpl implements EmailService {
         final JavaMailSender javaMailSender,
         final SpringTemplateEngine templateEngine,
         final ProductReportRemovalTokenService reportRemovalTokenService,
-        @Value("${app.base.url:http://localhost:8000}") final String baseUrl,
-        @Value("${mail.username}") final String adminEmail
-    ) {
+        @Value("${app.base.url:http://pawserver.it.itba.edu.ar/paw-2026a-02/}") final String baseUrl,
+        @Value("${mail.username}") final String adminEmail) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.reportRemovalTokenService = reportRemovalTokenService;

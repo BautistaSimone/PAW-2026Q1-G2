@@ -3,58 +3,96 @@
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<ui:layout title="Vinyland | Update Password" bodyClass="auth-page-bg">
+<ui:layout title="Vinyland | Restablecer contraseña" bodyClass="auth-page-bg">
 
     <ui:header showHeaderActions="false"/>
 
-    <div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
-        <div class="card shadow-sm p-4" style="width: 100%; max-width: 420px;">
-
-            <h4 class="text-center mb-4">Restablecer contraseña</h4>
-
-            <!-- Spring form:form -->
-            <form:form modelAttribute="updatePasswordForm" action="${pageContext.request.contextPath}/changePassword" method="POST">
-
-                <!-- CSRF token -->
-                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-
-                <!-- Token hidden field -->
-                <form:hidden path="token" />
-
-                <div class="mb-3">
-                    <label class="form-label">Nueva contraseña</label>
-                    <form:password path="newPassword" 
-                                   cssClass="form-control" 
-                                   placeholder="Nueva contraseña" 
-                                   required="required"/>
-                    <form:errors path="newPassword" cssClass="text-danger small"/>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Confirmar contraseña</label>
-                    <form:password path="newPasswordConfirm" 
-                                   cssClass="form-control" 
-                                   placeholder="Confirmar contraseña" 
-                                   required="required"/>
-                    <form:errors path="newPasswordConfirm" cssClass="text-danger small"/>
-                </div>
-
-                <c:if test="${not empty error}">
-                    <div class="alert alert-danger py-2">
-                        <c:out value="${error}" />
+    <div class="container py-5" style="min-height: 70vh; display: flex; align-items: center;">
+        <div class="row justify-content-center w-100">
+            <div class="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
+                <div class="auth-card">
+                    <div class="auth-card-header">
+                        <h2><i class="bi bi-vinyl" aria-hidden="true"></i> Vinyland</h2>
+                        <p>Restablecer contraseña</p>
                     </div>
-                </c:if>
+                    <div class="auth-card-body">
 
-                <button type="submit" class="btn-accent w-100">
-                    Cambiar contraseña
-                </button>
+                        <form:form modelAttribute="updatePasswordForm" action="${pageContext.request.contextPath}/changePassword" method="POST">
 
-            </form:form>
+                            <!-- Token hidden field -->
+                            <form:hidden path="token" />
 
-            <div class="text-center mt-3">
-                <a href="${pageContext.request.contextPath}/login">Volver al login</a>
+                            <div class="mb-3">
+                                <label class="form-label">Nueva contraseña</label>
+                                <div class="password-toggle-wrapper">
+                                    <form:password path="newPassword"
+                                                   id="newPassword"
+                                                   cssClass="form-control"
+                                                   placeholder="Nueva contraseña"
+                                                   required="required"/>
+                                    <button type="button" class="password-toggle-btn" aria-label="Mostrar contraseña" onclick="togglePassword('newPassword', this)">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <form:errors path="newPassword" cssClass="text-danger small"/>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Confirmar contraseña</label>
+                                <div class="password-toggle-wrapper">
+                                    <form:password path="newPasswordConfirm"
+                                                   id="newPasswordConfirm"
+                                                   cssClass="form-control"
+                                                   placeholder="Confirmar contraseña"
+                                                   required="required"/>
+                                    <button type="button" class="password-toggle-btn" aria-label="Mostrar contraseña" onclick="togglePassword('newPasswordConfirm', this)">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <form:errors path="newPasswordConfirm" cssClass="text-danger small"/>
+                            </div>
+
+                            <c:if test="${not empty error}">
+                                <div class="alert-retro alert-retro-warning mb-3" role="alert">
+                                    <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                                    <c:out value="${error}" />
+                                </div>
+                            </c:if>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn-accent">
+                                    Cambiar contraseña
+                                </button>
+                            </div>
+
+                        </form:form>
+
+                        <script>
+                            function togglePassword(inputId, btn) {
+                                const input = document.getElementById(inputId);
+                                const icon = btn.querySelector('i');
+                                if (input.type === 'password') {
+                                    input.type = 'text';
+                                    icon.classList.remove('bi-eye');
+                                    icon.classList.add('bi-eye-slash');
+                                    btn.setAttribute('aria-label', 'Ocultar contraseña');
+                                } else {
+                                    input.type = 'password';
+                                    icon.classList.remove('bi-eye-slash');
+                                    icon.classList.add('bi-eye');
+                                    btn.setAttribute('aria-label', 'Mostrar contraseña');
+                                }
+                            }
+                        </script>
+                    </div>
+
+                    <div class="auth-card-footer">
+                        <a href="<c:url value='/login'/>" class="btn btn-retro btn-retro-outline w-100">
+                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al login
+                        </a>
+                    </div>
+                </div>
             </div>
-
         </div>
     </div>
 
