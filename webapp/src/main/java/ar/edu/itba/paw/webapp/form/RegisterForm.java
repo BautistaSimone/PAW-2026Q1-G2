@@ -52,6 +52,7 @@ public class RegisterForm {
     private String streetName;
 
     @Size(max = 20, message = "{Size.registerForm.streetNumber}")
+    @Pattern(regexp = "^$|^[1-9]\\d*$", message = "{Pattern.registerForm.streetNumber}")
     private String streetNumber;
 
     @Size(max = 100, message = "{Size.registerForm.neighborhood}")

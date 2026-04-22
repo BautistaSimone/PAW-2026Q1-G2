@@ -18,6 +18,7 @@ public class UserProfileForm {
     private String streetName;
 
     @Size(max = 20, message = "{Size.userProfileForm.streetNumber}")
+    @Pattern(regexp = "^$|^[1-9]\\d*$", message = "{Pattern.userProfileForm.streetNumber}")
     private String streetNumber;
 
     @Size(max = 100, message = "{Size.userProfileForm.neighborhood}")

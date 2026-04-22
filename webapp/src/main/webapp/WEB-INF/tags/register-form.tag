@@ -93,7 +93,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="streetNumber" class="form-label">Número</label>
-                            <form:input path="streetNumber" id="streetNumber" cssClass="form-control" placeholder="Número" />
+                            <form:input type="number" path="streetNumber" id="streetNumber" cssClass="form-control" placeholder="Número" min="1" />
                             <form:errors path="streetNumber" cssClass="text-danger small"/>
                         </div>
                         <div class="row g-2">
