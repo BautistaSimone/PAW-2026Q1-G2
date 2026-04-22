@@ -79,7 +79,19 @@
                 <c:if test="${param.missingData eq 'publish'}">
                     <div class="alert-retro alert-retro-warning mt-3" role="alert">
                         <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                        Para publicar un vinilo necesitás cargar tu CBU/CVU (22 dígitos) en Mis datos.
+                        Para publicar un vinilo necesitás cargar tu CBU/CVU (22 dígitos) y completar barrio y provincia en Mis datos (se usan como ubicación de tus publicaciones).
+                    </div>
+                </c:if>
+                <c:if test="${param.deleted eq '1'}">
+                    <div class="alert-retro alert-retro-success mt-3" role="alert">
+                        <i class="bi bi-check-circle" aria-hidden="true"></i>
+                        La publicación se eliminó correctamente.
+                    </div>
+                </c:if>
+                <c:if test="${param.deleteError eq 'forbidden'}">
+                    <div class="alert-retro alert-retro-warning mt-3" role="alert">
+                        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                        No podés eliminar una publicación que no es tuya.
                     </div>
                 </c:if>
             </c:if>
@@ -132,6 +144,15 @@
                                                 imageUrl="${productImageUrls[product.id]}"
                                                 categories="${product.categories}"
                                                 href="${productUrl}"/>
+                                        <c:if test="${isOwnProfile}">
+                                            <c:url var="deleteProductUrl" value="/products/${product.id}/delete"/>
+                                            <form action="${deleteProductUrl}" method="post" class="mt-2" onsubmit="return confirm('¿Estás seguro de que querés eliminar esta publicación?');">
+                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                <button type="submit" class="btn btn-retro btn-retro-secondary w-100" style="font-size: 0.85rem; padding: 0.4rem 0.75rem;">
+                                                    <i class="bi bi-trash" aria-hidden="true"></i> Eliminar publicación
+                                                </button>
+                                            </form>
+                                        </c:if>
                                     </div>
                                 </c:forEach>
                             </div>

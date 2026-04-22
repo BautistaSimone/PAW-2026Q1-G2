@@ -87,20 +87,6 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="neighborhood" class="form-label">Barrio / Ciudad *</label>
-                            <form:input path="neighborhood" cssClass="form-control"
-                                   placeholder="Ej: Palermo" required="required" />
-                            <form:errors path="neighborhood" cssClass="text-danger" element="div" />
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="province" class="form-label">Provincia *</label>
-                            <form:input path="province" cssClass="form-control"
-                                   placeholder="Ej: Buenos Aires" required="required" />
-                            <form:errors path="province" cssClass="text-danger" element="div" />
-                        </div>
-
-                        <div class="col-md-6">
                             <label for="priceDisplay" class="form-label">Precio *</label>
                             <form:hidden path="price" id="price" />
                             <div class="input-group">

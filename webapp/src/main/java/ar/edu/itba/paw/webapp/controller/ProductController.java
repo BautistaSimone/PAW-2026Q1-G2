@@ -111,11 +111,11 @@ public class ProductController {
             return new ModelAndView("product-form");
         }
 
-        // Get the current logged in user
-        User user = authUser.getUser();
+        final User publisher = userService.findById(authUser.getUser().getId())
+            .orElseThrow(() -> new IllegalStateException("User not found"));
 
         final Product product = productService.createProduct(
-            user.getId(),
+            publisher.getId(),
             form.getTitle(),
             form.getArtist(),
             form.getRecordLabel(),
@@ -125,8 +125,8 @@ public class ProductController {
             form.getDescription(),
             form.getSleeveCondition(),
             form.getRecordCondition(),
-            form.getNeighborhood(),
-            form.getProvince(),
+            publisher.getNeighborhood(),
+            publisher.getProvince(),
             form.getPrice()
         );
 
@@ -144,6 +144,7 @@ public class ProductController {
     @RequestMapping(value = "/products/{id}", method = RequestMethod.GET)
     public ModelAndView productDetail(
         @PathVariable("id") final Long id,
+        @AuthenticationPrincipal final PawAuthUser authUser,
         @ModelAttribute("purchaseCreateForm") final ar.edu.itba.paw.webapp.form.PurchaseCreateForm purchaseForm
     ) {
         final Product product = productService.findByIdIfAvailable(id)
@@ -151,6 +152,10 @@ public class ProductController {
 
         final ModelAndView mav = new ModelAndView("product-detail");
         mav.addObject("product", product);
+
+        final boolean isOwnProduct = authUser != null
+            && product.getUserId().equals(authUser.getUser().getId());
+        mav.addObject("isOwnProduct", isOwnProduct);
 
         final List<ar.edu.itba.paw.models.Image> productImages = imageService.findAllByProductId(product.getId());
         if (!productImages.isEmpty()) {
@@ -200,6 +205,26 @@ public class ProductController {
         return new ModelAndView("redirect:/products/" + id + "?reported=1");
     }
 
+    @RequestMapping(value = "/products/{id}/delete", method = RequestMethod.POST)
+    public ModelAndView deleteOwnProduct(
+        @AuthenticationPrincipal final PawAuthUser authUser,
+        @PathVariable("id") final Long id
+    ) {
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        final Product product = productService.findById(id)
+            .orElseThrow(ResourceNotFoundException::new);
+
+        if (!product.getUserId().equals(authUser.getUser().getId())) {
+            return new ModelAndView("redirect:/profile?deleteError=forbidden");
+        }
+
+        productService.hideProductFromCatalog(id);
+        return new ModelAndView("redirect:/profile?deleted=1");
+    }
+
     @RequestMapping(value = "/products/{id}/moderate-hide", method = RequestMethod.GET)
     public ModelAndView moderateHideFromReportMail(
         @PathVariable("id") final Long id,
@@ -227,7 +252,7 @@ public class ProductController {
         }
         final User publisher = userService.findById(authUser.getUser().getId())
             .orElseThrow(() -> new IllegalStateException("User not found"));
-        if (!publisher.hasCbuCvu()) {
+        if (!publisher.hasCbuCvu() || !publisher.hasNeighborhoodAndProvince()) {
             return Optional.of(new ModelAndView("redirect:/profile?tab=mydata&missingData=publish"));
         }
         return Optional.empty();

@@ -59,6 +59,11 @@ public class User {
         return nonBlank(cbuCvu);
     }
 
+    /** True if barrio and provincia are both filled (required to publish using profile location). */
+    public boolean hasNeighborhoodAndProvince() {
+        return nonBlank(neighborhood) && nonBlank(province);
+    }
+
     /** True if street, number, barrio and provincia are all filled. */
     public boolean hasAddress() {
         return nonBlank(streetName)

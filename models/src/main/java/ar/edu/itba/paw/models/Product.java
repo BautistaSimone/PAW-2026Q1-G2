@@ -105,7 +105,18 @@ public class Product {
     }
 
     public String getLocation() {
-        return neighborhood + ", " + province;
+        final String n = neighborhood != null ? neighborhood.trim() : "";
+        final String p = province != null ? province.trim() : "";
+        if (n.isEmpty() && p.isEmpty()) {
+            return "";
+        }
+        if (n.isEmpty()) {
+            return p;
+        }
+        if (p.isEmpty()) {
+            return n;
+        }
+        return n + ", " + p;
     }
 
     public BigDecimal getPrice() {

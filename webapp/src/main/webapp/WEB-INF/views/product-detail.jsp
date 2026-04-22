@@ -185,36 +185,53 @@
                                                     style="font-size: 1rem; color: var(--color-text-muted); font-weight: 600; padding-bottom: 0.4rem;">ARS</span>
                                             </div>
 
-                                            <div class="d-grid">
-                                                <c:url var="purchasePostUrl" value='/purchases' />
-                                                <form:form modelAttribute="purchaseCreateForm"
-                                                    action="${purchasePostUrl}" method="POST" cssClass="w-100">
-                                                    <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
-                                                    <input type="hidden" name="productId" value="<c:out value='${product.id}'/>" />
-                                                    <button type="submit" class="btn w-100"
-                                                        style="background: var(--color-accent); color: #fff; font-size: 1.15rem; padding: 1.1rem; border-radius: 99px; box-shadow: 0 8px 24px rgba(231, 111, 81, 0.4); border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: center; align-items: center; gap: 0.75rem; font-weight: 700;"
-                                                        onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 28px rgba(231, 111, 81, 0.5)'; this.style.background='var(--color-accent-hover)';"
-                                                        onmouseout="this.style.transform='none'; this.style.boxShadow='0 8px 24px rgba(231, 111, 81, 0.4)'; this.style.background='var(--color-accent)';">
-                                                        <i class="bi bi-cart-fill" aria-hidden="true"
-                                                            style="font-size: 1.3rem;"></i> Iniciar Compra
-                                                    </button>
-                                                </form:form>
-                                            </div>
-                                            <sec:authorize access="isAuthenticated()">
-                                                <div class="d-grid mt-3">
-                                                    <c:url var="reportPostUrl" value="/products/${product.id}/report" />
-                                                    <form action="<c:out value='${reportPostUrl}'/>" method="POST" class="w-100">
-                                                        <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
-                                                        <button type="submit" class="btn w-100"
-                                                            style="background: transparent; color: var(--color-accent); font-size: 1rem; padding: 0.8rem; border-radius: 99px; border: 1px solid rgba(231, 111, 81, 0.5); transition: all 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-weight: 600;"
-                                                            onmouseover="this.style.background='rgba(231, 111, 81, 0.08)'; this.style.borderColor='var(--color-accent)';"
-                                                            onmouseout="this.style.background='transparent'; this.style.borderColor='rgba(231, 111, 81, 0.5)';">
-                                                            <i class="bi bi-flag" aria-hidden="true"></i> Reportar
-                                                            publicación
+                                            <c:choose>
+                                                <c:when test="${isOwnProduct}">
+                                                    <div class="alert-retro alert-retro-warning mb-0" role="status" style="border-radius: 16px;">
+                                                        <i class="bi bi-info-circle" aria-hidden="true"></i>
+                                                        Este vinilo es tuyo. No podés comprarlo.
+                                                    </div>
+                                                    <div class="d-grid mt-3">
+                                                        <button type="button" class="btn w-100" disabled
+                                                            style="background: #e0e0e0; color: #888; font-size: 1.15rem; padding: 1.1rem; border-radius: 99px; border: none; cursor: not-allowed; font-weight: 700;">
+                                                            <i class="bi bi-cart-fill" aria-hidden="true"
+                                                                style="font-size: 1.3rem;"></i> Iniciar Compra
                                                         </button>
-                                                    </form>
-                                                </div>
-                                            </sec:authorize>
+                                                    </div>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="d-grid">
+                                                        <c:url var="purchasePostUrl" value='/purchases' />
+                                                        <form:form modelAttribute="purchaseCreateForm"
+                                                            action="${purchasePostUrl}" method="POST" cssClass="w-100">
+                                                            <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
+                                                            <input type="hidden" name="productId" value="<c:out value='${product.id}'/>" />
+                                                            <button type="submit" class="btn w-100"
+                                                                style="background: var(--color-accent); color: #fff; font-size: 1.15rem; padding: 1.1rem; border-radius: 99px; box-shadow: 0 8px 24px rgba(231, 111, 81, 0.4); border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: center; align-items: center; gap: 0.75rem; font-weight: 700;"
+                                                                onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 28px rgba(231, 111, 81, 0.5)'; this.style.background='var(--color-accent-hover)';"
+                                                                onmouseout="this.style.transform='none'; this.style.boxShadow='0 8px 24px rgba(231, 111, 81, 0.4)'; this.style.background='var(--color-accent)';">
+                                                                <i class="bi bi-cart-fill" aria-hidden="true"
+                                                                    style="font-size: 1.3rem;"></i> Iniciar Compra
+                                                            </button>
+                                                        </form:form>
+                                                    </div>
+                                                    <sec:authorize access="isAuthenticated()">
+                                                        <div class="d-grid mt-3">
+                                                            <c:url var="reportPostUrl" value="/products/${product.id}/report" />
+                                                            <form action="<c:out value='${reportPostUrl}'/>" method="POST" class="w-100">
+                                                                <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
+                                                                <button type="submit" class="btn w-100"
+                                                                    style="background: transparent; color: var(--color-accent); font-size: 1rem; padding: 0.8rem; border-radius: 99px; border: 1px solid rgba(231, 111, 81, 0.5); transition: all 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-weight: 600;"
+                                                                    onmouseover="this.style.background='rgba(231, 111, 81, 0.08)'; this.style.borderColor='var(--color-accent)';"
+                                                                    onmouseout="this.style.background='transparent'; this.style.borderColor='rgba(231, 111, 81, 0.5)';">
+                                                                    <i class="bi bi-flag" aria-hidden="true"></i> Reportar
+                                                                    publicación
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </sec:authorize>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div> <!-- End Main Info Card -->
 
                                         <!-- Details & Description Card -->

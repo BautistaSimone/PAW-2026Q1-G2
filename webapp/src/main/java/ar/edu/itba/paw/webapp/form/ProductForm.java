@@ -48,14 +48,6 @@ public class ProductForm {
     @DecimalMax("10.0")
     private BigDecimal recordCondition;
 
-    @NotBlank
-    @Size(min = 1, max = 100)
-    private String neighborhood;
-
-    @NotBlank
-    @Size(min = 1, max = 100)
-    private String province;
-
     @NotNull
     @DecimalMin("0.0")
     private BigDecimal price;
@@ -128,22 +120,6 @@ public class ProductForm {
 
     public void setRecordCondition(BigDecimal recordCondition) {
         this.recordCondition = recordCondition;
-    }
-
-    public String getNeighborhood() {
-        return neighborhood;
-    }
-
-    public void setNeighborhood(String neighborhood) {
-        this.neighborhood = neighborhood;
-    }
-
-    public String getProvince() {
-        return province;
-    }
-
-    public void setProvince(String province) {
-        this.province = province;
     }
 
     public BigDecimal getPrice() {
