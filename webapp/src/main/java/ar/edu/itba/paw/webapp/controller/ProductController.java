@@ -2,8 +2,12 @@ package ar.edu.itba.paw.webapp.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +29,7 @@ import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductSortOrder;
+import ar.edu.itba.paw.models.SellerRatingSummary;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.form.ProductForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
@@ -183,8 +188,21 @@ public class ProductController {
                 .limit(10).collect(Collectors.toList());
         }
 
+        final Set<Long> carouselSellerIds = new HashSet<>();
+        for (Product p : sellerProducts) {
+            carouselSellerIds.add(p.getUserId());
+        }
+        for (Product p : relatedProducts) {
+            carouselSellerIds.add(p.getUserId());
+        }
+        final Map<Long, SellerRatingSummary> sellerRatings = new HashMap<>();
+        for (Long uid : carouselSellerIds) {
+            sellerRatings.put(uid, reviewService.summaryForSeller(uid));
+        }
+
         mav.addObject("sellerProducts", sellerProducts);
         mav.addObject("relatedProducts", relatedProducts);
+        mav.addObject("sellerRatings", sellerRatings);
 
         return mav;
     }

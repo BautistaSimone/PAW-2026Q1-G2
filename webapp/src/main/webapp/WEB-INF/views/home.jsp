@@ -87,6 +87,7 @@
                                                 installments="${product.installmentPrice}"
                                                 imageUrl="${productImageUrls[product.id]}"
                                                 categories="${product.categories}"
+                                                sellerRating="${sellerRatingByUserId[product.userId]}"
                                                 href="${productUrl}"/>
                                     </div>
                                 </c:forEach>

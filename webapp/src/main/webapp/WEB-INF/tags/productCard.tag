@@ -8,6 +8,7 @@
 <%@ attribute name="onSale" required="false" type="java.lang.Boolean" %>
 <%@ attribute name="discountPercentage" required="false" type="java.lang.Integer" %>
 <%@ attribute name="categories" required="false" rtexprvalue="true" type="java.util.List" %>
+<%@ attribute name="sellerRating" required="false" rtexprvalue="true" type="ar.edu.itba.paw.models.SellerRatingSummary" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -45,6 +46,11 @@
                 <c:if test="${fn:length(categories) > 3}">
                     <span class="product-card-category-overflow">+${fn:length(categories) - 3}</span>
                 </c:if>
+            </div>
+        </c:if>
+        <c:if test="${not empty sellerRating}">
+            <div class="product-card-seller-rating" style="margin-top: 0.35rem;" aria-label="Valoración del vendedor">
+                <ui:sellerRatingStars summary="${sellerRating}" compact="true"/>
             </div>
         </c:if>
         <c:choose>

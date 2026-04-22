@@ -107,30 +107,26 @@
 
                                             <c:if test="${seller != null}">
                                                 <div
-                                                    style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; padding: 0.75rem 1rem; background: #fcfaf8; border-radius: 12px; border: 1px solid rgba(0,0,0,0.04);">
+                                                    style="display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 2rem; padding: 0.75rem 1rem; background: #fcfaf8; border-radius: 12px; border: 1px solid rgba(0,0,0,0.04);">
                                                     <div
                                                         style="width: 32px; height: 32px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;">
                                                         <c:out value="${fn:substring(seller.username, 0, 1)}" />
                                                     </div>
-                                                    <div style="flex: 1;">
+                                                    <div style="flex: 1; min-width: 0;">
                                                         <a href="<c:url value='/profile?userId=${seller.id}'/>"
                                                             style="font-weight: 600; color: var(--color-text-main); text-decoration: none; font-size: 0.95rem;"
                                                             onmouseover="this.style.color='var(--color-accent)';"
                                                             onmouseout="this.style.color='var(--color-text-main)';">
                                                             <c:out value="${seller.username}" />
                                                         </a>
+                                                        <div style="margin-top: 0.35rem;">
+                                                            <a href="<c:url value='/profile?userId=${seller.id}'/>"
+                                                                style="text-decoration: none; color: inherit;"
+                                                                aria-label="Ver perfil y reseñas del vendedor">
+                                                                <ui:sellerRatingStars summary="${sellerRating}" compact="false"/>
+                                                            </a>
+                                                        </div>
                                                     </div>
-                                                    <c:if test="${sellerRating.count > 0}">
-                                                        <a href="<c:url value='/profile?userId=${seller.id}'/>"
-                                                            style="display: flex; align-items: center; gap: 0.35rem; text-decoration: none; color: var(--color-accent); font-weight: 600; font-size: 0.9rem;">
-                                                            <i class="bi bi-star-fill"></i>
-                                                            <c:out value="${sellerRating.formattedAvg}" />
-                                                            <span
-                                                                style="color: var(--color-text-muted); font-weight: 400;">(
-                                                                <c:out value="${sellerRating.count}" />)
-                                                            </span>
-                                                        </a>
-                                                    </c:if>
                                                 </div>
                                             </c:if>
 
@@ -343,7 +339,9 @@
                                                                     artist="${sp.artist}" price="${sp.price}"
                                                                     installments="${sp.installmentPrice}"
                                                                     imageUrl="/images/product/${sp.id}"
-                                                                    categories="${sp.categories}" href="${spUrl}" />
+                                                                    categories="${sp.categories}"
+                                                                    sellerRating="${sellerRatings[sp.userId]}"
+                                                                    href="${spUrl}" />
                                                             </div>
                                                         </c:forEach>
                                                     </div>
@@ -385,7 +383,9 @@
                                                                     artist="${rp.artist}" price="${rp.price}"
                                                                     installments="${rp.installmentPrice}"
                                                                     imageUrl="/images/product/${rp.id}"
-                                                                    categories="${rp.categories}" href="${rpUrl}" />
+                                                                    categories="${rp.categories}"
+                                                                    sellerRating="${sellerRatings[rp.userId]}"
+                                                                    href="${rpUrl}" />
                                                             </div>
                                                         </c:forEach>
                                                     </div>

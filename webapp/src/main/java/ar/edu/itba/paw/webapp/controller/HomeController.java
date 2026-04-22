@@ -3,7 +3,6 @@ package ar.edu.itba.paw.webapp.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +20,12 @@ import ar.edu.itba.paw.models.ConditionBucket;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductSortOrder;
-import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.SellerRatingSummary;
 import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductService;
+import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 
 @Controller
@@ -35,18 +35,21 @@ public class HomeController {
 	private final ProductService productService;
 	private final CategoryService categoryService;
     private final UserService userService;
+    private final ReviewService reviewService;
 
 	@Autowired
 	public HomeController(
 		final ProductService productService,
 		final ImageService imageService,
 		final CategoryService categoryService,
-		final UserService userService
+		final UserService userService,
+		final ReviewService reviewService
 	) {
 		this.productService = productService;
 		this.imageService = imageService;
 		this.categoryService = categoryService;
 		this.userService = userService;
+		this.reviewService = reviewService;
 	}
 
 	private static BigDecimal parsePriceParam(final String raw) {
@@ -126,6 +129,15 @@ public class HomeController {
 			}
 		}
 
+		final Set<Long> distinctSellerIds = new HashSet<>();
+		for (Product product : products) {
+			distinctSellerIds.add(product.getUserId());
+		}
+		final Map<Long, SellerRatingSummary> sellerRatingByUserId = new HashMap<>();
+		for (Long sellerId : distinctSellerIds) {
+			sellerRatingByUserId.put(sellerId, reviewService.summaryForSeller(sellerId));
+		}
+
 		final Set<Long> selectedCategoryIds = new HashSet<>();
 		if (categoryIds != null) {
 			selectedCategoryIds.addAll(categoryIds);
@@ -148,7 +160,7 @@ public class HomeController {
 		final ModelAndView mav = new ModelAndView("home");
 
 		// If password was never changed, tell the user
-		if (userService.isPasswordEmpty(authUser.getUser())) {
+		if (authUser != null && authUser.getUser() != null && userService.isPasswordEmpty(authUser.getUser())) {
 			mav.addObject("changePsswdModal", true);
 		} else {
 			mav.addObject("changePsswdModal", false);
@@ -157,6 +169,7 @@ public class HomeController {
 
 		mav.addObject("products", products);
 		mav.addObject("productImageUrls", productImageUrls);
+		mav.addObject("sellerRatingByUserId", sellerRatingByUserId);
 		mav.addObject("categories", categoryService.findAll());
 		mav.addObject("recordLabelsFilter", productService.listDistinctRecordLabels());
 		mav.addObject("selectedCategoryIds", selectedCategoryIds);

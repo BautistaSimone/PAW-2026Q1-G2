@@ -143,6 +143,7 @@
                                                 installments="${product.installmentPrice}"
                                                 imageUrl="${productImageUrls[product.id]}"
                                                 categories="${product.categories}"
+                                                sellerRating="${sellerRating}"
                                                 href="${productUrl}"/>
                                         <c:if test="${isOwnProfile}">
                                             <c:url var="deleteProductUrl" value="/products/${product.id}/delete"/>
