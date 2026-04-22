@@ -60,6 +60,7 @@ public class ProductForm {
     @DecimalMin("0.0")
     private BigDecimal price;
 
+    @NotBlank
     @Size(max = 1000)
     private String description;
 
