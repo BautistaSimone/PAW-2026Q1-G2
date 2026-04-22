@@ -6,27 +6,13 @@
             <div class="footer-section-contact">
                 <h4 class="footer-title">Vinyland</h4>
                 <div class="footer-contact">
-                    <a href="mailto:contacto@vinyland.com" class="footer-link">
+                    <a href="mailto:vinyland67@gmail.com" class="footer-link">
                         <i class="bi bi-envelope" aria-hidden="true"></i>
-                        contacto@vinyland.com
+                        vinyland67@gmail.com
                     </a>
                     <a href="#" class="footer-link">
                         <i class="bi bi-geo-alt" aria-hidden="true"></i>
                         Buenos Aires, Argentina
-                    </a>
-                </div>
-            </div>
-            <div class="footer-section-social">
-                <h4 class="footer-title">Seguinos</h4>
-                <div class="footer-social">
-                    <a href="#" class="social-icon" aria-label="Instagram">
-                        <i class="bi bi-instagram" aria-hidden="true"></i>
-                    </a>
-                    <a href="#" class="social-icon" aria-label="Twitter">
-                        <i class="bi bi-twitter-x" aria-hidden="true"></i>
-                    </a>
-                    <a href="#" class="social-icon" aria-label="Facebook">
-                        <i class="bi bi-facebook" aria-hidden="true"></i>
                     </a>
                 </div>
             </div>
