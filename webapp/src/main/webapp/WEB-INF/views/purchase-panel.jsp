@@ -62,10 +62,7 @@
                                         <dt>Fecha del pedido</dt>
                                         <dd><c:out value="${purchase.date}"/></dd>
                                     </div>
-                                    <div>
-                                        <dt>Publicación</dt>
-                                        <dd><a href="<c:url value='/products/${product.id}'/>" style="color: var(--color-accent); font-weight: 600;">Ver ficha del vinilo</a></dd>
-                                    </div>
+
                                 </dl>
                             </div>
 
