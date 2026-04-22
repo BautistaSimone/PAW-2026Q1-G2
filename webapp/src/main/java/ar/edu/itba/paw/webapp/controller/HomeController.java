@@ -21,8 +21,8 @@ import ar.edu.itba.paw.models.ConditionBucket;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductSortOrder;
-import ar.edu.itba.paw.models.PasswordToken;
-import ar.edu.itba.paw.services.PasswordTokenService;
+import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductService;
@@ -34,19 +34,19 @@ public class HomeController {
 	private final ImageService imageService;
 	private final ProductService productService;
 	private final CategoryService categoryService;
-    private final PasswordTokenService passwordTokenService;
+    private final UserService userService;
 
 	@Autowired
 	public HomeController(
 		final ProductService productService,
 		final ImageService imageService,
 		final CategoryService categoryService,
-		final PasswordTokenService passwordTokenService
+		final UserService userService
 	) {
 		this.productService = productService;
 		this.imageService = imageService;
 		this.categoryService = categoryService;
-		this.passwordTokenService = passwordTokenService;
+		this.userService = userService;
 	}
 
 	private static BigDecimal parsePriceParam(final String raw) {
@@ -138,10 +138,8 @@ public class HomeController {
 
 		final ModelAndView mav = new ModelAndView("home");
 
-        final Optional<PasswordToken> passTokenOpt = passwordTokenService.findByUserId(authUser.getUser().getId());
-
 		// If password was never changed, tell the user
-		if (!passTokenOpt.isPresent()) {
+		if (userService.isPasswordEmpty(authUser.getUser())) {
 			mav.addObject("changePsswdModal", true);
 		} else {
 			mav.addObject("changePsswdModal", false);

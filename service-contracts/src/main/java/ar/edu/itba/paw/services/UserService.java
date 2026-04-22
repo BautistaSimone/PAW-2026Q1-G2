@@ -33,7 +33,9 @@ public interface UserService {
 
     void updatePassword(final Long userId, final String newPassword);
 
-	Optional<User> findByEmail(final String email);
-	Optional<User> findById(final Long id);
+    Optional<User> findByEmail(final String email);
+    Optional<User> findById(final Long id);
+
+	Boolean isPasswordEmpty(User usr);
 
 }

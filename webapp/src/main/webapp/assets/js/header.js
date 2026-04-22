@@ -1,4 +1,5 @@
 (function () {
+
     const form = document.querySelector('form.search-form');
     const searchInput = document.getElementById('search-input');
     if (!searchInput) {

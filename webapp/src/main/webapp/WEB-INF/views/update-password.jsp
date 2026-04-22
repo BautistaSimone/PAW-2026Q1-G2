@@ -3,7 +3,7 @@
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<ui:layout title="Vinyland | Reset Password" bodyClass="auth-page-bg">
+<ui:layout title="Vinyland | Update Password" bodyClass="auth-page-bg">
 
     <ui:header showHeaderActions="false"/>
 
@@ -12,32 +12,30 @@
 
             <h4 class="text-center mb-4">Restablecer contraseña</h4>
 
-            <form action="${pageContext.request.contextPath}/changePassword" method="POST">
+            <!-- Spring form:form -->
+            <form:form modelAttribute="updatePasswordForm" action="${pageContext.request.contextPath}/changePassword" method="POST">
 
+                <!-- CSRF token -->
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
-                <!-- token hidden field -->
-                <input type="hidden" name="token" value="${token}" />
+                <!-- Token hidden field -->
+                <form:hidden path="token" />
 
                 <div class="mb-3">
                     <label class="form-label">Nueva contraseña</label>
-                    <input type="password"
-                            name="newPassword"
-                            class="form-control"
-                            placeholder="Nueva contraseña"
-                            required />
-
+                    <form:password path="newPassword" 
+                                   cssClass="form-control" 
+                                   placeholder="Nueva contraseña" 
+                                   required="required"/>
                     <form:errors path="newPassword" cssClass="text-danger small"/>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Confirmar contraseña</label>
-                    <input type="password"
-                           name="newPasswordConfirm"
-                           class="form-control"
-                           placeholder="Confirmar contraseña"
-                           required />
-
+                    <form:password path="newPasswordConfirm" 
+                                   cssClass="form-control" 
+                                   placeholder="Confirmar contraseña" 
+                                   required="required"/>
                     <form:errors path="newPasswordConfirm" cssClass="text-danger small"/>
                 </div>
 
@@ -51,7 +49,7 @@
                     Cambiar contraseña
                 </button>
 
-            </form>
+            </form:form>
 
             <div class="text-center mt-3">
                 <a href="${pageContext.request.contextPath}/login">Volver al login</a>

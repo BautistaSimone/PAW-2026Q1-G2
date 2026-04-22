@@ -120,48 +120,59 @@ public class UserController {
     @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
     public ModelAndView changePassword(
         @AuthenticationPrincipal PawAuthUser authUser,
-        @RequestParam("token") String token,
-        @Valid @ModelAttribute UpdatePasswordForm form
+        @Valid @ModelAttribute UpdatePasswordForm form,
+        final BindingResult errors
         ) {
 
-        ModelAndView mv = new ModelAndView();
-
-        if (!passwordTokenService.isValidPasswordResetToken(token)) {
-            mv.setViewName("redirect:/login");
+        // Return to the same page if an error occurs
+        if (errors.hasErrors()) {
+            ModelAndView mv = new ModelAndView("update-password");
+            mv.addObject("updatePasswordForm", form);
             return mv;
         }
 
-        final Optional<PasswordToken> passTokenOpt = passwordTokenService.findByToken(token);
+        if (!passwordTokenService.isValidPasswordResetToken(form.getToken())) {
+            ModelAndView mv = new ModelAndView("redirect:/login");
+            return mv;
+        }
+
+        final Optional<PasswordToken> passTokenOpt = passwordTokenService.findByToken(form.getToken());
 
         // We already know it exists
         final PasswordToken passToken = passTokenOpt.get();
 
         userService.updatePassword(passToken.getUserId(), form.getNewPassword());
+
+        // Reset the form on success
+        form = new UpdatePasswordForm(); 
+        
         if (authUser == null) {
             // If no user, go to login
-            mv.setViewName("redirect:/login");
-            mv.addObject("message", "Password updated successfully");
+            ModelAndView mv = new ModelAndView("redirect:/login");
+            mv.addObject("message", "UpdatedPassword.authForm.password");
             return mv;
         }
-
-        mv.setViewName("redirect:/");
+        
+        ModelAndView mv = new ModelAndView("redirect:/");
+        mv.addObject("message", "UpdatedPassword.authForm.password");
 
         return mv;
     }
 
     @RequestMapping(value = "/changePassword")
-    public ModelAndView showChangePasswordPage(@RequestParam("token") String token) {
+    public ModelAndView showChangePasswordPage(
+        @ModelAttribute UpdatePasswordForm form) {
 
         ModelAndView mv = new ModelAndView();
 
-        if(!passwordTokenService.isValidPasswordResetToken(token)) {
+        if(!passwordTokenService.isValidPasswordResetToken(form.getToken())) {
             
             mv.setViewName("redirect:/login");
             return mv;
         }
 
         mv.setViewName("update-password");
-        mv.addObject("token", token);
+        mv.addObject("updatePasswordForm", form);
 
         return mv;
     }
@@ -194,8 +205,10 @@ public class UserController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ModelAndView createUser(@Valid @ModelAttribute RegisterForm form,
-        final BindingResult errors) {
+    public ModelAndView createUser(
+        @Valid @ModelAttribute RegisterForm form,
+        final BindingResult errors
+        ) {
 
         ModelAndView mv = new ModelAndView("register");
         mv.addObject("registerForm", form);

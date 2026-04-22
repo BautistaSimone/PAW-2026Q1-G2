@@ -22,7 +22,11 @@ public class UpdatePasswordForm {
         message = "{Pattern.authForm.password}"
     )
     private String newPassword;
+
+    @NotBlank(message = "{NotBlank.authForm.password}")
     private String newPasswordConfirm;
+
+    private String token;
 
     public String getNewPassword() {
         return newPassword;
@@ -39,4 +43,13 @@ public class UpdatePasswordForm {
     public void setNewPasswordConfirm(final String newPasswordConfirm) {
         this.newPasswordConfirm = newPasswordConfirm;
     }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(final String token) {
+        this.token = token;
+    }
+
 }

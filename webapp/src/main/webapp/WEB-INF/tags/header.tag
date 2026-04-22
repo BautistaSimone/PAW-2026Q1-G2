@@ -1,12 +1,14 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix = "spring" uri = "http://www.springframework.org/tags" %>
 
 <%@ attribute name="showHeaderActions" required="false" type="java.lang.Boolean" %>
 
 <c:set var="headerSearchText" value="${param['search-text']}" />
 
 <header class="header-bbdiscos">
+
     <div class="header-content">
         <div class="header-left">
             <a href="<c:url value="/"/>" class="header-logo-link" aria-label="Vinyland - Ir al inicio">
@@ -45,7 +47,18 @@
             </div>
         </c:if>
     </div>
+
 </header>
 
+<!-- Messages -->
+<c:if test="${message != null}">
+    <div class="alert-retro alert-retro-info mb-3 text-break d-flex align-items-start" role="alert">
+        <i class="bi bi-info-circle me-2 fs-4" aria-hidden="true"></i>
+        <div>
+            <spring:message code="${message}" />
+        </div>
+    </div>
+</c:if>
+
 <!-- Scripts -->
-<script src="<c:url value="/assets/js/search.js"/>"></script>
+<script src="<c:url value="/assets/js/header.js"/>"></script>

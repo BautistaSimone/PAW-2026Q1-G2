@@ -95,6 +95,7 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findByEmail(final String email) {
         return userDao.findByEmail(email);
     }
+
     @Override
 	public void updatePassword(final Long userId, final String newPassword) {
 		// Encode password before storing
@@ -106,5 +107,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findById(final Long id) {
         return userDao.findById(id);
+    }
+
+	@Override
+    public Boolean isPasswordEmpty(User usr) {
+        return passwordEncoder.matches("", usr.getPassword());
     }
 }
