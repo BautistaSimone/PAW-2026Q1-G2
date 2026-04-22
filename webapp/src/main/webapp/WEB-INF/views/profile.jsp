@@ -206,7 +206,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label" for="pfStreetNum">Número</label>
-                                    <form:input path="streetNumber" id="pfStreetNum" cssClass="form-control" placeholder="Opcional"/>
+                                    <form:input type="number" path="streetNumber" id="pfStreetNum" cssClass="form-control" placeholder="Opcional" min="1"/>
                                     <form:errors path="streetNumber" cssClass="text-danger small d-block"/>
                                 </div>
                                 <div class="row g-2">
