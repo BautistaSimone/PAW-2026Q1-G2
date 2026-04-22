@@ -24,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +122,8 @@ public class UserController {
     public ModelAndView changePassword(
         @AuthenticationPrincipal PawAuthUser authUser,
         @Valid @ModelAttribute UpdatePasswordForm form,
-        final BindingResult errors
+        final BindingResult errors,
+        RedirectAttributes redirectAttributes
         ) {
 
         // Return to the same page if an error occurs
@@ -149,12 +151,12 @@ public class UserController {
         if (authUser == null) {
             // If no user, go to login
             ModelAndView mv = new ModelAndView("redirect:/login");
-            mv.addObject("message", "UpdatedPassword.authForm.password");
+            redirectAttributes.addFlashAttribute("message", "UpdatedPassword.authForm.password");
             return mv;
         }
         
         ModelAndView mv = new ModelAndView("redirect:/");
-        mv.addObject("message", "UpdatedPassword.authForm.password");
+        redirectAttributes.addFlashAttribute("message", "UpdatedPassword.authForm.password");
 
         return mv;
     }
