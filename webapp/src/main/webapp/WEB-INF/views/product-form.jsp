@@ -120,10 +120,9 @@
                         </div>
 
                         <div class="col-12">
-                            <label for="description" class="form-label">Descripcion</label>
+                            <label for="description" class="form-label">Descripcion *</label>
                             <form:textarea path="description" cssClass="form-control" rows="5"
-                                      placeholder="Conta detalles adicionales del disco, edicion, etc." />
-                            <div class="form-text">Opcional.</div>
+                                      placeholder="Conta detalles adicionales del disco, edicion, etc." required="required" />
                             <form:errors path="description" cssClass="text-danger" element="div" />
                         </div>
 
