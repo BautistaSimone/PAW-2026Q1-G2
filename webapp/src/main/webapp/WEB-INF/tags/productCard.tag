@@ -1,13 +1,14 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ attribute name="title" required="true" %>
 <%@ attribute name="artist" required="true" %>
-<%@ attribute name="price" required="true" %>
-<%@ attribute name="installments" required="true" %>
+<%@ attribute name="price" required="true" type="java.lang.Number" %>
+<%@ attribute name="installments" required="true" type="java.lang.Number" %>
 <%@ attribute name="href" required="true" %>
 <%@ attribute name="imageUrl" required="false" %>
 <%@ attribute name="onSale" required="false" type="java.lang.Boolean" %>
 <%@ attribute name="discountPercentage" required="false" type="java.lang.Integer" %>
 <%@ attribute name="categories" required="false" rtexprvalue="true" type="java.util.List" %>
+<%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <c:set var="isOnSale" value="${onSale ne null ? onSale : false}" />
@@ -45,12 +46,12 @@
         <c:choose>
             <c:when test="${isOnSale && discountPercentage ne null && discountPercentage gt 0}">
                 <div class="price-wrapper">
-                    <span class="album-price-original">$<c:out value='${price}'/></span>
-                    <span class="product-price" style="margin: 0;">$<c:out value='${price}'/></span>
+                    <span class="album-price-original"><ui:price value="${price}" /></span>
+                    <span class="product-price" style="margin: 0;"><ui:price value="${price}" /></span>
                 </div>
             </c:when>
             <c:otherwise>
-                <div class="product-price">$<c:out value='${price}'/></div>
+                <div class="product-price"><ui:price value="${price}" /></div>
             </c:otherwise>
         </c:choose>
     </div>

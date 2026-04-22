@@ -2,7 +2,9 @@ package ar.edu.itba.paw.services;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -26,6 +28,7 @@ import ar.edu.itba.paw.models.User;
 public class EmailServiceImpl implements EmailService {
 
     private static final DateTimeFormatter PURCHASE_DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final Locale PRICE_LOCALE = Locale.forLanguageTag("es-AR");
 
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
@@ -86,7 +89,7 @@ public class EmailServiceImpl implements EmailService {
         ctx.setVariable("message", "Se reportó una publicación y requiere revisión manual por parte del equipo de moderación.");
         ctx.setVariable("productId", product.getId());
         ctx.setVariable("productName", product.getTitle() + " - " + product.getArtist());
-        ctx.setVariable("amount", "$" + product.getPrice());
+        ctx.setVariable("amount", formatAmount(product));
         ctx.setVariable("location", safeProductLocation(product));
         ctx.setVariable("recordLabel", nullToEmpty(product.getRecordLabel()));
         ctx.setVariable("catalogNumber", nullToEmpty(product.getCatalogNumber()));
@@ -165,7 +168,7 @@ public class EmailServiceImpl implements EmailService {
         final Context ctx = new Context(LocaleContextHolder.getLocale());
         ctx.setVariable("title", title);
         ctx.setVariable("message", message);
-        ctx.setVariable("amount", "$" + product.getPrice());
+        ctx.setVariable("amount", formatAmount(product));
         ctx.setVariable("productName", product.getTitle() + " - " + product.getArtist());
         ctx.setVariable("actionUrl", actionUrl);
         final String recipientName = recipientIsBuyer
@@ -236,6 +239,14 @@ public class EmailServiceImpl implements EmailService {
         }
         final String t = text.trim().replaceAll("\\s+", " ");
         return t.length() <= maxLen ? t : t.substring(0, maxLen).trim() + "…";
+    }
+
+    private static String formatAmount(final Product product) {
+        final NumberFormat priceFormat = NumberFormat.getNumberInstance(PRICE_LOCALE);
+        priceFormat.setGroupingUsed(true);
+        priceFormat.setMinimumFractionDigits(0);
+        priceFormat.setMaximumFractionDigits(2);
+        return "$" + priceFormat.format(product.getPrice());
     }
 
     private static String safeProductLocation(final Product product) {

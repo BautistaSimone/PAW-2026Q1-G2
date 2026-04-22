@@ -52,7 +52,7 @@
                                 <div class="purchase-product-info">
                                     <h5><c:out value="${product.title}"/></h5>
                                     <p class="purchase-artist"><c:out value="${product.artist}"/></p>
-                                    <div class="purchase-price">$<c:out value="${product.price}"/></div>
+                                    <div class="purchase-price"><ui:price value="${product.price}" /></div>
                                 </div>
                             </div>
 
@@ -108,7 +108,7 @@
                                         <c:when test="${purchase.status eq 'PENDING'}">
                                             <div class="alert-retro alert-retro-info">
                                                 <p class="mb-2"><i class="bi bi-info-circle" aria-hidden="true"></i>
-                                                    Transferí <strong>$<c:out value="${product.price}"/></strong> y avisá al vendedor cuando hayas pagado. Datos para coordinar:</p>
+                                                    Transferí <strong><ui:price value="${product.price}" /></strong> y avisá al vendedor cuando hayas pagado. Datos para coordinar:</p>
                                                 <ul class="purchase-inset-list mb-0">
                                                     <li><strong>Usuario:</strong> <c:out value="${orderSeller.username}" default="—"/></li>
                                                     <li><strong>Email:</strong>
@@ -188,7 +188,7 @@
                                         <c:when test="${purchase.status eq 'PENDING'}">
                                             <div class="purchase-card-inset">
                                                 <p class="purchase-inset-title">Esperando pago</p>
-                                                <p class="mb-2" style="margin:0 0 0.5rem;font-size:0.95rem;">Monto: <strong style="color: var(--color-accent);">$<c:out value="${product.price}"/></strong></p>
+                                                <p class="mb-2" style="margin:0 0 0.5rem;font-size:0.95rem;">Monto: <strong style="color: var(--color-accent);"><ui:price value="${product.price}" /></strong></p>
                                                 <ul class="purchase-inset-list mb-2">
                                                     <li><strong>Comprador:</strong> <c:out value="${orderBuyer.username}" default="—"/></li>
                                                     <li><strong>Email:</strong> <a href="mailto:<c:out value='${orderBuyer.email}'/>" style="color: var(--color-accent); font-weight: 600;"><c:out value="${orderBuyer.email}"/></a></li>

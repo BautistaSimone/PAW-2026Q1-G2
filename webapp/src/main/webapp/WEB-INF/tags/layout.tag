@@ -23,6 +23,7 @@
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
     />
+    <script src="<c:url value="/assets/js/price-format.js"/>"></script>
 </head>
 <body class="${not empty bodyClass ? bodyClass : ''}">
 <div class="app-container">

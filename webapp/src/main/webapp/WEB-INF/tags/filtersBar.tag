@@ -57,12 +57,12 @@
             <div class="price-inputs filter-options pt-2">
                 <div class="price-input-group">
                     <label for="filterMinPrice" class="price-label">Desde</label>
-                    <input id="filterMinPrice" name="minPrice" type="number" min="0" step="1" class="price-input"
+                    <input id="filterMinPrice" name="minPrice" type="text" inputmode="numeric" class="price-input"
                            placeholder="Minimo" value="<c:out value="${filterMinPrice}" />" />
                 </div>
                 <div class="price-input-group">
                     <label for="filterMaxPrice" class="price-label">Hasta</label>
-                    <input id="filterMaxPrice" name="maxPrice" type="number" min="0" step="1" class="price-input"
+                    <input id="filterMaxPrice" name="maxPrice" type="text" inputmode="numeric" class="price-input"
                            placeholder="Maximo" value="<c:out value="${filterMaxPrice}" />" />
                 </div>
             </div>
@@ -140,6 +140,13 @@
     if (!form || !applyBtn) {
         return;
     }
+    var minPriceInput = document.getElementById('filterMinPrice');
+    var maxPriceInput = document.getElementById('filterMaxPrice');
+
+    if (window.VinylandPriceFormat) {
+        window.VinylandPriceFormat.attachFormattedPriceInput(minPriceInput);
+        window.VinylandPriceFormat.attachFormattedPriceInput(maxPriceInput);
+    }
 
     // Function to serialize form state for comparison
     function getSerializedState() {
@@ -178,15 +185,17 @@
 
     document.querySelectorAll('.price-preset-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
-            var minEl = document.getElementById('filterMinPrice');
-            var maxEl = document.getElementById('filterMaxPrice');
             var dMin = btn.getAttribute('data-min');
             var dMax = btn.getAttribute('data-max');
-            if (minEl) {
-                minEl.value = dMin !== null && dMin !== '' ? dMin : '';
+            if (minPriceInput) {
+                minPriceInput.value = dMin !== null && dMin !== '' && window.VinylandPriceFormat
+                    ? window.VinylandPriceFormat.normalizePrice(dMin).formatted
+                    : (dMin || '');
             }
-            if (maxEl) {
-                maxEl.value = dMax !== null && dMax !== '' ? dMax : '';
+            if (maxPriceInput) {
+                maxPriceInput.value = dMax !== null && dMax !== '' && window.VinylandPriceFormat
+                    ? window.VinylandPriceFormat.normalizePrice(dMax).formatted
+                    : (dMax || '');
             }
             checkChanges();
         });

@@ -53,8 +53,17 @@ public class HomeController {
 		if (raw == null || raw.isBlank()) {
 			return null;
 		}
+		String normalized = raw.trim();
+		if (normalized.contains(",")) {
+			normalized = normalized.replace(".", "").replace(",", ".");
+		} else if (normalized.matches("\\d{1,3}(\\.\\d{3})+")) {
+			normalized = normalized.replace(".", "");
+		}
+		if (normalized.endsWith(".")) {
+			normalized = normalized.substring(0, normalized.length() - 1);
+		}
 		try {
-			return new BigDecimal(raw.trim());
+			return new BigDecimal(normalized);
 		} catch (NumberFormatException ex) {
 			return null;
 		}

@@ -178,8 +178,8 @@
                                             <div
                                                 style="margin-bottom: 2rem; display: flex; align-items: flex-end; gap: 0.5rem;">
                                                 <span
-                                                    style="font-family: var(--font-mono); font-size: 3rem; font-weight: 700; color: var(--color-accent); line-height: 1; letter-spacing: -1px;">$
-                                                    <c:out value='${product.price}' />
+                                                    style="font-family: var(--font-mono); font-size: 3rem; font-weight: 700; color: var(--color-accent); line-height: 1; letter-spacing: -1px;">
+                                                    <ui:price value="${product.price}" />
                                                 </span>
                                                 <span
                                                     style="font-size: 1rem; color: var(--color-text-muted); font-weight: 600; padding-bottom: 0.4rem;">ARS</span>

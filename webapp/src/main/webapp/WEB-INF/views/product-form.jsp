@@ -101,8 +101,13 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="price" class="form-label">Precio *</label>
-                            <form:input type="number" path="price" min="0" step="0.01" cssClass="form-control" required="required" />
+                            <label for="priceDisplay" class="form-label">Precio *</label>
+                            <form:hidden path="price" id="price" />
+                            <div class="input-group">
+                                <span class="input-group-text" style="border-color: var(--color-border);">$</span>
+                                <input type="text" id="priceDisplay" class="form-control" inputmode="decimal"
+                                       autocomplete="off" placeholder="Ej: 40.000" required="required" />
+                            </div>
                             <form:errors path="price" cssClass="text-danger" element="div" />
                         </div>
 
@@ -141,6 +146,20 @@
         </div>
     </div>
     <script>
+    (function () {
+        var priceDisplay = document.getElementById('priceDisplay');
+        var price = document.getElementById('price');
+        var form = document.querySelector('form.sell-form');
+        if (!priceDisplay || !price || !form || !window.VinylandPriceFormat) {
+            return;
+        }
+
+        var syncPrice = window.VinylandPriceFormat.attachFormattedPriceInput(priceDisplay, price);
+        form.addEventListener('submit', function () {
+            syncPrice();
+        });
+    })();
+
     (function () {
         var input = document.getElementById('images');
         var previewEl = document.getElementById('sell-images-preview');

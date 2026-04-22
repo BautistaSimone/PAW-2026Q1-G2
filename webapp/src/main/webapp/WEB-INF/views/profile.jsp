@@ -237,7 +237,7 @@
                                                         <c:out value="${pProduct.title}"/>
                                                     </div>
                                                     <div style="font-size: 0.85rem; color: var(--color-text-muted);">
-                                                        <c:out value="${pProduct.artist}"/> · $<c:out value="${pProduct.price}"/>
+                                                        <c:out value="${pProduct.artist}"/> · <ui:price value="${pProduct.price}" />
                                                     </div>
                                                 </c:if>
                                                 <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.2rem;">
@@ -290,7 +290,7 @@
                                                         <c:out value="${sProduct.title}"/>
                                                     </div>
                                                     <div style="font-size: 0.85rem; color: var(--color-text-muted);">
-                                                        <c:out value="${sProduct.artist}"/> · $<c:out value="${sProduct.price}"/>
+                                                        <c:out value="${sProduct.artist}"/> · <ui:price value="${sProduct.price}" />
                                                     </div>
                                                 </c:if>
                                                 <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.2rem;">
