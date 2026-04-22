@@ -48,11 +48,6 @@
                 </c:if>
             </div>
         </c:if>
-        <c:if test="${not empty sellerRating}">
-            <div class="product-card-seller-rating" style="margin-top: 0.35rem;" aria-label="Valoración del vendedor">
-                <ui:sellerRatingStars summary="${sellerRating}" compact="true"/>
-            </div>
-        </c:if>
         <c:choose>
             <c:when test="${isOnSale && discountPercentage ne null && discountPercentage gt 0}">
                 <div class="price-wrapper">
