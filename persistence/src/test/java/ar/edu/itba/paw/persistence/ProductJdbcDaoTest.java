@@ -46,7 +46,7 @@ public class ProductJdbcDaoTest {
 
     @Test
     public void testCreateProductAllowsMoreThanOneProductPerUser() {
-        final User user = userDao.createUser("seller@test.com", "password", "seller", false, null, null, null, null, null, null, null, null);
+        final User user = userDao.createUser("seller@test.com", "password", "seller", false, true, null, null, null, null, null, null, null, null);
 
         final Product firstProduct = productDao.createProduct(
             user.getId(),
@@ -87,7 +87,7 @@ public class ProductJdbcDaoTest {
 
     @Test
     public void findProductsSearchMatchesArtist() {
-        final User user = userDao.createUser("seller2@test.com", "password", "seller2", false, null, null, null, null, null, null, null, null);
+        final User user = userDao.createUser("seller2@test.com", "password", "seller2", false, true, null, null, null, null, null, null, null, null);
         productDao.createProduct(
             user.getId(),
             "Bocanada",
@@ -121,7 +121,7 @@ public class ProductJdbcDaoTest {
 
     @Test
     public void findProductsSearchReturnsEmptyWhenNoMatch() {
-        final User user = userDao.createUser("seller3@test.com", "password", "seller3", false, null, null, null, null, null, null, null, null);
+        final User user = userDao.createUser("seller3@test.com", "password", "seller3", false, true, null, null, null, null, null, null, null, null);
         productDao.createProduct(
             user.getId(),
             "Dynamo",
@@ -153,7 +153,7 @@ public class ProductJdbcDaoTest {
 
     @Test
     public void reserveIfAvailableHidesProductAndOnlySucceedsOnce() {
-        final User user = userDao.createUser("seller4@test.com", "password", "seller4", false, null, null, null, null, null, null, null, null);
+        final User user = userDao.createUser("seller4@test.com", "password", "seller4", false, true, null, null, null, null, null, null, null, null);
         final Product product = productDao.createProduct(
             user.getId(),
             "Artaud",

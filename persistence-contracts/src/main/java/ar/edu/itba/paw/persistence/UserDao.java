@@ -11,6 +11,7 @@ public interface UserDao {
             final String password,
             final String username,
             final Boolean mod,
+            final Boolean enabled,
             final String firstName,
             final String lastName,
             final String streetName,
@@ -35,4 +36,6 @@ public interface UserDao {
     Optional<User> findByEmail(final String email);
 
     Optional<User> findById(final Long id);
+
+	void enable(final Long id);
 }

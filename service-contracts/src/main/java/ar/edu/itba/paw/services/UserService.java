@@ -11,6 +11,7 @@ public interface UserService {
             final String password,
             final String username,
             final Boolean mod,
+            final Boolean enabled,
             final String firstName,
             final String lastName,
             final String streetName,
@@ -36,6 +37,8 @@ public interface UserService {
     Optional<User> findByEmail(final String email);
     Optional<User> findById(final Long id);
 
-	Boolean isPasswordEmpty(User usr);
+    Boolean isPasswordEmpty(User usr);
+
+	void enable(final Long id);
 
 }

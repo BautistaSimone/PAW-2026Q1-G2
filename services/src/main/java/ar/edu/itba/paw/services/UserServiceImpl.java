@@ -40,6 +40,7 @@ public class UserServiceImpl implements UserService {
             final String password,
             final String username,
             final Boolean mod,
+            final Boolean enabled,
             final String firstName,
             final String lastName,
             final String streetName,
@@ -58,6 +59,7 @@ public class UserServiceImpl implements UserService {
                 encodedPassword,
                 trimToNull(username),
                 mod,
+                enabled,
                 trimToNull(firstName),
                 trimToNull(lastName),
                 trimToNull(streetName),
@@ -113,4 +115,11 @@ public class UserServiceImpl implements UserService {
     public Boolean isPasswordEmpty(User usr) {
         return passwordEncoder.matches("", usr.getPassword());
     }
+
+
+	@Override
+    public void enable(final Long id) {
+        userDao.enable(id);
+    }
+
 }

@@ -42,6 +42,7 @@ public class UserJdbcDaoTest {
         final String password = "[PASSWORD]";
         final String username = "[USERNAME]";
         final Boolean mod = false;
+        final Boolean enabled = false;
 
         // 2. Exercise
         final User user = userDao.createUser(
@@ -49,6 +50,7 @@ public class UserJdbcDaoTest {
                 password,
                 username,
                 mod,
+                enabled,
                 "Juan",
                 "Perez",
                 null,

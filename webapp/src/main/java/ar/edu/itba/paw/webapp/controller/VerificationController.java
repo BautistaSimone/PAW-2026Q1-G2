@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Collection;
 
+import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.VerificationTokenService;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
@@ -55,15 +56,17 @@ public class VerificationController {
         this.verificationTokenService = verificationTokenService;
     }
 
-    @RequestMapping(value = "verifyEmail", method = RequestMethod.POST)
+    @RequestMapping(value = "sendVerificationEmail", method = RequestMethod.POST)
     public ModelAndView verificationEmail(@AuthenticationPrincipal PawAuthUser authUser) {
 
-        ModelAndView mv = new ModelAndView("login");
         if (authUser == null) {
+            ModelAndView mv = new ModelAndView("login");
+            mv.addObject("loginForm", new LoginForm());
             mv.addObject("error", "UserNotFound.authForm.email");
             return mv;
         }
 
+        ModelAndView mv = new ModelAndView("verification-email-sent");
         final User user = authUser.getUser();
 
         verificationTokenService.createVerificationTokenForUser(user.getId());
@@ -73,18 +76,50 @@ public class VerificationController {
         return mv;
     }
 
-    @RequestMapping(value = "verificationPending")
-    public ModelAndView verificationPending() {
+    // TODO: Should this be always accessible?
+    @RequestMapping(value = "sendVerificationEmail")
+    public ModelAndView showVerificationEmailSent() {
 
-        ModelAndView mv = new ModelAndView("login");
+        ModelAndView mv = new ModelAndView("verification-email-sent");
+
+        return mv;
+    }
+
+
+    @RequestMapping(value = "notVerified")
+    public ModelAndView showNotVerified() {
+
+        ModelAndView mv = new ModelAndView("account-not-verified");
+
+        return mv;
+    }
+
+    @RequestMapping(value = "verifyEmail", method = RequestMethod.POST)
+    public ModelAndView verifyEmail(
+        @RequestParam("token") final String token,
+        RedirectAttributes redirectAttributes) {
+
+        ModelAndView mv = new ModelAndView("redirect:/verificationStatus");
+
+        if (!verificationTokenService.isValidVerificationToken(token)) {
+            redirectAttributes.addFlashAttribute("verificationSuccessful", false);
+            redirectAttributes.addFlashAttribute("message", "ExpiredToken.verification");
+            return mv;
+        }
+
+        final Token verificationToken = verificationTokenService.findByToken(token).get();
+
+        userService.enable(verificationToken.getUserId());
+
+        redirectAttributes.addFlashAttribute("verificationSuccessful", true);
+        redirectAttributes.addFlashAttribute("message", "SuccessToken.verification");
+
         return mv;
     }
 
     @RequestMapping(value = "verificationStatus")
     public ModelAndView verificationStatus() {
-
-        ModelAndView mv = new ModelAndView("login");
-        return mv;
+        return new ModelAndView("verification-status");
     }
 
 }

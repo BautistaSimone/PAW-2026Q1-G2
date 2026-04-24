@@ -35,7 +35,7 @@ public class ImageJdbcDaoTest {
 
     @Test
     public void testCreateImageStoresBinaryDataAndContentType() {
-        final User user = userDao.createUser("image@test.com", "password", "seller", false, null, null, null, null, null, null, null, null);
+        final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null, null, null, null, null, null);
         final Product product = productDao.createProduct(
             user.getId(),
             "Dynamo",

@@ -25,6 +25,7 @@ public class UserJdbcDao implements UserDao {
             rs.getString("password"),
             rs.getString("username"),
             rs.getBoolean("mod"),
+            rs.getBoolean("enabled"),
             rs.getString("first_name"),
             rs.getString("last_name"),
             rs.getString("street_name"),
@@ -49,6 +50,7 @@ public class UserJdbcDao implements UserDao {
             final String password,
             final String username,
             final Boolean mod,
+            final Boolean enabled,
             final String firstName,
             final String lastName,
             final String streetName,
@@ -62,6 +64,7 @@ public class UserJdbcDao implements UserDao {
         values.put("password", password);
         values.put("username", username);
         values.put("mod", mod);
+        values.put("enabled", enabled);
         values.put("first_name", firstName);
         values.put("last_name", lastName);
         values.put("street_name", streetName);
@@ -79,6 +82,7 @@ public class UserJdbcDao implements UserDao {
                 password,
                 username,
                 mod,
+                enabled,
                 firstName,
                 lastName,
                 streetName,
@@ -131,5 +135,13 @@ public class UserJdbcDao implements UserDao {
     @Override
     public Optional<User> findById(final Long id) {
         return jdbcTemplate.query("SELECT * FROM users WHERE user_id = ?", USER_ROW_MAPPER, id).stream().findAny();
+    }
+
+	@Override
+    public void enable(final Long id) {
+        jdbcTemplate.update(
+            "UPDATE users SET enabled = true WHERE user_id = ?",
+            id
+        );
     }
 }
