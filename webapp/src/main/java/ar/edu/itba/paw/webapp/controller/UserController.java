@@ -46,7 +46,7 @@ import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.models.PasswordToken;
+import ar.edu.itba.paw.models.Token;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 
 @Controller
@@ -59,7 +59,6 @@ public class UserController {
     private final ImageService imageService;
     private final PurchaseService purchaseService;
     private final ReviewService reviewService;
-    private final PasswordTokenService passwordTokenService;
 
     @Autowired
     public UserController(
@@ -67,116 +66,13 @@ public class UserController {
         final ProductService productService,
         final ImageService imageService,
         final PurchaseService purchaseService,
-        final ReviewService reviewService,
-        final PasswordTokenService passwordTokenService) {
+        final ReviewService reviewService) {
 
         this.userService = userService;
         this.productService = productService;
         this.imageService = imageService;
         this.purchaseService = purchaseService;
         this.reviewService = reviewService;
-        this.passwordTokenService = passwordTokenService;
-    }
-
-    @RequestMapping(value = "/resetPassword")
-    public ModelAndView showResetPasswordPage(
-        @AuthenticationPrincipal PawAuthUser authUser
-        ) {
-
-        ModelAndView mv = new ModelAndView("forgot-password");
-
-        // If logged in, fill in the mail
-        if (authUser != null) {
-            mv.addObject("userEmail", authUser.getUser().getEmail());
-        }
-
-        return mv;
-    }
-
-    @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
-    public ModelAndView resetPassword(@RequestParam("email") String userEmail) {
-
-        final Optional<User> userOpt = userService.findByEmail(userEmail);
-
-        if (!userOpt.isPresent()) {
-            ModelAndView mv = new ModelAndView("forgot-password");
-            mv.addObject("error", "UserNotFound.authForm.email");
-            return mv;
-        }
-
-        ModelAndView mv = new ModelAndView("login");
-        mv.addObject("loginForm", new LoginForm());
-
-        final User user = userOpt.get();
-
-        final String token = UUID.randomUUID().toString();
-
-        passwordTokenService.createPasswordResetTokenForUser(user.getId(), token);
-
-        mv.addObject("message", "EmailSent.authForm.email");
-
-        return mv;
-    }
-
-    @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
-    public ModelAndView changePassword(
-        @AuthenticationPrincipal PawAuthUser authUser,
-        @Valid @ModelAttribute UpdatePasswordForm form,
-        final BindingResult errors,
-        RedirectAttributes redirectAttributes
-        ) {
-
-        // Return to the same page if an error occurs
-        if (errors.hasErrors()) {
-            ModelAndView mv = new ModelAndView("update-password");
-            mv.addObject("updatePasswordForm", form);
-            return mv;
-        }
-
-        if (!passwordTokenService.isValidPasswordResetToken(form.getToken())) {
-            ModelAndView mv = new ModelAndView("redirect:/login");
-            return mv;
-        }
-
-        final Optional<PasswordToken> passTokenOpt = passwordTokenService.findByToken(form.getToken());
-
-        // We already know it exists
-        final PasswordToken passToken = passTokenOpt.get();
-
-        userService.updatePassword(passToken.getUserId(), form.getNewPassword());
-
-        // Reset the form on success
-        form = new UpdatePasswordForm(); 
-        
-        if (authUser == null) {
-            // If no user, go to login
-            ModelAndView mv = new ModelAndView("redirect:/login");
-            redirectAttributes.addFlashAttribute("message", "UpdatedPassword.authForm.password");
-            return mv;
-        }
-        
-        ModelAndView mv = new ModelAndView("redirect:/");
-        redirectAttributes.addFlashAttribute("message", "UpdatedPassword.authForm.password");
-
-        return mv;
-    }
-
-    @RequestMapping(value = "/changePassword")
-    public ModelAndView showChangePasswordPage(
-        @ModelAttribute UpdatePasswordForm form) {
-
-        ModelAndView mv = new ModelAndView();
-
-        if(!passwordTokenService.isValidPasswordResetToken(form.getToken())) {
-            
-            mv.setViewName("redirect:/login");
-            return mv;
-        }
-
-        mv.setViewName("update-password");
-        mv.addObject("updatePasswordForm", form);
-
-        return mv;
     }
 
     @RequestMapping(value = "/login")

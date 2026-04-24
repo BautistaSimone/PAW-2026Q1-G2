@@ -153,6 +153,36 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Async
+    @Override
+    public void sendVerificationEmail(String to, String resetToken, String username) {
+        String resetUrl = buildAbsoluteUrl("/changePassword?token=" + resetToken);
+
+        final Context ctx = new Context(LocaleContextHolder.getLocale());
+        ctx.setVariable("title", "Recuperación de contraseña");
+        ctx.setVariable("message", "Hacé click en el enlace para restablecer tu contraseña.");
+        ctx.setVariable("recipientName", username);
+        ctx.setVariable("actionUrl", resetUrl);
+
+        try {
+            final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
+
+            messageHelper.setSubject("Vinyland - Recuperar contraseña");
+            messageHelper.setTo(to);
+            messageHelper.setFrom("no-reply@vinyland.com");
+
+            final String htmlContent = templateEngine.process("password-reset", ctx);
+            messageHelper.setText(htmlContent, true);
+
+            javaMailSender.send(mimeMessage);
+            System.out.println("Password reset email sent to: " + to);
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void sendOrderEmail(
             final String to,
             final Product product,

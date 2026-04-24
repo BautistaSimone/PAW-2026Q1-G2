@@ -18,9 +18,9 @@ import org.springframework.stereotype.Repository;
 import ar.edu.itba.paw.models.Token;
 
 @Repository
-public class PasswordTokenJdbcDao implements PasswordTokenDao {
+public class VerificationTokenJdbcDao implements VerificationTokenDao {
 
-    private static final RowMapper<Token> PASSWORD_TOKEN_ROW_MAPPER = (rs, rowNum) ->
+    private static final RowMapper<Token> VERIFICATION_TOKEN_ROW_MAPPER = (rs, rowNum) ->
         new Token(
             rs.getLong("token_id"),
             rs.getLong("user_id"),
@@ -32,9 +32,9 @@ public class PasswordTokenJdbcDao implements PasswordTokenDao {
     private final SimpleJdbcInsert jdbcInsert;
 
     @Autowired
-    public PasswordTokenJdbcDao(final DataSource dataSource) {
+    public VerificationTokenJdbcDao(final DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
-        this.jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName("password_tokens").usingGeneratedKeyColumns("token_id");
+        this.jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName("verification_tokens").usingGeneratedKeyColumns("token_id");
     }
 
     @Override
@@ -46,7 +46,7 @@ public class PasswordTokenJdbcDao implements PasswordTokenDao {
         values.put("expiration_date", expirationDate);
 
         // Delete previous token, we don't want more than one per user
-        jdbcTemplate.update("DELETE FROM password_tokens WHERE user_id = ?", userId);
+        jdbcTemplate.update("DELETE FROM verification_tokens WHERE user_id = ?", userId);
 
         final Number id = jdbcInsert.executeAndReturnKey(values);
 
@@ -60,12 +60,12 @@ public class PasswordTokenJdbcDao implements PasswordTokenDao {
 
     @Override
     public Optional<Token> findByUserId(final Long userId) {
-        return jdbcTemplate.query("SELECT * FROM password_tokens WHERE user_id = ?", PASSWORD_TOKEN_ROW_MAPPER, userId).stream().findAny();
+        return jdbcTemplate.query("SELECT * FROM verification_tokens WHERE user_id = ?", VERIFICATION_TOKEN_ROW_MAPPER, userId).stream().findAny();
     }
 
     @Override
     public Optional<Token> findByToken(final String token) {
-        return jdbcTemplate.query("SELECT * FROM password_tokens WHERE token = ?", PASSWORD_TOKEN_ROW_MAPPER, token).stream().findAny();
+        return jdbcTemplate.query("SELECT * FROM verification_tokens WHERE token = ?", VERIFICATION_TOKEN_ROW_MAPPER, token).stream().findAny();
     }
 
 }

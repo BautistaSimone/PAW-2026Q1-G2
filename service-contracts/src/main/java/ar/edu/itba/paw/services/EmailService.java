@@ -30,4 +30,5 @@ public interface EmailService {
     void sendProductReportEmail(Product product, User reporter);
     
     void sendPasswordResetEmail(String to, String resetToken, String username);
+    void sendVerificationEmail(String to, String resetToken, String username);
 }

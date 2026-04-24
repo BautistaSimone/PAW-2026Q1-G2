@@ -6,10 +6,11 @@ import java.util.Optional;
 import ar.edu.itba.paw.models.Token;
 import ar.edu.itba.paw.models.User;
 
-public interface PasswordTokenService {
-    void createPasswordResetTokenForUser(final Long userId, String token);
+public interface VerificationTokenService {
     
-    boolean isValidPasswordResetToken(String token);
+    void createVerificationTokenForUser(final Long userId);
+    
+    boolean isValidVerificationToken(String token);
     Optional<Token> findByUserId(final Long userId);
     Optional<Token> findByToken(final String token);
 

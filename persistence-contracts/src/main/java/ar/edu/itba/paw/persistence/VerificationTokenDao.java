@@ -6,7 +6,7 @@ import java.util.Date;
 
 import ar.edu.itba.paw.models.Token;
 
-public interface PasswordTokenDao {
+public interface VerificationTokenDao {
     Token createToken(final Long userId, final String token, final Date expirationDate);
 
     Optional<Token> findByUserId(final Long userId);
