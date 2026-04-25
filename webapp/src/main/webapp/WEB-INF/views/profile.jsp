@@ -286,6 +286,9 @@
                                 <div class="empty-products-state">
                                     <i class="bi bi-bag" style="font-size: 2.5rem; color: var(--color-border);"></i>
                                     <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;">Aún no realizaste ninguna compra.</p>
+                                    <a href="<c:url value='/'/>" class="btn btn-retro btn-retro-primary" style="justify-self: center;">
+                                        <i class="bi bi-search" aria-hidden="true"></i> Explorar vinilos
+                                    </a>
                                 </div>
                             </c:otherwise>
                         </c:choose>
