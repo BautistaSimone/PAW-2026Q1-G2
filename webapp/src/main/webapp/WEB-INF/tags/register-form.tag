@@ -34,7 +34,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="username" class="form-label">Nombre de usuario</label>
+                            <label for="username" class="form-label">Nombre de usuario <span class="text-danger">*</span></label>
                             <form:input path="username"
                                         id="username"
                                         cssClass="form-control"
@@ -44,7 +44,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
+                            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
                             <form:input path="email"
                                         id="email"
                                         cssClass="form-control"
@@ -54,7 +54,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="password" class="form-label">Contraseña</label>
+                            <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
                             <div class="password-toggle-wrapper">
                                 <form:password path="password"
                                             id="password"
@@ -65,11 +65,12 @@
                                     <i class="bi bi-eye"></i>
                                 </button>
                             </div>
+                            <div class="form-text">Mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número.</div>
                             <form:errors path="password" cssClass="text-danger small"/>
                         </div>
 
                         <div class="mb-3">
-                            <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
+                            <label for="confirmPassword" class="form-label">Confirmar contraseña <span class="text-danger">*</span></label>
                             <div class="password-toggle-wrapper">
                                 <form:password path="confirmPassword"
                                             id="confirmPassword"

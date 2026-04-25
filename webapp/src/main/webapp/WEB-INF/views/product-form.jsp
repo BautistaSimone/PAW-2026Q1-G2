@@ -26,19 +26,19 @@
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                     <div class="row g-4">
                         <div class="col-md-6">
-                            <label for="title" class="form-label">Titulo del album *</label>
+                            <label for="title" class="form-label">Titulo del album <span class="text-danger">*</span></label>
                             <form:input path="title" cssClass="form-control" required="required" />
                             <form:errors path="title" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
-                            <label for="artist" class="form-label">Artista *</label>
+                            <label for="artist" class="form-label">Artista <span class="text-danger">*</span></label>
                             <form:input path="artist" cssClass="form-control" required="required" />
                             <form:errors path="artist" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label">Sello – Numero de catalogo *</label>
+                            <label class="form-label">Sello – Numero de catalogo <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <form:input path="recordLabel" cssClass="form-control"
                                        placeholder="Ej: Sony Music, Rough Trade" required="required" />
@@ -51,14 +51,14 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="editionCountry" class="form-label">Pais de la Edicion *</label>
+                            <label for="editionCountry" class="form-label">Pais de la Edicion <span class="text-danger">*</span></label>
                             <form:input path="editionCountry" cssClass="form-control"
                                    placeholder="Ej: Argentina, USA, UK" required="required" />
                             <form:errors path="editionCountry" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">Generos *</label>
+                            <label class="form-label">Generos <span class="text-danger">*</span></label>
                             <div class="genre-checkboxes d-flex flex-wrap gap-2">
                                 <c:forEach items="${categories}" var="cat">
                                     <div class="form-check genre-check">
@@ -73,21 +73,21 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="sleeveCondition" class="form-label">Estado de la tapa (1 a 10) *</label>
+                            <label for="sleeveCondition" class="form-label">Estado de la tapa (1 a 10) <span class="text-danger">*</span></label>
                             <form:input type="number" path="sleeveCondition" min="1" max="10" step="0.1"
                                    cssClass="form-control" placeholder="Ej: 8.5" required="required" />
                             <form:errors path="sleeveCondition" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
-                            <label for="recordCondition" class="form-label">Estado del disco (1 a 10) *</label>
+                            <label for="recordCondition" class="form-label">Estado del disco (1 a 10) <span class="text-danger">*</span></label>
                             <form:input type="number" path="recordCondition" min="1" max="10" step="0.1"
                                    cssClass="form-control" placeholder="Ej: 9.0" required="required" />
                             <form:errors path="recordCondition" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
-                            <label for="priceDisplay" class="form-label">Precio *</label>
+                            <label for="priceDisplay" class="form-label">Precio <span class="text-danger">*</span></label>
                             <form:hidden path="price" id="price" />
                             <div class="input-group">
                                 <span class="input-group-text" style="border-color: var(--color-border);">$</span>
@@ -98,7 +98,7 @@
                         </div>
 
                         <div class="col-12">
-                            <label for="images" class="form-label">Imagenes del vinilo *</label>
+                            <label for="images" class="form-label">Imagenes del vinilo <span class="text-danger">*</span></label>
                             <form:input type="file" path="images" cssClass="form-control sell-images-input" accept="image/*" multiple="true" id="images" />
                             <div class="form-text">Podes cargar hasta 8 fotos del disco (hasta 5 MB cada una). La imagen principal es la primera; toca las miniaturas de abajo para elegir otra como portada.</div>
                             <form:errors path="images" cssClass="text-danger" element="div" />
@@ -111,7 +111,7 @@
                         </div>
 
                         <div class="col-12">
-                            <label for="description" class="form-label">Descripcion *</label>
+                            <label for="description" class="form-label">Descripcion <span class="text-danger">*</span></label>
                             <form:textarea path="description" cssClass="form-control" rows="5"
                                       placeholder="Conta detalles adicionales del disco, edicion, etc." required="required" />
                             <form:errors path="description" cssClass="text-danger" element="div" />
