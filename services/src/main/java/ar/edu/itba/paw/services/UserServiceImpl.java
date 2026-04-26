@@ -122,4 +122,9 @@ public class UserServiceImpl implements UserService {
         userDao.enable(id);
     }
 
+	@Override
+    public void ban(final Long id) {
+        userDao.ban(id);
+    }
+
 }

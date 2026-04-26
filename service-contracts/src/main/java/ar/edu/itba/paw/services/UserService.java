@@ -41,4 +41,6 @@ public interface UserService {
 
 	void enable(final Long id);
 
+	void ban(final Long id);
+
 }

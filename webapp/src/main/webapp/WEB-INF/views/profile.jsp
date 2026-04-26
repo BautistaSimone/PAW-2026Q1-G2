@@ -5,6 +5,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <c:set var="activeMyData" value="${isOwnProfile and param.tab eq 'mydata'}"/>
+<c:set var="activeReports" value="${isOwnProfile and user['mod'] and param.tab eq 'reports'}"/>
 
 <ui:layout title="Vinyland | Perfil">
 
@@ -96,10 +97,23 @@
                 </c:if>
             </c:if>
 
+            <c:if test="${isOwnProfile and param.hidden eq '1'}">
+                <div class="alert-retro alert-retro-success mt-3" role="alert">
+                    <i class="bi bi-check-circle" aria-hidden="true"></i>
+                    La publicación fue dada de baja correctamente.
+                </div>
+            </c:if>
+            <c:if test="${isOwnProfile and param.banned eq '1'}">
+                <div class="alert-retro alert-retro-success mt-3" role="alert">
+                    <i class="bi bi-check-circle" aria-hidden="true"></i>
+                    El usuario fue baneado y todas sus publicaciones fueron dadas de baja.
+                </div>
+            </c:if>
+
             <!-- Tabs -->
             <ul class="nav nav-tabs mt-4" id="profileTabs" role="tablist" style="border-bottom: 2px solid var(--color-border);">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link<c:if test='${not activeMyData}'> active</c:if>" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications" type="button" role="tab" aria-controls="publications" aria-selected="${not activeMyData}" style="font-weight: 600;">
+                    <button class="nav-link<c:if test='${not activeMyData and not activeReports}'> active</c:if>" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications" type="button" role="tab" aria-controls="publications" aria-selected="${not activeMyData and not activeReports}" style="font-weight: 600;">
                         <i class="bi bi-vinyl" aria-hidden="true"></i> Publicaciones
                     </button>
                 </li>
@@ -125,11 +139,18 @@
                         <i class="bi bi-star" aria-hidden="true"></i> Reseñas recibidas
                     </button>
                 </li>
+                <c:if test="${isOwnProfile and user['mod']}">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link<c:if test='${activeReports}'> active</c:if>" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="${activeReports}" style="font-weight: 600;">
+                            <i class="bi bi-flag" aria-hidden="true"></i> Reportes
+                        </button>
+                    </li>
+                </c:if>
             </ul>
 
             <div class="tab-content mt-3" id="profileTabContent">
                 <!-- Tab: Publicaciones -->
-                <div class="tab-pane fade<c:if test='${not activeMyData}'> show active</c:if>" id="publications" role="tabpanel" aria-labelledby="publications-tab">
+                <div class="tab-pane fade<c:if test='${not activeMyData and not activeReports}'> show active</c:if>" id="publications" role="tabpanel" aria-labelledby="publications-tab">
                     <c:choose>
                         <c:when test="${not empty userProducts}">
                             <div class="products-grid">
@@ -387,6 +408,72 @@
                         </c:otherwise>
                     </c:choose>
                 </div>
+
+                <!-- Tab: Reportes (solo moderadores en perfil propio) -->
+                <c:if test="${isOwnProfile and user['mod']}">
+                    <div class="tab-pane fade<c:if test='${activeReports}'> show active</c:if>" id="reports" role="tabpanel" aria-labelledby="reports-tab">
+                        <c:choose>
+                            <c:when test="${not empty reportedProducts}">
+                                <div class="d-flex flex-column gap-3">
+                                    <c:forEach items="${reportedProducts}" var="rp">
+                                        <div style="background: #fff; border-radius: 16px; padding: 1.25rem; border: 1px solid var(--color-border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 1rem;">
+                                            <img src="<c:url value='/images/product/${rp.productId}'/>" alt=""
+                                                 style="width: 70px; height: 70px; border-radius: 12px; object-fit: cover; flex-shrink: 0;"
+                                                 onerror="this.src='https://via.placeholder.com/70?text=%E2%80%94';"/>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <div style="font-weight: 600; font-size: 1rem; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    <c:out value="${rp.productTitle}"/>
+                                                </div>
+                                                <div style="font-size: 0.85rem; color: var(--color-text-muted);">
+                                                    <c:out value="${rp.productArtist}"/>
+                                                </div>
+                                                <div style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                                                    <span style="background: #dc3545; color: #fff; font-weight: 700; font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 50px;">
+                                                        <i class="bi bi-flag-fill" aria-hidden="true"></i>
+                                                        <c:out value="${rp.reportCount}"/> reporte<c:if test="${rp.reportCount != 1}">s</c:if>
+                                                    </span>
+                                                    <span style="font-size: 0.8rem; color: var(--color-text-muted);">
+                                                        Publicado por <a href="<c:url value='/profile?userId=${rp.ownerUserId}'/>" style="color: var(--color-accent); text-decoration: none; font-weight: 600;"><c:out value="${rp.ownerUsername}"/></a>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; flex-shrink: 0;">
+                                                <a href="<c:url value='/products/${rp.productId}'/>" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem;" title="Ver publicación">
+                                                    <i class="bi bi-eye" aria-hidden="true"></i> Ver
+                                                </a>
+                                                <c:url var="hideUrl" value="/profile/admin/hide-product"/>
+                                                <form action="<c:out value='${hideUrl}'/>" method="post" style="margin: 0;" onsubmit="return confirm('¿Bajar esta publicación?');">
+                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                    <input type="hidden" name="productId" value="<c:out value='${rp.productId}'/>" />
+                                                    <button type="submit" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem; color: #dc3545; border-color: #dc3545;" title="Bajar publicación">
+                                                        <i class="bi bi-x-circle" aria-hidden="true"></i> Bajar
+                                                    </button>
+                                                </form>
+                                                <a href="<c:url value='/profile?userId=${rp.ownerUserId}'/>" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem;" title="Ver perfil del dueño">
+                                                    <i class="bi bi-person" aria-hidden="true"></i> Perfil
+                                                </a>
+                                                <c:url var="banUrl" value="/profile/admin/ban-user"/>
+                                                <form action="<c:out value='${banUrl}'/>" method="post" style="margin: 0;" onsubmit="return confirm('¿Bannear a este usuario? Se bajarán todas sus publicaciones y no podrá volver a iniciar sesión.');">
+                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                    <input type="hidden" name="userId" value="<c:out value='${rp.ownerUserId}'/>" />
+                                                    <button type="submit" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem; color: #fff; background: #dc3545; border-color: #dc3545;" title="Bannear usuario">
+                                                        <i class="bi bi-person-x" aria-hidden="true"></i> Bannear
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="empty-products-state">
+                                    <i class="bi bi-flag" style="font-size: 2.5rem; color: var(--color-border);"></i>
+                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;">No hay reportes pendientes.</p>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </c:if>
             </div>
         </div>
     </div>

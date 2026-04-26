@@ -38,4 +38,6 @@ public interface UserDao {
     Optional<User> findById(final Long id);
 
 	void enable(final Long id);
+
+	void ban(final Long id);
 }

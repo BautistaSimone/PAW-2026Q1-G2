@@ -41,6 +41,7 @@ import ar.edu.itba.paw.services.EmailService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductReportRemovalTokenService;
 import ar.edu.itba.paw.services.ProductService;
+import ar.edu.itba.paw.services.ReportService;
 import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
@@ -53,6 +54,7 @@ public class ProductController {
     private final ImageService imageService;
     private final EmailService emailService;
     private final ProductReportRemovalTokenService reportRemovalTokenService;
+    private final ReportService reportService;
     private final ReviewService reviewService;
     private final UserService userService;
 
@@ -63,6 +65,7 @@ public class ProductController {
         final ImageService imageService,
         final EmailService emailService,
         final ProductReportRemovalTokenService reportRemovalTokenService,
+        final ReportService reportService,
         final ReviewService reviewService,
         final UserService userService
     ) {
@@ -71,6 +74,7 @@ public class ProductController {
         this.imageService = imageService;
         this.emailService = emailService;
         this.reportRemovalTokenService = reportRemovalTokenService;
+        this.reportService = reportService;
         this.reviewService = reviewService;
         this.userService = userService;
     }
@@ -219,6 +223,11 @@ public class ProductController {
         final Product product = productService.findByIdIfAvailable(id)
             .orElseThrow(ResourceNotFoundException::new);
 
+        if (reportService.hasReported(id, authUser.getUser().getId())) {
+            return new ModelAndView("redirect:/products/" + id + "?alreadyReported=1");
+        }
+
+        reportService.report(id, authUser.getUser().getId());
         emailService.sendProductReportEmail(product, authUser.getUser());
         return new ModelAndView("redirect:/products/" + id + "?reported=1");
     }

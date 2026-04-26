@@ -30,16 +30,18 @@ public class PawUserDetailsService implements UserDetailsService {
         final User user = userService.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
+        final boolean isBanned = Boolean.TRUE.equals(user.getBanned());
+
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
 
         return new PawAuthUser(
                 email,
                 user.getPassword(),
-                true,   // enabled
-                true,   // accountNonExpired
-                true,   // credentialsNonExpired
-                true,   // accountNonLocked
+                true,           // enabled
+                true,           // accountNonExpired
+                true,           // credentialsNonExpired
+                !isBanned,      // accountNonLocked — false if banned
                 authorities,
                 user
         );

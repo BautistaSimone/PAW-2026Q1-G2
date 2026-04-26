@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
 	neighborhood VARCHAR(100),
 	province VARCHAR(100),
 	extra_address_info VARCHAR(500),
-	cbu_cvu VARCHAR(22)
+	cbu_cvu VARCHAR(22),
+	banned BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS password_tokens (
@@ -97,6 +98,18 @@ CREATE TABLE IF NOT EXISTS reviews (
 	FOREIGN KEY(buyer_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+
+CREATE TABLE IF NOT EXISTS reports (
+	report_id SERIAL PRIMARY KEY,
+	product_id INTEGER NOT NULL,
+	owner_user_id INTEGER NOT NULL,
+	reporter_user_id INTEGER NOT NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	UNIQUE(product_id, reporter_user_id),
+	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(owner_user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(reporter_user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
 
 -- Seed default categories (genres) using more compatible EXISTS check instead of ON CONFLICT
 INSERT INTO categories (name) SELECT 'Rock'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Rock');

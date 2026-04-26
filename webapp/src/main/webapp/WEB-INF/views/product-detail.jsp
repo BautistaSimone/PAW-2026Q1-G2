@@ -22,6 +22,12 @@
                                         Gracias por el reporte. Nuestro equipo lo revisará.
                                     </div>
                                 </c:if>
+                                <c:if test="${param.alreadyReported eq '1'}">
+                                    <div class="alert-retro alert-retro-warning mb-3" role="alert">
+                                        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                                        Ya reportaste esta publicación anteriormente.
+                                    </div>
+                                </c:if>
                                 <c:if test="${param.purchaseError eq '1'}">
                                     <div class="alert-retro alert-retro-warning mb-3" role="alert">
                                         <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>

@@ -8,6 +8,7 @@ public class User {
     private final String username;
     private final Boolean mod;
     private final Boolean enabled;
+    private final Boolean banned;
     private final String firstName;
     private final String lastName;
     private final String streetName;
@@ -24,6 +25,7 @@ public class User {
             final String username,
             final Boolean mod,
             final Boolean enabled,
+            final Boolean banned,
             final String firstName,
             final String lastName,
             final String streetName,
@@ -38,6 +40,7 @@ public class User {
         this.username = username;
         this.mod = mod;
         this.enabled = enabled;
+        this.banned = banned;
         this.firstName = firstName;
         this.lastName = lastName;
         this.streetName = streetName;
@@ -50,7 +53,7 @@ public class User {
 
     /** Backward-compatible constructor: profile fields are null. */
     public User(final Long id, final String email, final String password, final String username, final Boolean mod) {
-        this(id, email, password, username, mod, false, null, null, null, null, null, null, null, null);
+        this(id, email, password, username, mod, false, false, null, null, null, null, null, null, null, null);
     }
 
     private static boolean nonBlank(final String s) {
@@ -126,6 +129,10 @@ public class User {
         return enabled;
     }
 
+    public Boolean getBanned() {
+        return banned;
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -165,6 +172,7 @@ public class User {
                 + ", password=" + password
                 + ", username=" + username
                 + ", mod=" + mod
+                + ", banned=" + banned
                 + ", firstName=" + firstName
                 + ", lastName=" + lastName
                 + "]";

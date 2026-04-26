@@ -38,6 +38,7 @@ import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.PurchaseService;
 import ar.edu.itba.paw.services.PasswordTokenService;
 import ar.edu.itba.paw.services.ReviewService;
+import ar.edu.itba.paw.services.ReportService;
 import ar.edu.itba.paw.webapp.form.RegisterForm;
 import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
@@ -59,6 +60,7 @@ public class UserController {
     private final ImageService imageService;
     private final PurchaseService purchaseService;
     private final ReviewService reviewService;
+    private final ReportService reportService;
 
     @Autowired
     public UserController(
@@ -66,13 +68,15 @@ public class UserController {
         final ProductService productService,
         final ImageService imageService,
         final PurchaseService purchaseService,
-        final ReviewService reviewService) {
+        final ReviewService reviewService,
+        final ReportService reportService) {
 
         this.userService = userService;
         this.productService = productService;
         this.imageService = imageService;
         this.purchaseService = purchaseService;
         this.reviewService = reviewService;
+        this.reportService = reportService;
     }
 
     @RequestMapping(value = "/login")
@@ -310,6 +314,62 @@ public class UserController {
 
             mv.addObject("sales", sales);
             mv.addObject("saleProducts", saleProducts);
+
+            // Load reports for moderators
+            if (Boolean.TRUE.equals(profileUser.getMod())) {
+                final List<ar.edu.itba.paw.models.ReportedProduct> reportedProducts = reportService.findAllGroupedByProduct();
+                mv.addObject("reportedProducts", reportedProducts);
+            }
         }
+    }
+
+    @RequestMapping(value = "/profile/admin/hide-product", method = RequestMethod.POST)
+    public ModelAndView adminHideProduct(
+        @AuthenticationPrincipal PawAuthUser authUser,
+        @RequestParam("productId") final Long productId
+    ) {
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+        final User currentUser = userService.findById(authUser.getUser().getId())
+            .orElseThrow(() -> new IllegalStateException("User not found"));
+        if (!Boolean.TRUE.equals(currentUser.getMod())) {
+            throw new IllegalArgumentException("Not authorized");
+        }
+
+        productService.hideProductFromCatalog(productId);
+        reportService.deleteByProductId(productId);
+        return new ModelAndView("redirect:/profile?tab=reports&hidden=1");
+    }
+
+    @RequestMapping(value = "/profile/admin/ban-user", method = RequestMethod.POST)
+    public ModelAndView adminBanUser(
+        @AuthenticationPrincipal PawAuthUser authUser,
+        @RequestParam("userId") final Long userId
+    ) {
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+        final User currentUser = userService.findById(authUser.getUser().getId())
+            .orElseThrow(() -> new IllegalStateException("User not found"));
+        if (!Boolean.TRUE.equals(currentUser.getMod())) {
+            throw new IllegalArgumentException("Not authorized");
+        }
+
+        // Ban the user
+        userService.ban(userId);
+
+        // Hide all their active products
+        final ProductSearchCriteria criteria = new ProductSearchCriteria(
+            null, Collections.emptyList(), null, null,
+            Collections.emptyList(), Collections.emptyList(), null, userId
+        );
+        final List<Product> userProducts = productService.listProducts(criteria);
+        for (Product p : userProducts) {
+            productService.hideProductFromCatalog(p.getId());
+            reportService.deleteByProductId(p.getId());
+        }
+
+        return new ModelAndView("redirect:/profile?tab=reports&banned=1");
     }
 }

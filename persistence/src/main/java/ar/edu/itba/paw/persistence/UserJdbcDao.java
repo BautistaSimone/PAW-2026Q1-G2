@@ -26,6 +26,7 @@ public class UserJdbcDao implements UserDao {
             rs.getString("username"),
             rs.getBoolean("mod"),
             rs.getBoolean("enabled"),
+            rs.getBoolean("banned"),
             rs.getString("first_name"),
             rs.getString("last_name"),
             rs.getString("street_name"),
@@ -73,6 +74,7 @@ public class UserJdbcDao implements UserDao {
         values.put("province", province);
         values.put("extra_address_info", extraAddressInfo);
         values.put("cbu_cvu", cbuCvu);
+        values.put("banned", false);
 
         final Number id = jdbcInsert.executeAndReturnKey(values);
 
@@ -83,6 +85,7 @@ public class UserJdbcDao implements UserDao {
                 username,
                 mod,
                 enabled,
+                false,
                 firstName,
                 lastName,
                 streetName,
@@ -141,6 +144,14 @@ public class UserJdbcDao implements UserDao {
     public void enable(final Long id) {
         jdbcTemplate.update(
             "UPDATE users SET enabled = true WHERE user_id = ?",
+            id
+        );
+    }
+
+    @Override
+    public void ban(final Long id) {
+        jdbcTemplate.update(
+            "UPDATE users SET banned = true WHERE user_id = ?",
             id
         );
     }
