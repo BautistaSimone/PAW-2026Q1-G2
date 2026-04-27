@@ -24,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import org.slf4j.Logger;
@@ -36,8 +37,10 @@ import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.VerificationTokenService;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
+import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Token;
+import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
 
 @Controller
 public class VerificationController {
@@ -46,14 +49,17 @@ public class VerificationController {
 
     private final UserService userService;
     private final VerificationTokenService verificationTokenService;
+    private final PawUserDetailsService pawUserDetailsService;
 
     @Autowired
     public VerificationController(
         final UserService userService,
-        final VerificationTokenService verificationTokenService) {
+        final VerificationTokenService verificationTokenService,
+        PawUserDetailsService pawUserDetailsService) {
 
         this.userService = userService;
         this.verificationTokenService = verificationTokenService;
+        this.pawUserDetailsService = pawUserDetailsService;
     }
 
     @RequestMapping(value = "/sendVerificationEmail", method = RequestMethod.POST)
@@ -96,6 +102,7 @@ public class VerificationController {
 
     @RequestMapping(value = "/verifyEmail")
     public ModelAndView verifyEmail(
+        @AuthenticationPrincipal PawAuthUser authUser,
         @RequestParam("token") final String token,
         RedirectAttributes redirectAttributes) {
 
@@ -113,6 +120,23 @@ public class VerificationController {
 
         redirectAttributes.addFlashAttribute("verificationSuccessful", true);
         redirectAttributes.addFlashAttribute("message", "SuccessToken.verification");
+
+        // Update the current session too if the user is logged in
+        if (authUser != null) {
+            User updatedUser = userService.findById(verificationToken.getUserId())
+                .orElseThrow(ResourceNotFoundException::new);
+
+            UserDetails newPrincipal = pawUserDetailsService
+                .loadUserByUsername(updatedUser.getEmail());
+
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                newPrincipal,
+                newPrincipal.getPassword(),
+                newPrincipal.getAuthorities()
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
+        }
 
         return mv;
     }

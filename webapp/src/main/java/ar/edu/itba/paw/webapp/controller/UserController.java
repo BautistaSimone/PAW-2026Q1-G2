@@ -37,6 +37,7 @@ import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.PurchaseService;
 import ar.edu.itba.paw.services.PasswordTokenService;
+import ar.edu.itba.paw.services.VerificationTokenService;
 import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.services.ReportService;
 import ar.edu.itba.paw.webapp.form.RegisterForm;
@@ -62,6 +63,7 @@ public class UserController {
     private final PurchaseService purchaseService;
     private final ReviewService reviewService;
     private final ReportService reportService;
+    private final VerificationTokenService verificationTokenService;
 
     @Autowired
     public UserController(
@@ -70,7 +72,8 @@ public class UserController {
         final ImageService imageService,
         final PurchaseService purchaseService,
         final ReviewService reviewService,
-        final ReportService reportService) {
+        final ReportService reportService,
+        final VerificationTokenService verificationTokenService) {
 
         this.userService = userService;
         this.productService = productService;
@@ -78,6 +81,7 @@ public class UserController {
         this.purchaseService = purchaseService;
         this.reviewService = reviewService;
         this.reportService = reportService;
+        this.verificationTokenService = verificationTokenService;
     }
 
     @RequestMapping(value = "/login")
@@ -165,6 +169,7 @@ public class UserController {
 
         SecurityContextHolder.getContext().setAuthentication(auth);
 
+        verificationTokenService.createVerificationTokenForUser(user.getId());
         return new ModelAndView("redirect:/");
     }
 
