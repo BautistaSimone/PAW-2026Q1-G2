@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.persistence.ProductDao;
@@ -78,12 +79,12 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public List<Product> listProducts() {
+    public PaginatedResult<Product> listProducts() {
         return productDao.listProducts();
     }
 
     @Override
-    public List<Product> listProducts(final ProductSearchCriteria criteria) {
+    public PaginatedResult<Product> listProducts(final ProductSearchCriteria criteria) {
         return productDao.findProducts(criteria);
     }
 

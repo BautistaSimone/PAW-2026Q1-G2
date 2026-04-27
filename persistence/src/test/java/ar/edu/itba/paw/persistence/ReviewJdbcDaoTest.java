@@ -84,7 +84,7 @@ public class ReviewJdbcDaoTest {
     public void testFindBySellerId() {
         reviewDao.create(purchaseId, sellerId, buyerId, 3, "OK");
 
-        var reviews = reviewDao.findBySellerId(sellerId);
+        var reviews = reviewDao.findBySellerId(sellerId, 1, 10).getResults();
 
         Assertions.assertEquals(1, reviews.size());
         Assertions.assertEquals(3, reviews.get(0).getScore());

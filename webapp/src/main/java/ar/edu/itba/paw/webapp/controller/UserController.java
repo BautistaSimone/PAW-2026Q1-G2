@@ -44,6 +44,7 @@ import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.UpdatePasswordForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
+import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.User;
@@ -170,7 +171,8 @@ public class UserController {
     @RequestMapping(value = "/profile")
     public ModelAndView profile(
         @AuthenticationPrincipal PawAuthUser authUser,
-        @RequestParam(value = "userId", required = false) final Long userId
+        @RequestParam(value = "userId", required = false) final Long userId,
+        @RequestParam(value = "page", defaultValue = "1") final int page
     ) {
         final boolean isOwnProfile;
         final User profileUser;
@@ -189,7 +191,7 @@ public class UserController {
         }
 
         final ModelAndView mv = new ModelAndView("profile");
-        enrichProfileModel(mv, profileUser, isOwnProfile, authUser);
+        enrichProfileModel(mv, profileUser, isOwnProfile, authUser, page);
         if (isOwnProfile) {
             mv.addObject("userProfileForm", UserProfileForm.fromUser(profileUser));
         }
@@ -211,7 +213,7 @@ public class UserController {
 
         if (errors.hasErrors()) {
             final ModelAndView mv = new ModelAndView("profile");
-            enrichProfileModel(mv, profileUser, true, authUser);
+            enrichProfileModel(mv, profileUser, true, authUser, 1);
             mv.addObject("userProfileForm", form);
             return mv;
         }
@@ -257,7 +259,8 @@ public class UserController {
         final ModelAndView mv,
         final User profileUser,
         final boolean isOwnProfile,
-        final PawAuthUser authUser
+        final PawAuthUser authUser,
+        final int page
     ) {
         final ProductSearchCriteria criteria = new ProductSearchCriteria(
             null,
@@ -267,13 +270,15 @@ public class UserController {
             Collections.emptyList(),
             Collections.emptyList(),
             null,
-            profileUser.getId()
+            profileUser.getId(),
+            page,
+            10
         );
 
-        final List<Product> products = productService.listProducts(criteria);
+        final PaginatedResult<Product> productsPage = productService.listProducts(criteria);
 
         final Map<Long, String> productImageUrls = new HashMap<>();
-        for (Product product : products) {
+        for (Product product : productsPage.getResults()) {
             if (imageService.existsByProductId(product.getId())) {
                 productImageUrls.put(product.getId(), "/images/product/" + product.getId());
             }
@@ -281,38 +286,43 @@ public class UserController {
 
         mv.addObject("user", profileUser);
         mv.addObject("isOwnProfile", isOwnProfile);
-        mv.addObject("userProducts", products);
+        mv.addObject("userProductsPage", productsPage);
+        mv.addObject("userProducts", productsPage.getResults());
         mv.addObject("productImageUrls", productImageUrls);
 
-        mv.addObject("receivedReviews", reviewService.findBySellerId(profileUser.getId()));
+        PaginatedResult<ar.edu.itba.paw.models.Review> reviewsPage = reviewService.findBySellerId(profileUser.getId(), page, 10);
+        mv.addObject("receivedReviewsPage", reviewsPage);
+        mv.addObject("receivedReviews", reviewsPage.getResults());
         mv.addObject("sellerRating", reviewService.summaryForSeller(profileUser.getId()));
 
         if (isOwnProfile && authUser != null) {
-            final List<Purchase> purchases = purchaseService.findByBuyerId(profileUser.getId());
+            final PaginatedResult<Purchase> purchasesPage = purchaseService.findByBuyerId(profileUser.getId(), page, 10);
 
             final Map<Long, Product> purchaseProducts = new HashMap<>();
             final Map<Long, Boolean> purchaseHasReview = new HashMap<>();
-            for (Purchase p : purchases) {
+            for (Purchase p : purchasesPage.getResults()) {
                 productService.findById(p.getProductId()).ifPresent(prod ->
                     purchaseProducts.put(p.getPurchaseId(), prod)
                 );
                 purchaseHasReview.put(p.getPurchaseId(), reviewService.findByPurchaseId(p.getPurchaseId()).isPresent());
             }
 
-            mv.addObject("purchases", purchases);
+            mv.addObject("purchasesPage", purchasesPage);
+            mv.addObject("purchases", purchasesPage.getResults());
             mv.addObject("purchaseProducts", purchaseProducts);
             mv.addObject("purchaseHasReview", purchaseHasReview);
 
-            final List<Purchase> sales = purchaseService.findBySellerId(profileUser.getId());
+            final PaginatedResult<Purchase> salesPage = purchaseService.findBySellerId(profileUser.getId(), page, 10);
 
             final Map<Long, Product> saleProducts = new HashMap<>();
-            for (Purchase s : sales) {
+            for (Purchase s : salesPage.getResults()) {
                 productService.findById(s.getProductId()).ifPresent(prod ->
                     saleProducts.put(s.getPurchaseId(), prod)
                 );
             }
 
-            mv.addObject("sales", sales);
+            mv.addObject("salesPage", salesPage);
+            mv.addObject("sales", salesPage.getResults());
             mv.addObject("saleProducts", saleProducts);
 
             // Load reports for moderators
@@ -362,9 +372,10 @@ public class UserController {
         // Hide all their active products
         final ProductSearchCriteria criteria = new ProductSearchCriteria(
             null, Collections.emptyList(), null, null,
-            Collections.emptyList(), Collections.emptyList(), null, userId
+            Collections.emptyList(), Collections.emptyList(), null, userId,
+            1, 1000000
         );
-        final List<Product> userProducts = productService.listProducts(criteria);
+        final List<Product> userProducts = productService.listProducts(criteria).getResults();
         for (Product p : userProducts) {
             productService.hideProductFromCatalog(p.getId());
             reportService.deleteByProductId(p.getId());

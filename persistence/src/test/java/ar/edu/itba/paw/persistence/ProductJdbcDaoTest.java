@@ -82,7 +82,7 @@ public class ProductJdbcDaoTest {
         Assertions.assertNotNull(firstProduct);
         Assertions.assertNotNull(secondProduct);
         Assertions.assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "products"));
-        Assertions.assertEquals(2, productDao.listProducts().size());
+        Assertions.assertEquals(2, productDao.listProducts().getResults().size());
     }
 
     @Test
@@ -112,9 +112,11 @@ public class ProductJdbcDaoTest {
             Collections.emptyList(),
             Collections.emptyList(),
             null,
-            null
+            null,
+            1,
+            10
         );
-        final List<Product> found = productDao.findProducts(criteria);
+        final List<Product> found = productDao.findProducts(criteria).getResults();
         Assertions.assertEquals(1, found.size());
         Assertions.assertEquals("Bocanada", found.get(0).getTitle());
     }
@@ -146,9 +148,11 @@ public class ProductJdbcDaoTest {
             Collections.emptyList(),
             Collections.emptyList(),
             null,
-            null
+            null,
+            1,
+            10
         );
-        Assertions.assertTrue(productDao.findProducts(criteria).isEmpty());
+        Assertions.assertTrue(productDao.findProducts(criteria).getResults().isEmpty());
     }
 
     @Test
@@ -173,6 +177,6 @@ public class ProductJdbcDaoTest {
         Assertions.assertTrue(productDao.reserveIfAvailable(product.getId()));
         Assertions.assertFalse(productDao.reserveIfAvailable(product.getId()));
         Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isEmpty());
-        Assertions.assertTrue(productDao.findProducts(ProductSearchCriteria.empty()).isEmpty());
+        Assertions.assertTrue(productDao.findProducts(ProductSearchCriteria.empty()).getResults().isEmpty());
     }
 }

@@ -5,7 +5,11 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <c:set var="activeMyData" value="${isOwnProfile and param.tab eq 'mydata'}"/>
+<c:set var="activePurchases" value="${isOwnProfile and param.tab eq 'purchases'}"/>
+<c:set var="activeSales" value="${isOwnProfile and param.tab eq 'sales'}"/>
+<c:set var="activeReviews" value="${param.tab eq 'reviews'}"/>
 <c:set var="activeReports" value="${isOwnProfile and user['mod'] and param.tab eq 'reports'}"/>
+<c:set var="activePublications" value="${not activeMyData and not activePurchases and not activeSales and not activeReviews and not activeReports}"/>
 
 <ui:layout title="Vinyland | Perfil">
 
@@ -113,7 +117,7 @@
             <!-- Tabs -->
             <ul class="nav nav-tabs mt-4" id="profileTabs" role="tablist" style="border-bottom: 2px solid var(--color-border);">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link<c:if test='${not activeMyData and not activeReports}'> active</c:if>" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications" type="button" role="tab" aria-controls="publications" aria-selected="${not activeMyData and not activeReports}" style="font-weight: 600;">
+                    <button class="nav-link<c:if test='${activePublications}'> active</c:if>" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications" type="button" role="tab" aria-controls="publications" aria-selected="${activePublications}" style="font-weight: 600;">
                         <i class="bi bi-vinyl" aria-hidden="true"></i> Publicaciones
                     </button>
                 </li>
@@ -124,18 +128,18 @@
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="purchases-tab" data-bs-toggle="tab" data-bs-target="#purchases" type="button" role="tab" aria-controls="purchases" aria-selected="false" style="font-weight: 600;">
+                        <button class="nav-link<c:if test='${activePurchases}'> active</c:if>" id="purchases-tab" data-bs-toggle="tab" data-bs-target="#purchases" type="button" role="tab" aria-controls="purchases" aria-selected="${activePurchases}" style="font-weight: 600;">
                             <i class="bi bi-bag" aria-hidden="true"></i> Mis compras
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="sales-tab" data-bs-toggle="tab" data-bs-target="#sales" type="button" role="tab" aria-controls="sales" aria-selected="false" style="font-weight: 600;">
+                        <button class="nav-link<c:if test='${activeSales}'> active</c:if>" id="sales-tab" data-bs-toggle="tab" data-bs-target="#sales" type="button" role="tab" aria-controls="sales" aria-selected="${activeSales}" style="font-weight: 600;">
                             <i class="bi bi-shop" aria-hidden="true"></i> Mis ventas
                         </button>
                     </li>
                 </c:if>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false" style="font-weight: 600;">
+                    <button class="nav-link<c:if test='${activeReviews}'> active</c:if>" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="${activeReviews}" style="font-weight: 600;">
                         <i class="bi bi-star" aria-hidden="true"></i> Reseñas recibidas
                     </button>
                 </li>
@@ -150,7 +154,7 @@
 
             <div class="tab-content mt-3" id="profileTabContent">
                 <!-- Tab: Publicaciones -->
-                <div class="tab-pane fade<c:if test='${not activeMyData and not activeReports}'> show active</c:if>" id="publications" role="tabpanel" aria-labelledby="publications-tab">
+                <div class="tab-pane fade<c:if test='${activePublications}'> show active</c:if>" id="publications" role="tabpanel" aria-labelledby="publications-tab">
                     <c:choose>
                         <c:when test="${not empty userProducts}">
                             <div class="products-grid">
@@ -178,6 +182,7 @@
                                     </div>
                                 </c:forEach>
                             </div>
+                            <ui:pagination result="${userProductsPage}" />
                         </c:when>
                         <c:otherwise>
                             <div class="empty-products-state">
@@ -262,7 +267,7 @@
 
                 <!-- Tab: Mis compras (only own profile) -->
                 <c:if test="${isOwnProfile}">
-                    <div class="tab-pane fade" id="purchases" role="tabpanel" aria-labelledby="purchases-tab">
+                    <div class="tab-pane fade<c:if test='${activePurchases}'> show active</c:if>" id="purchases" role="tabpanel" aria-labelledby="purchases-tab">
                         <c:choose>
                             <c:when test="${not empty purchases}">
                                 <div class="d-flex flex-column gap-3">
@@ -302,6 +307,7 @@
                                         </div>
                                     </c:forEach>
                                 </div>
+                                <ui:pagination result="${purchasesPage}" />
                             </c:when>
                             <c:otherwise>
                                 <div class="empty-products-state">
@@ -318,7 +324,7 @@
 
                 <!-- Tab: Mis ventas (only own profile) -->
                 <c:if test="${isOwnProfile}">
-                    <div class="tab-pane fade" id="sales" role="tabpanel" aria-labelledby="sales-tab">
+                    <div class="tab-pane fade<c:if test='${activeSales}'> show active</c:if>" id="sales" role="tabpanel" aria-labelledby="sales-tab">
                         <c:choose>
                             <c:when test="${not empty sales}">
                                 <div class="d-flex flex-column gap-3">
@@ -352,6 +358,7 @@
                                         </div>
                                     </c:forEach>
                                 </div>
+                                <ui:pagination result="${salesPage}" />
                             </c:when>
                             <c:otherwise>
                                 <div class="empty-products-state">
@@ -364,7 +371,7 @@
                 </c:if>
 
                 <!-- Tab: Reseñas recibidas -->
-                <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                <div class="tab-pane fade<c:if test='${activeReviews}'> show active</c:if>" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
                     <c:choose>
                         <c:when test="${not empty receivedReviews}">
                             <div class="d-flex flex-column gap-3">
@@ -394,6 +401,7 @@
                                     </div>
                                 </c:forEach>
                             </div>
+                            <ui:pagination result="${receivedReviewsPage}" />
                         </c:when>
                         <c:otherwise>
                             <div class="empty-products-state">

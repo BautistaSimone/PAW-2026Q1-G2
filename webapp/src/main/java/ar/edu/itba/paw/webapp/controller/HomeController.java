@@ -17,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import ar.edu.itba.paw.models.ConditionBucket;
+import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductSortOrder;
@@ -81,7 +82,8 @@ public class HomeController {
 		@RequestParam(value = "maxPrice", required = false) final String maxPriceParam,
 		@RequestParam(value = "label", required = false) final List<String> recordLabels,
 		@RequestParam(value = "estado", required = false) final List<String> estadoParams,
-		@RequestParam(value = "sort", required = false) final String sortParam
+		@RequestParam(value = "sort", required = false) final String sortParam,
+		@RequestParam(value = "page", defaultValue = "1") final int page
 	) {
 		BigDecimal minPrice = parsePriceParam(minPriceParam);
 		BigDecimal maxPrice = parsePriceParam(maxPriceParam);
@@ -117,20 +119,22 @@ public class HomeController {
 			recordLabels,
 			buckets,
 			sortOrder,
-			null
+			null,
+			page,
+			12
 		);
 
-		final List<Product> products = productService.listProducts(criteria);
+		final PaginatedResult<Product> productsPage = productService.listProducts(criteria);
 		final Map<Long, String> productImageUrls = new HashMap<>();
 
-		for (Product product : products) {
+		for (Product product : productsPage.getResults()) {
 			if (imageService.existsByProductId(product.getId())) {
 				productImageUrls.put(product.getId(), "/images/product/" + product.getId());
 			}
 		}
 
 		final Set<Long> distinctSellerIds = new HashSet<>();
-		for (Product product : products) {
+		for (Product product : productsPage.getResults()) {
 			distinctSellerIds.add(product.getUserId());
 		}
 		final Map<Long, SellerRatingSummary> sellerRatingByUserId = new HashMap<>();
@@ -167,7 +171,8 @@ public class HomeController {
 		}
 
 
-		mav.addObject("products", products);
+		mav.addObject("productsPage", productsPage);
+		mav.addObject("products", productsPage.getResults());
 		mav.addObject("productImageUrls", productImageUrls);
 		mav.addObject("sellerRatingByUserId", sellerRatingByUserId);
 		mav.addObject("categories", categoryService.findAll());
@@ -180,7 +185,7 @@ public class HomeController {
 		mav.addObject("sortOptions", ProductSortOrder.values());
 		mav.addObject("selectedSort", sortOrder.name());
 		mav.addObject("activeSearchText", hasActiveSearch ? trimmedSearch : null);
-		mav.addObject("noProductsMatchFilters", products.isEmpty() && hasActiveFilters);
+		mav.addObject("noProductsMatchFilters", productsPage.getResults().isEmpty() && hasActiveFilters);
 		return mav;
 	}
 }

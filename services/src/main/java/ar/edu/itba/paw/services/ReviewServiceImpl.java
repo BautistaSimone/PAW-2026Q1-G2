@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.PurchaseStatus;
@@ -62,8 +63,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<Review> findBySellerId(long sellerId) {
-        return reviewDao.findBySellerId(sellerId);
+    public PaginatedResult<Review> findBySellerId(long sellerId, int page, int pageSize) {
+        return reviewDao.findBySellerId(sellerId, page, pageSize);
     }
 
     @Override

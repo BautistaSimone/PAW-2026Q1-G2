@@ -14,6 +14,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
+import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.PurchaseStatus;
@@ -177,12 +178,12 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public List<Purchase> findByBuyerId(Long buyerId) {
-        return purchaseDao.findByBuyerId(buyerId);
+    public PaginatedResult<Purchase> findByBuyerId(Long buyerId, int page, int pageSize) {
+        return purchaseDao.findByBuyerId(buyerId, page, pageSize);
     }
 
     @Override
-    public List<Purchase> findBySellerId(Long sellerId) {
-        return purchaseDao.findBySellerId(sellerId);
+    public PaginatedResult<Purchase> findBySellerId(Long sellerId, int page, int pageSize) {
+        return purchaseDao.findBySellerId(sellerId, page, pageSize);
     }
 }

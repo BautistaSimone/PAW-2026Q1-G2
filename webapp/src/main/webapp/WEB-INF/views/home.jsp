@@ -78,7 +78,7 @@
                         <c:when test="${not empty products}">
                             <div class="products-grid" id="productsGrid">
                                 <c:forEach items="${products}" var="product" varStatus="loop">
-                                    <div class="products-grid-item" data-product-index="${loop.index}" style="${loop.index >= 12 ? 'display:none' : ''}">
+                                    <div class="products-grid-item" data-product-index="${loop.index}">
                                         <c:url value="/products/${product.id}" var="productUrl"/>
                                         <ui:productCard
                                                 title="${product.title}"
@@ -92,13 +92,7 @@
                                     </div>
                                 </c:forEach>
                             </div>
-                            <c:if test="${fn:length(products) > 12}">
-                                <div style="text-align:center; margin-top:2rem;">
-                                    <button id="showMoreBtn" class="btn btn-retro btn-retro-outline" type="button">
-                                        Mostrar m&aacute;s
-                                    </button>
-                                </div>
-                            </c:if>
+                            <ui:pagination result="${productsPage}" />
                         </c:when>
                         <c:otherwise>
                             <div class="empty-products-state">
@@ -142,21 +136,6 @@
             });
         }
 
-        var showMoreBtn = document.getElementById('showMoreBtn');
-        if (showMoreBtn) {
-            var BATCH = 12;
-            var visible = BATCH;
-            var items = document.querySelectorAll('#productsGrid .products-grid-item');
-            showMoreBtn.addEventListener('click', function () {
-                var next = visible + BATCH;
-                for (var i = visible; i < next && i < items.length; i++) {
-                    items[i].style.display = '';
-                }
-                visible = next;
-                if (visible >= items.length) {
-                    showMoreBtn.style.display = 'none';
-                }
-            });
         }
 
         var filterBar = document.querySelector('.filters-bar');

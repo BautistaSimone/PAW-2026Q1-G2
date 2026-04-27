@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 
@@ -24,9 +25,9 @@ public interface ProductDao {
         final BigDecimal price
     );
 
-    List<Product> listProducts();
+    PaginatedResult<Product> listProducts();
 
-    List<Product> findProducts(ProductSearchCriteria criteria);
+    PaginatedResult<Product> findProducts(ProductSearchCriteria criteria);
 
     List<String> listDistinctRecordLabels();
 

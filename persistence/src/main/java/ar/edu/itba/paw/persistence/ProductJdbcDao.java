@@ -22,6 +22,7 @@ import org.springframework.stereotype.Repository;
 
 import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.ConditionBucket;
+import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 
@@ -181,77 +182,93 @@ public class ProductJdbcDao implements ProductDao {
     }
 
     @Override
-    public List<Product> listProducts() {
+    public PaginatedResult<Product> listProducts() {
         return findProducts(ProductSearchCriteria.empty());
     }
 
     @Override
-    public List<Product> findProducts(final ProductSearchCriteria criteria) {
-        final StringBuilder sql = new StringBuilder(
-            "SELECT p.product_id, p.user_id, p.title, p.artist, p.record_label, p.catalog_number, p.edition_country, p.description, " +
-            "p.sleeve_condition, p.record_condition, p.neighborhood, p.province, p.published, p.price " +
-            "FROM products p WHERE p.available = TRUE "
-        );
+    public PaginatedResult<Product> findProducts(final ProductSearchCriteria criteria) {
+        final StringBuilder whereSql = new StringBuilder("WHERE p.available = TRUE ");
         final List<Object> args = new ArrayList<>();
 
         if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
             final String likeNeedle = escapeForLike(criteria.getSearchText().trim()).toLowerCase(Locale.ROOT);
-            sql.append(" AND (");
-            sql.append("LOWER(p.title) LIKE '%' || ? || '%' ESCAPE '\\' OR ");
-            sql.append("LOWER(p.artist) LIKE '%' || ? || '%' ESCAPE '\\' OR ");
-            sql.append("LOWER(p.description) LIKE '%' || ? || '%' ESCAPE '\\'");
-            sql.append(")");
+            whereSql.append(" AND (");
+            whereSql.append("LOWER(p.title) LIKE '%' || ? || '%' ESCAPE '\\' OR ");
+            whereSql.append("LOWER(p.artist) LIKE '%' || ? || '%' ESCAPE '\\' OR ");
+            whereSql.append("LOWER(p.description) LIKE '%' || ? || '%' ESCAPE '\\'");
+            whereSql.append(")");
             args.add(likeNeedle);
             args.add(likeNeedle);
             args.add(likeNeedle);
         }
 
         if (!criteria.getCategoryIds().isEmpty()) {
-            sql.append(" AND EXISTS (SELECT 1 FROM products_categories pc WHERE pc.product_id = p.product_id AND pc.category_id IN (");
-            sql.append(String.join(",", Collections.nCopies(criteria.getCategoryIds().size(), "?")));
-            sql.append(")) ");
+            whereSql.append(" AND EXISTS (SELECT 1 FROM products_categories pc WHERE pc.product_id = p.product_id AND pc.category_id IN (");
+            whereSql.append(String.join(",", Collections.nCopies(criteria.getCategoryIds().size(), "?")));
+            whereSql.append(")) ");
             args.addAll(criteria.getCategoryIds());
         }
 
         if (criteria.getMinPrice() != null) {
-            sql.append(" AND p.price >= ? ");
+            whereSql.append(" AND p.price >= ? ");
             args.add(criteria.getMinPrice());
         }
 
         if (criteria.getMaxPrice() != null) {
-            sql.append(" AND p.price <= ? ");
+            whereSql.append(" AND p.price <= ? ");
             args.add(criteria.getMaxPrice());
         }
 
         if (!criteria.getRecordLabels().isEmpty()) {
-            sql.append(" AND p.record_label IN (");
-            sql.append(String.join(",", Collections.nCopies(criteria.getRecordLabels().size(), "?")));
-            sql.append(") ");
+            whereSql.append(" AND p.record_label IN (");
+            whereSql.append(String.join(",", Collections.nCopies(criteria.getRecordLabels().size(), "?")));
+            whereSql.append(") ");
             args.addAll(criteria.getRecordLabels());
         }
 
         if (!criteria.getConditionBuckets().isEmpty()) {
-            sql.append(" AND (");
+            whereSql.append(" AND (");
             boolean first = true;
             for (ConditionBucket bucket : criteria.getConditionBuckets()) {
                 if (!first) {
-                    sql.append(" OR ");
+                    whereSql.append(" OR ");
                 }
                 first = false;
-                appendConditionBucketSql(sql, bucket);
+                appendConditionBucketSql(whereSql, bucket);
             }
-            sql.append(") ");
+            whereSql.append(") ");
         }
 
         if (criteria.getUserId() != null) {
-            sql.append(" AND p.user_id = ? ");
+            whereSql.append(" AND p.user_id = ? ");
             args.add(criteria.getUserId());
         }
 
-        sql.append(" ORDER BY ").append(criteria.getSortOrder().getSqlOrderBy()).append(' ');
+        final Long totalCount = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM products p " + whereSql.toString(),
+            Long.class,
+            args.toArray()
+        );
 
-        final List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql.toString(), args.toArray());
-        return rows.stream().map(this::mapProductFromRow).collect(Collectors.toList());
+        if (totalCount == null || totalCount == 0) {
+            return new PaginatedResult<>(Collections.emptyList(), criteria.getPage(), criteria.getPageSize(), 0);
+        }
+
+        final StringBuilder selectSql = new StringBuilder(
+            "SELECT p.product_id, p.user_id, p.title, p.artist, p.record_label, p.catalog_number, p.edition_country, p.description, " +
+            "p.sleeve_condition, p.record_condition, p.neighborhood, p.province, p.published, p.price " +
+            "FROM products p "
+        ).append(whereSql);
+
+        selectSql.append(" ORDER BY ").append(criteria.getSortOrder().getSqlOrderBy()).append(" LIMIT ? OFFSET ?");
+        args.add(criteria.getPageSize());
+        args.add((criteria.getPage() - 1) * criteria.getPageSize());
+
+        final List<Map<String, Object>> rows = jdbcTemplate.queryForList(selectSql.toString(), args.toArray());
+        final List<Product> products = rows.stream().map(this::mapProductFromRow).collect(Collectors.toList());
+        
+        return new PaginatedResult<>(products, criteria.getPage(), criteria.getPageSize(), totalCount);
     }
 
     @Override

@@ -178,15 +178,15 @@ public class ProductController {
         );
 
         List<Product> sellerProducts = productService.listProducts(
-            new ProductSearchCriteria(null, null, null, null, null, null, ProductSortOrder.NEWEST, product.getUserId())
-        ).stream().filter(p -> !p.getId().equals(product.getId())).limit(10).collect(Collectors.toList());
+            new ProductSearchCriteria(null, null, null, null, null, null, ProductSortOrder.NEWEST, product.getUserId(), 1, 11)
+        ).getResults().stream().filter(p -> !p.getId().equals(product.getId())).limit(10).collect(Collectors.toList());
 
         List<Product> relatedProducts = productService.listProducts(
-            new ProductSearchCriteria(product.getArtist(), null, null, null, null, null, ProductSortOrder.NEWEST, null)
-        ).stream().filter(p -> !p.getId().equals(product.getId())).limit(10).collect(Collectors.toList());
+            new ProductSearchCriteria(product.getArtist(), null, null, null, null, null, ProductSortOrder.NEWEST, null, 1, 11)
+        ).getResults().stream().filter(p -> !p.getId().equals(product.getId())).limit(10).collect(Collectors.toList());
 
         if (relatedProducts.isEmpty()) {
-            relatedProducts = productService.listProducts().stream()
+            relatedProducts = productService.listProducts().getResults().stream()
                 .filter(p -> !p.getId().equals(product.getId()))
                 .filter(p -> sellerProducts.stream().noneMatch(sp -> sp.getId().equals(p.getId())))
                 .limit(10).collect(Collectors.toList());

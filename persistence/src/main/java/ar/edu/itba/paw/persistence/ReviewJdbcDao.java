@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Review;
 import ar.edu.itba.paw.models.SellerRatingSummary;
 
@@ -79,13 +81,25 @@ public class ReviewJdbcDao implements ReviewDao {
     }
 
     @Override
-    public List<Review> findBySellerId(long sellerId) {
-        return jdbcTemplate.query(
+    public PaginatedResult<Review> findBySellerId(long sellerId, int page, int pageSize) {
+        final Long totalCount = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM reviews WHERE seller_id = ?",
+            Long.class,
+            sellerId
+        );
+
+        if (totalCount == null || totalCount == 0) {
+            return new PaginatedResult<>(Collections.emptyList(), page, pageSize, 0);
+        }
+
+        List<Review> reviews = jdbcTemplate.query(
             "SELECT r.*, u.username AS buyer_username FROM reviews r " +
             "JOIN users u ON r.buyer_id = u.user_id " +
-            "WHERE r.seller_id = ? ORDER BY r.created_at DESC",
-            REVIEW_ROW_MAPPER, sellerId
+            "WHERE r.seller_id = ? ORDER BY r.created_at DESC LIMIT ? OFFSET ?",
+            REVIEW_ROW_MAPPER, sellerId, pageSize, (page - 1) * pageSize
         );
+
+        return new PaginatedResult<>(reviews, page, pageSize, totalCount);
     }
 
     @Override
