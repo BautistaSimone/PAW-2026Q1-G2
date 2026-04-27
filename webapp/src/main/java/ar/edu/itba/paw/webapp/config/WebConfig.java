@@ -146,6 +146,7 @@ public class WebConfig implements WebMvcConfigurer {
                     "/register",
                     "/sendVerificationEmail",
                     "/verificationStatus",
+                    "/verifyEmail",
                     "/assets/**"
                 );
     }

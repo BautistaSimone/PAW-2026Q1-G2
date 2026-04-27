@@ -78,6 +78,21 @@ public class User {
                 && nonBlank(province);
     }
 
+    public String getLocation() {
+        final String n = neighborhood != null ? neighborhood.trim() : "";
+        final String p = province != null ? province.trim() : "";
+        if (n.isEmpty() && p.isEmpty()) {
+            return "";
+        }
+        if (n.isEmpty()) {
+            return p;
+        }
+        if (p.isEmpty()) {
+            return n;
+        }
+        return n + ", " + p;
+    }
+    
     /** True if nombre, apellido and full shipping address are present (required to buy). */
     public boolean hasCompleteBuyerDataForPurchase() {
         return nonBlank(firstName) && nonBlank(lastName) && hasAddress();

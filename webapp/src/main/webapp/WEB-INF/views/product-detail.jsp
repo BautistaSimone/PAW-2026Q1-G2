@@ -311,7 +311,7 @@
                                                         style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem;">Ubicación</span>
                                                     <span
                                                         style="font-size: 1rem; font-weight: 600; color: var(--color-text-main);">
-                                                        <c:out value="${product.location}" />
+                                                        <c:out value="${seller.location}" />
                                                     </span>
                                                 </div>
                                             </div>
