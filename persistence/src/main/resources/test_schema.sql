@@ -83,6 +83,14 @@ CREATE TABLE IF NOT EXISTS purchases (
 	FOREIGN KEY(seller_user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
+CREATE TABLE IF NOT EXISTS wishlist_products (
+	user_id INTEGER NOT NULL,
+	product_id INTEGER NOT NULL,
+	PRIMARY KEY(user_id, product_id),
+	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
+	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
 CREATE TABLE IF NOT EXISTS reviews (
 	review_id SERIAL PRIMARY KEY,
 	purchase_id INTEGER NOT NULL UNIQUE,
