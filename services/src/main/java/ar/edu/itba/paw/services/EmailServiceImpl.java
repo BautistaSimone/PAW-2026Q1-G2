@@ -146,7 +146,6 @@ public class EmailServiceImpl implements EmailService {
             messageHelper.setText(htmlContent, true);
 
             javaMailSender.send(mimeMessage);
-            System.out.println("Password reset email sent to: " + to);
 
         } catch (MessagingException e) {
             e.printStackTrace();
@@ -156,11 +155,11 @@ public class EmailServiceImpl implements EmailService {
     @Async
     @Override
     public void sendVerificationEmail(String to, String resetToken, String username) {
-        String resetUrl = buildAbsoluteUrl("/changePassword?token=" + resetToken);
+        String resetUrl = buildAbsoluteUrl("/verifyEmail?token=" + resetToken);
 
         final Context ctx = new Context(LocaleContextHolder.getLocale());
-        ctx.setVariable("title", "Recuperación de contraseña");
-        ctx.setVariable("message", "Hacé click en el enlace para restablecer tu contraseña.");
+        ctx.setVariable("title", "Verificá tu cuenta");
+        ctx.setVariable("message", "Hacé click en el enlace para verificar tu cuenta.");
         ctx.setVariable("recipientName", username);
         ctx.setVariable("actionUrl", resetUrl);
 
@@ -168,16 +167,14 @@ public class EmailServiceImpl implements EmailService {
             final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-            messageHelper.setSubject("Vinyland - Recuperar contraseña");
+            messageHelper.setSubject("Vinyland - Verificar cuenta");
             messageHelper.setTo(to);
             messageHelper.setFrom("no-reply@vinyland.com");
 
-            final String htmlContent = templateEngine.process("password-reset", ctx);
+            final String htmlContent = templateEngine.process("verification", ctx);
             messageHelper.setText(htmlContent, true);
 
             javaMailSender.send(mimeMessage);
-            System.out.println("Password reset email sent to: " + to);
-
         } catch (MessagingException e) {
             e.printStackTrace();
         }

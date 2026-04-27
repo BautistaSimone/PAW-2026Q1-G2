@@ -85,6 +85,7 @@ public class HomeController {
 		@RequestParam(value = "sort", required = false) final String sortParam,
 		@RequestParam(value = "page", defaultValue = "1") final int page
 	) {
+
 		BigDecimal minPrice = parsePriceParam(minPriceParam);
 		BigDecimal maxPrice = parsePriceParam(maxPriceParam);
 		if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
@@ -169,7 +170,6 @@ public class HomeController {
 		} else {
 			mav.addObject("changePsswdModal", false);
 		}
-
 
 		mav.addObject("productsPage", productsPage);
 		mav.addObject("products", productsPage.getResults());

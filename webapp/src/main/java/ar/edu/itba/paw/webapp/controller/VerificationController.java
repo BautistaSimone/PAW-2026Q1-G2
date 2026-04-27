@@ -56,7 +56,7 @@ public class VerificationController {
         this.verificationTokenService = verificationTokenService;
     }
 
-    @RequestMapping(value = "sendVerificationEmail", method = RequestMethod.POST)
+    @RequestMapping(value = "/sendVerificationEmail", method = RequestMethod.POST)
     public ModelAndView verificationEmail(@AuthenticationPrincipal PawAuthUser authUser) {
 
         if (authUser == null) {
@@ -66,7 +66,7 @@ public class VerificationController {
             return mv;
         }
 
-        ModelAndView mv = new ModelAndView("verification-email-sent");
+        ModelAndView mv = new ModelAndView("redirect:/sendVerificationEmail");
         final User user = authUser.getUser();
 
         verificationTokenService.createVerificationTokenForUser(user.getId());
@@ -77,7 +77,7 @@ public class VerificationController {
     }
 
     // TODO: Should this be always accessible?
-    @RequestMapping(value = "sendVerificationEmail")
+    @RequestMapping(value = "/sendVerificationEmail")
     public ModelAndView showVerificationEmailSent() {
 
         ModelAndView mv = new ModelAndView("verification-email-sent");
@@ -86,7 +86,7 @@ public class VerificationController {
     }
 
 
-    @RequestMapping(value = "notVerified")
+    @RequestMapping(value = "/notVerified")
     public ModelAndView showNotVerified() {
 
         ModelAndView mv = new ModelAndView("account-not-verified");
@@ -94,7 +94,7 @@ public class VerificationController {
         return mv;
     }
 
-    @RequestMapping(value = "verifyEmail", method = RequestMethod.POST)
+    @RequestMapping(value = "/verifyEmail")
     public ModelAndView verifyEmail(
         @RequestParam("token") final String token,
         RedirectAttributes redirectAttributes) {
@@ -117,7 +117,7 @@ public class VerificationController {
         return mv;
     }
 
-    @RequestMapping(value = "verificationStatus")
+    @RequestMapping(value = "/verificationStatus")
     public ModelAndView verificationStatus() {
         return new ModelAndView("verification-status");
     }

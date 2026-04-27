@@ -12,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -28,13 +29,15 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.FixedLocaleResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import java.util.Locale;
 
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
+import ar.edu.itba.paw.webapp.interceptor.VerificationInterceptor;
 
 @EnableWebMvc // Use all the defaults from webmvc
 @EnableTransactionManagement
-@ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.services", "ar.edu.itba.paw.persistence" })
+@ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.webapp.interceptor", "ar.edu.itba.paw.services", "ar.edu.itba.paw.persistence" })
 @Configuration
 @PropertySource("classpath:application.properties")
 public class WebConfig implements WebMvcConfigurer {
@@ -47,6 +50,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${db.password}")
     private String dbPassword;
+
+    @Autowired
+    private VerificationInterceptor verificationInterceptor;
 
     @Bean
     public ViewResolver viewResolver() {
@@ -98,7 +104,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("assets/**").addResourceLocations("/assets/");
+        registry.addResourceHandler("/assets/**").addResourceLocations("/assets/");
     }
 
     @Bean
@@ -129,5 +135,18 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public LocaleResolver localeResolver() {
         return new FixedLocaleResolver(new Locale("es", "AR"));
+    }
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(verificationInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns(
+                    "/notVerified",
+                    "/login",
+                    "/register",
+                    "/sendVerificationEmail",
+                    "/verificationStatus",
+                    "/assets/**"
+                );
     }
 }

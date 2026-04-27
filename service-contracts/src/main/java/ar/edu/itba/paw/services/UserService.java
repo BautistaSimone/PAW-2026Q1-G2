@@ -38,6 +38,7 @@ public interface UserService {
     Optional<User> findById(final Long id);
 
     Boolean isPasswordEmpty(User usr);
+    Boolean isVerified(User usr);
 
 	void enable(final Long id);
 

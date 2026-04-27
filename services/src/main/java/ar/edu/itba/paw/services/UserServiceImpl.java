@@ -116,6 +116,10 @@ public class UserServiceImpl implements UserService {
         return passwordEncoder.matches("", usr.getPassword());
     }
 
+    @Override
+    public Boolean isVerified(User usr) {
+        return usr.getEnabled();
+    }
 
 	@Override
     public void enable(final Long id) {

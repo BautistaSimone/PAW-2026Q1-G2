@@ -37,11 +37,10 @@ public class WebAuthConfig{
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
 
         http.sessionManagement()
-                .invalidSessionUrl("/login")
             .and()
             .authorizeHttpRequests()
                 .requestMatchers("/login", "/register").anonymous()
-                .requestMatchers("/changePassword", "/resetPassword").permitAll()
+                .requestMatchers("/changePassword", "/resetPassword", "/verifyEmail", "/verificationStatus").permitAll()
                 .requestMatchers("/").authenticated()
                 // Role based routes
                 .requestMatchers("/profile", "/profile/**").hasRole("USER")

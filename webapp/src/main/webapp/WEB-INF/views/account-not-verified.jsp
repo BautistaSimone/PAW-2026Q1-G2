@@ -52,10 +52,14 @@
                     </div>
 
                     <div class="auth-card-footer">
-                        <a href="<c:url value='/login'/>" class="btn btn-retro btn-retro-outline w-100">
-                            <i class="bi bi-arrow-left"></i>
-                            <spring:message code="notVerified.backToLogin"/>
-                        </a>
+
+                        <form action="<c:url value='/logout' />" method="post" style="margin-top: 1rem;">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                            <button type="submit" class="btn btn-retro btn-retro-outline w-100">
+                                <i class="bi bi-arrow-left"></i>
+                                <spring:message code="notVerified.backToLogin"/>
+                            </button>
+                        </form>
                     </div>
 
                 </div>
