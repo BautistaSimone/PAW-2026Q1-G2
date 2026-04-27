@@ -20,8 +20,6 @@ public interface ProductService {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final String neighborhood,
-        final String province,
         final BigDecimal price
     );
 

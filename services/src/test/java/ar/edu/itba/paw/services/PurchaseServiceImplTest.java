@@ -59,8 +59,6 @@ public class PurchaseServiceImplTest {
             "Edicion original",
             BigDecimal.valueOf(9),
             BigDecimal.valueOf(9),
-            "Palermo",
-            "CABA",
             LocalDate.now(),
             BigDecimal.valueOf(32000)
         );

@@ -27,7 +27,7 @@ public interface EmailService {
             User seller,
             PurchaseStatus currentStatus);
 
-    void sendProductReportEmail(Product product, User reporter);
+    void sendProductReportEmail(Product product, User reporter, final User seller);
     
     void sendPasswordResetEmail(String to, String resetToken, String username);
     void sendVerificationEmail(String to, String resetToken, String username);

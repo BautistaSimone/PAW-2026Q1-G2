@@ -43,8 +43,6 @@ CREATE TABLE IF NOT EXISTS products (
 	description TEXT NOT NULL,
 	sleeve_condition NUMERIC NOT NULL,
 	record_condition NUMERIC NOT NULL,
-	neighborhood VARCHAR(255) NOT NULL,
-	province VARCHAR(255) NOT NULL,
 	published DATE NOT NULL,
 	price NUMERIC NOT NULL,
 	available BOOLEAN NOT NULL DEFAULT TRUE,

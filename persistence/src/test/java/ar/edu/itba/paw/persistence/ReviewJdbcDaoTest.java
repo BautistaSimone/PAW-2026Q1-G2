@@ -49,8 +49,8 @@ public class ReviewJdbcDaoTest {
             Long.class
         );
         productId = jdbcTemplate.queryForObject(
-            "INSERT INTO products (user_id, title, artist, description, sleeve_condition, record_condition, neighborhood, province, published, price) " +
-            "VALUES (" + sellerId + ", 'Test Album', 'Test Artist', 'desc', 8, 9, 'Palermo', 'CABA', CURRENT_DATE, 1000) CALL IDENTITY()",
+            "INSERT INTO products (user_id, title, artist, description, sleeve_condition, record_condition, published, price) " +
+            "VALUES (" + sellerId + ", 'Test Album', 'Test Artist', 'desc', 8, 9, CURRENT_DATE, 1000) CALL IDENTITY()",
             Long.class
         );
         purchaseId = jdbcTemplate.queryForObject(

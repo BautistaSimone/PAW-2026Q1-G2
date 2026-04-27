@@ -44,8 +44,6 @@ public class ProductServiceImpl implements ProductService {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final String neighborhood,
-        final String province,
         final BigDecimal price
     ) {
         if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
@@ -63,17 +61,11 @@ public class ProductServiceImpl implements ProductService {
         if (artist == null || artist.trim().isEmpty()) {
             throw new IllegalArgumentException("Artist cannot be empty");
         }
-        if (neighborhood == null || neighborhood.trim().isEmpty()) {
-            throw new IllegalArgumentException("Neighborhood cannot be empty");
-        }
-        if (province == null || province.trim().isEmpty()) {
-            throw new IllegalArgumentException("Province cannot be empty");
-        }
 
         return productDao.createProduct(
             userId, trimToNull(title), trimToNull(artist), trimToNull(recordLabel), 
             trimToNull(catalogNumber), trimToNull(editionCountry), categoryIds, trimToNull(description), 
-            sleeveCondition, recordCondition, trimToNull(neighborhood), trimToNull(province), price
+            sleeveCondition, recordCondition, price
         );
     }
 

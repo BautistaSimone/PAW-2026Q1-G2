@@ -92,15 +92,13 @@ public class ProductJdbcDao implements ProductDao {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final String neighborhood,
-        final String province,
         final LocalDate published,
         final BigDecimal price
     ) {
         final List<Category> categories = findCategoriesByProductId(productId);
         return new Product(
             productId, userId, title, artist, recordLabel, catalogNumber, editionCountry, categories, description,
-            sleeveCondition, recordCondition, neighborhood, province, published, price
+            sleeveCondition, recordCondition, published, price
         );
     }
 
@@ -119,8 +117,6 @@ public class ProductJdbcDao implements ProductDao {
             (String) row.get("description"),
             (BigDecimal) row.get("sleeve_condition"),
             (BigDecimal) row.get("record_condition"),
-            (String) row.get("neighborhood"),
-            (String) row.get("province"),
             ((Date) row.get("published")).toLocalDate(),
             (BigDecimal) row.get("price")
         );
@@ -138,8 +134,6 @@ public class ProductJdbcDao implements ProductDao {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final String neighborhood,
-        final String province,
         final BigDecimal price
     ) {
         final Map<String, Object> values = new HashMap<>();
@@ -156,8 +150,6 @@ public class ProductJdbcDao implements ProductDao {
         values.put("edition_country", normalizedCountry);
         values.put("sleeve_condition", sleeveCondition);
         values.put("record_condition", recordCondition);
-        values.put("neighborhood", neighborhood);
-        values.put("province", province);
         values.put("price", price);
         values.put("description", description);
         values.put("published", Date.valueOf(published));
@@ -177,7 +169,7 @@ public class ProductJdbcDao implements ProductDao {
 
         return mapProduct(
             productId, userId, title, artist, normalizedLabel, normalizedCatNum, normalizedCountry, description,
-            sleeveCondition, recordCondition, neighborhood, province, published, price
+            sleeveCondition, recordCondition, published, price
         );
     }
 
@@ -257,7 +249,7 @@ public class ProductJdbcDao implements ProductDao {
 
         final StringBuilder selectSql = new StringBuilder(
             "SELECT p.product_id, p.user_id, p.title, p.artist, p.record_label, p.catalog_number, p.edition_country, p.description, " +
-            "p.sleeve_condition, p.record_condition, p.neighborhood, p.province, p.published, p.price " +
+            "p.sleeve_condition, p.record_condition, p.published, p.price " +
             "FROM products p "
         ).append(whereSql);
 
@@ -284,7 +276,7 @@ public class ProductJdbcDao implements ProductDao {
     public Optional<Product> findById(final Long id) {
         final List<Map<String, Object>> rows = jdbcTemplate.queryForList(
             "SELECT product_id, user_id, title, artist, record_label, catalog_number, edition_country, description, sleeve_condition, record_condition, " +
-            "neighborhood, province, published, price FROM products WHERE product_id = ?",
+            "published, price FROM products WHERE product_id = ?",
             id
         );
 
@@ -295,7 +287,7 @@ public class ProductJdbcDao implements ProductDao {
     public Optional<Product> findByIdIfAvailable(final Long id) {
         final List<Map<String, Object>> rows = jdbcTemplate.queryForList(
             "SELECT product_id, user_id, title, artist, record_label, catalog_number, edition_country, description, sleeve_condition, record_condition, " +
-            "neighborhood, province, published, price FROM products WHERE product_id = ? AND available = TRUE",
+            "published, price FROM products WHERE product_id = ? AND available = TRUE",
             id
         );
 

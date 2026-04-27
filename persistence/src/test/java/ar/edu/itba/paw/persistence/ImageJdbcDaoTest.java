@@ -47,8 +47,6 @@ public class ImageJdbcDaoTest {
             "Edicion original",
             BigDecimal.valueOf(9.0),
             BigDecimal.valueOf(9.0),
-            "Palermo",
-            "CABA",
             BigDecimal.valueOf(32000)
         );
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);

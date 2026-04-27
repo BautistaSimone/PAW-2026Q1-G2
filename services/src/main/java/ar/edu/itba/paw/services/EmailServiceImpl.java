@@ -82,14 +82,14 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendProductReportEmail(final Product product, final User reporter) {
+    public void sendProductReportEmail(final Product product, final User reporter, final User seller) {
         final Context ctx = new Context(LocaleContextHolder.getLocale());
         ctx.setVariable("title", "Nueva publicación reportada");
         ctx.setVariable("message", "Se reportó una publicación y requiere revisión manual por parte del equipo de moderación.");
         ctx.setVariable("productId", product.getId());
         ctx.setVariable("productName", product.getTitle() + " - " + product.getArtist());
         ctx.setVariable("amount", formatAmount(product));
-        ctx.setVariable("location", safeProductLocation(product));
+        ctx.setVariable("location", safeProductLocation(seller));
         ctx.setVariable("recordLabel", nullToEmpty(product.getRecordLabel()));
         ctx.setVariable("catalogNumber", nullToEmpty(product.getCatalogNumber()));
         ctx.setVariable("editionCountry", nullToEmpty(product.getEditionCountry()));
@@ -223,7 +223,7 @@ public class EmailServiceImpl implements EmailService {
         ctx.setVariable("recordLabel", nullToEmpty(product.getRecordLabel()));
         ctx.setVariable("catalogNumber", nullToEmpty(product.getCatalogNumber()));
         ctx.setVariable("editionCountry", nullToEmpty(product.getEditionCountry()));
-        ctx.setVariable("productLocation", safeProductLocation(product));
+        ctx.setVariable("productLocation", safeProductLocation(seller));
         ctx.setVariable("sleeveCondition", product.getSleeveCondition() != null ? product.getSleeveCondition().toPlainString() : "");
         ctx.setVariable("recordCondition", product.getRecordCondition() != null ? product.getRecordCondition().toPlainString() : "");
 
@@ -275,9 +275,9 @@ public class EmailServiceImpl implements EmailService {
         return "$" + priceFormat.format(product.getPrice());
     }
 
-    private static String safeProductLocation(final Product product) {
-        final String n = product.getNeighborhood();
-        final String p = product.getProvince();
+    private static String safeProductLocation(final User seller) {
+        final String n = seller.getNeighborhood();
+        final String p = seller.getProvince();
         final boolean hn = n != null && !n.isBlank();
         final boolean hp = p != null && !p.isBlank();
         if (hn && hp) {

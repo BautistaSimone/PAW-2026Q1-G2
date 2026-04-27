@@ -134,8 +134,6 @@ public class ProductController {
             form.getDescription(),
             form.getSleeveCondition(),
             form.getRecordCondition(),
-            publisher.getNeighborhood(),
-            publisher.getProvince(),
             form.getPrice()
         );
 
@@ -228,7 +226,11 @@ public class ProductController {
         }
 
         reportService.report(id, authUser.getUser().getId());
-        emailService.sendProductReportEmail(product, authUser.getUser());
+
+        User seller = userService.findById(product.getUserId())
+            .orElseThrow(ResourceNotFoundException::new);
+
+        emailService.sendProductReportEmail(product, authUser.getUser(), seller);
         return new ModelAndView("redirect:/products/" + id + "?reported=1");
     }
 

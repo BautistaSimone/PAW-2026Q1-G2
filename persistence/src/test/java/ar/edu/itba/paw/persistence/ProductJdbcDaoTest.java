@@ -59,8 +59,6 @@ public class ProductJdbcDaoTest {
             "Edicion original",
             BigDecimal.valueOf(9.0),
             BigDecimal.valueOf(9.0),
-            "Palermo",
-            "CABA",
             BigDecimal.valueOf(32000)
         );
         final Product secondProduct = productDao.createProduct(
@@ -74,8 +72,6 @@ public class ProductJdbcDaoTest {
             "Reedicion 2024",
             BigDecimal.valueOf(10.0),
             BigDecimal.valueOf(10.0),
-            "Recoleta",
-            "CABA",
             BigDecimal.valueOf(28000)
         );
 
@@ -99,8 +95,6 @@ public class ProductJdbcDaoTest {
             "Album solista",
             BigDecimal.valueOf(10.0),
             BigDecimal.valueOf(10.0),
-            "Recoleta",
-            "CABA",
             BigDecimal.valueOf(28000)
         );
 
@@ -135,8 +129,6 @@ public class ProductJdbcDaoTest {
             "Desc",
             BigDecimal.valueOf(9.0),
             BigDecimal.valueOf(9.0),
-            "Palermo",
-            "CABA",
             BigDecimal.valueOf(1000)
         );
 
@@ -169,8 +161,6 @@ public class ProductJdbcDaoTest {
             "Original",
             BigDecimal.valueOf(9.0),
             BigDecimal.valueOf(9.0),
-            "Belgrano",
-            "CABA",
             BigDecimal.valueOf(45000)
         );
 

@@ -17,8 +17,6 @@ public class Product {
     private final String description;
     private final BigDecimal sleeveCondition;
     private final BigDecimal recordCondition;
-    private final String neighborhood;
-    private final String province;
     private final LocalDate published;
     private final BigDecimal price;
 
@@ -34,8 +32,6 @@ public class Product {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final String neighborhood,
-        final String province,
         final LocalDate published,
         final BigDecimal price
     ) {
@@ -50,8 +46,6 @@ public class Product {
         this.description = description;
         this.sleeveCondition = sleeveCondition;
         this.recordCondition = recordCondition;
-        this.neighborhood = neighborhood;
-        this.province = province;
         this.published = published;
         this.price = price;
     }
@@ -94,29 +88,6 @@ public class Product {
 
     public BigDecimal getRecordCondition() {
         return recordCondition;
-    }
-
-    public String getNeighborhood() {
-        return neighborhood;
-    }
-
-    public String getProvince() {
-        return province;
-    }
-
-    public String getLocation() {
-        final String n = neighborhood != null ? neighborhood.trim() : "";
-        final String p = province != null ? province.trim() : "";
-        if (n.isEmpty() && p.isEmpty()) {
-            return "";
-        }
-        if (n.isEmpty()) {
-            return p;
-        }
-        if (p.isEmpty()) {
-            return n;
-        }
-        return n + ", " + p;
     }
 
     public BigDecimal getPrice() {
