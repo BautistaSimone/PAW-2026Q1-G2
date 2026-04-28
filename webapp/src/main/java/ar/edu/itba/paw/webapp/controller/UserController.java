@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -18,38 +16,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.PurchaseService;
-import ar.edu.itba.paw.services.PasswordTokenService;
 import ar.edu.itba.paw.services.VerificationTokenService;
 import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.services.ReportService;
 import ar.edu.itba.paw.webapp.form.RegisterForm;
 import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
-import ar.edu.itba.paw.webapp.form.UpdatePasswordForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.models.Token;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 
 @Controller
@@ -148,23 +137,12 @@ public class UserController {
                 form.getExtraAddressInfo(),
                 form.getCbuCvu());
 
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
-        PawAuthUser authUser = new PawAuthUser(
-            user.getEmail(),
-            user.getPassword(),
-            true,
-            true,
-            true,
-            true,
-            authorities,
-            user
-        );
+        final PawAuthUser authUser = new PawAuthUser(user);
 
-        Authentication auth = new UsernamePasswordAuthenticationToken(
+        final Authentication auth = new UsernamePasswordAuthenticationToken(
             authUser,
             null,
-            authorities
+            authUser.getAuthorities()
         );
 
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -330,8 +308,9 @@ public class UserController {
             mv.addObject("sales", salesPage.getResults());
             mv.addObject("saleProducts", saleProducts);
 
-            // Load reports for moderators
-            if (Boolean.TRUE.equals(profileUser.getMod())) {
+            // Load reports for admins (checked via Spring Security role)
+            if (authUser != null && authUser.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                 final List<ar.edu.itba.paw.models.ReportedProduct> reportedProducts = reportService.findAllGroupedByProduct();
                 mv.addObject("reportedProducts", reportedProducts);
             }
@@ -340,18 +319,9 @@ public class UserController {
 
     @RequestMapping(value = "/profile/admin/hide-product", method = RequestMethod.POST)
     public ModelAndView adminHideProduct(
-        @AuthenticationPrincipal PawAuthUser authUser,
         @RequestParam("productId") final Long productId
     ) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
-        final User currentUser = userService.findById(authUser.getUser().getId())
-            .orElseThrow(() -> new IllegalStateException("User not found"));
-        if (!Boolean.TRUE.equals(currentUser.getMod())) {
-            throw new IllegalArgumentException("Not authorized");
-        }
-
+        // Authorization enforced by Spring Security: only ROLE_ADMIN can reach this endpoint
         productService.hideProductFromCatalog(productId);
         reportService.deleteByProductId(productId);
         return new ModelAndView("redirect:/profile?tab=reports&hidden=1");
@@ -359,17 +329,9 @@ public class UserController {
 
     @RequestMapping(value = "/profile/admin/ban-user", method = RequestMethod.POST)
     public ModelAndView adminBanUser(
-        @AuthenticationPrincipal PawAuthUser authUser,
         @RequestParam("userId") final Long userId
     ) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
-        final User currentUser = userService.findById(authUser.getUser().getId())
-            .orElseThrow(() -> new IllegalStateException("User not found"));
-        if (!Boolean.TRUE.equals(currentUser.getMod())) {
-            throw new IllegalArgumentException("Not authorized");
-        }
+        // Authorization enforced by Spring Security: only ROLE_ADMIN can reach this endpoint
 
         // Ban the user
         userService.ban(userId);

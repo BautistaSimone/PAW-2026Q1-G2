@@ -60,7 +60,7 @@ public class PawAuthUser extends User {
     authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
     if (Boolean.TRUE.equals(user.getMod())) {
-        authorities.add(new SimpleGrantedAuthority("ROLE_MOD"));
+        authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 
     return authorities;

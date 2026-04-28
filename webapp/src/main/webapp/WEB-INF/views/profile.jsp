@@ -4,11 +4,13 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <c:set var="activeMyData" value="${isOwnProfile and param.tab eq 'mydata'}"/>
 <c:set var="activePurchases" value="${isOwnProfile and param.tab eq 'purchases'}"/>
 <c:set var="activeSales" value="${isOwnProfile and param.tab eq 'sales'}"/>
 <c:set var="activeReviews" value="${param.tab eq 'reviews'}"/>
-<c:set var="activeReports" value="${isOwnProfile and user['mod'] and param.tab eq 'reports'}"/>
+<sec:authorize access="hasRole('ADMIN')" var="isAdmin"/>
+<c:set var="activeReports" value="${isOwnProfile and isAdmin and param.tab eq 'reports'}"/>
 <c:set var="activePublications" value="${not activeMyData and not activePurchases and not activeSales and not activeReviews and not activeReports}"/>
 
 <ui:layout title="Vinyland | Perfil">
@@ -143,7 +145,7 @@
                         <i class="bi bi-star" aria-hidden="true"></i> Reseñas recibidas
                     </button>
                 </li>
-                <c:if test="${isOwnProfile and user['mod']}">
+                <c:if test="${isOwnProfile and isAdmin}">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link<c:if test='${activeReports}'> active</c:if>" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="${activeReports}" style="font-weight: 600;">
                             <i class="bi bi-flag" aria-hidden="true"></i> Reportes
@@ -418,7 +420,7 @@
                 </div>
 
                 <!-- Tab: Reportes (solo moderadores en perfil propio) -->
-                <c:if test="${isOwnProfile and user['mod']}">
+                <c:if test="${isOwnProfile and isAdmin}">
                     <div class="tab-pane fade<c:if test='${activeReports}'> show active</c:if>" id="reports" role="tabpanel" aria-labelledby="reports-tab">
                         <c:choose>
                             <c:when test="${not empty reportedProducts}">
