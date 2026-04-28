@@ -18,7 +18,7 @@ public class WishlistProductServiceImpl implements WishlistProductService {
         this.wishlistProductDao = wishlistProductDao;
     }
 
-    @Autowired
+    @Override
     public void createWishlistProduct(
         final Long productId,
         final Long userId
