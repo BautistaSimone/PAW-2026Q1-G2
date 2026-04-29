@@ -13,10 +13,7 @@
     <title><c:out value='${title}'/></title>
 
     <link rel="icon" type="image/x-icon" href="<c:url value="/assets/images/vinyl_disk.png"/>">
-
-    <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/style.css"/>"/>
-    <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/components.css"/>"/>
-
+    
     <!-- Bootstrap -->
     <link rel="stylesheet" href="<c:url value="/assets/bootstrap/css/bootstrap.css"/>">
     <link
@@ -24,6 +21,10 @@
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
     />
     <script src="<c:url value="/assets/js/price-format.js"/>"></script>
+
+    <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/style.css"/>"/>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/components.css"/>"/>
+
 </head>
 <body class="${not empty bodyClass ? bodyClass : ''}">
 <div class="app-container">

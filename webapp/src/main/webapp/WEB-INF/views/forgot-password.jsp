@@ -50,8 +50,8 @@
                     </div>
 
                     <div class="auth-card-footer">
-                        <a href="<c:url value='/login'/>" class="btn btn-retro btn-retro-outline w-100">
-                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al login
+                        <a href="<c:url value='/'/>" class="btn btn-retro btn-retro-outline w-100">
+                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Volver
                         </a>
                     </div>
                 </div>
