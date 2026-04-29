@@ -40,8 +40,7 @@ public class WebAuthConfig{
             .and()
             .authorizeHttpRequests()
                 .requestMatchers("/login", "/register").anonymous()
-                .requestMatchers("/changePassword", "/resetPassword", "/verifyEmail", "/verificationStatus").permitAll()
-                .requestMatchers("/").authenticated()
+                .requestMatchers("/", "/changePassword", "/resetPassword", "/verifyEmail", "/verificationStatus").permitAll()
                 // Role based routes — more specific first
                 .requestMatchers("/profile/admin/**").hasRole("ADMIN")
                 .requestMatchers("/profile", "/profile/**").hasRole("USER")
@@ -62,7 +61,7 @@ public class WebAuthConfig{
                 .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30))
             .and().logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
+                .logoutSuccessUrl("/")
                 .permitAll()
             .and().exceptionHandling()
                 .accessDeniedPage("/403");

@@ -35,15 +35,20 @@
             </div>
 
             <div class="header-right">
-                <a href="<c:url value='/profile'/>" class="profile-btn" aria-label="Ver perfil">
-                    <i class="bi bi-person-fill" aria-hidden="true"></i>
-                    <sec:authorize access="isAuthenticated()">
+
+                <sec:authorize access="isAuthenticated()">
+                    <a href="<c:url value='/profile'/>" class="profile-btn" aria-label="Ver perfil">
+                        <i class="bi bi-person-fill" aria-hidden="true"></i>
                         <span><sec:authentication property="principal.user.username" /></span>
-                    </sec:authorize>
-                    <sec:authorize access="!isAuthenticated()">
-                        <span>Mi Perfil</span>
-                    </sec:authorize>
-                </a>
+                    </a>
+                </sec:authorize>
+
+                <!-- Link to login if not authenticated -->
+                <sec:authorize access="!isAuthenticated()">
+                    <a href="<c:url value='/login'/>" class="profile-btn" aria-label="<spring:message code='Profile.login.button' />">
+                        <span><spring:message code="Profile.login.button" /></span>
+                    </a>
+                </sec:authorize>
             </div>
         </c:if>
     </div>
