@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.constraints.PositiveOrZero;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,7 +37,7 @@ public class ProductForm {
     private String editionCountry;
 
     @NotEmpty
-    private List<Long> categories;
+    private List<@PositiveOrZero Long> categories;
 
     @NotNull
     @DecimalMin("1.0")

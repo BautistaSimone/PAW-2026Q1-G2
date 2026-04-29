@@ -18,7 +18,7 @@ public class PawAuthUser extends User {
         super(
             user.getEmail(),
             user.getPassword(),
-            user.getEnabled(),                 // enabled
+            true,                 // enabled
             true,                              // accountNonExpired
             true,                              // credentialsNonExpired
             !user.getBanned(),                 // accountNonLocked

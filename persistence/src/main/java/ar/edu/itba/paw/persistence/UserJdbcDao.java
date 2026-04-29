@@ -80,14 +80,14 @@ public class UserJdbcDao implements UserDao {
             (Boolean) row.get("mod"),
             (Boolean) row.get("enabled"),
             (Boolean) row.get("banned"),
-            (String) row.get("firstName"),
-            (String) row.get("lastName"),
-            (String) row.get("streetName"),
-            (String) row.get("streetNumber"),
+            (String) row.get("first_name"),
+            (String) row.get("last_name"),
+            (String) row.get("street_name"),
+            (String) row.get("street_number"),
             (String) row.get("neighborhood"),
             (String) row.get("province"),
-            (String) row.get("extraAddressInfo"),
-            (String) row.get("cbuCvu")
+            (String) row.get("extra_address_info"),
+            (String) row.get("cbu_cvu")
         );
     }
 

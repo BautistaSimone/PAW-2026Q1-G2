@@ -123,19 +123,9 @@ public class VerificationController {
 
         // Update the current session too if the user is logged in
         if (authUser != null) {
-            User updatedUser = userService.findById(verificationToken.getUserId())
-                .orElseThrow(ResourceNotFoundException::new);
-
-            UserDetails newPrincipal = pawUserDetailsService
-                .loadUserByUsername(updatedUser.getEmail());
-
-            Authentication newAuth = new UsernamePasswordAuthenticationToken(
-                newPrincipal,
-                newPrincipal.getPassword(),
-                newPrincipal.getAuthorities()
-            );
-
-            SecurityContextHolder.getContext().setAuthentication(newAuth);
+            final User refreshed = userService.findById(authUser.getUser().getId())
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+            refreshAuthenticationPrincipal(authUser, refreshed);
         }
 
         return mv;
@@ -146,4 +136,22 @@ public class VerificationController {
         return new ModelAndView("verification-status");
     }
 
+    private static void refreshAuthenticationPrincipal(final PawAuthUser current, final User refreshedUser) {
+        final Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+        final PawAuthUser newPrincipal = new PawAuthUser(
+            refreshedUser.getEmail(),
+            refreshedUser.getPassword(),
+            current.isEnabled(),
+            current.isAccountNonExpired(),
+            current.isCredentialsNonExpired(),
+            current.isAccountNonLocked(),
+            new ArrayList<>(current.getAuthorities()),
+            refreshedUser
+        );
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                newPrincipal,
+                currentAuth != null ? currentAuth.getCredentials() : null,
+                newPrincipal.getAuthorities()));
+    }
 }

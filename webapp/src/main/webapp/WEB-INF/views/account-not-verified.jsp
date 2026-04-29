@@ -57,7 +57,7 @@
                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                             <button type="submit" class="btn btn-retro btn-retro-outline w-100">
                                 <i class="bi bi-arrow-left"></i>
-                                <spring:message code="notVerified.backToLogin"/>
+                                <spring:message code="notVerified.back"/>
                             </button>
                         </form>
                     </div>
