@@ -3,7 +3,8 @@
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<ui:layout title="Vinyland | Verificación" bodyClass="auth-page-bg">
+<spring:message code="Status.verification.titlePage" var="statusTitle" />
+<ui:layout title="${statusTitle}" bodyClass="auth-page-bg">
 
     <ui:header showHeaderActions="false"/>
 

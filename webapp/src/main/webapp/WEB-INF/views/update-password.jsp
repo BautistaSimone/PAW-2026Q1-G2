@@ -2,8 +2,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<ui:layout title="Vinyland | Restablecer contraseña" bodyClass="auth-page-bg">
+<spring:message code="UpdatePassword.title" var="updatePasswordTitle" />
+<ui:layout title="${updatePasswordTitle}" bodyClass="auth-page-bg">
 
     <ui:header showHeaderActions="false"/>
 
@@ -13,7 +15,7 @@
                 <div class="auth-card">
                     <div class="auth-card-header">
                         <h2><i class="bi bi-vinyl" aria-hidden="true"></i> Vinyland</h2>
-                        <p>Restablecer contraseña</p>
+                        <p><spring:message code="UpdatePassword.heading" /></p>
                     </div>
                     <div class="auth-card-body">
 
@@ -23,14 +25,15 @@
                             <form:hidden path="token" />
 
                             <div class="mb-3">
-                                <label class="form-label">Nueva contraseña</label>
+                                <label class="form-label"><spring:message code="UpdatePassword.newPassword.label" /></label>
                                 <div class="password-toggle-wrapper">
+                                    <spring:message code="UpdatePassword.newPassword.placeholder" var="newPasswordPlaceholder" />
                                     <form:password path="newPassword"
                                                    id="newPassword"
                                                    cssClass="form-control"
-                                                   placeholder="Nueva contraseña"
+                                                   placeholder="${newPasswordPlaceholder}"
                                                    required="required"/>
-                                    <button type="button" class="password-toggle-btn" aria-label="Mostrar contraseña" onclick="togglePassword('newPassword', this)">
+                                    <button type="button" class="password-toggle-btn" aria-label="<spring:message code='Login.password.show.ariaLabel' />" onclick="togglePassword('newPassword', this)">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </div>
@@ -38,14 +41,15 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Confirmar contraseña</label>
+                                <label class="form-label"><spring:message code="UpdatePassword.confirmPassword.label" /></label>
                                 <div class="password-toggle-wrapper">
+                                    <spring:message code="UpdatePassword.confirmPassword.placeholder" var="confirmPasswordPlaceholder" />
                                     <form:password path="newPasswordConfirm"
                                                    id="newPasswordConfirm"
                                                    cssClass="form-control"
-                                                   placeholder="Confirmar contraseña"
+                                                   placeholder="${confirmPasswordPlaceholder}"
                                                    required="required"/>
-                                    <button type="button" class="password-toggle-btn" aria-label="Mostrar contraseña" onclick="togglePassword('newPasswordConfirm', this)">
+                                    <button type="button" class="password-toggle-btn" aria-label="<spring:message code='Login.password.show.ariaLabel' />" onclick="togglePassword('newPasswordConfirm', this)">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </div>
@@ -61,7 +65,7 @@
 
                             <div class="d-grid">
                                 <button type="submit" class="btn-accent">
-                                    Cambiar contraseña
+                                    <spring:message code="UpdatePassword.submit" />
                                 </button>
                             </div>
 
@@ -75,12 +79,12 @@
                                     input.type = 'text';
                                     icon.classList.remove('bi-eye');
                                     icon.classList.add('bi-eye-slash');
-                                    btn.setAttribute('aria-label', 'Ocultar contraseña');
+                                    btn.setAttribute('aria-label', '<spring:message code="Login.password.hide.ariaLabel" />');
                                 } else {
                                     input.type = 'password';
                                     icon.classList.remove('bi-eye-slash');
                                     icon.classList.add('bi-eye');
-                                    btn.setAttribute('aria-label', 'Mostrar contraseña');
+                                    btn.setAttribute('aria-label', '<spring:message code="Login.password.show.ariaLabel" />');
                                 }
                             }
                         </script>
@@ -88,7 +92,7 @@
 
                     <div class="auth-card-footer">
                         <a href="<c:url value='/login'/>" class="btn btn-retro btn-retro-outline w-100">
-                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al login
+                            <i class="bi bi-arrow-left" aria-hidden="true"></i> <spring:message code="UpdatePassword.backToLogin" />
                         </a>
                     </div>
                 </div>

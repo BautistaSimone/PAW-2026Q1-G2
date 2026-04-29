@@ -2,8 +2,10 @@
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<ui:layout title="Vinyland | Dejar Reseña">
+<spring:message code="ReviewForm.title" var="reviewTitle" />
+<ui:layout title="${reviewTitle}">
     <div class="purchase-page">
         <div class="container">
             <div class="row justify-content-center">
@@ -13,20 +15,20 @@
                            style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none; transition: color 0.2s;"
                            onmouseover="this.style.color='var(--color-accent)';" onmouseout="this.style.color='var(--color-text-muted)';">
                             <i class="bi bi-arrow-left" aria-hidden="true" style="font-size: 1.1rem;"></i>
-                            <span>Volver al pedido</span>
+                            <span><spring:message code="ReviewForm.backToOrder" /></span>
                         </a>
                         <span style="color: var(--color-border);">|</span>
                         <a href="<c:url value='/'/>"
                            style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none; transition: color 0.2s;"
                            onmouseover="this.style.color='var(--color-accent)';" onmouseout="this.style.color='var(--color-text-muted)';">
                             <i class="bi bi-house" aria-hidden="true" style="font-size: 1rem;"></i>
-                            <span>Inicio</span>
+                            <span><spring:message code="ReviewForm.home" /></span>
                         </a>
                     </div>
 
                     <div class="purchase-card">
                         <div class="purchase-card-header">
-                            <h4><i class="bi bi-star" aria-hidden="true"></i> Reseñar al vendedor</h4>
+                            <h4><i class="bi bi-star" aria-hidden="true"></i> <spring:message code="ReviewForm.heading" /></h4>
                         </div>
                         <div class="purchase-card-body">
 
@@ -39,7 +41,7 @@
                                     <h5><c:out value="${product.title}"/></h5>
                                     <p class="purchase-artist"><c:out value="${product.artist}"/></p>
                                     <p style="color: var(--color-text-muted); margin: 0; font-size: 0.9rem;">
-                                        Vendedor: <strong><c:out value="${seller.username}"/></strong>
+                                        <spring:message code="ReviewForm.seller" />: <strong><c:out value="${seller.username}"/></strong>
                                     </p>
                                 </div>
                             </div>
@@ -52,13 +54,14 @@
 
                                 <div class="mb-4">
                                     <label class="form-label" style="font-weight: 600; color: var(--color-text-main); font-size: 1rem;">
-                                        Puntuación
+                                        <spring:message code="ReviewForm.score.label" />
                                     </label>
-                                    <div class="star-rating-input" role="radiogroup" aria-label="Puntuación del vendedor">
+                                    <div class="star-rating-input" role="radiogroup" aria-label="<spring:message code='ReviewForm.score.ariaLabel' />">
                                         <c:forEach begin="1" end="5" var="i">
                                             <input type="radio" name="score" id="star${i}" value="${i}"
                                                    class="star-radio" ${reviewForm.score != null && reviewForm.score == i ? 'checked' : ''}/>
-                                            <label for="star${i}" class="star-label" title="${i} estrella${i > 1 ? 's' : ''}">
+                                            <spring:message code="ReviewForm.score.star" arguments="${i},${i}" var="starTitle" />
+                                            <label for="star${i}" class="star-label" title="${starTitle}">
                                                 <i class="bi bi-star-fill"></i>
                                             </label>
                                         </c:forEach>
@@ -68,24 +71,25 @@
 
                                 <div class="mb-4">
                                     <label for="reviewText" class="form-label" style="font-weight: 600; color: var(--color-text-main); font-size: 1rem;">
-                                        Comentario <span style="color: var(--color-text-muted); font-weight: 400;">(opcional)</span>
+                                        <spring:message code="ReviewForm.comment.label" /> <span style="color: var(--color-text-muted); font-weight: 400;"><spring:message code="ReviewForm.comment.optional" /></span>
                                     </label>
+                                    <spring:message code="ReviewForm.comment.placeholder" var="commentPlaceholder" />
                                     <form:textarea path="text" id="reviewText" cssClass="form-control"
                                                    rows="4" maxlength="2000"
-                                                   placeholder="Contá tu experiencia con este vendedor..."
+                                                   placeholder="${commentPlaceholder}"
                                                    style="resize: vertical; border-radius: 12px; border: 1.5px solid var(--color-border); padding: 1rem;"/>
                                     <form:errors path="text" cssClass="text-danger mt-1" element="div" />
                                 </div>
 
                                 <button type="submit" class="btn btn-retro btn-retro-primary w-100 btn-lg">
-                                    <i class="bi bi-send" aria-hidden="true"></i> Enviar reseña
+                                    <i class="bi bi-send" aria-hidden="true"></i> <spring:message code="ReviewForm.submit" />
                                 </button>
                             </form:form>
 
                             <div class="text-center mt-3">
                                 <a href="<c:url value='/purchases/${purchase.purchaseId}?token=${token}'/>"
                                    style="color: var(--color-text-muted); text-decoration: none; font-size: 0.9rem;">
-                                    Omitir por ahora
+                                    <spring:message code="ReviewForm.skip" />
                                 </a>
                             </div>
                         </div>

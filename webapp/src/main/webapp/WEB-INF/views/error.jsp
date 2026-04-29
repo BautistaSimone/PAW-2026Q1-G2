@@ -1,15 +1,19 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<ui:layout title="Vinyland | Error ${errorCode}">
+<spring:message code="Error.title" arguments="${errorCode}" var="errorTitle" />
+<ui:layout title="${errorTitle}">
     <div class="error-page">
         <div class="error-vinyl"></div>
         <div class="error-code"><c:out value="${errorCode}" default="Error" /></div>
-        <h2 class="error-message"><c:out value="${errorMessage}" default="Ocurrió un error inesperado" /></h2>
-        <p class="error-description"><c:out value="${errorDescription}" default="Lo sentimos, no pudimos completar tu solicitud." /></p>
+        <spring:message code="Error.defaultMessage" var="defMsg" />
+        <h2 class="error-message"><c:out value="${errorMessage}" default="${defMsg}" /></h2>
+        <spring:message code="Error.defaultDescription" var="defDesc" />
+        <p class="error-description"><c:out value="${errorDescription}" default="${defDesc}" /></p>
         <a href="<c:url value='/'/>" class="btn btn-retro btn-retro-primary">
-            <i class="bi bi-house" aria-hidden="true"></i> Volver al inicio
+            <i class="bi bi-house" aria-hidden="true"></i> <spring:message code="Error.backToHome" />
         </a>
     </div>
 </ui:layout>

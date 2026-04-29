@@ -1,4 +1,5 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <footer class="footer-bbdiscos">
     <div class="footer-container">
@@ -19,18 +20,18 @@
         </div>
         <div class="footer-bottom">
             <p class="footer-copyright">
-                Copyright Vinyland - 2026. Todos los derechos reservados.
+                <spring:message code="Footer.copyright" />
             </p>
             <p class="footer-legal">
-                Defensa de las y los consumidores. Para reclamos
+                <spring:message code="Footer.consumerDefense" />
                 <a
                         href="https://autogestion.produccion.gob.ar/consumidores"
                         target="_blank"
                         rel="noopener noreferrer"
                 >
-                    ingresá acá
+                    <spring:message code="Footer.enterHere" />
                 </a>
-                . / <a href="#">Botón de arrepentimiento</a>
+                . / <a href="#"><spring:message code="Footer.regretButton" /></a>
             </p>
         </div>
     </div>

@@ -11,7 +11,7 @@
 
     <div class="header-content">
         <div class="header-left">
-            <a href="<c:url value="/"/>" class="header-logo-link" aria-label="Vinyland - Ir al inicio">
+            <a href="<c:url value="/"/>" class="header-logo-link" aria-label="<spring:message code='Header.logo.ariaLabel' />">
                 <img src="<c:url value="/assets/images/vinyl_disk.png"/>" alt="" class="header-logo-img" width="44" height="44" decoding="async" />
                 <span class="brand-name">Vinyland</span>
             </a>
@@ -21,13 +21,14 @@
             <div class="header-center">
                 <div class="search-container">
                     <form class="search-form" method="get" action="<c:url value='/'/>" novalidate>
+                        <spring:message code="Header.search.placeholder" var="searchPlaceholder" />
                         <input id="search-input" name="search-text"
                             class="search-input"
                             type="text"
-                            placeholder="Buscar vinilos, artistas, sellos..."
-                            aria-label="Buscar vinilos"
+                            placeholder="${searchPlaceholder}"
+                            aria-label="<spring:message code='Header.search.ariaLabel' />"
                             value="<c:out value='${headerSearchText}' />">
-                        <button id="search-button" class="search-btn" type="submit" aria-label="Buscar">
+                        <button id="search-button" class="search-btn" type="submit" aria-label="<spring:message code='Header.search.button.ariaLabel' />">
                             <i class="bi bi-search" aria-hidden="true"></i>
                         </button>
                     </form>
@@ -37,7 +38,7 @@
             <div class="header-right">
 
                 <sec:authorize access="isAuthenticated()">
-                    <a href="<c:url value='/profile'/>" class="profile-btn" aria-label="Ver perfil">
+                    <a href="<c:url value='/profile'/>" class="profile-btn" aria-label="<spring:message code='Header.profile.ariaLabel' />">
                         <i class="bi bi-person-fill" aria-hidden="true"></i>
                         <span><sec:authentication property="principal.user.username" /></span>
                     </a>

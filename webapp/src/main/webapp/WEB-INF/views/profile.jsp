@@ -5,6 +5,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <c:set var="activeMyData" value="${isOwnProfile and param.tab eq 'mydata'}"/>
 <c:set var="activePurchases" value="${isOwnProfile and param.tab eq 'purchases'}"/>
 <c:set var="activeSales" value="${isOwnProfile and param.tab eq 'sales'}"/>
@@ -13,7 +14,8 @@
 <c:set var="activeReports" value="${isOwnProfile and isAdmin and param.tab eq 'reports'}"/>
 <c:set var="activePublications" value="${not activeMyData and not activePurchases and not activeSales and not activeReviews and not activeReports}"/>
 
-<ui:layout title="Vinyland | Perfil">
+<spring:message code="Profile.title" var="profileTitle" />
+<ui:layout title="${profileTitle}">
 
     <ui:header showHeaderActions="true"/>
 
@@ -35,7 +37,7 @@
                             <h2><c:out value="${user.email}" /></h2>
                         </c:if>
                         <c:if test="${sellerRating.count > 0}">
-                            <div class="profile-rating-row" aria-label="Valoración como vendedor">
+                            <div class="profile-rating-row" aria-label="<spring:message code='Profile.rating.ariaLabel' />">
                                 <span class="profile-rating-stars" aria-hidden="true">
                                     <c:forEach begin="1" end="5" var="i">
                                         <c:choose>
@@ -46,7 +48,7 @@
                                     </c:forEach>
                                 </span>
                                 <span class="profile-rating-caption">
-                                    <c:out value="${sellerRating.formattedAvg}"/> (<c:out value="${sellerRating.count}"/> reseña<c:if test="${sellerRating.count != 1}">s</c:if>)
+                                    <c:out value="${sellerRating.formattedAvg}"/> (<c:out value="${sellerRating.count}"/> <spring:message code="${sellerRating.count == 1 ? 'Profile.rating.reviews.singular' : 'Profile.rating.reviews.plural'}" />)
                                 </span>
                             </div>
                         </c:if>
@@ -56,12 +58,12 @@
                 <c:if test="${isOwnProfile}">
                     <div>
                         <a href="<c:url value='/resetPassword'/>" class="btn btn-retro btn-retro-secondary" role="button">
-                            Cambiar contraseña
+                            <spring:message code="Profile.changePassword" />
                         </a>
                         <form action="<c:url value='/logout' />" method="post" style="margin-top: 1rem;">
                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                             <button type="submit" class="btn btn-retro btn-retro-secondary">
-                                <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión
+                                <i class="bi bi-box-arrow-right" aria-hidden="true"></i> <spring:message code="Profile.logout" />
                             </button>
                         </form>
                     </div>
@@ -71,34 +73,34 @@
             <c:if test="${isOwnProfile}">
                 <c:if test="${param.updated eq '1'}">
                     <div class="alert-retro alert-retro-success mt-3" role="alert">
-                        <i class="bi bi-check-circle" aria-hidden="true"></i> Tus datos se guardaron correctamente.
+                        <i class="bi bi-check-circle" aria-hidden="true"></i> <spring:message code="Profile.alert.updated" />
                     </div>
                 </c:if>
                 <c:if test="${param.missingData eq 'purchase'}">
                     <div class="alert-retro alert-retro-warning mt-3" role="alert">
                         <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                        Para comprar necesitás completar tu nombre, apellido y dirección de envío (calle, número, barrio y provincia).
+                        <spring:message code="Profile.alert.missingData.purchase" />
                         <c:if test="${not empty param.productId}">
-                            <a href="<c:url value='/products/${param.productId}'/>" class="alert-link" style="margin-left: 0.5rem;">Volver al producto</a>
+                            <a href="<c:url value='/products/${param.productId}'/>" class="alert-link" style="margin-left: 0.5rem;"><spring:message code="Profile.alert.backToProduct" /></a>
                         </c:if>
                     </div>
                 </c:if>
                 <c:if test="${param.missingData eq 'publish'}">
                     <div class="alert-retro alert-retro-warning mt-3" role="alert">
                         <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                        Para publicar un vinilo necesitás cargar tu CBU/CVU (22 dígitos) y completar barrio y provincia en Mis datos (se usan como ubicación de tus publicaciones).
+                        <spring:message code="Profile.alert.missingData.publish" />
                     </div>
                 </c:if>
                 <c:if test="${param.deleted eq '1'}">
                     <div class="alert-retro alert-retro-success mt-3" role="alert">
                         <i class="bi bi-check-circle" aria-hidden="true"></i>
-                        La publicación se eliminó correctamente.
+                        <spring:message code="Profile.alert.deleted" />
                     </div>
                 </c:if>
                 <c:if test="${param.deleteError eq 'forbidden'}">
                     <div class="alert-retro alert-retro-warning mt-3" role="alert">
                         <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                        No podés eliminar una publicación que no es tuya.
+                        <spring:message code="Profile.alert.deleteForbidden" />
                     </div>
                 </c:if>
             </c:if>
@@ -106,13 +108,13 @@
             <c:if test="${isOwnProfile and param.hidden eq '1'}">
                 <div class="alert-retro alert-retro-success mt-3" role="alert">
                     <i class="bi bi-check-circle" aria-hidden="true"></i>
-                    La publicación fue dada de baja correctamente.
+                    <spring:message code="Profile.alert.hidden" />
                 </div>
             </c:if>
             <c:if test="${isOwnProfile and param.banned eq '1'}">
                 <div class="alert-retro alert-retro-success mt-3" role="alert">
                     <i class="bi bi-check-circle" aria-hidden="true"></i>
-                    El usuario fue baneado y todas sus publicaciones fueron dadas de baja.
+                    <spring:message code="Profile.alert.banned" />
                 </div>
             </c:if>
 
@@ -120,35 +122,35 @@
             <ul class="nav nav-tabs mt-4" id="profileTabs" role="tablist" style="border-bottom: 2px solid var(--color-border);">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link<c:if test='${activePublications}'> active</c:if>" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications" type="button" role="tab" aria-controls="publications" aria-selected="${activePublications}" style="font-weight: 600;">
-                        <i class="bi bi-vinyl" aria-hidden="true"></i> Publicaciones
+                        <i class="bi bi-vinyl" aria-hidden="true"></i> <spring:message code="Profile.tabs.publications" />
                     </button>
                 </li>
                 <c:if test="${isOwnProfile}">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link<c:if test='${activeMyData}'> active</c:if>" id="mydata-tab" data-bs-toggle="tab" data-bs-target="#mydata" type="button" role="tab" aria-controls="mydata" aria-selected="${activeMyData}" style="font-weight: 600;">
-                            <i class="bi bi-person-lines-fill" aria-hidden="true"></i> Mis datos
+                            <i class="bi bi-person-lines-fill" aria-hidden="true"></i> <spring:message code="Profile.tabs.myData" />
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link<c:if test='${activePurchases}'> active</c:if>" id="purchases-tab" data-bs-toggle="tab" data-bs-target="#purchases" type="button" role="tab" aria-controls="purchases" aria-selected="${activePurchases}" style="font-weight: 600;">
-                            <i class="bi bi-bag" aria-hidden="true"></i> Mis compras
+                            <i class="bi bi-bag" aria-hidden="true"></i> <spring:message code="Profile.tabs.purchases" />
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link<c:if test='${activeSales}'> active</c:if>" id="sales-tab" data-bs-toggle="tab" data-bs-target="#sales" type="button" role="tab" aria-controls="sales" aria-selected="${activeSales}" style="font-weight: 600;">
-                            <i class="bi bi-shop" aria-hidden="true"></i> Mis ventas
+                            <i class="bi bi-shop" aria-hidden="true"></i> <spring:message code="Profile.tabs.sales" />
                         </button>
                     </li>
                 </c:if>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link<c:if test='${activeReviews}'> active</c:if>" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="${activeReviews}" style="font-weight: 600;">
-                        <i class="bi bi-star" aria-hidden="true"></i> Reseñas recibidas
+                        <i class="bi bi-star" aria-hidden="true"></i> <spring:message code="Profile.tabs.reviews" />
                     </button>
                 </li>
                 <c:if test="${isOwnProfile and isAdmin}">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link<c:if test='${activeReports}'> active</c:if>" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="${activeReports}" style="font-weight: 600;">
-                            <i class="bi bi-flag" aria-hidden="true"></i> Reportes
+                            <i class="bi bi-flag" aria-hidden="true"></i> <spring:message code="Profile.tabs.reports" />
                         </button>
                     </li>
                 </c:if>
@@ -174,10 +176,11 @@
                                                 href="${productUrl}"/>
                                         <c:if test="${isOwnProfile}">
                                             <c:url var="deleteProductUrl" value="/products/${product.id}/delete"/>
-                                            <form action="${deleteProductUrl}" method="post" class="mt-2" onsubmit="return confirm('¿Estás seguro de que querés eliminar esta publicación?');">
+                                            <spring:message code="Profile.publications.deleteConfirm" var="confirmDelete" />
+                                            <form action="${deleteProductUrl}" method="post" class="mt-2" onsubmit="return confirm('${confirmDelete}');">
                                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                 <button type="submit" class="btn btn-retro btn-retro-secondary w-100" style="font-size: 0.85rem; padding: 0.4rem 0.75rem;">
-                                                    <i class="bi bi-trash" aria-hidden="true"></i> Eliminar publicación
+                                                    <i class="bi bi-trash" aria-hidden="true"></i> <spring:message code="Profile.publications.deleteButton" />
                                                 </button>
                                             </form>
                                         </c:if>
@@ -191,13 +194,13 @@
                                 <i class="bi bi-vinyl" style="font-size: 2.5rem; color: var(--color-border);"></i>
                                 <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;">
                                     <c:choose>
-                                        <c:when test="${isOwnProfile}">Todavía no publicaste ningún vinilo.</c:when>
-                                        <c:otherwise>Este usuario aún no publicó vinilos.</c:otherwise>
+                                        <c:when test="${isOwnProfile}"><spring:message code="Profile.publications.empty.own" /></c:when>
+                                        <c:otherwise><spring:message code="Profile.publications.empty.other" /></c:otherwise>
                                     </c:choose>
                                 </p>
                                 <c:if test="${isOwnProfile}">
                                     <a href="<c:url value='/products/new'/>" class="btn btn-retro btn-retro-primary" style="justify-self: center;">
-                                        <i class="bi bi-plus-lg" aria-hidden="true"></i> Publicar tu primer vinilo
+                                        <i class="bi bi-plus-lg" aria-hidden="true"></i> <spring:message code="Profile.publications.publishFirst" />
                                     </a>
                                 </c:if>
                             </div>
@@ -210,57 +213,58 @@
                     <div class="tab-pane fade<c:if test='${activeMyData}'> show active</c:if>" id="mydata" role="tabpanel" aria-labelledby="mydata-tab">
                         <div style="background: #fff; border-radius: 16px; padding: 1.5rem 1.25rem; border: 1px solid var(--color-border); max-width: 640px;">
                             <p style="color: var(--color-text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
-                                Nombre y apellido son obligatorios. El resto es opcional; podés dejarlo vacío si preferís completarlo más tarde.
+                                <spring:message code="Profile.myData.help" />
                             </p>
                             <c:url var="profileUpdateUrl" value="/profile/update"/>
                             <form:form modelAttribute="userProfileForm" action="${profileUpdateUrl}" method="post" cssClass="user-profile-form" id="profileForm">
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                 <div class="row g-2">
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="pfFirstName">Nombre <span class="text-danger">*</span></label>
+                                        <label class="form-label" for="pfFirstName"><spring:message code="Profile.myData.firstName" /> <span class="text-danger">*</span></label>
                                         <form:input path="firstName" id="pfFirstName" cssClass="form-control" autocomplete="given-name" />
                                         <form:errors path="firstName" cssClass="text-danger small d-block"/>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="pfLastName">Apellido <span class="text-danger">*</span></label>
+                                        <label class="form-label" for="pfLastName"><spring:message code="Profile.myData.lastName" /> <span class="text-danger">*</span></label>
                                         <form:input path="lastName" id="pfLastName" cssClass="form-control" autocomplete="family-name" />
                                         <form:errors path="lastName" cssClass="text-danger small d-block"/>
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label" for="pfStreet">Calle</label>
-                                    <form:input path="streetName" id="pfStreet" cssClass="form-control" placeholder="Opcional"/>
+                                    <label class="form-label" for="pfStreet"><spring:message code="Profile.myData.street" /></label>
+                                    <spring:message code="Common.optional" var="optionalPlaceholder" />
+                                    <form:input path="streetName" id="pfStreet" cssClass="form-control" placeholder="${optionalPlaceholder}"/>
                                     <form:errors path="streetName" cssClass="text-danger small d-block"/>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label" for="pfStreetNum">Número</label>
-                                    <form:input type="number" path="streetNumber" id="pfStreetNum" cssClass="form-control" placeholder="Opcional" min="1"/>
+                                    <label class="form-label" for="pfStreetNum"><spring:message code="Profile.myData.number" /></label>
+                                    <form:input type="number" path="streetNumber" id="pfStreetNum" cssClass="form-control" placeholder="${optionalPlaceholder}" min="1"/>
                                     <form:errors path="streetNumber" cssClass="text-danger small d-block"/>
                                 </div>
                                 <div class="row g-2">
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="pfNeighborhood">Barrio</label>
-                                        <form:input path="neighborhood" id="pfNeighborhood" cssClass="form-control" placeholder="Opcional"/>
+                                        <label class="form-label" for="pfNeighborhood"><spring:message code="Profile.myData.neighborhood" /></label>
+                                        <form:input path="neighborhood" id="pfNeighborhood" cssClass="form-control" placeholder="${optionalPlaceholder}"/>
                                         <form:errors path="neighborhood" cssClass="text-danger small d-block"/>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="pfProvince">Provincia</label>
-                                        <form:input path="province" id="pfProvince" cssClass="form-control" placeholder="Opcional"/>
+                                        <label class="form-label" for="pfProvince"><spring:message code="Profile.myData.province" /></label>
+                                        <form:input path="province" id="pfProvince" cssClass="form-control" placeholder="${optionalPlaceholder}"/>
                                         <form:errors path="province" cssClass="text-danger small d-block"/>
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label" for="pfExtra">Comentario (edificio, piso, etc.)</label>
-                                    <form:input path="extraAddressInfo" id="pfExtra" cssClass="form-control" placeholder="Opcional"/>
+                                    <label class="form-label" for="pfExtra"><spring:message code="Profile.myData.extraInfo" /></label>
+                                    <form:input path="extraAddressInfo" id="pfExtra" cssClass="form-control" placeholder="${optionalPlaceholder}"/>
                                     <form:errors path="extraAddressInfo" cssClass="text-danger small d-block"/>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label" for="pfCbu">CBU/CVU (22 dígitos)</label>
-                                    <form:input path="cbuCvu" id="pfCbu" cssClass="form-control" placeholder="Opcional" inputmode="numeric" maxlength="22"/>
+                                    <label class="form-label" for="pfCbu"><spring:message code="Profile.myData.cbuCvu" /></label>
+                                    <form:input path="cbuCvu" id="pfCbu" cssClass="form-control" placeholder="${optionalPlaceholder}" inputmode="numeric" maxlength="22"/>
                                     <form:errors path="cbuCvu" cssClass="text-danger small d-block"/>
                                 </div>
                                 <button type="submit" class="btn btn-retro btn-retro-primary" id="profileSaveBtn" disabled="true">
-                                    <i class="bi bi-save" aria-hidden="true"></i> Guardar cambios
+                                    <i class="bi bi-save" aria-hidden="true"></i> <spring:message code="Profile.myData.save" />
                                 </button>
                             </form:form>
                         </div>
@@ -297,12 +301,12 @@
                                             <div style="display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0;">
                                                 <a href="<c:url value='/purchases/${purchase.purchaseId}?token=${purchase.buyerToken}'/>"
                                                    class="btn btn-retro btn-retro-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
-                                                    <i class="bi bi-eye" aria-hidden="true"></i> Ver
+                                                    <i class="bi bi-eye" aria-hidden="true"></i> <spring:message code="Profile.reports.view" />
                                                 </a>
                                                 <c:if test="${purchase.status eq 'DELIVERED' and not purchaseHasReview[purchase.purchaseId]}">
                                                     <a href="<c:url value='/purchases/${purchase.purchaseId}/review?token=${purchase.buyerToken}'/>"
                                                        class="btn btn-retro btn-retro-primary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
-                                                        <i class="bi bi-star" aria-hidden="true"></i> Reseñar
+                                                        <i class="bi bi-star" aria-hidden="true"></i> <spring:message code="PurchasePanel.buyer.delivered.review" />
                                                     </a>
                                                 </c:if>
                                             </div>
@@ -314,9 +318,9 @@
                             <c:otherwise>
                                 <div class="empty-products-state">
                                     <i class="bi bi-bag" style="font-size: 2.5rem; color: var(--color-border);"></i>
-                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;">Aún no realizaste ninguna compra.</p>
+                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;"><spring:message code="Profile.purchases.empty" /></p>
                                     <a href="<c:url value='/'/>" class="btn btn-retro btn-retro-primary" style="justify-self: center;">
-                                        <i class="bi bi-search" aria-hidden="true"></i> Explorar vinilos
+                                        <i class="bi bi-search" aria-hidden="true"></i> <spring:message code="Profile.purchases.explore" />
                                     </a>
                                 </div>
                             </c:otherwise>
@@ -354,7 +358,7 @@
                                             <div style="display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0;">
                                                 <a href="<c:url value='/purchases/${sale.purchaseId}?token=${sale.sellerToken}'/>"
                                                    class="btn btn-retro btn-retro-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
-                                                    <i class="bi bi-eye" aria-hidden="true"></i> Ver
+                                                    <i class="bi bi-eye" aria-hidden="true"></i> <spring:message code="Profile.reports.view" />
                                                 </a>
                                             </div>
                                         </div>
@@ -365,7 +369,7 @@
                             <c:otherwise>
                                 <div class="empty-products-state">
                                     <i class="bi bi-shop" style="font-size: 2.5rem; color: var(--color-border);"></i>
-                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;">Aún no realizaste ninguna venta.</p>
+                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;"><spring:message code="Profile.sales.empty" /></p>
                                 </div>
                             </c:otherwise>
                         </c:choose>
@@ -410,8 +414,8 @@
                                 <i class="bi bi-star" style="font-size: 2.5rem; color: var(--color-border);"></i>
                                 <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;">
                                     <c:choose>
-                                        <c:when test="${isOwnProfile}">Aún no recibiste reseñas como vendedor.</c:when>
-                                        <c:otherwise>Este vendedor aún no tiene reseñas.</c:otherwise>
+                                        <c:when test="${isOwnProfile}"><spring:message code="Profile.reviews.empty.own" /></c:when>
+                                        <c:otherwise><spring:message code="Profile.reviews.empty.other" /></c:otherwise>
                                     </c:choose>
                                 </p>
                             </div>
@@ -440,34 +444,40 @@
                                                 <div style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
                                                     <span style="background: #dc3545; color: #fff; font-weight: 700; font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 50px;">
                                                         <i class="bi bi-flag-fill" aria-hidden="true"></i>
-                                                        <c:out value="${rp.reportCount}"/> reporte<c:if test="${rp.reportCount != 1}">s</c:if>
+                                                        <spring:message code="Profile.reports.count" arguments="${rp.reportCount},${rp.reportCount}" />
                                                     </span>
                                                     <span style="font-size: 0.8rem; color: var(--color-text-muted);">
-                                                        Publicado por <a href="<c:url value='/profile?userId=${rp.ownerUserId}'/>" style="color: var(--color-accent); text-decoration: none; font-weight: 600;"><c:out value="${rp.ownerUsername}"/></a>
+                                                        <spring:message code="Profile.reports.publishedBy" /> <a href="<c:url value='/profile?userId=${rp.ownerUserId}'/>" style="color: var(--color-accent); text-decoration: none; font-weight: 600;"><c:out value="${rp.ownerUsername}"/></a>
                                                     </span>
                                                 </div>
                                             </div>
                                             <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; flex-shrink: 0;">
-                                                <a href="<c:url value='/products/${rp.productId}'/>" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem;" title="Ver publicación">
-                                                    <i class="bi bi-eye" aria-hidden="true"></i> Ver
+                                                <spring:message code="Profile.reports.view" var="viewText" />
+                                                <a href="<c:url value='/products/${rp.productId}'/>" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem;" title="${viewText}">
+                                                    <i class="bi bi-eye" aria-hidden="true"></i> <c:out value="${viewText}"/>
                                                 </a>
                                                 <c:url var="hideUrl" value="/profile/admin/hide-product"/>
-                                                <form action="<c:out value='${hideUrl}'/>" method="post" style="margin: 0;" onsubmit="return confirm('¿Bajar esta publicación?');">
+                                                <spring:message code="Profile.reports.hideConfirm" var="confirmHide" />
+                                                <spring:message code="Profile.reports.hide" var="hideText" />
+                                                <form action="<c:out value='${hideUrl}'/>" method="post" style="margin: 0;" onsubmit="return confirm('${confirmHide}');">
                                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                     <input type="hidden" name="productId" value="<c:out value='${rp.productId}'/>" />
-                                                    <button type="submit" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem; color: #dc3545; border-color: #dc3545;" title="Bajar publicación">
-                                                        <i class="bi bi-x-circle" aria-hidden="true"></i> Bajar
+                                                    <button type="submit" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem; color: #dc3545; border-color: #dc3545;" title="${hideText}">
+                                                        <i class="bi bi-x-circle" aria-hidden="true"></i> <c:out value="${hideText}"/>
                                                     </button>
                                                 </form>
-                                                <a href="<c:url value='/profile?userId=${rp.ownerUserId}'/>" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem;" title="Ver perfil del dueño">
-                                                    <i class="bi bi-person" aria-hidden="true"></i> Perfil
+                                                <spring:message code="Profile.reports.profile" var="profileText" />
+                                                <a href="<c:url value='/profile?userId=${rp.ownerUserId}'/>" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem;" title="${profileText}">
+                                                    <i class="bi bi-person" aria-hidden="true"></i> <c:out value="${profileText}"/>
                                                 </a>
                                                 <c:url var="banUrl" value="/profile/admin/ban-user"/>
-                                                <form action="<c:out value='${banUrl}'/>" method="post" style="margin: 0;" onsubmit="return confirm('¿Bannear a este usuario? Se bajarán todas sus publicaciones y no podrá volver a iniciar sesión.');">
+                                                <spring:message code="Profile.reports.banConfirm" var="confirmBan" />
+                                                <spring:message code="Profile.reports.ban" var="banText" />
+                                                <form action="<c:out value='${banUrl}'/>" method="post" style="margin: 0;" onsubmit="return confirm('${confirmBan}');">
                                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                     <input type="hidden" name="userId" value="<c:out value='${rp.ownerUserId}'/>" />
-                                                    <button type="submit" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem; color: #fff; background: #dc3545; border-color: #dc3545;" title="Bannear usuario">
-                                                        <i class="bi bi-person-x" aria-hidden="true"></i> Bannear
+                                                    <button type="submit" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem; color: #fff; background: #dc3545; border-color: #dc3545;" title="${banText}">
+                                                        <i class="bi bi-person-x" aria-hidden="true"></i> <c:out value="${banText}"/>
                                                     </button>
                                                 </form>
                                             </div>
@@ -478,7 +488,7 @@
                             <c:otherwise>
                                 <div class="empty-products-state">
                                     <i class="bi bi-flag" style="font-size: 2.5rem; color: var(--color-border);"></i>
-                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;">No hay reportes pendientes.</p>
+                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;"><spring:message code="Profile.reports.empty" /></p>
                                 </div>
                             </c:otherwise>
                         </c:choose>

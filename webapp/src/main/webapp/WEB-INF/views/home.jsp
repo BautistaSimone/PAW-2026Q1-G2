@@ -1,20 +1,23 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-<ui:layout title="Vinyland | Productos">
+<spring:message code="Home.title" var="homeTitle" />
+<ui:layout title="${homeTitle}">
 
     <ui:sidebar />
     <ui:header showHeaderActions="true"/>
 
     <!-- Tell user to change its password -->
     <c:if test="${changePsswdModal}">
+        <spring:message code="Home.modal.password.title" var="psswdTitle" />
+        <spring:message code="Home.modal.password.text" var="psswdText" />
         <ui:modal 
             id="psswd" 
-            title="Cambie su contraseña inmediatamente" 
-            text="Corre riesgo de que un actor maligno tenga acceso a la misma, vaya a su perfil y cambiela" />
+            title="${psswdTitle}" 
+            text="${psswdText}" />
     </c:if>
 
     <div class="products-section">
@@ -22,25 +25,25 @@
             <c:if test="${param.created eq '1'}">
                 <div class="alert-retro alert-retro-success mb-3" role="alert">
                     <i class="bi bi-check-circle" aria-hidden="true"></i>
-                    El vinilo se publico correctamente.
+                    <spring:message code="Home.alert.productCreated" />
                 </div>
             </c:if>
             <c:if test="${param.moderated eq '1'}">
                 <div class="alert-retro alert-retro-success mb-3" role="alert">
                     <i class="bi bi-check-circle" aria-hidden="true"></i>
-                    La publicación fue ocultada del catálogo.
+                    <spring:message code="Home.alert.productHidden" />
                 </div>
             </c:if>
             <c:if test="${param.purchaseUnavailable eq '1'}">
                 <div class="alert-retro alert-retro-warning mb-3" role="alert">
                     <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                    Ese vinilo ya fue reservado por otra persona.
+                    <spring:message code="Home.alert.purchaseUnavailable" />
                 </div>
             </c:if>
             <c:if test="${param.purchaseError eq '1'}">
                 <div class="alert-retro alert-retro-warning mb-3" role="alert">
                     <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                    No pudimos iniciar la compra. Intentalo nuevamente.
+                    <spring:message code="Home.alert.purchaseError" />
                 </div>
             </c:if>
 
@@ -53,23 +56,24 @@
                 <section class="products-content-column">
                     <div class="products-header">
                         <div class="products-header-titles">
-                            <h2 class="products-count m-0"><c:out value="${fn:length(products)}" /> productos</h2>
+                            <h2 class="products-count m-0"><spring:message code="Home.productsCount" arguments="${fn:length(products)}" /></h2>
                             <c:if test="${not empty activeSearchText}">
                                 <p class="products-search-context m-0" role="status">
-                                    Resultados para <span class="products-search-query">"<c:out value="${activeSearchText}" />"</span>
+                                    <spring:message code="Home.searchResultsFor" /> <span class="products-search-query">"<c:out value="${activeSearchText}" />"</span>
                                 </p>
                             </c:if>
                         </div>
                         <div class="products-header-actions">
-                            <select id="sortSelect" class="sort-select" aria-label="Ordenar por">
+                            <spring:message code="Home.sort.ariaLabel" var="sortAriaLabel" />
+                            <select id="sortSelect" class="sort-select" aria-label="${sortAriaLabel}">
                                 <c:forEach items="${sortOptions}" var="opt">
                                     <option value="${opt.name()}" ${opt.name() eq selectedSort ? 'selected' : ''}>
-                                        <c:out value="${opt.label}" />
+                                        <spring:message code="ProductSortOrder.${opt.name()}" />
                                     </option>
                                 </c:forEach>
                             </select>
                             <a href="<c:url value='/products/new'/>" class="btn btn-retro btn-retro-primary">
-                                <i class="bi bi-plus-lg" aria-hidden="true"></i> Publicar vinilo
+                                <i class="bi bi-plus-lg" aria-hidden="true"></i> <spring:message code="Home.publish.button" />
                             </a>
                         </div>
                     </div>
@@ -99,10 +103,10 @@
                                 <i class="bi bi-vinyl" style="font-size: 3rem; color: var(--color-border);"></i>
                                 <c:choose>
                                     <c:when test="${noProductsMatchFilters}">
-                                        <p style="color: var(--color-text-muted); font-size: 1.05rem;">No hay productos que coincidan con tu busqueda o filtros.</p>
+                                        <p style="color: var(--color-text-muted); font-size: 1.05rem;"><spring:message code="Home.empty.filtered" /></p>
                                     </c:when>
                                     <c:otherwise>
-                                        <p style="color: var(--color-text-muted); font-size: 1.05rem;">Todavia no hay productos cargados. Publica un vinilo para probar el alta.</p>
+                                        <p style="color: var(--color-text-muted); font-size: 1.05rem;"><spring:message code="Home.empty.none" /></p>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
@@ -134,8 +138,6 @@
                     window.location.search = params.toString();
                 }
             });
-        }
-
         }
 
         var filterBar = document.querySelector('.filters-bar');

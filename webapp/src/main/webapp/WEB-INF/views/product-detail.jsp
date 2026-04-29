@@ -4,6 +4,7 @@
             <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
                 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
                     <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
                         <ui:layout title="Vinyland | ${product.title}">
 
@@ -13,25 +14,25 @@
                                 <c:if test="${param.created eq '1'}">
                                     <div class="alert-retro alert-retro-success mb-3" role="alert">
                                         <i class="bi bi-check-circle" aria-hidden="true"></i>
-                                        El vinilo se publico correctamente.
+                                        <spring:message code="Home.alert.productCreated" />
                                     </div>
                                 </c:if>
                                 <c:if test="${param.reported eq '1'}">
                                     <div class="alert-retro alert-retro-success mb-3" role="alert">
                                         <i class="bi bi-check-circle" aria-hidden="true"></i>
-                                        Gracias por el reporte. Nuestro equipo lo revisará.
+                                        <spring:message code="ProductDetail.alert.reported" />
                                     </div>
                                 </c:if>
                                 <c:if test="${param.alreadyReported eq '1'}">
                                     <div class="alert-retro alert-retro-warning mb-3" role="alert">
                                         <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                                        Ya reportaste esta publicación anteriormente.
+                                        <spring:message code="ProductDetail.alert.alreadyReported" />
                                     </div>
                                 </c:if>
                                 <c:if test="${param.purchaseError eq '1'}">
                                     <div class="alert-retro alert-retro-warning mb-3" role="alert">
                                         <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                                        No pudimos iniciar la compra de este vinilo.
+                                        <spring:message code="ProductDetail.alert.purchaseError" />
                                     </div>
                                 </c:if>
 
@@ -41,7 +42,7 @@
                                         onmouseover="this.style.color='var(--color-accent)';"
                                         onmouseout="this.style.color='var(--color-text-muted)';">
                                         <i class="bi bi-arrow-left" aria-hidden="true" style="font-size: 1.1rem;"></i>
-                                        <span>Volver</span>
+                                        <span><spring:message code="ProductDetail.back" /></span>
                                     </a>
                                 </div>
 
@@ -70,7 +71,7 @@
                                             </div>
                                             <c:if test="${not empty productImages}">
                                                 <div class="product-gallery-thumbs mt-4" role="group"
-                                                    aria-label="Galeria de imagenes del producto">
+                                                    aria-label="<spring:message code='ProductDetail.images.ariaLabel' />">
                                                     <c:forEach items="${productImages}" var="img" varStatus="st">
                                                         <c:url var="galleryImgUrl" value="/images/${img.imageId}" />
                                                         <button type="button"
@@ -79,7 +80,7 @@
                                                             style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.2s;"
                                                             onmouseover="this.style.transform='scale(1.05)'"
                                                             onmouseout="this.style.transform='scale(1)'"
-                                                            aria-label="Ver imagen ${st.index + 1} de ${fn:length(productImages)}"
+                                                            aria-label="<spring:message code='ProductDetail.images.item.ariaLabel' arguments='${st.index + 1},${fn:length(productImages)}' />"
                                                             aria-pressed="${st.first}">
                                                             <img src="<c:out value='${galleryImgUrl}'/>" alt=""
                                                                 loading="lazy" style="border-radius: 8px;" />
@@ -128,7 +129,7 @@
                                                         <div style="margin-top: 0.35rem;">
                                                             <a href="<c:url value='/profile?userId=${seller.id}'/>"
                                                                 style="text-decoration: none; color: inherit;"
-                                                                aria-label="Ver perfil y reseñas del vendedor">
+                                                                aria-label="<spring:message code='ProductDetail.seller.profile.ariaLabel' />">
                                                                 <ui:sellerRatingStars summary="${sellerRating}" compact="false"/>
                                                             </a>
                                                         </div>
@@ -144,8 +145,7 @@
                                                         test="${not empty product.recordLabel or not empty product.catalogNumber}">
                                                         <div>
                                                             <span
-                                                                style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.2rem; font-weight: 700;">Sello
-                                                                - Nro. de catálogo</span>
+                                                                style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.2rem; font-weight: 700;"><spring:message code="ProductDetail.labelCatalog" /></span>
                                                             <span
                                                                 style="font-weight: 600; color: var(--color-text-main); font-size: 0.95rem;">
                                                                 <c:choose>
@@ -167,7 +167,7 @@
                                                     <c:if test="${not empty product.editionCountry}">
                                                         <div>
                                                             <span
-                                                                style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.2rem; font-weight: 700;">Origen</span>
+                                                                style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.2rem; font-weight: 700;"><spring:message code="ProductDetail.origin" /></span>
                                                             <span
                                                                 style="font-weight: 600; color: var(--color-text-main); font-size: 0.95rem;">
                                                                 <c:out value="${product.editionCountry}" />
@@ -191,13 +191,13 @@
                                                 <c:when test="${isOwnProduct}">
                                                     <div class="alert-retro alert-retro-warning mb-0" role="status" style="border-radius: 16px;">
                                                         <i class="bi bi-info-circle" aria-hidden="true"></i>
-                                                        Este vinilo es tuyo. No podés comprarlo.
+                                                        <spring:message code="ProductDetail.isOwnProduct" />
                                                     </div>
                                                     <div class="d-grid mt-3">
                                                         <button type="button" class="btn w-100" disabled
                                                             style="background: #e0e0e0; color: #888; font-size: 1.15rem; padding: 1.1rem; border-radius: 99px; border: none; cursor: not-allowed; font-weight: 700;">
                                                             <i class="bi bi-cart-fill" aria-hidden="true"
-                                                                style="font-size: 1.3rem;"></i> Iniciar Compra
+                                                                style="font-size: 1.3rem;"></i> <spring:message code="ProductDetail.purchase.button" />
                                                         </button>
                                                     </div>
                                                 </c:when>
@@ -213,7 +213,7 @@
                                                                 onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 28px rgba(231, 111, 81, 0.5)'; this.style.background='var(--color-accent-hover)';"
                                                                 onmouseout="this.style.transform='none'; this.style.boxShadow='0 8px 24px rgba(231, 111, 81, 0.4)'; this.style.background='var(--color-accent)';">
                                                                 <i class="bi bi-cart-fill" aria-hidden="true"
-                                                                    style="font-size: 1.3rem;"></i> Iniciar Compra
+                                                                    style="font-size: 1.3rem;"></i> <spring:message code="ProductDetail.purchase.button" />
                                                             </button>
                                                         </form:form>
                                                     </div>
@@ -226,8 +226,7 @@
                                                                     style="background: transparent; color: var(--color-accent); font-size: 1rem; padding: 0.8rem; border-radius: 99px; border: 1px solid rgba(231, 111, 81, 0.5); transition: all 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-weight: 600;"
                                                                     onmouseover="this.style.background='rgba(231, 111, 81, 0.08)'; this.style.borderColor='var(--color-accent)';"
                                                                     onmouseout="this.style.background='transparent'; this.style.borderColor='rgba(231, 111, 81, 0.5)';">
-                                                                    <i class="bi bi-flag" aria-hidden="true"></i> Reportar
-                                                                    publicación
+                                                                    <i class="bi bi-flag" aria-hidden="true"></i> <spring:message code="ProductDetail.report.button" />
                                                                 </button>
                                                             </form>
                                                         </div>
@@ -242,7 +241,7 @@
                                             <h5
                                                 style="font-family: var(--font-heading); font-weight: 700; margin-bottom: 1.5rem; font-size: 1.3rem; color: var(--color-text-main); display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 1rem;">
                                                 <i class="bi bi-music-note-list"
-                                                    style="color: var(--color-accent);"></i> Más detalles
+                                                    style="color: var(--color-accent);"></i> <spring:message code="ProductDetail.details.title" />
                                             </h5>
 
                                             <div style="margin-bottom: 1.5rem;">
@@ -275,8 +274,7 @@
                                                     <div
                                                         style="background: #fff; padding: 1.25rem 1rem; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
                                                         <span
-                                                            style="display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.5rem;">Estado
-                                                            Disco</span>
+                                                            style="display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.5rem;"><spring:message code="ProductDetail.recordCondition" /></span>
                                                         <span
                                                             style="font-family: var(--font-mono); font-size: 1.85rem; font-weight: 700; color: var(--color-text-main);">
                                                             <c:out value="${product.recordCondition}" />
@@ -288,8 +286,7 @@
                                                     <div
                                                         style="background: #fff; padding: 1.25rem 1rem; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
                                                         <span
-                                                            style="display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.5rem;">Estado
-                                                            Tapa</span>
+                                                            style="display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.5rem;"><spring:message code="ProductDetail.sleeveCondition" /></span>
                                                         <span
                                                             style="font-family: var(--font-mono); font-size: 1.85rem; font-weight: 700; color: var(--color-text-main);">
                                                             <c:out value="${product.sleeveCondition}" />
@@ -308,7 +305,7 @@
                                                 </div>
                                                 <div>
                                                     <span
-                                                        style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem;">Ubicación</span>
+                                                        style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem;"><spring:message code="ProductDetail.location" /></span>
                                                     <span
                                                         style="font-size: 1rem; font-weight: 600; color: var(--color-text-main);">
                                                         <c:out value="${seller.location}" />
@@ -324,7 +321,7 @@
                                 <div class="recommendations-wrapper">
                                     <div class="mb-5">
                                         <h4 class="recommendations-title">
-                                            Más de
+                                            <spring:message code="ProductDetail.moreFrom" />
                                             <c:out value="${seller.username}" />
                                         </h4>
                                         <c:choose>
@@ -333,7 +330,7 @@
                                                     <div class="carousel-fade-edge left"></div>
                                                     <div class="carousel-fade-edge right"></div>
 
-                                                    <button class="carousel-control-btn prev" aria-label="Anterior">
+                                                    <button class="carousel-control-btn prev" aria-label="<spring:message code='ProductDetail.carousel.prev' />">
                                                         <i class="bi bi-chevron-left"></i>
                                                     </button>
 
@@ -352,7 +349,7 @@
                                                         </c:forEach>
                                                     </div>
 
-                                                    <button class="carousel-control-btn next" aria-label="Siguiente">
+                                                    <button class="carousel-control-btn next" aria-label="<spring:message code='ProductDetail.carousel.next' />">
                                                         <i class="bi bi-chevron-right"></i>
                                                     </button>
                                                 </div>
@@ -362,7 +359,7 @@
                                                     style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(8px); border-radius: 16px; padding: 2.5rem; border: 1px dashed rgba(231,111,81,0.2); text-align: center;">
                                                     <p
                                                         style="color: var(--color-text-muted); font-size: 1.05rem; margin: 0; font-weight: 500;">
-                                                        Este vendedor no tiene otras publicaciones activas.
+                                                        <spring:message code="ProductDetail.moreFrom.empty" />
                                                     </p>
                                                 </div>
                                             </c:otherwise>
@@ -370,14 +367,14 @@
                                     </div>
 
                                     <div class="mb-5">
-                                        <h4 class="recommendations-title">También te podría interesar</h4>
+                                        <h4 class="recommendations-title"><spring:message code="ProductDetail.related.title" /></h4>
                                         <c:choose>
                                             <c:when test="${not empty relatedProducts}">
                                                 <div id="relatedCarousel" class="recommendations-carousel">
                                                     <div class="carousel-fade-edge left"></div>
                                                     <div class="carousel-fade-edge right"></div>
 
-                                                    <button class="carousel-control-btn prev" aria-label="Anterior">
+                                                    <button class="carousel-control-btn prev" aria-label="<spring:message code='ProductDetail.carousel.prev' />">
                                                         <i class="bi bi-chevron-left"></i>
                                                     </button>
 
@@ -396,7 +393,7 @@
                                                         </c:forEach>
                                                     </div>
 
-                                                    <button class="carousel-control-btn next" aria-label="Siguiente">
+                                                    <button class="carousel-control-btn next" aria-label="<spring:message code='ProductDetail.carousel.next' />">
                                                         <i class="bi bi-chevron-right"></i>
                                                     </button>
                                                 </div>
@@ -406,7 +403,7 @@
                                                     style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(8px); border-radius: 16px; padding: 2.5rem; border: 1px dashed rgba(231,111,81,0.2); text-align: center;">
                                                     <p
                                                         style="color: var(--color-text-muted); font-size: 1.05rem; margin: 0; font-weight: 500;">
-                                                        No hay más discos publicados en este momento.
+                                                        <spring:message code="ProductDetail.related.empty" />
                                                     </p>
                                                 </div>
                                             </c:otherwise>

@@ -2,8 +2,10 @@
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<ui:layout title="Vinyland | Publicar vinilo">
+<spring:message code="ProductForm.title" var="productFormTitle" />
+<ui:layout title="${productFormTitle}">
 
     <ui:header />
 
@@ -11,10 +13,10 @@
         <div class="container py-4">
             <div class="sell-form-card">
                 <div class="sell-form-header">
-                    <span class="sell-form-eyebrow"><i class="bi bi-vinyl" aria-hidden="true"></i> Panel de vendedor</span>
-                    <h1>Publicar un vinilo</h1>
+                    <span class="sell-form-eyebrow"><i class="bi bi-vinyl" aria-hidden="true"></i> <spring:message code="ProductForm.eyebrow" /></span>
+                    <h1><spring:message code="ProductForm.heading" /></h1>
                     <p>
-                        Carga la informacion principal del disco para que quede disponible en el catalogo.
+                        <spring:message code="ProductForm.subtitle" />
                     </p>
                 </div>
 
@@ -26,39 +28,42 @@
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                     <div class="row g-4">
                         <div class="col-md-6">
-                            <label for="title" class="form-label">Titulo del album <span class="text-danger">*</span></label>
+                            <label for="title" class="form-label"><spring:message code="ProductForm.albumTitle.label" /> <span class="text-danger">*</span></label>
                             <form:input path="title" cssClass="form-control" required="required" />
                             <form:errors path="title" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
-                            <label for="artist" class="form-label">Artista <span class="text-danger">*</span></label>
+                            <label for="artist" class="form-label"><spring:message code="ProductForm.artist.label" /> <span class="text-danger">*</span></label>
                             <form:input path="artist" cssClass="form-control" required="required" />
                             <form:errors path="artist" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label">Sello – Numero de catalogo <span class="text-danger">*</span></label>
+                            <label class="form-label"><spring:message code="ProductForm.recordLabelCatalog.label" /> <span class="text-danger">*</span></label>
                             <div class="input-group">
+                                <spring:message code="ProductForm.recordLabel.placeholder" var="labelPlaceholder" />
                                 <form:input path="recordLabel" cssClass="form-control"
-                                       placeholder="Ej: Sony Music, Rough Trade" required="required" />
+                                       placeholder="${labelPlaceholder}" required="required" />
                                 <span class="input-group-text" style="border-color: var(--color-border);">–</span>
+                                <spring:message code="ProductForm.catalogNumber.placeholder" var="catalogPlaceholder" />
                                 <form:input path="catalogNumber" cssClass="form-control"
-                                       placeholder="Ej: EPC 85930" required="required" />
+                                       placeholder="${catalogPlaceholder}" required="required" />
                             </div>
                             <form:errors path="recordLabel" cssClass="text-danger" element="div" />
                             <form:errors path="catalogNumber" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
-                            <label for="editionCountry" class="form-label">Pais de la Edicion <span class="text-danger">*</span></label>
+                            <label for="editionCountry" class="form-label"><spring:message code="ProductForm.editionCountry.label" /> <span class="text-danger">*</span></label>
+                            <spring:message code="ProductForm.editionCountry.placeholder" var="editionPlaceholder" />
                             <form:input path="editionCountry" cssClass="form-control"
-                                   placeholder="Ej: Argentina, USA, UK" required="required" />
+                                   placeholder="${editionPlaceholder}" required="required" />
                             <form:errors path="editionCountry" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">Generos <span class="text-danger">*</span></label>
+                            <label class="form-label"><spring:message code="ProductForm.genres.label" /> <span class="text-danger">*</span></label>
                             <div class="genre-checkboxes d-flex flex-wrap gap-2">
                                 <c:forEach items="${categories}" var="cat">
                                     <div class="form-check genre-check">
@@ -73,47 +78,51 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="sleeveCondition" class="form-label">Estado de la tapa (1 a 10) <span class="text-danger">*</span></label>
+                            <label for="sleeveCondition" class="form-label"><spring:message code="ProductForm.sleeveCondition.label" /> <span class="text-danger">*</span></label>
+                            <spring:message code="ProductForm.sleeveCondition.placeholder" var="sleevePlaceholder" />
                             <form:input type="number" path="sleeveCondition" min="1" max="10" step="0.1"
-                                   cssClass="form-control" placeholder="Ej: 8.5" required="required" />
+                                   cssClass="form-control" placeholder="${sleevePlaceholder}" required="required" />
                             <form:errors path="sleeveCondition" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
-                            <label for="recordCondition" class="form-label">Estado del disco (1 a 10) <span class="text-danger">*</span></label>
+                            <label for="recordCondition" class="form-label"><spring:message code="ProductForm.recordCondition.label" /> <span class="text-danger">*</span></label>
+                            <spring:message code="ProductForm.recordCondition.placeholder" var="recordPlaceholder" />
                             <form:input type="number" path="recordCondition" min="1" max="10" step="0.1"
-                                   cssClass="form-control" placeholder="Ej: 9.0" required="required" />
+                                   cssClass="form-control" placeholder="${recordPlaceholder}" required="required" />
                             <form:errors path="recordCondition" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-md-6">
-                            <label for="priceDisplay" class="form-label">Precio <span class="text-danger">*</span></label>
+                            <label for="priceDisplay" class="form-label"><spring:message code="ProductForm.price.label" /> <span class="text-danger">*</span></label>
                             <form:hidden path="price" id="price" />
                             <div class="input-group">
                                 <span class="input-group-text" style="border-color: var(--color-border);">$</span>
+                                <spring:message code="ProductForm.price.placeholder" var="priceFormPlaceholder" />
                                 <input type="text" id="priceDisplay" class="form-control" inputmode="decimal"
-                                       autocomplete="off" placeholder="Ej: 40.000" required="required" />
+                                       autocomplete="off" placeholder="${priceFormPlaceholder}" required="required" />
                             </div>
                             <form:errors path="price" cssClass="text-danger" element="div" />
                         </div>
 
                         <div class="col-12">
-                            <label for="images" class="form-label">Imagenes del vinilo <span class="text-danger">*</span></label>
+                            <label for="images" class="form-label"><spring:message code="ProductForm.images.label" /> <span class="text-danger">*</span></label>
                             <form:input type="file" path="images" cssClass="form-control sell-images-input" accept="image/*" multiple="true" id="images" />
-                            <div class="form-text">Podes cargar hasta 8 fotos del disco (hasta 5 MB cada una). La imagen principal es la primera; toca las miniaturas de abajo para elegir otra como portada.</div>
+                            <div class="form-text"><spring:message code="ProductForm.images.help" /></div>
                             <form:errors path="images" cssClass="text-danger" element="div" />
                             <div id="sell-images-preview" class="sell-images-preview" hidden>
                                 <div class="sell-img-main-wrap">
-                                    <img id="sell-img-main" class="sell-img-main" alt="Vista previa principal del vinilo" />
+                                    <img id="sell-img-main" class="sell-img-main" alt="<spring:message code='ProductForm.images.mainPreview.alt' />" />
                                 </div>
-                                <div id="sell-img-thumbs" class="sell-img-thumbs" role="group" aria-label="Miniaturas para cambiar la imagen principal"></div>
+                                <div id="sell-img-thumbs" class="sell-img-thumbs" role="group" aria-label="<spring:message code='ProductForm.images.thumbs.ariaLabel' />"></div>
                             </div>
                         </div>
 
                         <div class="col-12">
-                            <label for="description" class="form-label">Descripcion <span class="text-danger">*</span></label>
+                            <label for="description" class="form-label"><spring:message code="ProductForm.description.label" /> <span class="text-danger">*</span></label>
+                            <spring:message code="ProductForm.description.placeholder" var="descriptionPlaceholder" />
                             <form:textarea path="description" cssClass="form-control" rows="5"
-                                      placeholder="Conta detalles adicionales del disco, edicion, etc." required="required" />
+                                      placeholder="${descriptionPlaceholder}" required="required" />
                             <form:errors path="description" cssClass="text-danger" element="div" />
                         </div>
 
@@ -121,10 +130,10 @@
 
                     <div class="sell-form-actions">
                         <a href="<c:url value="/"/>" class="btn btn-retro btn-retro-outline">
-                            <i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al catalogo
+                            <i class="bi bi-arrow-left" aria-hidden="true"></i> <spring:message code="ProductForm.backToCatalog" />
                         </a>
                         <button type="submit" class="btn btn-retro btn-retro-primary" id="publishBtn">
-                            <i class="bi bi-vinyl" aria-hidden="true"></i> Publicar vinilo
+                            <i class="bi bi-vinyl" aria-hidden="true"></i> <spring:message code="ProductForm.submit" />
                         </button>
                     </div>
                 </form:form>
@@ -138,7 +147,7 @@
         if (form && publishBtn) {
             form.addEventListener('submit', function () {
                 publishBtn.disabled = true;
-                publishBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Publicando...';
+                publishBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> <spring:message code="ProductForm.submitting" />';
             });
         }
     })();
@@ -204,7 +213,7 @@
                 var btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'sell-img-thumb';
-                btn.setAttribute('aria-label', 'Usar como imagen principal');
+                btn.setAttribute('aria-label', '<spring:message code="ProductForm.images.useAsMain.ariaLabel" />');
                 var realIndex = idx + 1;
                 btn.addEventListener('click', function () {
                     var picked = filesOrder[realIndex];

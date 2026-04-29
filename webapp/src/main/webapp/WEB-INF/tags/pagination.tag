@@ -1,10 +1,11 @@
 <%@ tag language="java" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <%@ attribute name="result" required="true" type="ar.edu.itba.paw.models.PaginatedResult" %>
 
 <c:if test="${result.totalPages > 1}">
-    <nav aria-label="Navegación de páginas" class="mt-4 mb-2">
+    <nav aria-label="<spring:message code='Pagination.nav.ariaLabel' />" class="mt-4 mb-2">
         <ul class="pagination justify-content-center">
             
             <c:choose>
@@ -20,7 +21,7 @@
                         <c:param name="page" value="${result.currentPage - 1}"/>
                     </c:url>
                     <li class="page-item">
-                        <a class="page-link" href="${prevUrl}" aria-label="Anterior">
+                        <a class="page-link" href="${prevUrl}" aria-label="<spring:message code='Pagination.prev.ariaLabel' />">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -68,7 +69,7 @@
                         <c:param name="page" value="${result.currentPage + 1}"/>
                     </c:url>
                     <li class="page-item">
-                        <a class="page-link" href="${nextUrl}" aria-label="Siguiente">
+                        <a class="page-link" href="${nextUrl}" aria-label="<spring:message code='Pagination.next.ariaLabel' />">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>

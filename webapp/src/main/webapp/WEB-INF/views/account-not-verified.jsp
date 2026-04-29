@@ -4,7 +4,8 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<ui:layout title="Vinyland | Cuenta no verificada" bodyClass="auth-page-bg">
+<spring:message code="notVerified.titlePage" var="notVerifiedTitle" />
+<ui:layout title="${notVerifiedTitle}" bodyClass="auth-page-bg">
 
     <ui:header showHeaderActions="false"/>
 

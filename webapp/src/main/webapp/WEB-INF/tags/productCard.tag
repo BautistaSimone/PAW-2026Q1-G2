@@ -11,6 +11,7 @@
 <%@ attribute name="sellerRating" required="false" rtexprvalue="true" type="ar.edu.itba.paw.models.SellerRatingSummary" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <c:set var="isOnSale" value="${onSale ne null ? onSale : false}" />
@@ -39,7 +40,7 @@
         <h6 class="product-title"><c:out value='${title}'/></h6>
         <p class="product-artist"><c:out value='${artist}'/></p>
         <c:if test="${not empty categories}">
-            <div class="product-card-categories" aria-label="Géneros">
+            <div class="product-card-categories" role="list" aria-label="<spring:message code='Product.categories.ariaLabel' />">
                 <c:forEach items="${categories}" var="cat" varStatus="st" end="2">
                     <span class="product-card-category-pill"><c:out value="${cat.name}"/></span>
                 </c:forEach>

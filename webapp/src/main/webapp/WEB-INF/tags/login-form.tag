@@ -13,7 +13,7 @@
             <div class="auth-card">
                 <div class="auth-card-header">
                     <h2><i class="bi bi-vinyl" aria-hidden="true"></i> Vinyland</h2>
-                    <p>Inicia sesion para comprar y vender vinilos</p>
+                    <p><spring:message code="Login.subtitle" /></p>
                 </div>
                 <div class="auth-card-body">
                     
@@ -24,27 +24,29 @@
 
                         <!-- Email -->
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
+                            <label for="email" class="form-label"><spring:message code="Login.email.label" /></label>
+                            <spring:message code="Login.email.placeholder" var="emailPlaceholder" />
                             <form:input
                                 path="email"
                                 id="email"
                                 cssClass="form-control"
-                                placeholder="tu@email.com"
+                                placeholder="${emailPlaceholder}"
                                 autocomplete="email" />
                             <form:errors path="email" cssClass="text-danger small"/>
                         </div>
 
                         <!-- Password -->
                         <div class="mb-3">
-                            <label for="password" class="form-label">Contraseña</label>
+                            <label for="password" class="form-label"><spring:message code="Login.password.label" /></label>
                             <div class="password-toggle-wrapper">
+                                <spring:message code="Login.password.placeholder" var="passwordPlaceholder" />
                                 <form:password
                                     path="password"
                                     id="password"
                                     cssClass="form-control"
-                                    placeholder="Tu contraseña"
+                                    placeholder="${passwordPlaceholder}"
                                     autocomplete="current-password" />
-                                <button type="button" class="password-toggle-btn" aria-label="Mostrar contraseña" onclick="togglePassword('password', this)">
+                                <button type="button" class="password-toggle-btn" aria-label="<spring:message code='Login.password.show.ariaLabel' />" onclick="togglePassword('password', this)">
                                     <i class="bi bi-eye"></i>
                                 </button>
                             </div>
@@ -59,12 +61,12 @@
                                     input.type = 'text';
                                     icon.classList.remove('bi-eye');
                                     icon.classList.add('bi-eye-slash');
-                                    btn.setAttribute('aria-label', 'Ocultar contraseña');
+                                    btn.setAttribute('aria-label', '<spring:message code="Login.password.hide.ariaLabel" />');
                                 } else {
                                     input.type = 'password';
                                     icon.classList.remove('bi-eye-slash');
                                     icon.classList.add('bi-eye');
-                                    btn.setAttribute('aria-label', 'Mostrar contraseña');
+                                    btn.setAttribute('aria-label', '<spring:message code="Login.password.show.ariaLabel" />');
                                 }
                             }
                         </script>
@@ -76,7 +78,7 @@
                                 id="rememberMe"
                                 cssClass="form-check-input" />
                             <label class="form-check-label" for="rememberMe">
-                                Recordarme
+                                <spring:message code="Login.rememberMe.label" />
                             </label>
                         </div>
 

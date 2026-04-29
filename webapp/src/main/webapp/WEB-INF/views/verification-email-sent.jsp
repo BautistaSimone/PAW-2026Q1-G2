@@ -4,7 +4,8 @@
 
 <%@ taglib prefix = "spring" uri = "http://www.springframework.org/tags" %>
 
-<ui:layout title="Vinyland | Verificación enviada" bodyClass="auth-page-bg">
+<spring:message code="Sent.verification.titlePage" var="sentTitle" />
+<ui:layout title="${sentTitle}" bodyClass="auth-page-bg">
 
     <ui:header showHeaderActions="false"/>
 
