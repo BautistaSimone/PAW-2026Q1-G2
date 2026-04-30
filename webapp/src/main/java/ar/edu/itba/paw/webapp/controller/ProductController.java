@@ -29,6 +29,7 @@ import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductSortOrder;
+import ar.edu.itba.paw.models.Review;
 import ar.edu.itba.paw.models.SellerRatingSummary;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.form.ProductForm;
@@ -174,6 +175,7 @@ public class ProductController {
         userService.findById(product.getUserId()).ifPresent(seller ->
             mav.addObject("seller", seller)
         );
+        mav.addObject("sellerReviews", reviewService.findBySellerId(product.getUserId(), 1, 3).getResults());
 
         List<Product> sellerProducts = productService.listProducts(
             new ProductSearchCriteria(null, null, null, null, null, null, ProductSortOrder.NEWEST, product.getUserId(), 1, 11)

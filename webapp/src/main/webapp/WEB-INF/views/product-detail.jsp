@@ -89,6 +89,8 @@
                                                 </div>
                                             </c:if>
                                         </div>
+
+
                                     </div>
 
                                     <!-- Right Side: Details -->
@@ -112,30 +114,6 @@
                                                 <c:out value="${product.artist}" />
                                             </h2>
 
-                                            <c:if test="${seller != null}">
-                                                <div
-                                                    style="display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 2rem; padding: 0.75rem 1rem; background: #fcfaf8; border-radius: 12px; border: 1px solid rgba(0,0,0,0.04);">
-                                                    <div
-                                                        style="width: 32px; height: 32px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;">
-                                                        <c:out value="${fn:substring(seller.username, 0, 1)}" />
-                                                    </div>
-                                                    <div style="flex: 1; min-width: 0;">
-                                                        <a href="<c:url value='/profile?userId=${seller.id}'/>"
-                                                            style="font-weight: 600; color: var(--color-text-main); text-decoration: none; font-size: 0.95rem;"
-                                                            onmouseover="this.style.color='var(--color-accent)';"
-                                                            onmouseout="this.style.color='var(--color-text-main)';">
-                                                            <c:out value="${seller.username}" />
-                                                        </a>
-                                                        <div style="margin-top: 0.35rem;">
-                                                            <a href="<c:url value='/profile?userId=${seller.id}'/>"
-                                                                style="text-decoration: none; color: inherit;"
-                                                                aria-label="<spring:message code='ProductDetail.seller.profile.ariaLabel' />">
-                                                                <ui:sellerRatingStars summary="${sellerRating}" compact="false"/>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </c:if>
 
                                             <c:if
                                                 test="${not empty product.recordLabel or not empty product.catalogNumber or not empty product.editionCountry}">
@@ -235,6 +213,78 @@
                                             </c:choose>
                                         </div> <!-- End Main Info Card -->
 
+                                    </div>
+                                </div>
+
+                                <div class="row g-5 mt-2">
+                                    <div class="col-lg-6 mb-4">
+                                        <!-- Seller Information Card -->
+                                        <c:if test="${seller != null}">
+                                            <div style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px); border-radius: 20px; padding: 2rem; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 8px 32px rgba(0,0,0,0.03);">
+                                                <h5 style="font-family: var(--font-heading); font-weight: 700; margin-bottom: 1.5rem; font-size: 1.3rem; color: var(--color-text-main); display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 1rem;">
+                                                    <i class="bi bi-person-badge" style="color: var(--color-accent);"></i> <spring:message code="ProductDetail.seller.title" />
+                                                </h5>
+
+                                                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                                                    <div style="width: 50px; height: 50px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; flex-shrink: 0;">
+                                                        <c:out value="${fn:substring(seller.username, 0, 1)}" />
+                                                    </div>
+                                                    <div>
+                                                        <a href="<c:url value='/profile?userId=${seller.id}'/>"
+                                                            style="font-weight: 700; color: var(--color-text-main); text-decoration: none; font-size: 1.1rem; display: block; margin-bottom: 0.2rem;"
+                                                            onmouseover="this.style.color='var(--color-accent)';"
+                                                            onmouseout="this.style.color='var(--color-text-main)';">
+                                                            <c:out value="${seller.username}" />
+                                                        </a>
+                                                        <a href="<c:url value='/profile?userId=${seller.id}'/>"
+                                                            style="text-decoration: none; color: inherit; display: inline-block;">
+                                                            <ui:sellerRatingStars summary="${sellerRating}" compact="false"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+
+                                                <div style="display: flex; align-items: center; gap: 1rem; background: #fff; padding: 1.25rem; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 1.5rem;">
+                                                    <div style="width: 44px; height: 44px; background: rgba(231, 111, 81, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                        <i class="bi bi-geo-alt-fill" aria-hidden="true" style="color: var(--color-accent); font-size: 1.2rem;"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem;"><spring:message code="ProductDetail.location" /></span>
+                                                        <span style="font-size: 1rem; font-weight: 600; color: var(--color-text-main);">
+                                                            <c:out value="${seller.location}" />
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div style="background: #fff; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); padding: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                                                    <c:choose>
+                                                        <c:when test="${not empty sellerReviews}">
+                                                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                                                <c:forEach items="${sellerReviews}" var="review" varStatus="st">
+                                                                    <div style="padding-bottom: ${st.last ? '0' : '1rem'}; border-bottom: ${st.last ? 'none' : '1px solid rgba(0,0,0,0.05)'};">
+                                                                        <div style="display: flex; align-items: center; gap: 0.2rem; margin-bottom: 0.4rem; color: #ffb400; font-size: 0.85rem;">
+                                                                            <c:forEach begin="1" end="${review.score}">
+                                                                                <i class="bi bi-star-fill"></i>
+                                                                            </c:forEach>
+                                                                            <c:forEach begin="${review.score + 1}" end="5">
+                                                                                <i class="bi bi-star" style="color: #e0e0e0;"></i>
+                                                                            </c:forEach>
+                                                                        </div>
+                                                                        <c:if test="${not empty review.comment}">
+                                                                            <p style="margin: 0; font-size: 0.9rem; color: var(--color-text-muted); font-style: italic;">"<c:out value="${review.comment}" />"</p>
+                                                                        </c:if>
+                                                                    </div>
+                                                                </c:forEach>
+                                                            </div>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <p style="margin: 0; font-size: 0.9rem; color: var(--color-text-muted); text-align: center;"><spring:message code="ProductDetail.seller.reviews.empty" /></p>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                            </div>
+                                        </c:if>
+                                    </div>
+                                    <div class="col-lg-6 mb-4">
                                         <!-- Details & Description Card -->
                                         <div
                                             style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px); border-radius: 20px; padding: 2rem; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 8px 32px rgba(0,0,0,0.03);">
@@ -293,23 +343,6 @@
                                                         </span><span
                                                             style="font-family: var(--font-mono); font-size: 0.95rem; color: #a0a0a0; font-weight: 600;">/10</span>
                                                     </div>
-                                                </div>
-                                            </div>
-
-                                            <div
-                                                style="display: flex; align-items: center; gap: 1rem; background: #fff; padding: 1.25rem; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-                                                <div
-                                                    style="width: 44px; height: 44px; background: rgba(231, 111, 81, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                                    <i class="bi bi-geo-alt-fill" aria-hidden="true"
-                                                        style="color: var(--color-accent); font-size: 1.2rem;"></i>
-                                                </div>
-                                                <div>
-                                                    <span
-                                                        style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem;"><spring:message code="ProductDetail.location" /></span>
-                                                    <span
-                                                        style="font-size: 1rem; font-weight: 600; color: var(--color-text-main);">
-                                                        <c:out value="${seller.location}" />
-                                                    </span>
                                                 </div>
                                             </div>
                                         </div> <!-- End Details Card -->
