@@ -2375,6 +2375,48 @@ details.filter-section:not([open]) .filter-section-chevron {
     align-items: center;
 }
 
+.sell-img-thumb-wrap {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.sell-img-remove {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    z-index: 2;
+    width: 1.35rem;
+    height: 1.35rem;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 0.65rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.sell-img-remove:hover,
+.sell-img-remove:focus {
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    outline: none;
+}
+
+.sell-img-remove-main {
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+}
+
 .sell-img-thumb {
     padding: 0;
     border: 2px solid var(--color-border);

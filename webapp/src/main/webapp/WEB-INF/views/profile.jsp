@@ -10,9 +10,10 @@
 <c:set var="activePurchases" value="${isOwnProfile and param.tab eq 'purchases'}"/>
 <c:set var="activeSales" value="${isOwnProfile and param.tab eq 'sales'}"/>
 <c:set var="activeReviews" value="${param.tab eq 'reviews'}"/>
+<c:set var="activeTrash" value="${isOwnProfile and param.tab eq 'trash'}"/>
 <sec:authorize access="hasRole('ADMIN')" var="isAdmin"/>
 <c:set var="activeReports" value="${isOwnProfile and isAdmin and param.tab eq 'reports'}"/>
-<c:set var="activePublications" value="${not activeMyData and not activePurchases and not activeSales and not activeReviews and not activeReports}"/>
+<c:set var="activePublications" value="${not activeMyData and not activePurchases and not activeSales and not activeReviews and not activeTrash and not activeReports}"/>
 
 <spring:message code="Profile.title" var="profileTitle" />
 <ui:layout title="${profileTitle}">
@@ -103,11 +104,6 @@
                         <spring:message code="Profile.alert.deleteForbidden" />
                     </div>
                 </c:if>
-                <div class="mt-2">
-                    <a href="<c:url value='/profile/trash'/>" class="btn btn-retro btn-retro-outline btn-sm">
-                        <i class="bi bi-trash3" aria-hidden="true"></i> <spring:message code="Profile.trash.link" />
-                    </a>
-                </div>
             </c:if>
 
             <c:if test="${isOwnProfile and param.hidden eq '1'}">
@@ -152,6 +148,13 @@
                         <i class="bi bi-star" aria-hidden="true"></i> <spring:message code="Profile.tabs.reviews" />
                     </button>
                 </li>
+                <c:if test="${isOwnProfile}">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link<c:if test='${activeTrash}'> active</c:if>" id="trash-tab" data-bs-toggle="tab" data-bs-target="#trash" type="button" role="tab" aria-controls="trash" aria-selected="${activeTrash}" style="font-weight: 600;">
+                            <i class="bi bi-trash3" aria-hidden="true"></i> <spring:message code="Profile.tabs.trash" />
+                        </button>
+                    </li>
+                </c:if>
                 <c:if test="${isOwnProfile and isAdmin}">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link<c:if test='${activeReports}'> active</c:if>" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="${activeReports}" style="font-weight: 600;">
@@ -432,6 +435,64 @@
                     </c:choose>
                 </div>
 
+                <!-- Tab: Papelera (solo perfil propio) -->
+                <c:if test="${isOwnProfile}">
+                    <div class="tab-pane fade<c:if test='${activeTrash}'> show active</c:if>" id="trash" role="tabpanel" aria-labelledby="trash-tab">
+                        <c:if test="${param.restored eq '1'}">
+                            <div class="alert-retro alert-retro-success mb-3" role="alert">
+                                <i class="bi bi-check-circle" aria-hidden="true"></i>
+                                <spring:message code="Trash.alert.restored" />
+                            </div>
+                        </c:if>
+                        <c:if test="${param.restoreError eq '1'}">
+                            <div class="alert-retro alert-retro-warning mb-3" role="alert">
+                                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                                <spring:message code="Trash.alert.restoreError" />
+                            </div>
+                        </c:if>
+                        <h2 class="h5 mb-3" style="font-family: var(--font-heading); font-weight: 700;">
+                            <i class="bi bi-trash3" aria-hidden="true"></i> <spring:message code="Trash.heading" />
+                        </h2>
+                        <c:choose>
+                            <c:when test="${not empty deletedProducts}">
+                                <div class="products-grid">
+                                    <c:forEach items="${deletedProducts}" var="product">
+                                        <div class="products-grid-item">
+                                            <ui:productCard
+                                                title="${product.title}"
+                                                artist="${product.artist}"
+                                                price="${product.price}"
+                                                installments="${product.installmentPrice}"
+                                                imageUrl="${deletedProductImageUrls[product.id]}"
+                                                categories="${product.categories}"
+                                                sellerRating="${sellerRating}"
+                                                href="#"
+                                                linkDisabled="true" />
+                                            <c:url var="restoreProductUrl" value="/products/${product.id}/restore" />
+                                            <spring:message code="Trash.restore.confirm" var="confirmRestore" />
+                                            <form action="${restoreProductUrl}" method="post" class="mt-2" onsubmit="return confirm('${confirmRestore}');">
+                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                <button type="submit" class="btn btn-retro btn-retro-primary w-100" style="font-size: 0.85rem; padding: 0.4rem 0.75rem;">
+                                                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> <spring:message code="Trash.restore.button" />
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                                <ui:pagination result="${deletedProductsPage}" pageParamName="trashPage" />
+                            </c:when>
+                            <c:otherwise>
+                                <div class="empty-products-state" style="text-align: center; padding: 2rem;">
+                                    <i class="bi bi-trash3" style="font-size: 2.5rem; color: var(--color-border);"></i>
+                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 1rem 0 0;">
+                                        <spring:message code="Trash.empty" />
+                                    </p>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </c:if>
+
                 <!-- Tab: Reportes (solo moderadores en perfil propio) -->
                 <c:if test="${isOwnProfile and isAdmin}">
                     <div class="tab-pane fade<c:if test='${activeReports}'> show active</c:if>" id="reports" role="tabpanel" aria-labelledby="reports-tab">
@@ -507,6 +568,19 @@
         </div>
     </div>
     <script>
+    (function () {
+        var tabList = document.getElementById('profileTabs');
+        if (tabList && window.history && window.history.replaceState && typeof URL !== 'undefined') {
+            tabList.addEventListener('shown.bs.tab', function (ev) {
+                if (!ev.target || ev.target.id !== 'trash-tab') {
+                    return;
+                }
+                var u = new URL(window.location.href);
+                u.searchParams.set('tab', 'trash');
+                window.history.replaceState({}, '', u.pathname + u.search + u.hash);
+            });
+        }
+    })();
     (function () {
         var form = document.getElementById('profileForm');
         var saveBtn = document.getElementById('profileSaveBtn');

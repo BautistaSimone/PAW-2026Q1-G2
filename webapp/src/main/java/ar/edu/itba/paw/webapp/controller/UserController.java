@@ -155,7 +155,8 @@ public class UserController {
     public ModelAndView profile(
         @AuthenticationPrincipal PawAuthUser authUser,
         @RequestParam(value = "userId", required = false) final Long userId,
-        @RequestParam(value = "page", defaultValue = "1") final int page
+        @RequestParam(value = "page", defaultValue = "1") final int page,
+        @RequestParam(value = "trashPage", defaultValue = "1") final int trashPage
     ) {
         final boolean isOwnProfile;
         final User profileUser;
@@ -174,7 +175,7 @@ public class UserController {
         }
 
         final ModelAndView mv = new ModelAndView("profile");
-        enrichProfileModel(mv, profileUser, isOwnProfile, authUser, page);
+        enrichProfileModel(mv, profileUser, isOwnProfile, authUser, page, trashPage);
         if (isOwnProfile) {
             mv.addObject("userProfileForm", UserProfileForm.fromUser(profileUser));
         }
@@ -196,7 +197,7 @@ public class UserController {
 
         if (errors.hasErrors()) {
             final ModelAndView mv = new ModelAndView("profile");
-            enrichProfileModel(mv, profileUser, true, authUser, 1);
+            enrichProfileModel(mv, profileUser, true, authUser, 1, 1);
             mv.addObject("userProfileForm", form);
             return mv;
         }
@@ -243,7 +244,8 @@ public class UserController {
         final User profileUser,
         final boolean isOwnProfile,
         final PawAuthUser authUser,
-        final int page
+        final int page,
+        final int trashPage
     ) {
         final ProductSearchCriteria criteria = new ProductSearchCriteria(
             null,
@@ -314,6 +316,17 @@ public class UserController {
                 final List<ar.edu.itba.paw.models.ReportedProduct> reportedProducts = reportService.findAllGroupedByProduct();
                 mv.addObject("reportedProducts", reportedProducts);
             }
+
+            final PaginatedResult<Product> deletedPage = productService.listUserDeletedProducts(profileUser.getId(), trashPage, 10);
+            final Map<Long, String> deletedProductImageUrls = new HashMap<>();
+            for (Product product : deletedPage.getResults()) {
+                if (imageService.existsByProductId(product.getId())) {
+                    deletedProductImageUrls.put(product.getId(), "/images/product/" + product.getId());
+                }
+            }
+            mv.addObject("deletedProductsPage", deletedPage);
+            mv.addObject("deletedProducts", deletedPage.getResults());
+            mv.addObject("deletedProductImageUrls", deletedProductImageUrls);
         }
     }
 
@@ -359,25 +372,6 @@ public class UserController {
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }
-
-        final User user = userService.findById(authUser.getUser().getId())
-            .orElseThrow(() -> new IllegalStateException("User not found"));
-
-        final PaginatedResult<Product> deletedPage = productService.listUserDeletedProducts(user.getId(), page, 10);
-
-        final Map<Long, String> productImageUrls = new HashMap<>();
-        for (Product product : deletedPage.getResults()) {
-            if (imageService.existsByProductId(product.getId())) {
-                productImageUrls.put(product.getId(), "/images/product/" + product.getId());
-            }
-        }
-
-        final ModelAndView mv = new ModelAndView("trash");
-        mv.addObject("user", user);
-        mv.addObject("deletedProductsPage", deletedPage);
-        mv.addObject("deletedProducts", deletedPage.getResults());
-        mv.addObject("productImageUrls", productImageUrls);
-        mv.addObject("sellerRating", reviewService.summaryForSeller(user.getId()));
-        return mv;
+        return new ModelAndView("redirect:/profile?tab=trash&trashPage=" + page);
     }
 }

@@ -10,7 +10,7 @@
 
     <div class="container py-4">
         <div class="mb-4">
-            <a href="<c:url value='/profile'/>"
+            <a href="<c:url value='/profile'><c:param name="tab" value="trash"/></c:url>"
                 style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none;">
                 <i class="bi bi-arrow-left" aria-hidden="true"></i>
                 <span><spring:message code="Trash.back" /></span>

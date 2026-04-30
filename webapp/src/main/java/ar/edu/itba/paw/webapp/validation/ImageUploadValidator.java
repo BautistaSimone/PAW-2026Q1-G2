@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.validation;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -87,6 +88,20 @@ public final class ImageUploadValidator {
 
         final ImageKind kind = validateImageData(data);
         return new ValidatedImage(data, kind.contentType);
+    }
+
+    /**
+     * Re-validates image bytes already stored in the database (e.g. when reordering or filtering images on edit).
+     */
+    public static ValidatedImage validateStoredImageBytes(final byte[] data) throws IOException {
+        if (data == null || data.length == 0) {
+            throw new InvalidImageUploadException("La imagen no puede estar vacia.");
+        }
+        if (data.length > MAX_IMAGE_BYTES) {
+            throw new InvalidImageUploadException("Cada imagen debe pesar como maximo 5 MB.");
+        }
+        final ImageKind kind = validateImageData(data);
+        return new ValidatedImage(Arrays.copyOf(data, data.length), kind.contentType);
     }
 
     public static Optional<String> detectSafeContentType(final byte[] data) {

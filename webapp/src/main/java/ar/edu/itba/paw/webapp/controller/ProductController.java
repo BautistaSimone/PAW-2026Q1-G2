@@ -28,6 +28,7 @@ import org.springframework.validation.BindingResult;
 import javax.validation.Valid;
 
 import ar.edu.itba.paw.models.Category;
+import ar.edu.itba.paw.models.Image;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductSortOrder;
@@ -36,6 +37,9 @@ import ar.edu.itba.paw.models.SellerRatingSummary;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.form.ProductForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
+import ar.edu.itba.paw.webapp.product.ProductImageLayoutParser;
+import ar.edu.itba.paw.webapp.product.ProductImageLayoutParser.Slot;
+import ar.edu.itba.paw.webapp.product.ProductImageLayoutParser.SlotKind;
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator.InvalidImageUploadException;
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator.ValidatedImage;
@@ -187,12 +191,7 @@ public class ProductController {
             product.getCategories().stream().map(c -> c.getId()).collect(Collectors.toList())
         );
 
-        final ModelAndView mav = new ModelAndView("product-form");
-        mav.addObject("isEditing", Boolean.TRUE);
-        mav.addObject("editingProductId", id);
-        mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
-        attachProductFormSuggestions(mav);
-        return mav;
+        return editProductFormModelAndView(id);
     }
 
     @RequestMapping(value = "/products/{id}/edit", method = RequestMethod.POST)
@@ -215,53 +214,110 @@ public class ProductController {
         }
 
         if (errors.hasErrors()) {
-            final ModelAndView mav = new ModelAndView("product-form");
-            mav.addObject("isEditing", Boolean.TRUE);
-            mav.addObject("editingProductId", id);
-            mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
-            attachProductFormSuggestions(mav);
-            return mav;
+            return editProductFormModelAndView(id);
         }
 
-        final boolean hasNewImages = hasNonEmptyMultipartFiles(form.getImages());
-        final List<ValidatedImage> validatedImages = new ArrayList<>();
-        if (hasNewImages) {
+        final boolean hadImages = imageService.existsByProductId(id);
+        final String layoutRaw = form.getImageLayout();
+        final boolean useLayout = hadImages && layoutRaw != null && !layoutRaw.isBlank();
+
+        final List<ValidatedImage> replacementImages;
+
+        if (!hadImages) {
+            final List<ValidatedImage> validatedImages;
             try {
-                validatedImages.addAll(ImageUploadValidator.validateAll(form.getImages()));
+                validatedImages = ImageUploadValidator.validateAll(form.getImages());
             } catch (InvalidImageUploadException e) {
                 errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
-                final ModelAndView mav = new ModelAndView("product-form");
-                mav.addObject("isEditing", Boolean.TRUE);
-                mav.addObject("editingProductId", id);
-                mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
-                attachProductFormSuggestions(mav);
-                return mav;
+                return editProductFormModelAndView(id);
             } catch (IOException e) {
                 errors.rejectValue("images", "Read.productForm.images", null);
-                final ModelAndView mav = new ModelAndView("product-form");
-                mav.addObject("isEditing", Boolean.TRUE);
-                mav.addObject("editingProductId", id);
-                mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
-                attachProductFormSuggestions(mav);
-                return mav;
+                return editProductFormModelAndView(id);
             }
             if (validatedImages.isEmpty()) {
                 errors.rejectValue("images", "Required.productForm.images", null);
-                final ModelAndView mav = new ModelAndView("product-form");
-                mav.addObject("isEditing", Boolean.TRUE);
-                mav.addObject("editingProductId", id);
-                mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
-                attachProductFormSuggestions(mav);
-                return mav;
+                return editProductFormModelAndView(id);
             }
-        } else if (!imageService.existsByProductId(id)) {
-            errors.rejectValue("images", "Required.productForm.images", null);
-            final ModelAndView mav = new ModelAndView("product-form");
-            mav.addObject("isEditing", Boolean.TRUE);
-            mav.addObject("editingProductId", id);
-            mav.addObject("hasExistingProductImages", Boolean.FALSE);
-            attachProductFormSuggestions(mav);
-            return mav;
+            replacementImages = validatedImages;
+        } else if (useLayout) {
+            final List<Slot> slots;
+            try {
+                slots = ProductImageLayoutParser.parse(layoutRaw);
+            } catch (RuntimeException ex) {
+                errors.rejectValue("images", "Invalid.productForm.imageLayout", null);
+                return editProductFormModelAndView(id);
+            }
+            if (slots.isEmpty() || slots.size() > ImageUploadValidator.MAX_IMAGES_PER_PRODUCT) {
+                errors.rejectValue("images", "Invalid.productForm.imageLayout", null);
+                return editProductFormModelAndView(id);
+            }
+            final long newSlotCount = slots.stream().filter(s -> s.getKind() == SlotKind.NEW).count();
+            final List<org.springframework.web.multipart.MultipartFile> newFiles =
+                extractNonEmptyMultipartFilesList(form.getImages());
+            if (newSlotCount != newFiles.size()) {
+                errors.rejectValue("images", "Invalid.productForm.imageLayout", null);
+                return editProductFormModelAndView(id);
+            }
+            long newBytesTotal = 0;
+            for (org.springframework.web.multipart.MultipartFile f : newFiles) {
+                newBytesTotal += f.getSize();
+            }
+            if (newBytesTotal > ImageUploadValidator.MAX_REQUEST_BYTES) {
+                errors.rejectValue("images", "Invalid.productForm.images", null);
+                return editProductFormModelAndView(id);
+            }
+            final List<ValidatedImage> built = new ArrayList<>(slots.size());
+            int newFileIndex = 0;
+            for (final Slot slot : slots) {
+                if (slot.getKind() == SlotKind.EXISTING) {
+                    final Optional<Image> imgOpt = imageService.findById(slot.getExistingImageId());
+                    if (imgOpt.isEmpty() || !imgOpt.get().getProductId().equals(id)) {
+                        errors.rejectValue("images", "Invalid.productForm.imageLayout", null);
+                        return editProductFormModelAndView(id);
+                    }
+                    try {
+                        built.add(ImageUploadValidator.validateStoredImageBytes(imgOpt.get().getData()));
+                    } catch (InvalidImageUploadException e) {
+                        errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
+                        return editProductFormModelAndView(id);
+                    } catch (IOException e) {
+                        errors.rejectValue("images", "Read.productForm.images", null);
+                        return editProductFormModelAndView(id);
+                    }
+                } else {
+                    try {
+                        built.add(ImageUploadValidator.validate(newFiles.get(newFileIndex++)));
+                    } catch (InvalidImageUploadException e) {
+                        errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
+                        return editProductFormModelAndView(id);
+                    } catch (IOException e) {
+                        errors.rejectValue("images", "Read.productForm.images", null);
+                        return editProductFormModelAndView(id);
+                    }
+                }
+            }
+            replacementImages = built;
+        } else {
+            final boolean hasNewImages = hasNonEmptyMultipartFiles(form.getImages());
+            if (hasNewImages) {
+                final List<ValidatedImage> validatedImages = new ArrayList<>();
+                try {
+                    validatedImages.addAll(ImageUploadValidator.validateAll(form.getImages()));
+                } catch (InvalidImageUploadException e) {
+                    errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
+                    return editProductFormModelAndView(id);
+                } catch (IOException e) {
+                    errors.rejectValue("images", "Read.productForm.images", null);
+                    return editProductFormModelAndView(id);
+                }
+                if (validatedImages.isEmpty()) {
+                    errors.rejectValue("images", "Required.productForm.images", null);
+                    return editProductFormModelAndView(id);
+                }
+                replacementImages = validatedImages;
+            } else {
+                replacementImages = null;
+            }
         }
 
         productService.updateProduct(
@@ -279,9 +335,9 @@ public class ProductController {
             form.getPrice()
         );
 
-        if (hasNewImages) {
+        if (replacementImages != null) {
             imageService.deleteImagesByProductId(id);
-            for (ValidatedImage image : validatedImages) {
+            for (ValidatedImage image : replacementImages) {
                 imageService.createImage(id, image.getData(), image.getContentType());
             }
         }
@@ -298,9 +354,9 @@ public class ProductController {
             return new ModelAndView("redirect:/login");
         }
         if (!productService.restoreUserDeletedProduct(id, authUser.getUser().getId())) {
-            return new ModelAndView("redirect:/profile/trash?restoreError=1");
+            return new ModelAndView("redirect:/profile?tab=trash&restoreError=1");
         }
-        return new ModelAndView("redirect:/profile/trash?restored=1");
+        return new ModelAndView("redirect:/profile?tab=trash&restored=1");
     }
 
     private static boolean hasNonEmptyMultipartFiles(final MultipartFile[] files) {
@@ -313,6 +369,35 @@ public class ProductController {
             }
         }
         return false;
+    }
+
+    private static List<MultipartFile> extractNonEmptyMultipartFilesList(final MultipartFile[] files) {
+        if (files == null) {
+            return List.of();
+        }
+        final List<MultipartFile> out = new ArrayList<>();
+        for (MultipartFile f : files) {
+            if (f != null && !f.isEmpty()) {
+                out.add(f);
+            }
+        }
+        return out;
+    }
+
+    private ModelAndView editProductFormModelAndView(final Long productId) {
+        final ModelAndView mav = new ModelAndView("product-form");
+        mav.addObject("isEditing", Boolean.TRUE);
+        mav.addObject("editingProductId", productId);
+        final boolean hasImg = imageService.existsByProductId(productId);
+        mav.addObject("hasExistingProductImages", hasImg);
+        if (hasImg) {
+            final List<Long> ids = imageService.findAllByProductId(productId).stream()
+                .map(Image::getImageId)
+                .collect(Collectors.toList());
+            mav.addObject("existingProductImageIds", ids);
+        }
+        attachProductFormSuggestions(mav);
+        return mav;
     }
 
     @RequestMapping(value = "/products/{id}", method = RequestMethod.GET)

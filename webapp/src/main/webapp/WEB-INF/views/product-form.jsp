@@ -167,10 +167,20 @@
                                     </c:otherwise>
                                 </c:choose>
                             </div>
+                            <c:if test="${isEditing and hasExistingProductImages}">
+                                <form:hidden path="imageLayout" id="imageLayout" />
+                                <script type="application/json" id="existing-image-ids-json" data-context="<c:out value='${pageContext.request.contextPath}' />">[<c:forEach items="${existingProductImageIds}" var="iid" varStatus="st"><c:if test="${!st.first}">,</c:if><c:out value="${iid}" /></c:forEach>]</script>
+                            </c:if>
                             <form:errors path="images" cssClass="text-danger" element="div" />
+                            <span id="sellNoImagesMsg" class="d-none"><spring:message code="ProductForm.images.error.none" /></span>
+                            <span id="sellAriaUseMainEl" class="d-none"><spring:message code="ProductForm.images.useAsMain.ariaLabel" /></span>
+                            <span id="sellAriaRemoveEl" class="d-none"><spring:message code="ProductForm.images.remove.ariaLabel" /></span>
                             <div id="sell-images-preview" class="sell-images-preview" hidden>
                                 <div class="sell-img-main-wrap">
                                     <img id="sell-img-main" class="sell-img-main" alt="<spring:message code='ProductForm.images.mainPreview.alt' />" />
+                                    <button type="button" class="sell-img-remove sell-img-remove-main" id="sell-img-main-remove" hidden="hidden" aria-label="<spring:message code='ProductForm.images.remove.ariaLabel' />">
+                                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                                    </button>
                                 </div>
                                 <div id="sell-img-thumbs" class="sell-img-thumbs" role="group" aria-label="<spring:message code='ProductForm.images.thumbs.ariaLabel' />"></div>
                             </div>
@@ -318,72 +328,165 @@
         var previewEl = document.getElementById('sell-images-preview');
         var mainImg = document.getElementById('sell-img-main');
         var thumbsEl = document.getElementById('sell-img-thumbs');
+        var mainRemoveBtn = document.getElementById('sell-img-main-remove');
         var form = document.querySelector('form.sell-form');
+        var layoutInput = document.getElementById('imageLayout');
+        var idsJsonEl = document.getElementById('existing-image-ids-json');
+        var noImagesMsgEl = document.getElementById('sellNoImagesMsg');
+        var useMainAriaEl = document.getElementById('sellAriaUseMainEl');
+        var removeAriaEl = document.getElementById('sellAriaRemoveEl');
+        var useMainAria = useMainAriaEl ? useMainAriaEl.textContent : '';
+        var removeAria = removeAriaEl ? removeAriaEl.textContent : '';
         if (!input || !previewEl || !mainImg || !thumbsEl || !form) {
             return;
         }
 
-        var filesOrder = [];
+        var isEditWithExisting = !!(layoutInput && idsJsonEl);
+        var slots = [];
         var objectUrls = [];
 
-        function revokeAll() {
+        function revokeObjectUrls() {
             objectUrls.forEach(function (u) { URL.revokeObjectURL(u); });
             objectUrls = [];
         }
 
-        function syncInput() {
+        function syncFilesInput() {
             var dt = new DataTransfer();
-            filesOrder.forEach(function (f) {
-                dt.items.add(f);
+            slots.filter(function (s) { return s.kind === 'n'; }).forEach(function (s) {
+                dt.items.add(s.file);
             });
             input.files = dt.files;
         }
 
+        function buildLayout() {
+            return slots.map(function (s) {
+                return s.kind === 'e' ? ('e:' + s.id) : 'n';
+            }).join(',');
+        }
+
+        function urlForSlot(slot) {
+            if (slot.kind === 'e') {
+                return slot.url;
+            }
+            var u = URL.createObjectURL(slot.file);
+            objectUrls.push(u);
+            return u;
+        }
+
         function render() {
-            revokeAll();
+            revokeObjectUrls();
             thumbsEl.innerHTML = '';
 
-            if (filesOrder.length === 0) {
+            if (slots.length === 0) {
                 previewEl.hidden = true;
                 mainImg.removeAttribute('src');
+                if (layoutInput) {
+                    layoutInput.value = '';
+                }
+                if (mainRemoveBtn) {
+                    mainRemoveBtn.hidden = true;
+                }
                 return;
             }
 
             previewEl.hidden = false;
-            var mainUrl = URL.createObjectURL(filesOrder[0]);
-            objectUrls.push(mainUrl);
-            mainImg.src = mainUrl;
+            mainImg.src = urlForSlot(slots[0]);
 
-            filesOrder.slice(1).forEach(function (file, idx) {
-                var url = URL.createObjectURL(file);
-                objectUrls.push(url);
-                var btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'sell-img-thumb';
-                btn.setAttribute('aria-label', '<spring:message code="ProductForm.images.useAsMain.ariaLabel" />');
-                var realIndex = idx + 1;
-                btn.addEventListener('click', function () {
-                    var picked = filesOrder[realIndex];
-                    filesOrder.splice(realIndex, 1);
-                    filesOrder.unshift(picked);
+            if (mainRemoveBtn) {
+                mainRemoveBtn.hidden = false;
+                mainRemoveBtn.onclick = function () {
+                    slots.splice(0, 1);
                     render();
+                };
+            }
+
+            for (var i = 1; i < slots.length; i++) {
+                (function (idx) {
+                    var wrap = document.createElement('div');
+                    wrap.className = 'sell-img-thumb-wrap';
+
+                    var btnMain = document.createElement('button');
+                    btnMain.type = 'button';
+                    btnMain.className = 'sell-img-thumb';
+                    btnMain.setAttribute('aria-label', useMainAria);
+                    var thumbUrl = urlForSlot(slots[idx]);
+                    btnMain.addEventListener('click', function () {
+                        var picked = slots[idx];
+                        slots.splice(idx, 1);
+                        slots.unshift(picked);
+                        render();
+                    });
+
+                    var im = document.createElement('img');
+                    im.src = thumbUrl;
+                    im.alt = '';
+                    btnMain.appendChild(im);
+
+                    var rm = document.createElement('button');
+                    rm.type = 'button';
+                    rm.className = 'sell-img-remove';
+                    rm.setAttribute('aria-label', removeAria);
+                    rm.innerHTML = '<i class="bi bi-x-lg" aria-hidden="true"></i>';
+                    rm.addEventListener('click', function (ev) {
+                        ev.stopPropagation();
+                        slots.splice(idx, 1);
+                        render();
+                    });
+
+                    wrap.appendChild(btnMain);
+                    wrap.appendChild(rm);
+                    thumbsEl.appendChild(wrap);
+                })(i);
+            }
+
+            if (!isEditWithExisting) {
+                syncFilesInput();
+            }
+        }
+
+        if (isEditWithExisting) {
+            try {
+                var ctx = idsJsonEl.getAttribute('data-context') || '';
+                var ids = JSON.parse(idsJsonEl.textContent || '[]');
+                ids.forEach(function (id) {
+                    slots.push({ kind: 'e', id: id, url: ctx + '/images/' + id });
                 });
-                var im = document.createElement('img');
-                im.src = url;
-                im.alt = '';
-                btn.appendChild(im);
-                thumbsEl.appendChild(btn);
-            });
-            syncInput();
+            } catch (ignore) {
+                slots = [];
+            }
+            render();
         }
 
         input.addEventListener('change', function () {
-            filesOrder = Array.prototype.slice.call(input.files, 0);
+            var picked = Array.prototype.slice.call(input.files || [], 0);
+            if (picked.length === 0) {
+                return;
+            }
+            if (isEditWithExisting) {
+                for (var j = 0; j < picked.length && slots.length < 8; j++) {
+                    slots.push({ kind: 'n', file: picked[j] });
+                }
+                input.value = '';
+                render();
+                return;
+            }
+            slots = picked.slice(0, 8).map(function (f) {
+                return { kind: 'n', file: f };
+            });
             render();
         });
 
-        form.addEventListener('submit', function () {
-            syncInput();
+        form.addEventListener('submit', function (ev) {
+            if (isEditWithExisting) {
+                if (slots.length === 0) {
+                    ev.preventDefault();
+                    var t = noImagesMsgEl ? noImagesMsgEl.textContent : '';
+                    window.alert(t);
+                    return;
+                }
+                layoutInput.value = buildLayout();
+            }
+            syncFilesInput();
         });
     })();
     </script>

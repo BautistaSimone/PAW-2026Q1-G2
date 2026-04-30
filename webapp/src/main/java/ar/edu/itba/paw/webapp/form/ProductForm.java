@@ -59,6 +59,9 @@ public class ProductForm {
 
     private MultipartFile[] images;
 
+    /** Comma-separated layout for edit: {@code e:123} = existing image id, {@code n} = next new upload. */
+    private String imageLayout;
+
     public String getTitle() {
         return title;
     }
@@ -145,5 +148,13 @@ public class ProductForm {
 
     public void setImages(MultipartFile[] images) {
         this.images = images;
+    }
+
+    public String getImageLayout() {
+        return imageLayout;
+    }
+
+    public void setImageLayout(final String imageLayout) {
+        this.imageLayout = imageLayout;
     }
 }

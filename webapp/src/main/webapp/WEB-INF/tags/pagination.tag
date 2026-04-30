@@ -3,6 +3,9 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <%@ attribute name="result" required="true" type="ar.edu.itba.paw.models.PaginatedResult" %>
+<%@ attribute name="pageParamName" required="false" %>
+
+<c:set var="pp" value="${empty pageParamName ? 'page' : pageParamName}" />
 
 <c:if test="${result.totalPages > 1}">
     <nav aria-label="<spring:message code='Pagination.nav.ariaLabel' />" class="mt-4 mb-2">
@@ -11,14 +14,14 @@
             <c:choose>
                 <c:when test="${result.hasPreviousPage}">
                     <c:url var="prevUrl" value="">
-                        <c:forEach items="${param}" var="p">
-                            <c:if test="${p.key ne 'page'}">
+                            <c:forEach items="${param}" var="p">
+                            <c:if test="${p.key ne pp}">
                                 <c:forEach items="${paramValues[p.key]}" var="val">
                                     <c:param name="${p.key}" value="${val}"/>
                                 </c:forEach>
                             </c:if>
                         </c:forEach>
-                        <c:param name="page" value="${result.currentPage - 1}"/>
+                        <c:param name="${pp}" value="${result.currentPage - 1}"/>
                     </c:url>
                     <li class="page-item">
                         <a class="page-link" href="${prevUrl}" aria-label="<spring:message code='Pagination.prev.ariaLabel' />">
@@ -43,13 +46,13 @@
                     <c:otherwise>
                         <c:url var="pageUrl" value="">
                             <c:forEach items="${param}" var="p">
-                                <c:if test="${p.key ne 'page'}">
+                                <c:if test="${p.key ne pp}">
                                     <c:forEach items="${paramValues[p.key]}" var="val">
                                         <c:param name="${p.key}" value="${val}"/>
                                     </c:forEach>
                                 </c:if>
                             </c:forEach>
-                            <c:param name="page" value="${i}"/>
+                            <c:param name="${pp}" value="${i}"/>
                         </c:url>
                         <li class="page-item"><a class="page-link" style="color: var(--color-accent);" href="${pageUrl}">${i}</a></li>
                     </c:otherwise>
@@ -59,14 +62,14 @@
             <c:choose>
                 <c:when test="${result.hasNextPage}">
                     <c:url var="nextUrl" value="">
-                        <c:forEach items="${param}" var="p">
-                            <c:if test="${p.key ne 'page'}">
+                            <c:forEach items="${param}" var="p">
+                            <c:if test="${p.key ne pp}">
                                 <c:forEach items="${paramValues[p.key]}" var="val">
                                     <c:param name="${p.key}" value="${val}"/>
                                 </c:forEach>
                             </c:if>
                         </c:forEach>
-                        <c:param name="page" value="${result.currentPage + 1}"/>
+                        <c:param name="${pp}" value="${result.currentPage + 1}"/>
                     </c:url>
                     <li class="page-item">
                         <a class="page-link" href="${nextUrl}" aria-label="<spring:message code='Pagination.next.ariaLabel' />">
