@@ -264,10 +264,19 @@ public class ProductJdbcDao implements ProductDao {
     }
 
     @Override
+    public List<String> listDistinctArtists() {
+        return jdbcTemplate.query(
+            "SELECT DISTINCT TRIM(artist) AS value FROM products WHERE available = TRUE " +
+            "AND artist IS NOT NULL AND TRIM(artist) <> '' ORDER BY value ASC",
+            (rs, rowNum) -> rs.getString(1)
+        );
+    }
+
+    @Override
     public List<String> listDistinctRecordLabels() {
         return jdbcTemplate.query(
-            "SELECT DISTINCT record_label FROM products WHERE available = TRUE " +
-            "AND record_label IS NOT NULL AND TRIM(record_label) <> '' ORDER BY record_label ASC",
+            "SELECT DISTINCT TRIM(record_label) AS value FROM products WHERE available = TRUE " +
+            "AND record_label IS NOT NULL AND TRIM(record_label) <> '' ORDER BY value ASC",
             (rs, rowNum) -> rs.getString(1)
         );
     }

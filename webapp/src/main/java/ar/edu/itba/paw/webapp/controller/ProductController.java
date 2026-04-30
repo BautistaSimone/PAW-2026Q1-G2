@@ -91,7 +91,7 @@ public class ProductController {
         @AuthenticationPrincipal final PawAuthUser authUser,
         @ModelAttribute("productForm") final ProductForm form
     ) {
-        return redirectIfCannotPublish(authUser).orElseGet(() -> new ModelAndView("product-form"));
+        return redirectIfCannotPublish(authUser).orElseGet(this::productFormView);
     }
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
@@ -107,7 +107,7 @@ public class ProductController {
         }
 
         if (errors.hasErrors()) {
-            return new ModelAndView("product-form");
+            return productFormView();
         }
 
         final List<ValidatedImage> validatedImages;
@@ -115,10 +115,10 @@ public class ProductController {
             validatedImages = ImageUploadValidator.validateAll(form.getImages());
         } catch (InvalidImageUploadException e) {
             errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
-            return new ModelAndView("product-form");
+            return productFormView();
         } catch (IOException e) {
             errors.rejectValue("images", "Read.productForm.images", "No pudimos leer la imagen enviada.");
-            return new ModelAndView("product-form");
+            return productFormView();
         }
 
         final User publisher = userService.findById(authUser.getUser().getId())
@@ -287,6 +287,13 @@ public class ProductController {
             return Optional.of(new ModelAndView("redirect:/profile?tab=mydata&missingData=publish"));
         }
         return Optional.empty();
+    }
+
+    private ModelAndView productFormView() {
+        final ModelAndView mav = new ModelAndView("product-form");
+        mav.addObject("artistSuggestions", productService.listDistinctArtists());
+        mav.addObject("recordLabelSuggestions", productService.listDistinctRecordLabels());
+        return mav;
     }
 }
 

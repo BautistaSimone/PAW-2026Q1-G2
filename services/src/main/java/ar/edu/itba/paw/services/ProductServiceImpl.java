@@ -81,6 +81,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<String> listDistinctArtists() {
+        return productDao.listDistinctArtists();
+    }
+
+    @Override
     public List<String> listDistinctRecordLabels() {
         return productDao.listDistinctRecordLabels();
     }

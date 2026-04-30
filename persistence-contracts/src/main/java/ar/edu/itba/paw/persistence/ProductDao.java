@@ -27,6 +27,8 @@ public interface ProductDao {
 
     PaginatedResult<Product> findProducts(ProductSearchCriteria criteria);
 
+    List<String> listDistinctArtists();
+
     List<String> listDistinctRecordLabels();
 
     Optional<Product> findById(final Long id);
