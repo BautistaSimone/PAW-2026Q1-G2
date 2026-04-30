@@ -5,12 +5,7 @@ import javax.sql.DataSource;
 import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.sql.ResultSet;
-import java.sql.Array;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,73 +18,23 @@ import ar.edu.itba.paw.models.User;
 @Repository
 public class UserJdbcDao implements UserDao {
 
-    private static final RowMapper<Long> WISHLIST_ROW_MAPPER = (rs, rowNum) ->
-        rs.getLong("product_id");
-
-    private List<Long> findWishlistByUserId(final Long userId) {
-        return jdbcTemplate.query(
-            "SELECT * FROM wishlist_products " +
-            "WHERE user_id = ?",
-            WISHLIST_ROW_MAPPER, userId
-        );
-    }
-
-    private User mapUser(
-        final Long id,
-        final String email,
-        final String password,
-        final String username,
-        final Boolean mod,
-        final Boolean enabled,
-        final Boolean banned,
-        final String firstName,
-        final String lastName,
-        final String streetName,
-        final String streetNumber,
-        final String neighborhood,
-        final String province,
-        final String extraAddressInfo,
-        final String cbuCvu
-    ) {
-        final List<Long> wishlist = findWishlistByUserId(id);
-        return new User(
-                id,
-                email,
-                password,
-                username,
-                mod,
-                enabled,
-                banned,
-                firstName,
-                lastName,
-                streetName,
-                streetNumber,
-                neighborhood,
-                province,
-                extraAddressInfo,
-                cbuCvu,
-                wishlist);
-    }
-
-    private User mapUserFromRow(final Map<String, Object> row) {
-        return mapUser(
-            ((Number) row.get("user_id")).longValue(),
-            (String) row.get("email"),
-            (String) row.get("password"),
-            (String) row.get("username"),
-            (Boolean) row.get("mod"),
-            (Boolean) row.get("enabled"),
-            (Boolean) row.get("banned"),
-            (String) row.get("first_name"),
-            (String) row.get("last_name"),
-            (String) row.get("street_name"),
-            (String) row.get("street_number"),
-            (String) row.get("neighborhood"),
-            (String) row.get("province"),
-            (String) row.get("extra_address_info"),
-            (String) row.get("cbu_cvu")
-        );
-    }
+    private final static RowMapper<User> USER_ROW_MAPPER = (ResultSet rs, int rowNum) ->
+        new User(
+            rs.getLong("user_id"),
+            rs.getString("email"),
+            rs.getString("password"),
+            rs.getString("username"),
+            rs.getBoolean("mod"),
+            rs.getBoolean("enabled"),
+            rs.getBoolean("banned"),
+            rs.getString("first_name"),
+            rs.getString("last_name"),
+            rs.getString("street_name"),
+            rs.getString("street_number"),
+            rs.getString("neighborhood"),
+            rs.getString("province"),
+            rs.getString("extra_address_info"),
+            rs.getString("cbu_cvu"));
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
@@ -148,8 +93,7 @@ public class UserJdbcDao implements UserDao {
                 neighborhood,
                 province,
                 extraAddressInfo,
-                cbuCvu,
-                Collections.emptyList());
+                cbuCvu);
     }
 
     @Override
@@ -188,18 +132,12 @@ public class UserJdbcDao implements UserDao {
 
     @Override
     public Optional<User> findByEmail(final String email) {
-        final List<Map<String, Object>> rows = 
-            jdbcTemplate.queryForList("SELECT * FROM users WHERE email = ?", email);
-
-        return rows.stream().findFirst().map(this::mapUserFromRow);
+        return jdbcTemplate.query("SELECT * FROM users WHERE email = ?", USER_ROW_MAPPER, email).stream().findAny();
     }
 
     @Override
     public Optional<User> findById(final Long id) {
-        final List<Map<String, Object>> rows = 
-            jdbcTemplate.queryForList("SELECT * FROM users WHERE user_id = ?", id);
-
-        return rows.stream().findFirst().map(this::mapUserFromRow);
+        return jdbcTemplate.query("SELECT * FROM users WHERE user_id = ?", USER_ROW_MAPPER, id).stream().findAny();
     }
 
 	@Override

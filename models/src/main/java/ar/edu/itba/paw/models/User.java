@@ -1,8 +1,5 @@
 package ar.edu.itba.paw.models;
 
-import java.util.List;
-import java.util.Collections;
-
 public class User {
 
     private final Long id;
@@ -21,8 +18,6 @@ public class User {
     private final String extraAddressInfo;
     private final String cbuCvu;
 
-    private final List<Long> wishlist;
-
     public User(
             final Long id,
             final String email,
@@ -38,8 +33,7 @@ public class User {
             final String neighborhood,
             final String province,
             final String extraAddressInfo,
-            final String cbuCvu,
-            final List<Long> wishlist) {
+            final String cbuCvu) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -55,12 +49,11 @@ public class User {
         this.province = province;
         this.extraAddressInfo = extraAddressInfo;
         this.cbuCvu = cbuCvu;
-        this.wishlist = wishlist;
     }
 
     /** Backward-compatible constructor: profile fields are null. */
     public User(final Long id, final String email, final String password, final String username, final Boolean mod) {
-        this(id, email, password, username, mod, false, false, null, null, null, null, null, null, null, null, Collections.emptyList());
+        this(id, email, password, username, mod, false, false, null, null, null, null, null, null, null, null);
     }
 
     private static boolean nonBlank(final String s) {
@@ -185,10 +178,6 @@ public class User {
 
     public String getCbuCvu() {
         return cbuCvu;
-    }
-
-    public List<Long> getWishlist() {
-        return wishlist;
     }
 
     @Override
