@@ -17,6 +17,12 @@
                                         <spring:message code="Home.alert.productCreated" />
                                     </div>
                                 </c:if>
+                                <c:if test="${param.updated eq '1'}">
+                                    <div class="alert-retro alert-retro-success mb-3" role="alert">
+                                        <i class="bi bi-check-circle" aria-hidden="true"></i>
+                                        <spring:message code="ProductDetail.alert.updated" />
+                                    </div>
+                                </c:if>
                                 <c:if test="${param.reported eq '1'}">
                                     <div class="alert-retro alert-retro-success mb-3" role="alert">
                                         <i class="bi bi-check-circle" aria-hidden="true"></i>

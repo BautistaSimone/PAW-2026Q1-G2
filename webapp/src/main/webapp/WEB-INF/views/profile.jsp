@@ -103,6 +103,11 @@
                         <spring:message code="Profile.alert.deleteForbidden" />
                     </div>
                 </c:if>
+                <div class="mt-2">
+                    <a href="<c:url value='/profile/trash'/>" class="btn btn-retro btn-retro-outline btn-sm">
+                        <i class="bi bi-trash3" aria-hidden="true"></i> <spring:message code="Profile.trash.link" />
+                    </a>
+                </div>
             </c:if>
 
             <c:if test="${isOwnProfile and param.hidden eq '1'}">
@@ -175,6 +180,10 @@
                                                 sellerRating="${sellerRating}"
                                                 href="${productUrl}"/>
                                         <c:if test="${isOwnProfile}">
+                                            <c:url var="editProductUrl" value="/products/${product.id}/edit"/>
+                                            <a href="<c:out value='${editProductUrl}'/>" class="btn btn-retro btn-retro-primary w-100 mt-2" style="font-size: 0.85rem; padding: 0.4rem 0.75rem;">
+                                                <i class="bi bi-pencil-square" aria-hidden="true"></i> <spring:message code="Profile.publications.editButton" />
+                                            </a>
                                             <c:url var="deleteProductUrl" value="/products/${product.id}/delete"/>
                                             <spring:message code="Profile.publications.deleteConfirm" var="confirmDelete" />
                                             <form action="${deleteProductUrl}" method="post" class="mt-2" onsubmit="return confirm('${confirmDelete}');">

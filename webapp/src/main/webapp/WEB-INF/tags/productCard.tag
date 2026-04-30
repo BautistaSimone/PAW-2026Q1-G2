@@ -9,14 +9,24 @@
 <%@ attribute name="discountPercentage" required="false" type="java.lang.Integer" %>
 <%@ attribute name="categories" required="false" rtexprvalue="true" type="java.util.List" %>
 <%@ attribute name="sellerRating" required="false" rtexprvalue="true" type="ar.edu.itba.paw.models.SellerRatingSummary" %>
+<%@ attribute name="linkDisabled" required="false" rtexprvalue="true" type="java.lang.Boolean" %>
 <%@ taglib prefix="ui" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <c:set var="isOnSale" value="${onSale ne null ? onSale : false}" />
+<c:set var="isLinkDisabled" value="${linkDisabled ne null ? linkDisabled : false}" />
+<spring:message code="ProductCard.linkDisabled.ariaLabel" var="productCardNoLinkAria" />
 
-<a href="${href}" class="card product-card text-decoration-none" style="cursor: pointer;">
+<c:choose>
+    <c:when test="${isLinkDisabled}">
+        <div class="card product-card text-decoration-none" style="cursor: default;" role="group" aria-label="${productCardNoLinkAria}">
+    </c:when>
+    <c:otherwise>
+        <a href="${href}" class="card product-card text-decoration-none" style="cursor: pointer;">
+    </c:otherwise>
+</c:choose>
     <div class="product-image-placeholder" style="position: relative;">
         <c:choose>
             <c:when test="${not empty imageUrl}">
@@ -61,4 +71,11 @@
             </c:otherwise>
         </c:choose>
     </div>
-</a>
+<c:choose>
+    <c:when test="${isLinkDisabled}">
+        </div>
+    </c:when>
+    <c:otherwise>
+        </a>
+    </c:otherwise>
+</c:choose>

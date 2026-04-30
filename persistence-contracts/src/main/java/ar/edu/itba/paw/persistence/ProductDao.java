@@ -7,6 +7,7 @@ import java.util.Optional;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
+import ar.edu.itba.paw.models.ProductState;
 
 public interface ProductDao {
     Product createProduct(
@@ -27,6 +28,13 @@ public interface ProductDao {
 
     PaginatedResult<Product> findProducts(ProductSearchCriteria criteria);
 
+    PaginatedResult<Product> findProductsByUserIdAndState(
+        final Long userId,
+        final ProductState state,
+        final int page,
+        final int pageSize
+    );
+
     List<String> listDistinctRecordLabels();
 
     Optional<Product> findById(final Long id);
@@ -37,6 +45,23 @@ public interface ProductDao {
 
     void markAsSold(final Long id);
 
-    void markAsUnavailable(final Long id);
-}
+    boolean markAsUserDeleted(final Long id);
 
+    void markAsAdminHidden(final Long id);
+
+    boolean updateProduct(
+        final Long productId,
+        final String title,
+        final String artist,
+        final String recordLabel,
+        final String catalogNumber,
+        final String editionCountry,
+        final List<Long> categoryIds,
+        final String description,
+        final BigDecimal sleeveCondition,
+        final BigDecimal recordCondition,
+        final BigDecimal price
+    );
+
+    boolean restoreUserDeletedProduct(final Long id);
+}

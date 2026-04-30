@@ -100,4 +100,9 @@ public class ImageJdbcDao implements ImageDao {
             IMAGE_ROW_MAPPER
         );
     }
+
+    @Override
+    public int deleteByProductId(final Long productId) {
+        return jdbcTemplate.update("DELETE FROM images WHERE product_id = ?", productId);
+    }
 }

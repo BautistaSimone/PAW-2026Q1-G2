@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindingResult;
 import javax.validation.Valid;
@@ -91,7 +93,11 @@ public class ProductController {
         @AuthenticationPrincipal final PawAuthUser authUser,
         @ModelAttribute("productForm") final ProductForm form
     ) {
-        return redirectIfCannotPublish(authUser).orElseGet(() -> new ModelAndView("product-form"));
+        return redirectIfCannotPublish(authUser).orElseGet(() -> {
+            final ModelAndView mav = new ModelAndView("product-form");
+            mav.addObject("isEditing", Boolean.FALSE);
+            return mav;
+        });
     }
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
@@ -107,7 +113,9 @@ public class ProductController {
         }
 
         if (errors.hasErrors()) {
-            return new ModelAndView("product-form");
+            final ModelAndView mav = new ModelAndView("product-form");
+            mav.addObject("isEditing", Boolean.FALSE);
+            return mav;
         }
 
         final List<ValidatedImage> validatedImages;
@@ -115,10 +123,21 @@ public class ProductController {
             validatedImages = ImageUploadValidator.validateAll(form.getImages());
         } catch (InvalidImageUploadException e) {
             errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
-            return new ModelAndView("product-form");
+            final ModelAndView mav = new ModelAndView("product-form");
+            mav.addObject("isEditing", Boolean.FALSE);
+            return mav;
         } catch (IOException e) {
-            errors.rejectValue("images", "Read.productForm.images", "No pudimos leer la imagen enviada.");
-            return new ModelAndView("product-form");
+            errors.rejectValue("images", "Read.productForm.images", null);
+            final ModelAndView mav = new ModelAndView("product-form");
+            mav.addObject("isEditing", Boolean.FALSE);
+            return mav;
+        }
+
+        if (validatedImages.isEmpty()) {
+            errors.rejectValue("images", "Required.productForm.images", null);
+            final ModelAndView mav = new ModelAndView("product-form");
+            mav.addObject("isEditing", Boolean.FALSE);
+            return mav;
         }
 
         final User publisher = userService.findById(authUser.getUser().getId())
@@ -147,6 +166,159 @@ public class ProductController {
         }
 
         return new ModelAndView("redirect:/products/" + product.getId() + "?created=1");
+    }
+
+    @RequestMapping(value = "/products/{id}/edit", method = RequestMethod.GET)
+    public ModelAndView editProductForm(
+        @AuthenticationPrincipal final PawAuthUser authUser,
+        @PathVariable("id") final Long id,
+        @ModelAttribute("productForm") final ProductForm form
+    ) {
+        final Optional<ModelAndView> publishGuard = redirectIfCannotPublish(authUser);
+        if (publishGuard.isPresent()) {
+            return publishGuard.get();
+        }
+
+        final Product product = productService.findByIdIfAvailable(id)
+            .orElseThrow(ResourceNotFoundException::new);
+
+        if (!product.getUserId().equals(authUser.getUser().getId())) {
+            throw new ResourceNotFoundException();
+        }
+
+        form.setTitle(product.getTitle());
+        form.setArtist(product.getArtist());
+        form.setRecordLabel(product.getRecordLabel());
+        form.setCatalogNumber(product.getCatalogNumber());
+        form.setEditionCountry(product.getEditionCountry());
+        form.setDescription(product.getDescription());
+        form.setSleeveCondition(product.getSleeveCondition());
+        form.setRecordCondition(product.getRecordCondition());
+        form.setPrice(product.getPrice());
+        form.setCategories(
+            product.getCategories().stream().map(c -> c.getId()).collect(Collectors.toList())
+        );
+
+        final ModelAndView mav = new ModelAndView("product-form");
+        mav.addObject("isEditing", Boolean.TRUE);
+        mav.addObject("editingProductId", id);
+        mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
+        return mav;
+    }
+
+    @RequestMapping(value = "/products/{id}/edit", method = RequestMethod.POST)
+    public ModelAndView updateProduct(
+        @AuthenticationPrincipal final PawAuthUser authUser,
+        @PathVariable("id") final Long id,
+        @Valid @ModelAttribute("productForm") final ProductForm form,
+        final BindingResult errors
+    ) {
+        final Optional<ModelAndView> publishGuard = redirectIfCannotPublish(authUser);
+        if (publishGuard.isPresent()) {
+            return publishGuard.get();
+        }
+
+        final Product existing = productService.findByIdIfAvailable(id)
+            .orElseThrow(ResourceNotFoundException::new);
+
+        if (!existing.getUserId().equals(authUser.getUser().getId())) {
+            throw new ResourceNotFoundException();
+        }
+
+        if (errors.hasErrors()) {
+            final ModelAndView mav = new ModelAndView("product-form");
+            mav.addObject("isEditing", Boolean.TRUE);
+            mav.addObject("editingProductId", id);
+            mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
+            return mav;
+        }
+
+        final boolean hasNewImages = hasNonEmptyMultipartFiles(form.getImages());
+        final List<ValidatedImage> validatedImages = new ArrayList<>();
+        if (hasNewImages) {
+            try {
+                validatedImages.addAll(ImageUploadValidator.validateAll(form.getImages()));
+            } catch (InvalidImageUploadException e) {
+                errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
+                final ModelAndView mav = new ModelAndView("product-form");
+                mav.addObject("isEditing", Boolean.TRUE);
+                mav.addObject("editingProductId", id);
+                mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
+                return mav;
+            } catch (IOException e) {
+                errors.rejectValue("images", "Read.productForm.images", null);
+                final ModelAndView mav = new ModelAndView("product-form");
+                mav.addObject("isEditing", Boolean.TRUE);
+                mav.addObject("editingProductId", id);
+                mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
+                return mav;
+            }
+            if (validatedImages.isEmpty()) {
+                errors.rejectValue("images", "Required.productForm.images", null);
+                final ModelAndView mav = new ModelAndView("product-form");
+                mav.addObject("isEditing", Boolean.TRUE);
+                mav.addObject("editingProductId", id);
+                mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
+                return mav;
+            }
+        } else if (!imageService.existsByProductId(id)) {
+            errors.rejectValue("images", "Required.productForm.images", null);
+            final ModelAndView mav = new ModelAndView("product-form");
+            mav.addObject("isEditing", Boolean.TRUE);
+            mav.addObject("editingProductId", id);
+            mav.addObject("hasExistingProductImages", Boolean.FALSE);
+            return mav;
+        }
+
+        productService.updateProduct(
+            authUser.getUser().getId(),
+            id,
+            form.getTitle(),
+            form.getArtist(),
+            form.getRecordLabel(),
+            form.getCatalogNumber(),
+            form.getEditionCountry(),
+            form.getCategories(),
+            form.getDescription(),
+            form.getSleeveCondition(),
+            form.getRecordCondition(),
+            form.getPrice()
+        );
+
+        if (hasNewImages) {
+            imageService.deleteImagesByProductId(id);
+            for (ValidatedImage image : validatedImages) {
+                imageService.createImage(id, image.getData(), image.getContentType());
+            }
+        }
+
+        return new ModelAndView("redirect:/products/" + id + "?updated=1");
+    }
+
+    @RequestMapping(value = "/products/{id}/restore", method = RequestMethod.POST)
+    public ModelAndView restoreDeletedProduct(
+        @AuthenticationPrincipal final PawAuthUser authUser,
+        @PathVariable("id") final Long id
+    ) {
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+        if (!productService.restoreUserDeletedProduct(id, authUser.getUser().getId())) {
+            return new ModelAndView("redirect:/profile/trash?restoreError=1");
+        }
+        return new ModelAndView("redirect:/profile/trash?restored=1");
+    }
+
+    private static boolean hasNonEmptyMultipartFiles(final MultipartFile[] files) {
+        if (files == null) {
+            return false;
+        }
+        for (MultipartFile f : files) {
+            if (f != null && !f.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @RequestMapping(value = "/products/{id}", method = RequestMethod.GET)
@@ -252,7 +424,9 @@ public class ProductController {
             return new ModelAndView("redirect:/profile?deleteError=forbidden");
         }
 
-        productService.hideProductFromCatalog(id);
+        if (!productService.hideProductByUser(id, authUser.getUser().getId())) {
+            return new ModelAndView("redirect:/profile?deleteError=forbidden");
+        }
         return new ModelAndView("redirect:/profile?deleted=1");
     }
 
@@ -264,7 +438,7 @@ public class ProductController {
         if (!reportRemovalTokenService.isValid(id, token)) {
             throw new IllegalArgumentException("Invalid or expired moderation link");
         }
-        productService.hideProductFromCatalog(id);
+        productService.hideProductByAdmin(id);
         return redirectAfterModerationHide();
     }
 

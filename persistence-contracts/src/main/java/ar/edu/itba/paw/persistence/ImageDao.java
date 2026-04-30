@@ -17,4 +17,6 @@ public interface ImageDao {
     boolean existsByProductId(Long productId);
 
     List<Image> listImages();
+
+    int deleteByProductId(Long productId);
 }

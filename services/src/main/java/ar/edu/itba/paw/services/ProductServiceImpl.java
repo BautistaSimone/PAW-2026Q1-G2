@@ -10,18 +10,17 @@ import org.springframework.stereotype.Service;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
+import ar.edu.itba.paw.models.ProductState;
 import ar.edu.itba.paw.persistence.ProductDao;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
     private final ProductDao productDao;
-    private final UserService userService;
 
     @Autowired
-    public ProductServiceImpl(final ProductDao productDao, final UserService userService) {
+    public ProductServiceImpl(final ProductDao productDao) {
         this.productDao = productDao;
-        this.userService = userService;
     }
 
     private static String trimToNull(final String s) {
@@ -46,6 +45,23 @@ public class ProductServiceImpl implements ProductService {
         final BigDecimal recordCondition,
         final BigDecimal price
     ) {
+        validateProductFields(title, artist, description, sleeveCondition, recordCondition, price);
+
+        return productDao.createProduct(
+            userId, trimToNull(title), trimToNull(artist), trimToNull(recordLabel),
+            trimToNull(catalogNumber), trimToNull(editionCountry), categoryIds, trimToNull(description),
+            sleeveCondition, recordCondition, price
+        );
+    }
+
+    private static void validateProductFields(
+        final String title,
+        final String artist,
+        final String description,
+        final BigDecimal sleeveCondition,
+        final BigDecimal recordCondition,
+        final BigDecimal price
+    ) {
         if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Price must be strictly positive");
         }
@@ -61,14 +77,10 @@ public class ProductServiceImpl implements ProductService {
         if (artist == null || artist.trim().isEmpty()) {
             throw new IllegalArgumentException("Artist cannot be empty");
         }
-
-        return productDao.createProduct(
-            userId, trimToNull(title), trimToNull(artist), trimToNull(recordLabel), 
-            trimToNull(catalogNumber), trimToNull(editionCountry), categoryIds, trimToNull(description), 
-            sleeveCondition, recordCondition, price
-        );
+        if (description == null || description.trim().isEmpty()) {
+            throw new IllegalArgumentException("Description cannot be empty");
+        }
     }
-
 
     @Override
     public PaginatedResult<Product> listProducts() {
@@ -78,6 +90,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public PaginatedResult<Product> listProducts(final ProductSearchCriteria criteria) {
         return productDao.findProducts(criteria);
+    }
+
+    @Override
+    public PaginatedResult<Product> listUserDeletedProducts(final Long userId, final int page, final int pageSize) {
+        return productDao.findProductsByUserIdAndState(userId, ProductState.USER_DELETED, page, pageSize);
     }
 
     @Override
@@ -106,8 +123,68 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void hideProductFromCatalog(final Long id) {
-        productDao.markAsUnavailable(id);
+    public boolean hideProductByUser(final Long productId, final Long ownerUserId) {
+        final Product product = productDao.findById(productId)
+            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        if (!product.getUserId().equals(ownerUserId)) {
+            return false;
+        }
+        return productDao.markAsUserDeleted(productId);
+    }
+
+    @Override
+    public void hideProductByAdmin(final Long id) {
+        productDao.markAsAdminHidden(id);
+    }
+
+    @Override
+    public Product updateProduct(
+        final Long ownerUserId,
+        final Long productId,
+        final String title,
+        final String artist,
+        final String recordLabel,
+        final String catalogNumber,
+        final String editionCountry,
+        final List<Long> categoryIds,
+        final String description,
+        final BigDecimal sleeveCondition,
+        final BigDecimal recordCondition,
+        final BigDecimal price
+    ) {
+        final Product product = productDao.findById(productId)
+            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        if (!product.getUserId().equals(ownerUserId)) {
+            throw new IllegalArgumentException("Not the product owner");
+        }
+        validateProductFields(title, artist, description, sleeveCondition, recordCondition, price);
+
+        final boolean ok = productDao.updateProduct(
+            productId,
+            trimToNull(title),
+            trimToNull(artist),
+            trimToNull(recordLabel),
+            trimToNull(catalogNumber),
+            trimToNull(editionCountry),
+            categoryIds,
+            trimToNull(description),
+            sleeveCondition,
+            recordCondition,
+            price
+        );
+        if (!ok) {
+            throw new IllegalStateException("Product cannot be updated (not active or missing)");
+        }
+        return productDao.findById(productId).orElseThrow(() -> new IllegalStateException("Product missing after update"));
+    }
+
+    @Override
+    public boolean restoreUserDeletedProduct(final Long productId, final Long ownerUserId) {
+        final Product product = productDao.findById(productId)
+            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        if (!product.getUserId().equals(ownerUserId)) {
+            return false;
+        }
+        return productDao.restoreUserDeletedProduct(productId);
     }
 }
-

@@ -52,4 +52,9 @@ public class ImageServiceImpl implements ImageService {
     public List<Image> listImages() {
         return imageDao.listImages();
     }
+
+    @Override
+    public void deleteImagesByProductId(final Long productId) {
+        imageDao.deleteByProductId(productId);
+    }
 }

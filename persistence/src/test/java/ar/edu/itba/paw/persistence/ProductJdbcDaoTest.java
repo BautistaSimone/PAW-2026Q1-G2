@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
+import ar.edu.itba.paw.models.ProductState;
 import ar.edu.itba.paw.models.User;
 
 @Rollback
@@ -168,5 +169,91 @@ public class ProductJdbcDaoTest {
         Assertions.assertFalse(productDao.reserveIfAvailable(product.getId()));
         Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isEmpty());
         Assertions.assertTrue(productDao.findProducts(ProductSearchCriteria.empty()).getResults().isEmpty());
+    }
+
+    @Test
+    public void markAsUserDeletedAndRestore() {
+        final User user = userDao.createUser("seller5@test.com", "password", "seller5", false, true, null, null, null, null, null, null, null, null);
+        final Product product = productDao.createProduct(
+            user.getId(),
+            "Album",
+            "Artist",
+            "Label",
+            "CAT-1",
+            "Argentina",
+            Collections.emptyList(),
+            "Desc",
+            BigDecimal.valueOf(8.0),
+            BigDecimal.valueOf(8.0),
+            BigDecimal.valueOf(1000)
+        );
+
+        Assertions.assertTrue(productDao.markAsUserDeleted(product.getId()));
+        Assertions.assertFalse(productDao.markAsUserDeleted(product.getId()));
+        Assertions.assertEquals(1, productDao.findProductsByUserIdAndState(user.getId(), ProductState.USER_DELETED, 1, 10).getResults().size());
+        Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isEmpty());
+
+        Assertions.assertTrue(productDao.restoreUserDeletedProduct(product.getId()));
+        Assertions.assertFalse(productDao.restoreUserDeletedProduct(product.getId()));
+        Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isPresent());
+    }
+
+    @Test
+    public void markAsSoldOnlyFromReserved() {
+        final User user = userDao.createUser("seller6@test.com", "password", "seller6", false, true, null, null, null, null, null, null, null, null);
+        final Product product = productDao.createProduct(
+            user.getId(),
+            "X",
+            "Y",
+            "L",
+            "C",
+            "Argentina",
+            Collections.emptyList(),
+            "D",
+            BigDecimal.valueOf(7.0),
+            BigDecimal.valueOf(7.0),
+            BigDecimal.valueOf(500)
+        );
+
+        Assertions.assertTrue(productDao.reserveIfAvailable(product.getId()));
+        productDao.markAsSold(product.getId());
+        Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isEmpty());
+        Assertions.assertTrue(productDao.findById(product.getId()).isPresent());
+    }
+
+    @Test
+    public void updateProductChangesTitleWhenActive() {
+        final User user = userDao.createUser("seller7@test.com", "password", "seller7", false, true, null, null, null, null, null, null, null, null);
+        final Product product = productDao.createProduct(
+            user.getId(),
+            "Old",
+            "Artist",
+            "Label",
+            "CAT",
+            "Argentina",
+            Collections.emptyList(),
+            "Desc",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(2000)
+        );
+
+        Assertions.assertTrue(productDao.updateProduct(
+            product.getId(),
+            "NewTitle",
+            "Artist",
+            "Label",
+            "CAT",
+            "Argentina",
+            Collections.emptyList(),
+            "Desc",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(2500)
+        ));
+
+        final Product reloaded = productDao.findById(product.getId()).orElseThrow();
+        Assertions.assertEquals("NewTitle", reloaded.getTitle());
+        Assertions.assertEquals(0, reloaded.getPrice().compareTo(BigDecimal.valueOf(2500)));
     }
 }

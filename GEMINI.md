@@ -182,3 +182,4 @@ Page titles must also be internationalized using a `var`:
 3. **Keep key names consistent** with the `PageName.element.property` convention.
 4. **Aria-labels and accessibility text** must also be internationalized.
 5. **The `<c:out>` XSS rule still applies** — when printing dynamic model data, use `<c:out>`. The `<spring:message>` tag is only for static translatable text from the message bundles.
+6. **For every new user-facing text** (labels, buttons, alerts, placeholders, titles, `aria-label`s, etc.), add the corresponding message key to **both** `messages.properties` and `messages_en.properties` in the same change — do not defer internationalization.

@@ -322,7 +322,7 @@ public class UserController {
         @RequestParam("productId") final Long productId
     ) {
         // Authorization enforced by Spring Security: only ROLE_ADMIN can reach this endpoint
-        productService.hideProductFromCatalog(productId);
+        productService.hideProductByAdmin(productId);
         reportService.deleteByProductId(productId);
         return new ModelAndView("redirect:/profile?tab=reports&hidden=1");
     }
@@ -344,10 +344,40 @@ public class UserController {
         );
         final List<Product> userProducts = productService.listProducts(criteria).getResults();
         for (Product p : userProducts) {
-            productService.hideProductFromCatalog(p.getId());
+            productService.hideProductByAdmin(p.getId());
             reportService.deleteByProductId(p.getId());
         }
 
         return new ModelAndView("redirect:/profile?tab=reports&banned=1");
+    }
+
+    @RequestMapping(value = "/profile/trash", method = RequestMethod.GET)
+    public ModelAndView trash(
+        @AuthenticationPrincipal final PawAuthUser authUser,
+        @RequestParam(value = "page", defaultValue = "1") final int page
+    ) {
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        final User user = userService.findById(authUser.getUser().getId())
+            .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        final PaginatedResult<Product> deletedPage = productService.listUserDeletedProducts(user.getId(), page, 10);
+
+        final Map<Long, String> productImageUrls = new HashMap<>();
+        for (Product product : deletedPage.getResults()) {
+            if (imageService.existsByProductId(product.getId())) {
+                productImageUrls.put(product.getId(), "/images/product/" + product.getId());
+            }
+        }
+
+        final ModelAndView mv = new ModelAndView("trash");
+        mv.addObject("user", user);
+        mv.addObject("deletedProductsPage", deletedPage);
+        mv.addObject("deletedProducts", deletedPage.getResults());
+        mv.addObject("productImageUrls", productImageUrls);
+        mv.addObject("sellerRating", reviewService.summaryForSeller(user.getId()));
+        return mv;
     }
 }

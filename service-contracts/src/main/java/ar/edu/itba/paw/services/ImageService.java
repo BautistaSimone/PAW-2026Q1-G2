@@ -21,4 +21,6 @@ public interface ImageService {
     boolean existsByProductId(final Long productId);
 
     List<Image> listImages();
+
+    void deleteImagesByProductId(final Long productId);
 }

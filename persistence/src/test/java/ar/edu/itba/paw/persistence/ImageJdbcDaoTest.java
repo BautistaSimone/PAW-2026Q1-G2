@@ -61,5 +61,8 @@ public class ImageJdbcDaoTest {
         Assertions.assertArrayEquals(imageData, imageById.get().getData());
         Assertions.assertEquals("image/jpeg", imageById.get().getContentType());
         Assertions.assertTrue(imageDao.existsByProductId(product.getId()));
+
+        Assertions.assertEquals(1, imageDao.deleteByProductId(product.getId()));
+        Assertions.assertFalse(imageDao.existsByProductId(product.getId()));
     }
 }

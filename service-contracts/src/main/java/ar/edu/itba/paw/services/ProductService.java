@@ -27,6 +27,8 @@ public interface ProductService {
 
     PaginatedResult<Product> listProducts(ProductSearchCriteria criteria);
 
+    PaginatedResult<Product> listUserDeletedProducts(final Long userId, final int page, final int pageSize);
+
     List<String> listDistinctRecordLabels();
 
     Optional<Product> findById(final Long id);
@@ -37,6 +39,33 @@ public interface ProductService {
 
     void markAsSold(final Long id);
 
-    void hideProductFromCatalog(final Long id);
-}
+    /**
+     * Marks an {@code ACTIVE} listing as deleted by the owner (restorable).
+     * @return {@code true} if the row was updated
+     */
+    boolean hideProductByUser(final Long productId, final Long ownerUserId);
 
+    /** Hides a product from the catalog (admin / moderation); any previous state is overwritten. */
+    void hideProductByAdmin(final Long id);
+
+    Product updateProduct(
+        final Long ownerUserId,
+        final Long productId,
+        final String title,
+        final String artist,
+        final String recordLabel,
+        final String catalogNumber,
+        final String editionCountry,
+        final List<Long> categoryIds,
+        final String description,
+        final BigDecimal sleeveCondition,
+        final BigDecimal recordCondition,
+        final BigDecimal price
+    );
+
+    /**
+     * Restores a {@code USER_DELETED} listing to {@code ACTIVE} if {@code ownerUserId} owns it.
+     * @return {@code true} if restored
+     */
+    boolean restoreUserDeletedProduct(final Long productId, final Long ownerUserId);
+}

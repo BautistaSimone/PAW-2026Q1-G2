@@ -4,7 +4,14 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<spring:message code="ProductForm.title" var="productFormTitle" />
+<c:choose>
+    <c:when test="${isEditing}">
+        <spring:message code="ProductForm.title.edit" var="productFormTitle" />
+    </c:when>
+    <c:otherwise>
+        <spring:message code="ProductForm.title" var="productFormTitle" />
+    </c:otherwise>
+</c:choose>
 <ui:layout title="${productFormTitle}">
 
     <ui:header />
@@ -14,16 +21,31 @@
             <div class="sell-form-card">
                 <div class="sell-form-header">
                     <span class="sell-form-eyebrow"><i class="bi bi-vinyl" aria-hidden="true"></i> <spring:message code="ProductForm.eyebrow" /></span>
-                    <h1><spring:message code="ProductForm.heading" /></h1>
-                    <p>
-                        <spring:message code="ProductForm.subtitle" />
-                    </p>
+                    <c:choose>
+                        <c:when test="${isEditing}">
+                            <h1><spring:message code="ProductForm.heading.edit" /></h1>
+                            <p><spring:message code="ProductForm.subtitle.edit" /></p>
+                        </c:when>
+                        <c:otherwise>
+                            <h1><spring:message code="ProductForm.heading" /></h1>
+                            <p><spring:message code="ProductForm.subtitle" /></p>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
 
                 <%-- CSRF on query string: CommonsMultipartResolver parses the body after the security chain, so a hidden _csrf inside multipart is invisible to CsrfFilter. --%>
-                <c:url var="postUrl" value="/products">
-                    <c:param name="${_csrf.parameterName}" value="${_csrf.token}" />
-                </c:url>
+                <c:choose>
+                    <c:when test="${isEditing}">
+                        <c:url var="postUrl" value="/products/${editingProductId}/edit">
+                            <c:param name="${_csrf.parameterName}" value="${_csrf.token}" />
+                        </c:url>
+                    </c:when>
+                    <c:otherwise>
+                        <c:url var="postUrl" value="/products">
+                            <c:param name="${_csrf.parameterName}" value="${_csrf.token}" />
+                        </c:url>
+                    </c:otherwise>
+                </c:choose>
                 <form:form modelAttribute="productForm" action="${postUrl}" method="post" enctype="multipart/form-data" cssClass="sell-form" novalidate="novalidate">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                     <div class="row g-4">
@@ -106,9 +128,35 @@
                         </div>
 
                         <div class="col-12">
-                            <label for="images" class="form-label"><spring:message code="ProductForm.images.label" /> <span class="text-danger">*</span></label>
-                            <form:input type="file" path="images" cssClass="form-control sell-images-input" accept="image/*" multiple="true" id="images" />
-                            <div class="form-text"><spring:message code="ProductForm.images.help" /></div>
+                            <label for="images" class="form-label">
+                                <spring:message code="ProductForm.images.label" />
+                                <c:choose>
+                                    <c:when test="${isEditing and hasExistingProductImages}">
+                                        <span class="text-muted" style="font-weight: 400;">(<spring:message code="ProductForm.images.optionalMark" />)</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="text-danger">*</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </label>
+                            <c:choose>
+                                <c:when test="${isEditing and hasExistingProductImages}">
+                                    <form:input type="file" path="images" cssClass="form-control sell-images-input" accept="image/*" multiple="true" id="images" />
+                                </c:when>
+                                <c:otherwise>
+                                    <form:input type="file" path="images" cssClass="form-control sell-images-input" accept="image/*" multiple="true" id="images" required="required" />
+                                </c:otherwise>
+                            </c:choose>
+                            <div class="form-text">
+                                <c:choose>
+                                    <c:when test="${isEditing}">
+                                        <spring:message code="ProductForm.images.help.edit" />
+                                    </c:when>
+                                    <c:otherwise>
+                                        <spring:message code="ProductForm.images.help" />
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
                             <form:errors path="images" cssClass="text-danger" element="div" />
                             <div id="sell-images-preview" class="sell-images-preview" hidden>
                                 <div class="sell-img-main-wrap">
@@ -129,25 +177,52 @@
                     </div>
 
                     <div class="sell-form-actions">
-                        <a href="<c:url value="/"/>" class="btn btn-retro btn-retro-outline">
-                            <i class="bi bi-arrow-left" aria-hidden="true"></i> <spring:message code="ProductForm.backToCatalog" />
-                        </a>
+                        <c:choose>
+                            <c:when test="${isEditing}">
+                                <a href="<c:url value='/profile'/>" class="btn btn-retro btn-retro-outline">
+                                    <i class="bi bi-arrow-left" aria-hidden="true"></i> <spring:message code="ProductForm.backToProfile" />
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="<c:url value="/"/>" class="btn btn-retro btn-retro-outline">
+                                    <i class="bi bi-arrow-left" aria-hidden="true"></i> <spring:message code="ProductForm.backToCatalog" />
+                                </a>
+                            </c:otherwise>
+                        </c:choose>
                         <button type="submit" class="btn btn-retro btn-retro-primary" id="publishBtn">
-                            <i class="bi bi-vinyl" aria-hidden="true"></i> <spring:message code="ProductForm.submit" />
+                            <i class="bi bi-vinyl" aria-hidden="true"></i>
+                            <c:choose>
+                                <c:when test="${isEditing}">
+                                    <spring:message code="ProductForm.submit.edit" />
+                                </c:when>
+                                <c:otherwise>
+                                    <spring:message code="ProductForm.submit" />
+                                </c:otherwise>
+                            </c:choose>
                         </button>
                     </div>
                 </form:form>
             </div>
         </div>
     </div>
+    <c:choose>
+        <c:when test="${isEditing}">
+            <span id="sellFormSubmittingText" class="d-none"><spring:message code="ProductForm.submitting.edit" /></span>
+        </c:when>
+        <c:otherwise>
+            <span id="sellFormSubmittingText" class="d-none"><spring:message code="ProductForm.submitting" /></span>
+        </c:otherwise>
+    </c:choose>
     <script>
     (function () {
         var form = document.querySelector('form.sell-form');
         var publishBtn = document.getElementById('publishBtn');
+        var submittingTextEl = document.getElementById('sellFormSubmittingText');
         if (form && publishBtn) {
             form.addEventListener('submit', function () {
                 publishBtn.disabled = true;
-                publishBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> <spring:message code="ProductForm.submitting" />';
+                var msg = submittingTextEl ? submittingTextEl.textContent : '';
+                publishBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> ' + msg;
             });
         }
     })();
