@@ -104,3 +104,81 @@ When generating new code, always strictly adhere to the following rules to ensur
 
 ### 6. SQL Injection Prevention
 - All user-submitted text evaluated within `LIKE` wildcard searches (e.g., `CONCAT('%', ?, '%')`) must be escaped upstream before parameterization to prevent wildcards like `%` and `_` from being exploited.
+
+## Internationalization (i18n)
+
+The application uses **Spring MessageSource** for full internationalization. The default locale is **Spanish (es_AR)** and **English (en)** is also supported. Users can switch languages via the `?lang=` query parameter (e.g., `?lang=en`).
+
+### Configuration (WebConfig.java)
+- **`MessageSource`**: A `ReloadableResourceBundleMessageSource` bean loads message bundles from `classpath:messages` with UTF-8 encoding.
+- **`LocaleResolver`**: A `SessionLocaleResolver` stores the user's chosen locale in their session (default: `es_AR`).
+- **`LocaleChangeInterceptor`**: Registered in `addInterceptors()`, listens for the `lang` request parameter to switch locale dynamically.
+
+### Message Files
+- **`webapp/src/main/resources/messages.properties`** — Default (Spanish). This is the **primary** file.
+- **`webapp/src/main/resources/messages_en.properties`** — English translations.
+- When adding new user-facing text, **always add the key to BOTH files**.
+
+### Key Naming Convention
+Keys follow a hierarchical `PageName.element.property` pattern. Examples:
+```properties
+Login.subtitle=Inicia sesión para comprar y vender vinilos
+Login.email.label=Email
+Login.email.placeholder=tu@email.com
+Login.password.label=Contraseña
+Login.password.placeholder=Tu contraseña
+Login.password.show.ariaLabel=Mostrar contraseña
+Login.rememberMe.label=Recordarme
+ProductForm.albumTitle.label=Título del álbum
+Header.search.placeholder=Buscar vinilos, artistas, sellos...
+Footer.copyright=Copyright Vinyland - 2026. Todos los derechos reservados.
+```
+
+### Usage in JSPs and Tag Files
+Every JSP and tag file that uses i18n must declare the Spring taglib:
+```jsp
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+```
+
+#### Inline text replacement
+Replace hardcoded Spanish text with `<spring:message>`:
+```jsp
+<%-- WRONG: hardcoded text --%>
+<p>Inicia sesión para comprar y vender vinilos</p>
+
+<%-- CORRECT: internationalized --%>
+<p><spring:message code="Login.subtitle" /></p>
+```
+
+#### Attributes (placeholder, aria-label, title)
+For tag attributes that don't accept JSP tags inline, use a `var` to capture the message first:
+```jsp
+<%-- Store message in a variable --%>
+<spring:message code="Login.email.placeholder" var="emailPlaceholder" />
+
+<%-- Use the variable in the attribute --%>
+<form:input path="email" placeholder="${emailPlaceholder}" />
+```
+
+#### Parameterized messages
+Use `{0}`, `{1}`, etc. for dynamic values and `arguments` attribute:
+```properties
+PurchasePanel.order.id=Pedido #{0}
+```
+```jsp
+<spring:message code="PurchasePanel.order.id" arguments="${purchase.purchaseId}" />
+```
+
+#### Page titles
+Page titles must also be internationalized using a `var`:
+```jsp
+<spring:message code="ProductForm.title" var="pageTitle" />
+<ui:layout title="${pageTitle}">
+```
+
+### Critical Rules
+1. **NEVER hardcode user-facing text** in JSPs or tag files. Always use `<spring:message>` keys.
+2. **Always add keys to BOTH** `messages.properties` (Spanish) and `messages_en.properties` (English).
+3. **Keep key names consistent** with the `PageName.element.property` convention.
+4. **Aria-labels and accessibility text** must also be internationalized.
+5. **The `<c:out>` XSS rule still applies** — when printing dynamic model data, use `<c:out>`. The `<spring:message>` tag is only for static translatable text from the message bundles.
