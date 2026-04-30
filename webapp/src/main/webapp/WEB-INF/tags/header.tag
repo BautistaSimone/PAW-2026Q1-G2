@@ -44,11 +44,17 @@
                     </a>
                 </sec:authorize>
 
-                <!-- Link to login if not authenticated -->
                 <sec:authorize access="!isAuthenticated()">
-                    <a href="<c:url value='/login'/>" class="profile-btn" aria-label="<spring:message code='Profile.login.button' />">
-                        <span><spring:message code="Profile.login.button" /></span>
-                    </a>
+                    <div class="header-auth-actions">
+                        <a href="<c:url value='/login'/>" class="profile-btn" aria-label="<spring:message code='Header.login.button' />">
+                            <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+                            <span><spring:message code="Header.login.button" /></span>
+                        </a>
+                        <a href="<c:url value='/register'/>" class="profile-btn profile-btn-primary" aria-label="<spring:message code='Header.register.button' />">
+                            <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
+                            <span><spring:message code="Header.register.button" /></span>
+                        </a>
+                    </div>
                 </sec:authorize>
             </div>
         </c:if>
