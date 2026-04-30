@@ -35,6 +35,8 @@ public interface ProductDao {
         final int pageSize
     );
 
+    List<String> listDistinctArtists();
+
     List<String> listDistinctRecordLabels();
 
     Optional<Product> findById(final Long id);

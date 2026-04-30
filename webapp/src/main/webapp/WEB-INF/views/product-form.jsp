@@ -57,7 +57,12 @@
 
                         <div class="col-md-6">
                             <label for="artist" class="form-label"><spring:message code="ProductForm.artist.label" /> <span class="text-danger">*</span></label>
-                            <form:input path="artist" cssClass="form-control" required="required" />
+                            <form:input path="artist" cssClass="form-control" required="required" list="artist-suggestions" autocomplete="off" />
+                            <datalist id="artist-suggestions">
+                                <c:forEach items="${artistSuggestions}" var="artistSuggestion">
+                                    <option value="<c:out value='${artistSuggestion}' />"></option>
+                                </c:forEach>
+                            </datalist>
                             <form:errors path="artist" cssClass="text-danger" element="div" />
                         </div>
 
@@ -66,12 +71,17 @@
                             <div class="input-group">
                                 <spring:message code="ProductForm.recordLabel.placeholder" var="labelPlaceholder" />
                                 <form:input path="recordLabel" cssClass="form-control"
-                                       placeholder="${labelPlaceholder}" required="required" />
+                                       placeholder="${labelPlaceholder}" required="required" list="record-label-suggestions" autocomplete="off" />
                                 <span class="input-group-text" style="border-color: var(--color-border);">–</span>
                                 <spring:message code="ProductForm.catalogNumber.placeholder" var="catalogPlaceholder" />
                                 <form:input path="catalogNumber" cssClass="form-control"
                                        placeholder="${catalogPlaceholder}" required="required" />
                             </div>
+                            <datalist id="record-label-suggestions">
+                                <c:forEach items="${recordLabelSuggestions}" var="recordLabelSuggestion">
+                                    <option value="<c:out value='${recordLabelSuggestion}' />"></option>
+                                </c:forEach>
+                            </datalist>
                             <form:errors path="recordLabel" cssClass="text-danger" element="div" />
                             <form:errors path="catalogNumber" cssClass="text-danger" element="div" />
                         </div>
@@ -214,6 +224,68 @@
         </c:otherwise>
     </c:choose>
     <script>
+    (function () {
+        function attachLimitedAutocomplete(inputId, datalistId) {
+            var input = document.getElementById(inputId);
+            var datalist = document.getElementById(datalistId);
+            if (!input || !datalist) {
+                return;
+            }
+
+            var suggestions = Array.prototype.slice.call(datalist.options)
+                .map(function (option) {
+                    return option.value;
+                })
+                .filter(function (value) {
+                    return value && value.trim().length > 0;
+                });
+
+            function clearSuggestions() {
+                while (datalist.firstChild) {
+                    datalist.removeChild(datalist.firstChild);
+                }
+            }
+
+            clearSuggestions();
+
+            function normalize(value) {
+                return (value || '').trim().toLowerCase();
+            }
+
+            function renderSuggestions() {
+                var query = normalize(input.value);
+                clearSuggestions();
+
+                if (query.length < 2) {
+                    return;
+                }
+
+                var rendered = 0;
+                var seen = Object.create(null);
+                suggestions.some(function (suggestion) {
+                    var normalizedSuggestion = normalize(suggestion);
+                    if (Object.prototype.hasOwnProperty.call(seen, normalizedSuggestion) || normalizedSuggestion.indexOf(query) === -1) {
+                        return false;
+                    }
+
+                    seen[normalizedSuggestion] = true;
+                    var option = document.createElement('option');
+                    option.value = suggestion;
+                    datalist.appendChild(option);
+                    rendered += 1;
+
+                    return rendered >= 5;
+                });
+            }
+
+            input.addEventListener('input', renderSuggestions);
+            input.addEventListener('focus', renderSuggestions);
+        }
+
+        attachLimitedAutocomplete('artist', 'artist-suggestions');
+        attachLimitedAutocomplete('recordLabel', 'record-label-suggestions');
+    })();
+
     (function () {
         var form = document.querySelector('form.sell-form');
         var publishBtn = document.getElementById('publishBtn');

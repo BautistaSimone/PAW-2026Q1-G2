@@ -93,11 +93,7 @@ public class ProductController {
         @AuthenticationPrincipal final PawAuthUser authUser,
         @ModelAttribute("productForm") final ProductForm form
     ) {
-        return redirectIfCannotPublish(authUser).orElseGet(() -> {
-            final ModelAndView mav = new ModelAndView("product-form");
-            mav.addObject("isEditing", Boolean.FALSE);
-            return mav;
-        });
+        return redirectIfCannotPublish(authUser).orElseGet(this::productFormView);
     }
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
@@ -113,9 +109,7 @@ public class ProductController {
         }
 
         if (errors.hasErrors()) {
-            final ModelAndView mav = new ModelAndView("product-form");
-            mav.addObject("isEditing", Boolean.FALSE);
-            return mav;
+            return productFormView();
         }
 
         final List<ValidatedImage> validatedImages;
@@ -123,21 +117,15 @@ public class ProductController {
             validatedImages = ImageUploadValidator.validateAll(form.getImages());
         } catch (InvalidImageUploadException e) {
             errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
-            final ModelAndView mav = new ModelAndView("product-form");
-            mav.addObject("isEditing", Boolean.FALSE);
-            return mav;
+            return productFormView();
         } catch (IOException e) {
             errors.rejectValue("images", "Read.productForm.images", null);
-            final ModelAndView mav = new ModelAndView("product-form");
-            mav.addObject("isEditing", Boolean.FALSE);
-            return mav;
+            return productFormView();
         }
 
         if (validatedImages.isEmpty()) {
             errors.rejectValue("images", "Required.productForm.images", null);
-            final ModelAndView mav = new ModelAndView("product-form");
-            mav.addObject("isEditing", Boolean.FALSE);
-            return mav;
+            return productFormView();
         }
 
         final User publisher = userService.findById(authUser.getUser().getId())
@@ -203,6 +191,7 @@ public class ProductController {
         mav.addObject("isEditing", Boolean.TRUE);
         mav.addObject("editingProductId", id);
         mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
+        attachProductFormSuggestions(mav);
         return mav;
     }
 
@@ -230,6 +219,7 @@ public class ProductController {
             mav.addObject("isEditing", Boolean.TRUE);
             mav.addObject("editingProductId", id);
             mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
+            attachProductFormSuggestions(mav);
             return mav;
         }
 
@@ -244,6 +234,7 @@ public class ProductController {
                 mav.addObject("isEditing", Boolean.TRUE);
                 mav.addObject("editingProductId", id);
                 mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
+                attachProductFormSuggestions(mav);
                 return mav;
             } catch (IOException e) {
                 errors.rejectValue("images", "Read.productForm.images", null);
@@ -251,6 +242,7 @@ public class ProductController {
                 mav.addObject("isEditing", Boolean.TRUE);
                 mav.addObject("editingProductId", id);
                 mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
+                attachProductFormSuggestions(mav);
                 return mav;
             }
             if (validatedImages.isEmpty()) {
@@ -259,6 +251,7 @@ public class ProductController {
                 mav.addObject("isEditing", Boolean.TRUE);
                 mav.addObject("editingProductId", id);
                 mav.addObject("hasExistingProductImages", imageService.existsByProductId(id));
+                attachProductFormSuggestions(mav);
                 return mav;
             }
         } else if (!imageService.existsByProductId(id)) {
@@ -267,6 +260,7 @@ public class ProductController {
             mav.addObject("isEditing", Boolean.TRUE);
             mav.addObject("editingProductId", id);
             mav.addObject("hasExistingProductImages", Boolean.FALSE);
+            attachProductFormSuggestions(mav);
             return mav;
         }
 
@@ -461,6 +455,18 @@ public class ProductController {
             return Optional.of(new ModelAndView("redirect:/profile?tab=mydata&missingData=publish"));
         }
         return Optional.empty();
+    }
+
+    private void attachProductFormSuggestions(final ModelAndView mav) {
+        mav.addObject("artistSuggestions", productService.listDistinctArtists());
+        mav.addObject("recordLabelSuggestions", productService.listDistinctRecordLabels());
+    }
+
+    private ModelAndView productFormView() {
+        final ModelAndView mav = new ModelAndView("product-form");
+        mav.addObject("isEditing", Boolean.FALSE);
+        attachProductFormSuggestions(mav);
+        return mav;
     }
 }
 

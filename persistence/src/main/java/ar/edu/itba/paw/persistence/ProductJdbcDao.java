@@ -25,6 +25,7 @@ import ar.edu.itba.paw.models.ConditionBucket;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
+import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.ProductState;
 
 @Repository
@@ -277,44 +278,54 @@ public class ProductJdbcDao implements ProductDao {
         final int page,
         final int pageSize
     ) {
-        final String whereSql = "WHERE p.user_id = ? AND p.state = ? ";
-        final List<Object> countArgs = new ArrayList<>();
-        countArgs.add(userId);
-        countArgs.add(state.getPersistenceValue());
+        final int safePage = page < 1 ? 1 : page;
+        final int safePageSize = pageSize < 1 ? 12 : pageSize;
+        final String stateVal = state.getPersistenceValue();
 
+        final String whereSql = "WHERE p.user_id = ? AND p.state = ? ";
         final Long totalCount = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM products p " + whereSql,
             Long.class,
-            countArgs.toArray()
+            userId,
+            stateVal
         );
 
         if (totalCount == null || totalCount == 0) {
-            return new PaginatedResult<>(Collections.emptyList(), page, pageSize, 0);
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
         }
 
         final List<Object> selectArgs = new ArrayList<>();
         selectArgs.add(userId);
-        selectArgs.add(state.getPersistenceValue());
-        selectArgs.add(pageSize);
-        selectArgs.add((page - 1) * pageSize);
-
+        selectArgs.add(stateVal);
         final String selectSql =
             "SELECT p.product_id, p.user_id, p.title, p.artist, p.record_label, p.catalog_number, p.edition_country, p.description, " +
             "p.sleeve_condition, p.record_condition, p.published, p.price " +
             "FROM products p " + whereSql +
-            "ORDER BY p.published DESC, p.product_id DESC LIMIT ? OFFSET ?";
+            "ORDER BY " + ProductSortOrder.NEWEST.getSqlOrderBy() + " LIMIT ? OFFSET ?";
+        selectArgs.add(safePageSize);
+        selectArgs.add((safePage - 1) * safePageSize);
 
         final List<Map<String, Object>> rows = jdbcTemplate.queryForList(selectSql, selectArgs.toArray());
         final List<Product> products = rows.stream().map(this::mapProductFromRow).collect(Collectors.toList());
 
-        return new PaginatedResult<>(products, page, pageSize, totalCount);
+        return new PaginatedResult<>(products, safePage, safePageSize, totalCount);
+    }
+
+    @Override
+    public List<String> listDistinctArtists() {
+        return jdbcTemplate.query(
+            "SELECT DISTINCT TRIM(artist) AS value FROM products WHERE state = ? " +
+            "AND artist IS NOT NULL AND TRIM(artist) <> '' ORDER BY value ASC",
+            (rs, rowNum) -> rs.getString(1),
+            ProductState.ACTIVE.getPersistenceValue()
+        );
     }
 
     @Override
     public List<String> listDistinctRecordLabels() {
         return jdbcTemplate.query(
-            "SELECT DISTINCT record_label FROM products WHERE state = ? " +
-            "AND record_label IS NOT NULL AND TRIM(record_label) <> '' ORDER BY record_label ASC",
+            "SELECT DISTINCT TRIM(record_label) AS value FROM products WHERE state = ? " +
+            "AND record_label IS NOT NULL AND TRIM(record_label) <> '' ORDER BY value ASC",
             (rs, rowNum) -> rs.getString(1),
             ProductState.ACTIVE.getPersistenceValue()
         );

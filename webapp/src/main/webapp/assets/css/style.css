@@ -165,6 +165,14 @@ img {
     gap: 1rem;
 }
 
+.header-auth-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex-wrap: nowrap;
+}
+
 /* Profile button in header */
 .profile-btn {
     display: inline-flex;
@@ -187,6 +195,18 @@ img {
     border-color: var(--color-accent);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(231, 111, 81, 0.3);
+}
+
+.profile-btn-primary {
+    background: var(--color-accent);
+    color: #fff;
+    border-color: var(--color-accent);
+}
+
+.profile-btn-primary:hover {
+    background: var(--color-accent-hover);
+    color: #fff;
+    border-color: var(--color-accent-hover);
 }
 
 .profile-btn i {
@@ -3082,6 +3102,7 @@ input[type="password"]::-ms-clear {
 
     .profile-btn span { display: none; }
     .profile-btn { padding: 0.5rem 0.65rem; }
+    .header-auth-actions { gap: 0.4rem; }
 
     .hero-section { padding: 2rem 0; }
     .hero-main-title { font-size: 1.6rem; }

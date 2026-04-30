@@ -45,6 +45,27 @@ public class ProductJdbcDaoTest {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    private Product createSuggestionProduct(
+        final User user,
+        final String title,
+        final String artist,
+        final String recordLabel
+    ) {
+        return productDao.createProduct(
+            user.getId(),
+            title,
+            artist,
+            recordLabel,
+            "CAT-001",
+            "Argentina",
+            Collections.emptyList(),
+            "Desc",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(1000)
+        );
+    }
+
     @Test
     public void testCreateProductAllowsMoreThanOneProductPerUser() {
         final User user = userDao.createUser("seller@test.com", "password", "seller", false, true, null, null, null, null, null, null, null, null);
@@ -255,5 +276,37 @@ public class ProductJdbcDaoTest {
         final Product reloaded = productDao.findById(product.getId()).orElseThrow();
         Assertions.assertEquals("NewTitle", reloaded.getTitle());
         Assertions.assertEquals(0, reloaded.getPrice().compareTo(BigDecimal.valueOf(2500)));
+    }
+
+    @Test
+    public void listDistinctArtistsReturnsUniqueVisibleNonBlankArtistsSorted() {
+        final User user = userDao.createUser("seller10@test.com", "password", "seller10", false, true, null, null, null, null, null, null, null, null);
+        createSuggestionProduct(user, "Visible B", "Zoo Artist", "Label B");
+        createSuggestionProduct(user, "Visible A", " Alpha Artist ", "Label A");
+        createSuggestionProduct(user, "Duplicate", "Zoo Artist", "Label C");
+        createSuggestionProduct(user, "Blank", "   ", "Label D");
+        final Product hiddenProduct = createSuggestionProduct(user, "Hidden", "Hidden Artist", "Hidden Label");
+        productDao.reserveIfAvailable(hiddenProduct.getId());
+
+        Assertions.assertIterableEquals(
+            List.of("Alpha Artist", "Zoo Artist"),
+            productDao.listDistinctArtists()
+        );
+    }
+
+    @Test
+    public void listDistinctRecordLabelsReturnsUniqueVisibleNonBlankLabelsSorted() {
+        final User user = userDao.createUser("seller11@test.com", "password", "seller11", false, true, null, null, null, null, null, null, null, null);
+        createSuggestionProduct(user, "Visible B", "Artist B", "Zoo Label");
+        createSuggestionProduct(user, "Visible A", "Artist A", " Alpha Label ");
+        createSuggestionProduct(user, "Duplicate", "Artist C", "Zoo Label");
+        createSuggestionProduct(user, "Blank", "Artist D", "   ");
+        final Product hiddenProduct = createSuggestionProduct(user, "Hidden", "Artist E", "Hidden Label");
+        productDao.reserveIfAvailable(hiddenProduct.getId());
+
+        Assertions.assertIterableEquals(
+            List.of("Alpha Label", "Zoo Label"),
+            productDao.listDistinctRecordLabels()
+        );
     }
 }
