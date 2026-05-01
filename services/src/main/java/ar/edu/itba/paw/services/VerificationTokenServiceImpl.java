@@ -2,8 +2,8 @@ package ar.edu.itba.paw.services;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Date;
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.Duration;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -39,7 +39,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     }
 
     private boolean isTokenExpired(Token verificationToken) {
-        return verificationToken.getExpirationDate().before(new Date());
+        return verificationToken.getExpirationDate().isBefore(Instant.now());
     }
 
     @Override
@@ -59,8 +59,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
 
         final String token = UUID.randomUUID().toString();
 
-        // TODO: Sacar de algun lado, que no sea magic number
-        Date expiryDate = calculateExpiryDate(EXPIRATION);
+        Instant expiryDate = Instant.now().plus(Duration.ofMinutes(EXPIRATION));
 
         verificationTokenDao.createToken(userId, token, expiryDate);
 
@@ -97,12 +96,5 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         } else {
             task.run();
         }
-    }
-
-    private Date calculateExpiryDate(int expiryTimeInMinutes) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Timestamp(cal.getTime().getTime()));
-        cal.add(Calendar.MINUTE, expiryTimeInMinutes);
-        return new Date(cal.getTime().getTime());
     }
 }

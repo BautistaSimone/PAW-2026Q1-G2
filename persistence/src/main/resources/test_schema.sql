@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS password_tokens (
 	token_id SERIAL PRIMARY KEY,
 	user_id INTEGER NOT NULL,
 	token VARCHAR(255) NOT NULL UNIQUE,
-	expiration_date DATE NOT NULL,
+	expiration_date TIMESTAMP NOT NULL,
 	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS verification_tokens (
 	token_id SERIAL PRIMARY KEY,
 	user_id INTEGER NOT NULL,
 	token VARCHAR(255) NOT NULL UNIQUE,
-	expiration_date DATE NOT NULL,
+	expiration_date TIMESTAMP NOT NULL,
 	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -83,14 +83,6 @@ CREATE TABLE IF NOT EXISTS purchases (
 	FOREIGN KEY(seller_user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
-CREATE TABLE IF NOT EXISTS wishlist_products (
-	user_id INTEGER NOT NULL,
-	product_id INTEGER NOT NULL,
-	PRIMARY KEY(user_id, product_id),
-	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
-	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
-);
-
 CREATE TABLE IF NOT EXISTS reviews (
 	review_id SERIAL PRIMARY KEY,
 	purchase_id INTEGER NOT NULL UNIQUE,
@@ -104,6 +96,13 @@ CREATE TABLE IF NOT EXISTS reviews (
 	FOREIGN KEY(buyer_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS wishlist_products (
+	user_id INTEGER NOT NULL,
+	product_id INTEGER NOT NULL,
+	PRIMARY KEY(user_id, product_id),
+	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
+	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
+);
 
 CREATE TABLE IF NOT EXISTS reports (
 	report_id SERIAL PRIMARY KEY,
