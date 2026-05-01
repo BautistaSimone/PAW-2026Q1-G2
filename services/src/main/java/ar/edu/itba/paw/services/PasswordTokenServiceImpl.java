@@ -2,7 +2,8 @@ package ar.edu.itba.paw.services;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Date;
+import java.time.Instant;
+import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ import ar.edu.itba.paw.persistence.PasswordTokenDao;
 @Service
 public class PasswordTokenServiceImpl implements PasswordTokenService {
 
+    private static final int EXPIRATION = 60 * 24;
+ 
     private final PasswordTokenDao passwordTokenDao;
 
     private final UserService userService;
@@ -34,7 +37,7 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
     }
 
     private boolean isTokenExpired(Token passToken) {
-        return passToken.getExpirationDate().before(new Date());
+        return passToken.getExpirationDate().isBefore(Instant.now());
     }
 
     @Override
@@ -51,9 +54,8 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
     @Override
     @Transactional
     public void createPasswordResetTokenForUser(final Long userId, String token) {
-
-        // TODO: Sacar de algun lado, que no sea magic number
-        Date expiryDate = new Date(System.currentTimeMillis() + 24L * 60 * 60 * 1000); // Expires in one day
+        
+        Instant expiryDate = Instant.now().plus(Duration.ofMinutes(EXPIRATION));
 
         passwordTokenDao.createToken(userId, token, expiryDate);
 

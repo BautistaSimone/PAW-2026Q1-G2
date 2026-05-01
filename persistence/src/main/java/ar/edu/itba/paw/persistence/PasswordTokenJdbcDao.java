@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.Date;
+import java.time.Instant;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -25,7 +26,7 @@ public class PasswordTokenJdbcDao implements PasswordTokenDao {
             rs.getLong("token_id"),
             rs.getLong("user_id"),
             rs.getString("token"),
-            rs.getDate("expiration_date")
+            rs.getTimestamp("expiration_date").toInstant()
         );
 
     private final JdbcTemplate jdbcTemplate;
@@ -38,12 +39,12 @@ public class PasswordTokenJdbcDao implements PasswordTokenDao {
     }
 
     @Override
-    public Token createToken(final Long userId, final String token, final Date expirationDate) {
+    public Token createToken(final Long userId, final String token, final Instant expirationDate) {
 
         final Map<String, Object> values = new HashMap<>();
         values.put("user_id", userId);
         values.put("token", token);
-        values.put("expiration_date", expirationDate);
+        values.put("expiration_date",  Timestamp.from(expirationDate));
 
         // Delete previous token, we don't want more than one per user
         jdbcTemplate.update("DELETE FROM password_tokens WHERE user_id = ?", userId);

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS password_tokens (
 	token_id SERIAL PRIMARY KEY,
 	user_id INTEGER NOT NULL,
 	token VARCHAR(255) NOT NULL UNIQUE,
-	expiration_date DATE NOT NULL,
+	expiration_date TIMESTAMP NOT NULL,
 	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS verification_tokens (
 	token_id SERIAL PRIMARY KEY,
 	user_id INTEGER NOT NULL,
 	token VARCHAR(255) NOT NULL UNIQUE,
-	expiration_date DATE NOT NULL,
+	expiration_date TIMESTAMP NOT NULL,
 	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
