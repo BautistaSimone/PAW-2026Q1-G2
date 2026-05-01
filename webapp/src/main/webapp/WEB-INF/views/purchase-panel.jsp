@@ -68,7 +68,7 @@
                                 </dl>
                             </div>
 
-                            <c:if test="${not empty product.recordLabel or not empty product.catalogNumber or not empty product.editionCountry or not empty product.neighborhood or not empty product.province or product.sleeveCondition ne null or product.recordCondition ne null}">
+                            <c:if test="${not empty product.recordLabel or not empty product.catalogNumber or not empty product.editionCountry or product.sleeveCondition ne null or product.recordCondition ne null}">
                                 <div class="purchase-card-inset">
                                     <p class="purchase-inset-title"><spring:message code="PurchasePanel.details.title" /></p>
                                     <ul class="purchase-inset-list mb-0">
@@ -81,11 +81,6 @@
                                         </c:if>
                                         <c:if test="${not empty product.editionCountry}">
                                             <li><strong><spring:message code="PurchasePanel.details.origin" /></strong> <c:out value="${product.editionCountry}"/></li>
-                                        </c:if>
-                                        <c:if test="${not empty product.neighborhood or not empty product.province}">
-                                            <li><strong><spring:message code="PurchasePanel.details.location" /></strong>
-                                                <c:out value="${product.neighborhood}"/><c:if test="${not empty product.neighborhood and not empty product.province}">, </c:if><c:out value="${product.province}"/>
-                                            </li>
                                         </c:if>
                                         <c:if test="${product.sleeveCondition ne null or product.recordCondition ne null}">
                                             <li><strong><spring:message code="PurchasePanel.details.status" /></strong>
