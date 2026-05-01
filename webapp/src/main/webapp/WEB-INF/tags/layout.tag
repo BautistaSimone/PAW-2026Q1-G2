@@ -35,5 +35,6 @@
 </div>
 
 <script src="<c:url value="/assets/bootstrap/js/bootstrap.bundle.js"/>"></script>
+<script src="<c:url value="/assets/js/single-submit.js"/>"></script>
 </body>
 </html>

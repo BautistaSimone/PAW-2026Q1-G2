@@ -119,7 +119,7 @@
                                                 </ul>
                                             </div>
                                             <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
-                                            <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}">
+                                            <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}" data-single-submit="true">
                                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                 <input type="hidden" name="token" value="${token}" />
                                                 <input type="hidden" name="newStatus" value="PAID" />
@@ -146,7 +146,7 @@
                                                 </c:if>
                                             </div>
                                             <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
-                                            <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}">
+                                            <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}" data-single-submit="true">
                                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                 <input type="hidden" name="token" value="${token}" />
                                                 <input type="hidden" name="newStatus" value="DELIVERED" />
@@ -211,7 +211,7 @@
                                                 <spring:message code="PurchasePanel.seller.paid.verify" />
                                             </div>
                                             <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
-                                            <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}">
+                                            <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}" data-single-submit="true">
                                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                 <input type="hidden" name="token" value="${token}" />
                                                 <input type="hidden" name="newStatus" value="SHIPPED" />

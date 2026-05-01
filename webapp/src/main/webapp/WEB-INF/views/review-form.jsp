@@ -49,7 +49,7 @@
                             <c:url var="reviewPostUrl" value="/purchases/${purchase.purchaseId}/review">
                                 <c:param name="token" value="${token}"/>
                             </c:url>
-                            <form:form modelAttribute="reviewForm" method="POST" action="${reviewPostUrl}">
+                            <form:form modelAttribute="reviewForm" method="POST" action="${reviewPostUrl}" data-single-submit="true">
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                                 <div class="mb-4">

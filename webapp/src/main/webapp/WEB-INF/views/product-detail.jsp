@@ -189,7 +189,7 @@
                                                     <div class="d-grid">
                                                         <c:url var="purchasePostUrl" value='/purchases' />
                                                         <form:form modelAttribute="purchaseCreateForm"
-                                                            action="${purchasePostUrl}" method="POST" cssClass="w-100">
+                                                            action="${purchasePostUrl}" method="POST" cssClass="w-100" data-single-submit="true">
                                                             <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
                                                             <input type="hidden" name="productId" value="<c:out value='${product.id}'/>" />
                                                             <button type="submit" class="btn w-100"
