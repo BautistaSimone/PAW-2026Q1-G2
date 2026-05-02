@@ -191,7 +191,7 @@
                                             <spring:message code="Profile.publications.deleteConfirm" var="confirmDelete" />
                                             <form action="${deleteProductUrl}" method="post" class="mt-2" onsubmit="return confirm('${confirmDelete}');">
                                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                                <button type="submit" class="btn btn-retro btn-retro-secondary w-100" style="font-size: 0.85rem; padding: 0.4rem 0.75rem;">
+                                                <button type="submit" class="btn btn-retro btn-retro-secondary w-100" style="font-size: 0.85rem; padding: 0.4rem 0.75rem; ">
                                                     <i class="bi bi-trash" aria-hidden="true"></i> <spring:message code="Profile.publications.deleteButton" />
                                                 </button>
                                             </form>
