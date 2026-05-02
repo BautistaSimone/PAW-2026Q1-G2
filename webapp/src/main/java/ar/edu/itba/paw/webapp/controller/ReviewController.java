@@ -46,7 +46,7 @@ public class ReviewController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "/purchases/{id}/review", method = RequestMethod.GET)
+    @RequestMapping(value = "/purchases/{id:\\d+}/review", method = RequestMethod.GET)
     public ModelAndView showReviewForm(
         @PathVariable("id") final Long id,
         @RequestParam("token") final String token,
@@ -81,7 +81,7 @@ public class ReviewController {
         return mav;
     }
 
-    @RequestMapping(value = "/purchases/{id}/review", method = RequestMethod.POST)
+    @RequestMapping(value = "/purchases/{id:\\d+}/review", method = RequestMethod.POST)
     public ModelAndView submitReview(
         @PathVariable("id") final Long id,
         @RequestParam("token") final String token,

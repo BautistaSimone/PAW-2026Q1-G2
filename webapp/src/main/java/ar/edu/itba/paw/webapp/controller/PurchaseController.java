@@ -82,7 +82,7 @@ public class PurchaseController {
         return new ModelAndView("redirect:/purchases/" + purchase.getPurchaseId() + "?token=" + purchase.getBuyerToken());
     }
 
-    @RequestMapping(value = "/purchases/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/purchases/{id:\\d+}", method = RequestMethod.GET)
     public ModelAndView getPurchase(
         @PathVariable("id") final Long id,
         @RequestParam("token") final String token,
@@ -122,7 +122,7 @@ public class PurchaseController {
         return mav;
     }
 
-    @RequestMapping(value = "/purchases/{id}/status", method = RequestMethod.POST)
+    @RequestMapping(value = "/purchases/{id:\\d+}/status", method = RequestMethod.POST)
     public ModelAndView updateStatus(
         @PathVariable("id") final Long id,
         @Valid @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form,

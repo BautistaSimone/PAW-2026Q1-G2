@@ -160,7 +160,7 @@ public class ProductController {
         return new ModelAndView("redirect:/products/" + product.getId() + "?created=1");
     }
 
-    @RequestMapping(value = "/products/{id}/edit", method = RequestMethod.GET)
+    @RequestMapping(value = "/products/{id:\\d+}/edit", method = RequestMethod.GET)
     public ModelAndView editProductForm(
         @AuthenticationPrincipal final PawAuthUser authUser,
         @PathVariable("id") final Long id,
@@ -194,7 +194,7 @@ public class ProductController {
         return editProductFormModelAndView(id);
     }
 
-    @RequestMapping(value = "/products/{id}/edit", method = RequestMethod.POST)
+    @RequestMapping(value = "/products/{id:\\d+}/edit", method = RequestMethod.POST)
     public ModelAndView updateProduct(
         @AuthenticationPrincipal final PawAuthUser authUser,
         @PathVariable("id") final Long id,
@@ -345,7 +345,7 @@ public class ProductController {
         return new ModelAndView("redirect:/products/" + id + "?updated=1");
     }
 
-    @RequestMapping(value = "/products/{id}/restore", method = RequestMethod.POST)
+    @RequestMapping(value = "/products/{id:\\d+}/restore", method = RequestMethod.POST)
     public ModelAndView restoreDeletedProduct(
         @AuthenticationPrincipal final PawAuthUser authUser,
         @PathVariable("id") final Long id
@@ -400,7 +400,7 @@ public class ProductController {
         return mav;
     }
 
-    @RequestMapping(value = "/products/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/products/{id:\\d+}", method = RequestMethod.GET)
     public ModelAndView productDetail(
         @PathVariable("id") final Long id,
         @AuthenticationPrincipal final PawAuthUser authUser,
@@ -462,7 +462,7 @@ public class ProductController {
         return mav;
     }
 
-    @RequestMapping(value = "/products/{id}/report", method = RequestMethod.POST)
+    @RequestMapping(value = "/products/{id:\\d+}/report", method = RequestMethod.POST)
     public ModelAndView reportProduct(
         @AuthenticationPrincipal final PawAuthUser authUser,
         @PathVariable("id") final Long id
@@ -487,7 +487,7 @@ public class ProductController {
         return new ModelAndView("redirect:/products/" + id + "?reported=1");
     }
 
-    @RequestMapping(value = "/products/{id}/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/products/{id:\\d+}/delete", method = RequestMethod.POST)
     public ModelAndView deleteOwnProduct(
         @AuthenticationPrincipal final PawAuthUser authUser,
         @PathVariable("id") final Long id
@@ -509,7 +509,7 @@ public class ProductController {
         return new ModelAndView("redirect:/profile?deleted=1");
     }
 
-    @RequestMapping(value = "/products/{id}/moderate-hide", method = RequestMethod.GET)
+    @RequestMapping(value = "/products/{id:\\d+}/moderate-hide", method = RequestMethod.GET)
     public ModelAndView moderateHideFromReportMail(
         @PathVariable("id") final Long id,
         @RequestParam("token") final String token
