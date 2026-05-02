@@ -295,7 +295,7 @@
                                             <c:if test="${pProduct != null}">
                                                 <img src="<c:url value='/images/product/${pProduct.id}'/>"
                                                      alt="" style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover;"
-                                                     onerror="this.src='https://via.placeholder.com/60?text=—';"/>
+                                                     onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\' viewBox=\'0 0 60 60\'%3E%3Crect width=\'60\' height=\'60\' fill=\'%23e9e4dc\'/%3E%3Ctext x=\'30\' y=\'38\' text-anchor=\'middle\' font-size=\'22\' fill=\'%23b0a898\'%3E♪%3C/text%3E%3C/svg%3E';"/>
                                             </c:if>
                                             <div style="flex: 1; min-width: 0;">
                                                 <c:if test="${pProduct != null}">
@@ -352,7 +352,7 @@
                                             <c:if test="${sProduct != null}">
                                                 <img src="<c:url value='/images/product/${sProduct.id}'/>"
                                                      alt="" style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover;"
-                                                     onerror="this.src='https://via.placeholder.com/60?text=—';"/>
+                                                     onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\' viewBox=\'0 0 60 60\'%3E%3Crect width=\'60\' height=\'60\' fill=\'%23e9e4dc\'/%3E%3Ctext x=\'30\' y=\'38\' text-anchor=\'middle\' font-size=\'22\' fill=\'%23b0a898\'%3E♪%3C/text%3E%3C/svg%3E';"/>
                                             </c:if>
                                             <div style="flex: 1; min-width: 0;">
                                                 <c:if test="${sProduct != null}">
@@ -503,7 +503,7 @@
                                         <div style="background: #fff; border-radius: 16px; padding: 1.25rem; border: 1px solid var(--color-border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 1rem;">
                                             <img src="<c:url value='/images/product/${rp.productId}'/>" alt=""
                                                  style="width: 70px; height: 70px; border-radius: 12px; object-fit: cover; flex-shrink: 0;"
-                                                 onerror="this.src='https://via.placeholder.com/70?text=%E2%80%94';"/>
+                                                  onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'70\' height=\'70\' viewBox=\'0 0 70 70\'%3E%3Crect width=\'70\' height=\'70\' fill=\'%23e9e4dc\'/%3E%3Ctext x=\'35\' y=\'44\' text-anchor=\'middle\' font-size=\'26\' fill=\'%23b0a898\'%3E&#9834;%3C/text%3E%3C/svg%3E';"/>
                                             <div style="flex: 1; min-width: 0;">
                                                 <div style="font-weight: 600; font-size: 1rem; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                                     <c:out value="${rp.productTitle}"/>

@@ -50,7 +50,7 @@
                                 <img src="<c:url value='/images/product/${product.id}'/>"
                                      alt=""
                                      class="purchase-product-img"
-                                     onerror="this.src='https://via.placeholder.com/150?text=Sin+Imagen';"/>
+                                     onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'150\' viewBox=\'0 0 150 150\'%3E%3Crect width=\'150\' height=\'150\' fill=\'%23e9e4dc\'/%3E%3Ctext x=\'75\' y=\'80\' text-anchor=\'middle\' font-size=\'40\' fill=\'%23b0a898\'%3E♪%3C/text%3E%3C/svg%3E';"/>
                                 <div class="purchase-product-info">
                                     <h5><c:out value="${product.title}"/></h5>
                                     <p class="purchase-artist"><c:out value="${product.artist}"/></p>
