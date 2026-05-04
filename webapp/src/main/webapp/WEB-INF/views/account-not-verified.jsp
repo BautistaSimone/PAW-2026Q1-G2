@@ -42,7 +42,7 @@
 
                         <!-- Resend verification email -->
                         <c:url var="sendVerificationUrl" value="/sendVerificationEmail" />
-                        <form:form action="${sendVerificationUrl}" method="POST">
+                        <form:form action="<c:out value='${sendVerificationUrl}' />" method="POST">
                             <div class="d-grid mt-4">
                                 <button type="submit" class="btn-accent">
                                     <i class="bi bi-envelope"></i>
@@ -56,7 +56,7 @@
                     <div class="auth-card-footer">
 
                         <form action="<c:url value='/logout' />" method="post" style="margin-top: 1rem;">
-                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                            <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
                             <button type="submit" class="btn btn-retro btn-retro-outline w-100">
                                 <i class="bi bi-arrow-left"></i>
                                 <spring:message code="notVerified.back"/>

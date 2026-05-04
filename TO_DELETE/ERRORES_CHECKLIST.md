@@ -267,9 +267,11 @@
 
 ## 4. JSP, JSTL y Frontend
 
-### ⚠️ GRAVE — `${variable}` sin `<c:out>` en JSPs/tags (XSS)
+### ⚠️ GRAVE — `${variable}` sin `<c:out>` en JSPs/tags (XSS) - LISTO
 
-**Hallazgos representativos** (hay muchos más en todo el proyecto):
+Se aplicó escape con `<c:out>` (o equivalente) en atributos HTML, URLs, CSRF, tags reutilizables y salidas sensibles en `webapp/src/main/webapp/WEB-INF/**`. Los hallazgos listados abajo quedaron cubiertos por esa pasada.
+
+**Hallazgos representativos** (referencia histórica; corregidos):
 
 - **Archivo**: `webapp/src/main/webapp/WEB-INF/tags/header.tag`
 - **Línea**: 43
@@ -537,7 +539,7 @@ Hay **CSS inline (style="...")** masivo en casi todas las vistas. Ejemplos repre
 
 ## 6. Seguridad
 
-> Las violaciones de XSS (`${...}` sin `<c:out>`) están detalladas en la sección 4.
+> Las violaciones de XSS (`${...}` sin `<c:out>`) estaban en la sección 4 (**LISTO**).
 > Las violaciones de SQL injection (concatenación) están en la sección 5.
 
 ---

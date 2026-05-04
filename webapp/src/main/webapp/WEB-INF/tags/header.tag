@@ -25,7 +25,7 @@
                         <input id="search-input" name="search-text"
                             class="search-input"
                             type="text"
-                            placeholder="${searchPlaceholder}"
+                            placeholder="<c:out value='${searchPlaceholder}' />"
                             aria-label="<spring:message code='Header.search.ariaLabel' />"
                             value="<c:out value='${headerSearchText}' />">
                         <button id="search-button" class="search-btn" type="submit" aria-label="<spring:message code='Header.search.button.ariaLabel' />">
@@ -40,7 +40,7 @@
                 <sec:authorize access="isAuthenticated()">
                     <a href="<c:url value='/profile'/>" class="profile-btn" aria-label="<spring:message code='Header.profile.ariaLabel' />">
                         <i class="bi bi-person-fill" aria-hidden="true"></i>
-                        <span><sec:authentication property="principal.user.username" /></span>
+                        <span><c:out value="${pageContext.request.userPrincipal.user.username}" /></span>
                     </a>
                 </sec:authorize>
 

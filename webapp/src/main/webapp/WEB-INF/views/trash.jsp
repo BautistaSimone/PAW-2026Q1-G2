@@ -40,19 +40,19 @@
                     <c:forEach items="${deletedProducts}" var="product">
                         <div class="products-grid-item">
                             <ui:productCard
-                                title="${product.title}"
-                                artist="${product.artist}"
+                                title="<c:out value='${product.title}' />"
+                                artist="<c:out value='${product.artist}' />"
                                 price="${product.price}"
                                 installments="${product.installmentPrice}"
-                                imageUrl="${productImageUrls[product.id]}"
+                                imageUrl="<c:out value='${productImageUrls[product.id]}' />"
                                 categories="${product.categories}"
                                 sellerRating="${sellerRating}"
                                 href="#"
                                 linkDisabled="true" />
                             <c:url var="restoreProductUrl" value="/products/${product.id}/restore" />
                             <spring:message code="Trash.restore.confirm" var="confirmRestore" />
-                            <form action="${restoreProductUrl}" method="post" class="mt-2" onsubmit="return confirm('${confirmRestore}');">
-                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                            <form action="<c:out value='${restoreProductUrl}' />" method="post" class="mt-2" onsubmit="return confirm('${confirmRestore}');">
+                                <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
                                 <button type="submit" class="btn btn-retro btn-retro-primary w-100 profile-button-3" >
                                     <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> <spring:message code="Trash.restore.button" />
                                 </button>

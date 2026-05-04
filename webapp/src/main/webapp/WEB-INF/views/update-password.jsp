@@ -20,7 +20,7 @@
                     <div class="auth-card-body">
 
                         <c:url var="changePasswordUrl" value="/changePassword" />
-                        <form:form modelAttribute="updatePasswordForm" action="${changePasswordUrl}" method="POST">
+                        <form:form modelAttribute="updatePasswordForm" action="<c:out value='${changePasswordUrl}' />" method="POST">
 
                             <!-- Token hidden field -->
                             <form:hidden path="token" />
@@ -32,7 +32,7 @@
                                     <form:password path="newPassword"
                                                    id="newPassword"
                                                    cssClass="form-control"
-                                                   placeholder="${newPasswordPlaceholder}"
+                                                   placeholder="<c:out value='${newPasswordPlaceholder}' />"
                                                    required="required"/>
                                     <button type="button" class="password-toggle-btn" aria-label="<spring:message code='Login.password.show.ariaLabel' />" onclick="togglePassword('newPassword', this)">
                                         <i class="bi bi-eye"></i>
@@ -48,7 +48,7 @@
                                     <form:password path="newPasswordConfirm"
                                                    id="newPasswordConfirm"
                                                    cssClass="form-control"
-                                                   placeholder="${confirmPasswordPlaceholder}"
+                                                   placeholder="<c:out value='${confirmPasswordPlaceholder}' />"
                                                    required="required"/>
                                     <button type="button" class="password-toggle-btn" aria-label="<spring:message code='Login.password.show.ariaLabel' />" onclick="togglePassword('newPasswordConfirm', this)">
                                         <i class="bi bi-eye"></i>

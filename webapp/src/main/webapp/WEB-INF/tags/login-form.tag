@@ -18,9 +18,9 @@
                 <div class="auth-card-body">
                     
                     <form:form modelAttribute="loginForm"
-                            action="${action}"
-                            method="${method}">
-                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                            action="<c:out value='${action}' />"
+                            method="<c:out value='${method}' />">
+                        <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
 
                         <!-- Email -->
                         <div class="mb-3">
@@ -30,7 +30,7 @@
                                 path="email"
                                 id="email"
                                 cssClass="form-control"
-                                placeholder="${emailPlaceholder}"
+                                placeholder="<c:out value='${emailPlaceholder}' />"
                                 autocomplete="email" />
                             <form:errors path="email" cssClass="text-danger small"/>
                         </div>
@@ -44,7 +44,7 @@
                                     path="password"
                                     id="password"
                                     cssClass="form-control"
-                                    placeholder="${passwordPlaceholder}"
+                                    placeholder="<c:out value='${passwordPlaceholder}' />"
                                     autocomplete="current-password" />
                                 <button type="button" class="password-toggle-btn" aria-label="<spring:message code='Login.password.show.ariaLabel' />" onclick="togglePassword('password', this)">
                                     <i class="bi bi-eye"></i>

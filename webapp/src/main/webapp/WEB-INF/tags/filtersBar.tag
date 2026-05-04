@@ -25,7 +25,7 @@
                 <c:when test="${not empty categories}">
                     <c:forEach items="${categories}" var="cat">
                         <label class="filter-category-chip">
-                            <input type="checkbox" name="categories" value="${cat.id}"
+                            <input type="checkbox" name="categories" value="<c:out value='${cat.id}' />"
                                 ${selectedCategoryIds.contains(cat.id) ? 'checked' : ''} />
                             <span class="filter-chip-text"><c:out value="${cat.name}" /></span>
                         </label>
@@ -60,13 +60,13 @@
                     <label for="filterMinPrice" class="price-label"><spring:message code="Filters.price.from" /></label>
                     <spring:message code="Filters.price.minPlaceholder" var="minPlaceholder" />
                     <input id="filterMinPrice" name="minPrice" type="text" inputmode="numeric" class="price-input"
-                           placeholder="${minPlaceholder}" value="<c:out value="${filterMinPrice}" />" />
+                           placeholder="<c:out value='${minPlaceholder}' />" value="<c:out value="${filterMinPrice}" />" />
                 </div>
                 <div class="price-input-group">
                     <label for="filterMaxPrice" class="price-label"><spring:message code="Filters.price.to" /></label>
                     <spring:message code="Filters.price.maxPlaceholder" var="maxPlaceholder" />
                     <input id="filterMaxPrice" name="maxPrice" type="text" inputmode="numeric" class="price-input"
-                           placeholder="${maxPlaceholder}" value="<c:out value="${filterMaxPrice}" />" />
+                           placeholder="<c:out value='${maxPlaceholder}' />" value="<c:out value="${filterMaxPrice}" />" />
                 </div>
             </div>
         </div>

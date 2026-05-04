@@ -24,7 +24,7 @@
                         <c:param name="${pp}" value="${result.currentPage - 1}"/>
                     </c:url>
                     <li class="page-item">
-                        <a class="page-link" href="${prevUrl}" aria-label="<spring:message code='Pagination.prev.ariaLabel' />">
+                        <a class="page-link" href="<c:out value='${prevUrl}' />" aria-label="<spring:message code='Pagination.prev.ariaLabel' />">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -40,7 +40,7 @@
                 <c:choose>
                     <c:when test="${i == result.currentPage}">
                         <li class="page-item active" aria-current="page">
-                            <span class="page-link pagination-span-1" >${i}</span>
+                            <span class="page-link pagination-span-1" ><c:out value="${i}" /></span>
                         </li>
                     </c:when>
                     <c:otherwise>
@@ -54,7 +54,7 @@
                             </c:forEach>
                             <c:param name="${pp}" value="${i}"/>
                         </c:url>
-                        <li class="page-item"><a class="page-link product-detail-i-21"  href="${pageUrl}">${i}</a></li>
+                        <li class="page-item"><a class="page-link product-detail-i-21"  href="<c:out value='${pageUrl}' />"><c:out value="${i}" /></a></li>
                     </c:otherwise>
                 </c:choose>
             </c:forEach>
@@ -72,7 +72,7 @@
                         <c:param name="${pp}" value="${result.currentPage + 1}"/>
                     </c:url>
                     <li class="page-item">
-                        <a class="page-link" href="${nextUrl}" aria-label="<spring:message code='Pagination.next.ariaLabel' />">
+                        <a class="page-link" href="<c:out value='${nextUrl}' />" aria-label="<spring:message code='Pagination.next.ariaLabel' />">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
