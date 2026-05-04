@@ -6,7 +6,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <!doctype html>
-<html lang="<c:out value='${pageContext.response.locale.language}' />">
+<html lang="${pageContext.response.locale.language}">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -27,7 +27,7 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/inline-styles.css"/>"/>
 
 </head>
-<body<c:if test="${not empty bodyClass}"> class="<c:out value='${bodyClass}' />"</c:if>>
+<body class="${not empty bodyClass ? bodyClass : ''}">
 <div class="app-container">
     <main class="page-content">
         <jsp:doBody />

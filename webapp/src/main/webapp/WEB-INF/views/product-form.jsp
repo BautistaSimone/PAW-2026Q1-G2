@@ -37,17 +37,17 @@
                 <c:choose>
                     <c:when test="${isEditing}">
                         <c:url var="postUrl" value="/products/${editingProductId}/edit">
-                            <c:param name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
+                            <c:param name="${_csrf.parameterName}" value="${_csrf.token}" />
                         </c:url>
                     </c:when>
                     <c:otherwise>
                         <c:url var="postUrl" value="/products">
-                            <c:param name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
+                            <c:param name="${_csrf.parameterName}" value="${_csrf.token}" />
                         </c:url>
                     </c:otherwise>
                 </c:choose>
-                <form:form modelAttribute="productForm" action="<c:out value='${postUrl}' />" method="post" enctype="multipart/form-data" cssClass="sell-form" novalidate="novalidate">
-                    <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
+                <form:form modelAttribute="productForm" action="${postUrl}" method="post" enctype="multipart/form-data" cssClass="sell-form" novalidate="novalidate">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                     <div class="row g-4">
                         <div class="col-md-6">
                             <label for="title" class="form-label"><spring:message code="ProductForm.albumTitle.label" /> <span class="text-danger">*</span></label>
@@ -71,11 +71,11 @@
                             <div class="input-group">
                                 <spring:message code="ProductForm.recordLabel.placeholder" var="labelPlaceholder" />
                                 <form:input path="recordLabel" cssClass="form-control"
-                                       placeholder="<c:out value='${labelPlaceholder}' />" required="required" list="record-label-suggestions" autocomplete="off" />
+                                       placeholder="${labelPlaceholder}" required="required" list="record-label-suggestions" autocomplete="off" />
                                 <span class="input-group-text product-form-span-1" >–</span>
                                 <spring:message code="ProductForm.catalogNumber.placeholder" var="catalogPlaceholder" />
                                 <form:input path="catalogNumber" cssClass="form-control"
-                                       placeholder="<c:out value='${catalogPlaceholder}' />" required="required" />
+                                       placeholder="${catalogPlaceholder}" required="required" />
                             </div>
                             <datalist id="record-label-suggestions">
                                 <c:forEach items="${recordLabelSuggestions}" var="recordLabelSuggestion">
@@ -90,7 +90,7 @@
                             <label for="editionCountry" class="form-label"><spring:message code="ProductForm.editionCountry.label" /> <span class="text-danger">*</span></label>
                             <spring:message code="ProductForm.editionCountry.placeholder" var="editionPlaceholder" />
                             <form:input path="editionCountry" cssClass="form-control"
-                                   placeholder="<c:out value='${editionPlaceholder}' />" required="required" />
+                                   placeholder="${editionPlaceholder}" required="required" />
                             <form:errors path="editionCountry" cssClass="text-danger" element="div" />
                         </div>
 
@@ -99,7 +99,7 @@
                             <div class="genre-checkboxes d-flex flex-wrap gap-2">
                                 <c:forEach items="${categories}" var="cat">
                                     <div class="form-check genre-check">
-                                        <form:checkbox path="categories" value="<c:out value='${cat.id}' />" cssClass="form-check-input" id="cat-${cat.id}" />
+                                        <form:checkbox path="categories" value="${cat.id}" cssClass="form-check-input" id="cat-${cat.id}" />
                                         <label class="form-check-label" for="cat-${cat.id}">
                                             <c:out value="${cat.name}" />
                                         </label>
@@ -113,7 +113,7 @@
                             <label for="sleeveCondition" class="form-label"><spring:message code="ProductForm.sleeveCondition.label" /> <span class="text-danger">*</span></label>
                             <spring:message code="ProductForm.sleeveCondition.placeholder" var="sleevePlaceholder" />
                             <form:input type="number" path="sleeveCondition" min="1" max="10" step="0.1"
-                                   cssClass="form-control" placeholder="<c:out value='${sleevePlaceholder}' />" required="required" />
+                                   cssClass="form-control" placeholder="${sleevePlaceholder}" required="required" />
                             <form:errors path="sleeveCondition" cssClass="text-danger" element="div" />
                         </div>
 
@@ -121,7 +121,7 @@
                             <label for="recordCondition" class="form-label"><spring:message code="ProductForm.recordCondition.label" /> <span class="text-danger">*</span></label>
                             <spring:message code="ProductForm.recordCondition.placeholder" var="recordPlaceholder" />
                             <form:input type="number" path="recordCondition" min="1" max="10" step="0.1"
-                                   cssClass="form-control" placeholder="<c:out value='${recordPlaceholder}' />" required="required" />
+                                   cssClass="form-control" placeholder="${recordPlaceholder}" required="required" />
                             <form:errors path="recordCondition" cssClass="text-danger" element="div" />
                         </div>
 
@@ -132,7 +132,7 @@
                                 <span class="input-group-text product-form-span-1" >$</span>
                                 <spring:message code="ProductForm.price.placeholder" var="priceFormPlaceholder" />
                                 <input type="text" id="priceDisplay" class="form-control" inputmode="decimal"
-                                       autocomplete="off" placeholder="<c:out value='${priceFormPlaceholder}' />" required="required" />
+                                       autocomplete="off" placeholder="${priceFormPlaceholder}" required="required" />
                             </div>
                             <form:errors path="price" cssClass="text-danger" element="div" />
                         </div>
@@ -191,7 +191,7 @@
                             <label for="description" class="form-label"><spring:message code="ProductForm.description.label" /> <span class="text-danger">*</span></label>
                             <spring:message code="ProductForm.description.placeholder" var="descriptionPlaceholder" />
                             <form:textarea path="description" cssClass="form-control" rows="5"
-                                      placeholder="<c:out value='${descriptionPlaceholder}' />" required="required" />
+                                      placeholder="${descriptionPlaceholder}" required="required" />
                             <form:errors path="description" cssClass="text-danger" element="div" />
                         </div>
 

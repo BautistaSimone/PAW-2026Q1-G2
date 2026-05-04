@@ -14,11 +14,11 @@
 
 <button 
     type="button" 
-    class="<c:out value='${classes}' />" 
+    class="${classes}" 
     data-bs-toggle="modal" 
-    data-bs-target="<c:out value='${target}' />"
-    href="<c:out value='${href}' />"
+    data-bs-target="${target}"
+    href="${href}"
     <c:if test="${btnDisabled}">disabled</c:if>
     >
-    <c:out value="${text}" />
+    ${text}
 </button>

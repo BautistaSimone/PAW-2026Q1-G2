@@ -10,7 +10,7 @@
     <ui:header showHeaderActions="false"/>
     <c:url var="registerUrl" value="/register" />
     <ui:register-form
-        action="<c:out value='${registerUrl}' />"
+        action="${registerUrl}"
         method="POST"
         buttonLabel="${registerButton}"
     />

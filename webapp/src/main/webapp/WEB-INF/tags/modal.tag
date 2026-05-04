@@ -29,7 +29,7 @@
             <div class="modal-footer">
 
                 <c:if test="${secondaryBtn ne null}">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><c:out value="${secondaryBtn}"/></button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><c:out value="${secondary}"/></button>
                 </c:if>
                 
                 <button type="button" class="btn-accent" data-bs-dismiss="modal"><c:out value="${primary}"/></button>

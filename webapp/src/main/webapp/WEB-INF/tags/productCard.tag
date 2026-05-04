@@ -21,10 +21,10 @@
 
 <c:choose>
     <c:when test="${isLinkDisabled}">
-        <div class="card product-card text-decoration-none product-card-div-1"  role="group" aria-label="<c:out value='${productCardNoLinkAria}' />">
+        <div class="card product-card text-decoration-none product-card-div-1"  role="group" aria-label="${productCardNoLinkAria}">
     </c:when>
     <c:otherwise>
-        <a href="<c:out value='${href}' />" class="card product-card text-decoration-none product-card-a-2" >
+        <a href="${href}" class="card product-card text-decoration-none product-card-a-2" >
     </c:otherwise>
 </c:choose>
     <div class="product-image-placeholder product-card-div-3" >
@@ -55,7 +55,7 @@
                     <span class="product-card-category-pill"><c:out value="${cat.name}"/></span>
                 </c:forEach>
                 <c:if test="${fn:length(categories) > 3}">
-                    <span class="product-card-category-overflow">+<c:out value="${fn:length(categories) - 3}" /></span>
+                    <span class="product-card-category-overflow">+${fn:length(categories) - 3}</span>
                 </c:if>
             </div>
         </c:if>

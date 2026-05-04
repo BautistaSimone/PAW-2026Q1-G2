@@ -119,9 +119,9 @@
                                                 </ul>
                                             </div>
                                             <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
-                                            <form:form modelAttribute="purchaseStatusForm" method="POST" action="<c:out value='${statusPostUrl}' />" data-single-submit="true">
-                                                <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
-                                                <input type="hidden" name="token" value="<c:out value='${token}' />" />
+                                            <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}" data-single-submit="true">
+                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                <input type="hidden" name="token" value="${token}" />
                                                 <input type="hidden" name="newStatus" value="PAID" />
                                                 <button type="submit" class="btn btn-retro btn-retro-primary w-100 btn-lg">
                                                     <i class="bi bi-credit-card" aria-hidden="true"></i> <spring:message code="PurchasePanel.buyer.pending.notifyPaid" />
@@ -133,7 +133,7 @@
                                             <div class="alert-retro alert-retro-info">
                                                 <i class="bi bi-hourglass-split" aria-hidden="true"></i>
                                                 <spring:message code="PurchasePanel.buyer.paid.waiting" />
-                                                <a class="purchase-panel-a-2" href="mailto:<c:out value='${orderSeller.email}'/>" ><c:out value="${orderSeller.email}"/></a>
+                                                <a class="purchase-panel-a-2" href="mailto:${orderSeller.email}" ><c:out value="${orderSeller.email}"/></a>
                                                 <c:if test="${not empty orderSeller.username}"> (<c:out value="${orderSeller.username}"/>)</c:if>.
                                             </div>
                                         </c:when>
@@ -146,9 +146,9 @@
                                                 </c:if>
                                             </div>
                                             <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
-                                            <form:form modelAttribute="purchaseStatusForm" method="POST" action="<c:out value='${statusPostUrl}' />" data-single-submit="true">
-                                                <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
-                                                <input type="hidden" name="token" value="<c:out value='${token}' />" />
+                                            <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}" data-single-submit="true">
+                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                <input type="hidden" name="token" value="${token}" />
                                                 <input type="hidden" name="newStatus" value="DELIVERED" />
                                                 <button type="submit" class="btn btn-retro btn-retro-primary w-100 btn-lg purchase-panel-button-4" >
                                                     <i class="bi bi-check2-circle" aria-hidden="true"></i> <spring:message code="PurchasePanel.buyer.shipped.confirmDelivery" />
@@ -211,9 +211,9 @@
                                                 <spring:message code="PurchasePanel.seller.paid.verify" />
                                             </div>
                                             <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
-                                            <form:form modelAttribute="purchaseStatusForm" method="POST" action="<c:out value='${statusPostUrl}' />" data-single-submit="true">
-                                                <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
-                                                <input type="hidden" name="token" value="<c:out value='${token}' />" />
+                                            <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}" data-single-submit="true">
+                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                <input type="hidden" name="token" value="${token}" />
                                                 <input type="hidden" name="newStatus" value="SHIPPED" />
                                                 <button type="submit" class="btn btn-retro btn-retro-primary w-100 btn-lg">
                                                     <i class="bi bi-truck" aria-hidden="true"></i> <spring:message code="PurchasePanel.seller.paid.confirmShip" />

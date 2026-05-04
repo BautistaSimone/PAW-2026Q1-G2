@@ -11,7 +11,7 @@
     <ui:header showHeaderActions="false"/>
     <c:url var="loginUrl" value="/login" />
     <ui:login-form
-        action="<c:out value='${loginUrl}' />"
+        action="${loginUrl}"
         method="POST"
         buttonLabel="${loginButton}"
     />

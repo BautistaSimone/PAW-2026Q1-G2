@@ -65,9 +65,9 @@
                         </div>
                         <div class="products-header-actions">
                             <spring:message code="Home.sort.ariaLabel" var="sortAriaLabel" />
-                            <select id="sortSelect" class="sort-select" aria-label="<c:out value='${sortAriaLabel}' />">
+                            <select id="sortSelect" class="sort-select" aria-label="${sortAriaLabel}">
                                 <c:forEach items="${sortOptions}" var="opt">
-                                    <option value="<c:out value='${opt.name()}' />" ${opt.name() eq selectedSort ? 'selected' : ''}>
+                                    <option value="${opt.name()}" ${opt.name() eq selectedSort ? 'selected' : ''}>
                                         <spring:message code="ProductSortOrder.${opt.name()}" />
                                     </option>
                                 </c:forEach>
@@ -85,14 +85,14 @@
                                     <div class="products-grid-item" data-product-index="${loop.index}">
                                         <c:url value="/products/${product.id}" var="productUrl"/>
                                         <ui:productCard
-                                                title="<c:out value='${product.title}' />"
-                                                artist="<c:out value='${product.artist}' />"
+                                                title="${product.title}"
+                                                artist="${product.artist}"
                                                 price="${product.price}"
                                                 installments="${product.installmentPrice}"
-                                                imageUrl="<c:out value='${productImageUrls[product.id]}' />"
+                                                imageUrl="${productImageUrls[product.id]}"
                                                 categories="${product.categories}"
                                                 sellerRating="${sellerRatingByUserId[product.userId]}"
-                                                href="<c:out value='${productUrl}' />"/>
+                                                href="${productUrl}"/>
                                     </div>
                                 </c:forEach>
                             </div>

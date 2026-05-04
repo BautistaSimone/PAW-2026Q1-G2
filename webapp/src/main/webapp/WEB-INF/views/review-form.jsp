@@ -47,10 +47,10 @@
                             </div>
 
                             <c:url var="reviewPostUrl" value="/purchases/${purchase.purchaseId}/review">
-                                <c:param name="token" value="<c:out value='${token}' />"/>
+                                <c:param name="token" value="${token}"/>
                             </c:url>
-                            <form:form modelAttribute="reviewForm" method="POST" action="<c:out value='${reviewPostUrl}' />" data-single-submit="true">
-                                <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
+                            <form:form modelAttribute="reviewForm" method="POST" action="${reviewPostUrl}" data-single-submit="true">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                                 <div class="mb-4">
                                     <label class="form-label review-form-label-4" >
@@ -58,10 +58,10 @@
                                     </label>
                                     <div class="star-rating-input" role="radiogroup" aria-label="<spring:message code='ReviewForm.score.ariaLabel' />">
                                         <c:forEach begin="1" end="5" var="i">
-                                            <input type="radio" name="score" id="star<c:out value='${i}' />" value="<c:out value='${i}' />"
+                                            <input type="radio" name="score" id="star${i}" value="${i}"
                                                    class="star-radio" ${reviewForm.score != null && reviewForm.score == i ? 'checked' : ''}/>
                                             <spring:message code="ReviewForm.score.star" arguments="${i},${i}" var="starTitle" />
-                                            <label for="star<c:out value='${i}' />" class="star-label" title="<c:out value='${starTitle}' />">
+                                            <label for="star${i}" class="star-label" title="${starTitle}">
                                                 <i class="bi bi-star-fill"></i>
                                             </label>
                                         </c:forEach>
@@ -76,7 +76,7 @@
                                     <spring:message code="ReviewForm.comment.placeholder" var="commentPlaceholder" />
                                     <form:textarea class="review-form-form-textarea-6" path="text" id="reviewText" cssClass="form-control"
                                                    rows="4" maxlength="2000"
-                                                   placeholder="<c:out value='${commentPlaceholder}' />"
+                                                   placeholder="${commentPlaceholder}"
                                                    />
                                     <form:errors path="text" cssClass="text-danger mt-1" element="div" />
                                 </div>

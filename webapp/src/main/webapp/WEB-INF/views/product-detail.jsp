@@ -189,7 +189,7 @@
                                                     <div class="d-grid">
                                                         <c:url var="purchasePostUrl" value='/purchases' />
                                                         <form:form modelAttribute="purchaseCreateForm"
-                                                            action="<c:out value='${purchasePostUrl}' />" method="POST" cssClass="w-100" data-single-submit="true">
+                                                            action="${purchasePostUrl}" method="POST" cssClass="w-100" data-single-submit="true">
                                                             <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
                                                             <input type="hidden" name="productId" value="<c:out value='${product.id}'/>" />
                                                             <button type="submit" class="btn w-100 product-detail-button-17"
@@ -313,7 +313,7 @@
                                                     <c:forEach items="${product.categories}" var="cat"
                                                         varStatus="status">
                                                         <c:url var="catFilterUrl" value="/">
-                                                            <c:param name="categories" value="<c:out value='${cat.id}' />" />
+                                                            <c:param name="categories" value="${cat.id}" />
                                                         </c:url>
                                                         <a href="<c:out value='${catFilterUrl}'/>"
                                                             style="background: #fff; color: var(--color-accent); font-weight: 600; font-size: 0.8rem; padding: 0.4rem 1rem; border-radius: 50px; border: 1.5px solid rgba(231, 111, 81, 0.2); transition: all 0.25s; box-shadow: 0 2px 8px rgba(231,111,81,0.05); text-decoration: none;"
@@ -376,14 +376,13 @@
                                                     <c:forEach items="${sellerProducts}" var="sp">
                                                             <div class="carousel-item-wrapper">
                                                                 <c:url value="/products/${sp.id}" var="spUrl" />
-                                                                <c:url value="/images/product/${sp.id}" var="spImgUrl" />
-                                                                <ui:productCard title="<c:out value='${sp.title}' />"
-                                                                    artist="<c:out value='${sp.artist}' />" price="${sp.price}"
+                                                                <ui:productCard title="${sp.title}"
+                                                                    artist="${sp.artist}" price="${sp.price}"
                                                                     installments="${sp.installmentPrice}"
-                                                                    imageUrl="<c:out value='${spImgUrl}' />"
+                                                                    imageUrl="/images/product/${sp.id}"
                                                                     categories="${sp.categories}"
                                                                     sellerRating="${sellerRatings[sp.userId]}"
-                                                                    href="<c:out value='${spUrl}' />" />
+                                                                    href="${spUrl}" />
                                                             </div>
                                                         </c:forEach>
                                                     </div>
@@ -421,14 +420,13 @@
                                                         <c:forEach items="${relatedProducts}" var="rp">
                                                             <div class="carousel-item-wrapper">
                                                                 <c:url value="/products/${rp.id}" var="rpUrl" />
-                                                                <c:url value="/images/product/${rp.id}" var="rpImgUrl" />
-                                                                <ui:productCard title="<c:out value='${rp.title}' />"
-                                                                    artist="<c:out value='${rp.artist}' />" price="${rp.price}"
+                                                                <ui:productCard title="${rp.title}"
+                                                                    artist="${rp.artist}" price="${rp.price}"
                                                                     installments="${rp.installmentPrice}"
-                                                                    imageUrl="<c:out value='${rpImgUrl}' />"
+                                                                    imageUrl="/images/product/${rp.id}"
                                                                     categories="${rp.categories}"
                                                                     sellerRating="${sellerRatings[rp.userId]}"
-                                                                    href="<c:out value='${rpUrl}' />" />
+                                                                    href="${rpUrl}" />
                                                             </div>
                                                         </c:forEach>
                                                     </div>

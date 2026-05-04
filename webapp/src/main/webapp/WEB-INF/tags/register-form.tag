@@ -17,21 +17,21 @@
                 </div>
                 <div class="auth-card-body">
                     <form:form modelAttribute="registerForm"
-                            action="<c:out value='${action}' />"
-                            method="<c:out value='${method}' />">
-                        <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
+                            action="${action}"
+                            method="${method}">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                         <div class="row g-2">
                             <div class="col-md-6 mb-3">
                                 <label for="firstName" class="form-label"><spring:message code="Register.firstName.label" /> <span class="text-danger">*</span></label>
                                 <spring:message code="Register.firstName.placeholder" var="firstNamePlaceholder" />
-                                <form:input path="firstName" id="firstName" cssClass="form-control" placeholder="<c:out value='${firstNamePlaceholder}' />" autocomplete="given-name" />
+                                <form:input path="firstName" id="firstName" cssClass="form-control" placeholder="${firstNamePlaceholder}" autocomplete="given-name" />
                                 <form:errors path="firstName" cssClass="text-danger small"/>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="lastName" class="form-label"><spring:message code="Register.lastName.label" /> <span class="text-danger">*</span></label>
                                 <spring:message code="Register.lastName.placeholder" var="lastNamePlaceholder" />
-                                <form:input path="lastName" id="lastName" cssClass="form-control" placeholder="<c:out value='${lastNamePlaceholder}' />" autocomplete="family-name" />
+                                <form:input path="lastName" id="lastName" cssClass="form-control" placeholder="${lastNamePlaceholder}" autocomplete="family-name" />
                                 <form:errors path="lastName" cssClass="text-danger small"/>
                             </div>
                         </div>
@@ -42,7 +42,7 @@
                             <form:input path="username"
                                         id="username"
                                         cssClass="form-control"
-                                        placeholder="<c:out value='${usernamePlaceholder}' />"
+                                        placeholder="${usernamePlaceholder}"
                                         autocomplete="username" />
                             <form:errors path="username" cssClass="text-danger small"/>
                         </div>
@@ -53,7 +53,7 @@
                             <form:input path="email"
                                         id="email"
                                         cssClass="form-control"
-                                        placeholder="<c:out value='${registerEmailPlaceholder}' />"
+                                        placeholder="${registerEmailPlaceholder}"
                                         autocomplete="email" />
                             <form:errors path="email" cssClass="text-danger small"/>
                         </div>
@@ -65,7 +65,7 @@
                                 <form:password path="password"
                                             id="password"
                                             cssClass="form-control"
-                                            placeholder="<c:out value='${registerPasswordPlaceholder}' />"
+                                            placeholder="${registerPasswordPlaceholder}"
                                             autocomplete="new-password" />
                                 <button type="button" class="password-toggle-btn" aria-label="<spring:message code='Login.password.show.ariaLabel' />" onclick="togglePassword('password', this)">
                                     <i class="bi bi-eye"></i>
@@ -82,7 +82,7 @@
                                 <form:password path="confirmPassword"
                                             id="confirmPassword"
                                             cssClass="form-control"
-                                            placeholder="<c:out value='${confirmPasswordPlaceholder}' />"
+                                            placeholder="${confirmPasswordPlaceholder}"
                                             autocomplete="new-password" />
                                 <button type="button" class="password-toggle-btn" aria-label="<spring:message code='Login.password.show.ariaLabel' />" onclick="togglePassword('confirmPassword', this)">
                                     <i class="bi bi-eye"></i>
@@ -97,39 +97,39 @@
                         <div class="mb-3">
                             <label for="streetName" class="form-label"><spring:message code="Register.streetName.label" /></label>
                             <spring:message code="Register.streetName.placeholder" var="streetNamePlaceholder" />
-                            <form:input path="streetName" id="streetName" cssClass="form-control" placeholder="<c:out value='${streetNamePlaceholder}' />" />
+                            <form:input path="streetName" id="streetName" cssClass="form-control" placeholder="${streetNamePlaceholder}" />
                             <form:errors path="streetName" cssClass="text-danger small"/>
                         </div>
                         <div class="mb-3">
                             <label for="streetNumber" class="form-label"><spring:message code="Register.streetNumber.label" /></label>
                             <spring:message code="Register.streetNumber.placeholder" var="streetNumberPlaceholder" />
-                            <form:input type="number" path="streetNumber" id="streetNumber" cssClass="form-control" placeholder="<c:out value='${streetNumberPlaceholder}' />" min="1" />
+                            <form:input type="number" path="streetNumber" id="streetNumber" cssClass="form-control" placeholder="${streetNumberPlaceholder}" min="1" />
                             <form:errors path="streetNumber" cssClass="text-danger small"/>
                         </div>
                         <div class="row g-2">
                             <div class="col-md-6 mb-3">
                                 <label for="neighborhood" class="form-label"><spring:message code="Register.neighborhood.label" /></label>
                                 <spring:message code="Register.neighborhood.placeholder" var="neighborhoodPlaceholder" />
-                                <form:input path="neighborhood" id="neighborhood" cssClass="form-control" placeholder="<c:out value='${neighborhoodPlaceholder}' />" />
+                                <form:input path="neighborhood" id="neighborhood" cssClass="form-control" placeholder="${neighborhoodPlaceholder}" />
                                 <form:errors path="neighborhood" cssClass="text-danger small"/>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="province" class="form-label"><spring:message code="Register.province.label" /></label>
                                 <spring:message code="Register.province.placeholder" var="provincePlaceholder" />
-                                <form:input path="province" id="province" cssClass="form-control" placeholder="<c:out value='${provincePlaceholder}' />" />
+                                <form:input path="province" id="province" cssClass="form-control" placeholder="${provincePlaceholder}" />
                                 <form:errors path="province" cssClass="text-danger small"/>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="extraAddressInfo" class="form-label"><spring:message code="Register.extraAddressInfo.label" /></label>
                             <spring:message code="Register.extraAddressInfo.placeholder" var="extraAddressInfoPlaceholder" />
-                            <form:input path="extraAddressInfo" id="extraAddressInfo" cssClass="form-control" placeholder="<c:out value='${extraAddressInfoPlaceholder}' />" />
+                            <form:input path="extraAddressInfo" id="extraAddressInfo" cssClass="form-control" placeholder="${extraAddressInfoPlaceholder}" />
                             <form:errors path="extraAddressInfo" cssClass="text-danger small"/>
                         </div>
                         <div class="mb-3">
                             <label for="cbuCvu" class="form-label"><spring:message code="Register.cbuCvu.label" /></label>
                             <spring:message code="Register.cbuCvu.placeholder" var="cbuPlaceholder" />
-                            <form:input path="cbuCvu" id="cbuCvu" cssClass="form-control" placeholder="<c:out value='${cbuPlaceholder}' />" inputmode="numeric" maxlength="22" />
+                            <form:input path="cbuCvu" id="cbuCvu" cssClass="form-control" placeholder="${cbuPlaceholder}" inputmode="numeric" maxlength="22" />
                             <form:errors path="cbuCvu" cssClass="text-danger small"/>
                         </div>
 

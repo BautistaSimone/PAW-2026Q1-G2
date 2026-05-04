@@ -62,7 +62,7 @@
                             <spring:message code="Profile.changePassword" />
                         </a>
                         <form action="<c:url value='/logout' />" method="post" style="margin-top: 1rem;">
-                            <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                             <button type="submit" class="btn btn-retro btn-retro-secondary">
                                 <i class="bi bi-box-arrow-right" aria-hidden="true"></i> <spring:message code="Profile.logout" />
                             </button>
@@ -174,14 +174,14 @@
                                     <div class="products-grid-item">
                                         <c:url value="/products/${product.id}" var="productUrl"/>
                                         <ui:productCard
-                                                title="<c:out value='${product.title}' />"
-                                                artist="<c:out value='${product.artist}' />"
+                                                title="${product.title}"
+                                                artist="${product.artist}"
                                                 price="${product.price}"
                                                 installments="${product.installmentPrice}"
-                                                imageUrl="<c:out value='${productImageUrls[product.id]}' />"
+                                                imageUrl="${productImageUrls[product.id]}"
                                                 categories="${product.categories}"
                                                 sellerRating="${sellerRating}"
-                                                href="<c:out value='${productUrl}' />"/>
+                                                href="${productUrl}"/>
                                         <c:if test="${isOwnProfile}">
                                             <c:url var="editProductUrl" value="/products/${product.id}/edit"/>
                                             <a href="<c:out value='${editProductUrl}'/>" class="btn btn-retro btn-retro-primary w-100 mt-2" style="font-size: 0.85rem; padding: 0.4rem 0.75rem;">
@@ -189,8 +189,8 @@
                                             </a>
                                             <c:url var="deleteProductUrl" value="/products/${product.id}/delete"/>
                                             <spring:message code="Profile.publications.deleteConfirm" var="confirmDelete" />
-                                            <form action="<c:out value='${deleteProductUrl}' />" method="post" class="mt-2" onsubmit="return confirm('${confirmDelete}');">
-                                                <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
+                                            <form action="${deleteProductUrl}" method="post" class="mt-2" onsubmit="return confirm('${confirmDelete}');">
+                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                 <button type="submit" class="btn btn-retro btn-retro-secondary w-100 profile-button-3" >
                                                     <i class="bi bi-trash" aria-hidden="true"></i> <spring:message code="Profile.publications.deleteButton" />
                                                 </button>
@@ -228,8 +228,8 @@
                                 <spring:message code="Profile.myData.help" />
                             </p>
                             <c:url var="profileUpdateUrl" value="/profile/update"/>
-                            <form:form modelAttribute="userProfileForm" action="<c:out value='${profileUpdateUrl}' />" method="post" cssClass="user-profile-form" id="profileForm">
-                                <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
+                            <form:form modelAttribute="userProfileForm" action="${profileUpdateUrl}" method="post" cssClass="user-profile-form" id="profileForm">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                 <div class="row g-2">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label" for="pfFirstName"><spring:message code="Profile.myData.firstName" /> <span class="text-danger">*</span></label>
@@ -245,34 +245,34 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="pfStreet"><spring:message code="Profile.myData.street" /></label>
                                     <spring:message code="Common.optional" var="optionalPlaceholder" />
-                                    <form:input path="streetName" id="pfStreet" cssClass="form-control" placeholder="<c:out value='${optionalPlaceholder}' />"/>
+                                    <form:input path="streetName" id="pfStreet" cssClass="form-control" placeholder="${optionalPlaceholder}"/>
                                     <form:errors path="streetName" cssClass="text-danger small d-block"/>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label" for="pfStreetNum"><spring:message code="Profile.myData.number" /></label>
-                                    <form:input type="number" path="streetNumber" id="pfStreetNum" cssClass="form-control" placeholder="<c:out value='${optionalPlaceholder}' />" min="1"/>
+                                    <form:input type="number" path="streetNumber" id="pfStreetNum" cssClass="form-control" placeholder="${optionalPlaceholder}" min="1"/>
                                     <form:errors path="streetNumber" cssClass="text-danger small d-block"/>
                                 </div>
                                 <div class="row g-2">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label" for="pfNeighborhood"><spring:message code="Profile.myData.neighborhood" /></label>
-                                        <form:input path="neighborhood" id="pfNeighborhood" cssClass="form-control" placeholder="<c:out value='${optionalPlaceholder}' />"/>
+                                        <form:input path="neighborhood" id="pfNeighborhood" cssClass="form-control" placeholder="${optionalPlaceholder}"/>
                                         <form:errors path="neighborhood" cssClass="text-danger small d-block"/>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label" for="pfProvince"><spring:message code="Profile.myData.province" /></label>
-                                        <form:input path="province" id="pfProvince" cssClass="form-control" placeholder="<c:out value='${optionalPlaceholder}' />"/>
+                                        <form:input path="province" id="pfProvince" cssClass="form-control" placeholder="${optionalPlaceholder}"/>
                                         <form:errors path="province" cssClass="text-danger small d-block"/>
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label" for="pfExtra"><spring:message code="Profile.myData.extraInfo" /></label>
-                                    <form:input path="extraAddressInfo" id="pfExtra" cssClass="form-control" placeholder="<c:out value='${optionalPlaceholder}' />"/>
+                                    <form:input path="extraAddressInfo" id="pfExtra" cssClass="form-control" placeholder="${optionalPlaceholder}"/>
                                     <form:errors path="extraAddressInfo" cssClass="text-danger small d-block"/>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label" for="pfCbu"><spring:message code="Profile.myData.cbuCvu" /></label>
-                                    <form:input path="cbuCvu" id="pfCbu" cssClass="form-control" placeholder="<c:out value='${optionalPlaceholder}' />" inputmode="numeric" maxlength="22"/>
+                                    <form:input path="cbuCvu" id="pfCbu" cssClass="form-control" placeholder="${optionalPlaceholder}" inputmode="numeric" maxlength="22"/>
                                     <form:errors path="cbuCvu" cssClass="text-danger small d-block"/>
                                 </div>
                                 <button type="submit" class="btn btn-retro btn-retro-primary" id="profileSaveBtn" disabled="true">
@@ -459,19 +459,19 @@
                                     <c:forEach items="${deletedProducts}" var="product">
                                         <div class="products-grid-item">
                                             <ui:productCard
-                                                title="<c:out value='${product.title}' />"
-                                                artist="<c:out value='${product.artist}' />"
+                                                title="${product.title}"
+                                                artist="${product.artist}"
                                                 price="${product.price}"
                                                 installments="${product.installmentPrice}"
-                                                imageUrl="<c:out value='${deletedProductImageUrls[product.id]}' />"
+                                                imageUrl="${deletedProductImageUrls[product.id]}"
                                                 categories="${product.categories}"
                                                 sellerRating="${sellerRating}"
                                                 href="#"
                                                 linkDisabled="true" />
                                             <c:url var="restoreProductUrl" value="/products/${product.id}/restore" />
                                             <spring:message code="Trash.restore.confirm" var="confirmRestore" />
-                                            <form action="<c:out value='${restoreProductUrl}' />" method="post" class="mt-2" onsubmit="return confirm('${confirmRestore}');">
-                                                <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
+                                            <form action="${restoreProductUrl}" method="post" class="mt-2" onsubmit="return confirm('${confirmRestore}');">
+                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                 <button type="submit" class="btn btn-retro btn-retro-primary w-100 profile-button-3" >
                                                     <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> <spring:message code="Trash.restore.button" />
                                                 </button>
@@ -523,30 +523,30 @@
                                             </div>
                                             <div class="profile-div-28" >
                                                 <spring:message code="Profile.reports.view" var="viewText" />
-                                                <a href="<c:url value='/products/${rp.productId}'/>" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem;" title="<c:out value='${viewText}' />">
+                                                <a href="<c:url value='/products/${rp.productId}'/>" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem;" title="${viewText}">
                                                     <i class="bi bi-eye" aria-hidden="true"></i> <c:out value="${viewText}"/>
                                                 </a>
                                                 <c:url var="hideUrl" value="/profile/admin/hide-product"/>
                                                 <spring:message code="Profile.reports.hideConfirm" var="confirmHide" />
                                                 <spring:message code="Profile.reports.hide" var="hideText" />
                                                 <form action="<c:out value='${hideUrl}'/>" method="post" style="margin: 0;" onsubmit="return confirm('${confirmHide}');">
-                                                    <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
+                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                     <input type="hidden" name="productId" value="<c:out value='${rp.productId}'/>" />
-                                                    <button type="submit" class="btn btn-retro btn-retro-secondary profile-button-29"  title="<c:out value='${hideText}' />">
+                                                    <button type="submit" class="btn btn-retro btn-retro-secondary profile-button-29"  title="${hideText}">
                                                         <i class="bi bi-x-circle" aria-hidden="true"></i> <c:out value="${hideText}"/>
                                                     </button>
                                                 </form>
                                                 <spring:message code="Profile.reports.profile" var="profileText" />
-                                                <a href="<c:url value='/profile?userId=${rp.ownerUserId}'/>" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem;" title="<c:out value='${profileText}' />">
+                                                <a href="<c:url value='/profile?userId=${rp.ownerUserId}'/>" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem;" title="${profileText}">
                                                     <i class="bi bi-person" aria-hidden="true"></i> <c:out value="${profileText}"/>
                                                 </a>
                                                 <c:url var="banUrl" value="/profile/admin/ban-user"/>
                                                 <spring:message code="Profile.reports.banConfirm" var="confirmBan" />
                                                 <spring:message code="Profile.reports.ban" var="banText" />
                                                 <form action="<c:out value='${banUrl}'/>" method="post" style="margin: 0;" onsubmit="return confirm('${confirmBan}');">
-                                                    <input type="hidden" name="<c:out value='${_csrf.parameterName}' />" value="<c:out value='${_csrf.token}' />" />
+                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                     <input type="hidden" name="userId" value="<c:out value='${rp.ownerUserId}'/>" />
-                                                    <button type="submit" class="btn btn-retro btn-retro-secondary profile-button-30"  title="<c:out value='${banText}' />">
+                                                    <button type="submit" class="btn btn-retro btn-retro-secondary profile-button-30"  title="${banText}">
                                                         <i class="bi bi-person-x" aria-hidden="true"></i> <c:out value="${banText}"/>
                                                     </button>
                                                 </form>
