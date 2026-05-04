@@ -70,7 +70,7 @@
 - **Código**: `public class ProductReportRemovalTokenService { ... }` (sin interfaz correspondiente)
 - **Regla violada**: [1] Interfaces obligatorias para servicios
 
-### Servicio con @Component en vez de @Service - ????????? QUIEN HIZO ESTO, POR FAVOR WTF  
+### Servicio con @Component en vez de @Service - LISTO
 
 - **Archivo**: `services/src/main/java/ar/edu/itba/paw/services/ProductReportRemovalTokenService.java`
 - **Línea**: 21
@@ -734,7 +734,7 @@ Hay **CSS inline (style="...")** masivo en casi todas las vistas. Ejemplos repre
 - `services/src/main/java/ar/edu/itba/paw/services/ProductServiceImpl.java` — sin tests
 - `services/src/main/java/ar/edu/itba/paw/services/ReportServiceImpl.java` — sin tests
 - `services/src/main/java/ar/edu/itba/paw/services/EmailServiceImpl.java` — sin tests
-- `services/src/main/java/ar/edu/itba/paw/services/ProductReportRemovalTokenService.java` — sin tests
+- `services/src/main/java/ar/edu/itba/paw/services/ProductReportRemovalTokenService.java` — sin tests- LISTO
 - **Regla violada**: [10] / [15.8] Tests de servicios obligatorios si tienen lógica de negocio
 
 ### Tests de DAO usando otros DAOs para setup

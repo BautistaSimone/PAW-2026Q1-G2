@@ -1,6 +1,5 @@
 package ar.edu.itba.paw.services;
 
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
@@ -32,7 +31,6 @@ public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
-    private final ProductReportRemovalTokenService reportRemovalTokenService;
     private final String baseUrl;
     private final String adminEmail;
 
@@ -40,12 +38,10 @@ public class EmailServiceImpl implements EmailService {
     public EmailServiceImpl(
         final JavaMailSender javaMailSender,
         final SpringTemplateEngine templateEngine,
-        final ProductReportRemovalTokenService reportRemovalTokenService,
         @Value("${app.base.url:http://pawserver.it.itba.edu.ar/paw-2026a-02/}") final String baseUrl,
         @Value("${mail.username}") final String adminEmail) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
-        this.reportRemovalTokenService = reportRemovalTokenService;
         this.baseUrl = baseUrl;
         this.adminEmail = adminEmail;
     }
@@ -96,12 +92,6 @@ public class EmailServiceImpl implements EmailService {
         ctx.setVariable("descriptionExcerpt", excerpt(product.getDescription(), 220));
         ctx.setVariable("reporterName", reporter.getUsername());
         ctx.setVariable("reporterEmail", reporter.getEmail());
-        final String removalToken = reportRemovalTokenService.createToken(product.getId());
-        final String encodedToken = URLEncoder.encode(removalToken, StandardCharsets.UTF_8);
-        ctx.setVariable(
-            "removeActionUrl",
-            buildAbsoluteUrl("/products/" + product.getId() + "/moderate-hide?token=" + encodedToken)
-        );
         ctx.setVariable("viewProductUrl", buildProductUrl(product.getId()));
 
         try {

@@ -107,19 +107,11 @@
                         <table role="presentation" class="cta-table" width="100%" cellpadding="0" cellspacing="0" style="margin-top:28px;">
                             <tr>
                                 <td align="center">
-                                    <a th:href="${removeActionUrl}" class="cta-link" style="display:inline-block;background-color:#264653;color:#e76f51 !important;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:700;font-family:Arial,Helvetica,sans-serif;font-size:15px;">Ocultar publicación del catálogo</a>
+                                    <a th:href="${viewProductUrl}" class="cta-link" style="display:inline-block;background-color:#264653;color:#e76f51 !important;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:700;font-family:Arial,Helvetica,sans-serif;font-size:15px;">Ver publicación</a>
                                 </td>
                             </tr>
                         </table>
 
-                        <p style="margin:18px 0 0;text-align:center;font-size:14px;">
-                            <a th:href="${viewProductUrl}" style="color:#264653;font-weight:600;">Solo ver publicación</a>
-                        </p>
-
-                        <p class="muted" style="color:#5a6f78;font-size:13px;margin:24px 0 0;text-align:center;">
-                            Enlace para ocultar (copiar si el botón no funciona):<br>
-                            <a th:href="${removeActionUrl}" th:text="${removeActionUrl}" style="color:#264653;word-break:break-all;">URL</a>
-                        </p>
                     </td>
                 </tr>
                 <tr>

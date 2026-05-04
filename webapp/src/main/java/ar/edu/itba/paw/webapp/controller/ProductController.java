@@ -46,7 +46,6 @@ import ar.edu.itba.paw.webapp.validation.ImageUploadValidator.ValidatedImage;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.EmailService;
 import ar.edu.itba.paw.services.ImageService;
-import ar.edu.itba.paw.services.ProductReportRemovalTokenService;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.ReportService;
 import ar.edu.itba.paw.services.ReviewService;
@@ -60,7 +59,6 @@ public class ProductController {
     private final CategoryService categoryService;
     private final ImageService imageService;
     private final EmailService emailService;
-    private final ProductReportRemovalTokenService reportRemovalTokenService;
     private final ReportService reportService;
     private final ReviewService reviewService;
     private final UserService userService;
@@ -71,7 +69,6 @@ public class ProductController {
         final CategoryService categoryService,
         final ImageService imageService,
         final EmailService emailService,
-        final ProductReportRemovalTokenService reportRemovalTokenService,
         final ReportService reportService,
         final ReviewService reviewService,
         final UserService userService
@@ -80,7 +77,6 @@ public class ProductController {
         this.categoryService = categoryService;
         this.imageService = imageService;
         this.emailService = emailService;
-        this.reportRemovalTokenService = reportRemovalTokenService;
         this.reportService = reportService;
         this.reviewService = reviewService;
         this.userService = userService;
@@ -498,25 +494,6 @@ public class ProductController {
         return new ModelAndView("redirect:/profile?deleted=1");
     }
 
-    @RequestMapping(value = "/products/{id:\\d+}/moderate-hide", method = RequestMethod.GET)
-    public ModelAndView moderateHideFromReportMail(
-        @PathVariable("id") final Long id,
-        @RequestParam("token") final String token
-    ) {
-        if (!reportRemovalTokenService.isValid(id, token)) {
-            throw new IllegalArgumentException("Invalid or expired moderation link");
-        }
-        productService.hideProductByAdmin(id);
-        return redirectAfterModerationHide();
-    }
-
-    private static ModelAndView redirectAfterModerationHide() {
-        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
-            return new ModelAndView("redirect:/?moderated=1");
-        }
-        return new ModelAndView("redirect:/login?moderated=1");
-    }
 
     /** Not logged in → login; no CBU/CVU → profile Mis datos with warning. Empty if OK to show or submit the publish form. */
     private Optional<ModelAndView> redirectIfCannotPublish(final PawAuthUser authUser) {
