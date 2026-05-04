@@ -79,9 +79,16 @@ public class EmailServiceImpl implements EmailService {
     @Async
     @Override
     public void sendProductReportEmail(final Product product, final User reporter, final User seller) {
+
+        final Locale locale = LocaleContextHolder.getLocale();
+
         final Context ctx = new Context(LocaleContextHolder.getLocale());
-        ctx.setVariable("title", "Nueva publicación reportada");
-        ctx.setVariable("message", "Se reportó una publicación y requiere revisión manual por parte del equipo de moderación.");
+        
+        ctx.setVariable("title",
+                messageSource.getMessage("email.report.heading", null, locale));
+
+        ctx.setVariable("message",
+                messageSource.getMessage("email.report.message", null, locale));
         ctx.setVariable("productId", product.getId());
         ctx.setVariable("productName", product.getTitle() + " - " + product.getArtist());
         ctx.setVariable("amount", formatAmount(product));
@@ -98,7 +105,9 @@ public class EmailServiceImpl implements EmailService {
             final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-            messageHelper.setSubject("Vinyland - Publicación reportada");
+            messageHelper.setSubject(
+                messageSource.getMessage("email.report.title", null, locale)
+            );
             messageHelper.setTo(adminEmail);
             messageHelper.setFrom("no-reply@vinyland.com");
 
@@ -119,8 +128,10 @@ public class EmailServiceImpl implements EmailService {
         String resetUrl = buildAbsoluteUrl("/changePassword?token=" + resetToken);
 
         final Context ctx = new Context(LocaleContextHolder.getLocale());
-        ctx.setVariable("title", "Recuperación de contraseña");
-        ctx.setVariable("message", "Hacé click en el enlace para restablecer tu contraseña.");
+        ctx.setVariable("title",
+            messageSource.getMessage("email.reset.heading", null, locale));
+        ctx.setVariable("message",
+            messageSource.getMessage("email.reset.instructions", null, locale));
         ctx.setVariable("recipientName", username);
         ctx.setVariable("actionUrl", resetUrl);
 
@@ -128,7 +139,9 @@ public class EmailServiceImpl implements EmailService {
             final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-            messageHelper.setSubject("Vinyland - Recuperar contraseña");
+            messageHelper.setSubject(
+                messageSource.getMessage("email.reset.title", null, locale)
+            );
             messageHelper.setTo(to);
             messageHelper.setFrom("no-reply@vinyland.com");
 
@@ -148,8 +161,10 @@ public class EmailServiceImpl implements EmailService {
         String resetUrl = buildAbsoluteUrl("/verifyEmail?token=" + resetToken);
 
         final Context ctx = new Context(LocaleContextHolder.getLocale());
-        ctx.setVariable("title", "Verificá tu cuenta");
-        ctx.setVariable("message", "Hacé click en el enlace para verificar tu cuenta.");
+        ctx.setVariable("title",
+            messageSource.getMessage("email.verify.heading", null, locale));
+        ctx.setVariable("message",
+                messageSource.getMessage("email.verify.instructions", null, locale));
         ctx.setVariable("recipientName", username);
         ctx.setVariable("actionUrl", resetUrl);
 
@@ -157,7 +172,9 @@ public class EmailServiceImpl implements EmailService {
             final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-            messageHelper.setSubject("Vinyland - Verificar cuenta");
+            messageHelper.setSubject(
+                messageSource.getMessage("email.verify.title", null, locale)
+            );
             messageHelper.setTo(to);
             messageHelper.setFrom("no-reply@vinyland.com");
 

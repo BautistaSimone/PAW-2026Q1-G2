@@ -6,95 +6,211 @@
     <title th:text="#{email.order.title}">Vinyland</title>
     <th:block th:replace="~{email-base :: emailStyles}"></th:block>
 </head>
-
 <body style="margin:0;padding:0;background-color:#f8f9fa;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa;padding:24px 16px;">
-    <tr>
-    <td align="center">
-
-    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);border:1px solid #e8e8e8;">
-
         <tr>
-            <td th:replace="~{email-base :: emailHeader}"></td>
-        </tr>
+            <td align="center">
 
-        <tr>
-            <td style="padding:28px 24px 32px;font-family:Arial,Helvetica,sans-serif;color:#264653;font-size:16px;line-height:1.55;">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0"
+                    style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);border:1px solid #e8e8e8;">
 
-            <p style="font-size:17px;font-weight:700;margin:0 0 16px;"
-            th:text="#{email.order.greeting(${recipientName})}">
-        </p>
+                    <tr>
+                        <td th:replace="~{email-base :: emailHeader}"></td>
+                    </tr>
 
-        <h1 style="color:#e76f51;font-size:20px;font-weight:700;margin:0 0 14px;"
-            th:text="${title}">
-        </h1>
+                    <tr>
+                        <td style="padding:28px 24px 32px;font-family:Arial,Helvetica,sans-serif;color:#264653;font-size:16px;line-height:1.55;">
 
-        <p th:text="${message}"></p>
+                        <!-- Greeting -->
+                        <p style="font-size:17px;font-weight:700;margin:0 0 16px;"
+                        th:text="#{email.order.greeting(${recipientName})}">
+                        </p>
 
-        <!-- Steps -->
-        <span th:text="#{email.order.step.pending}">Pending</span>
-        <span th:text="#{email.order.step.paid}">Paid</span>
-        <span th:text="#{email.order.step.shipped}">Shipped</span>
-        <span th:text="#{email.order.step.delivered}">Delivered</span>
+                        <h1 style="color:#e76f51;font-size:20px;font-weight:700;margin:0 0 14px;"
+                            th:text="#{email.order.title}">
+                        </h1>
 
-        <!-- Summary -->
-        <span th:text="#{email.order.label.number}">Order #</span>
-        <span th:text="#{email.order.label.product}">Product</span>
-        <span th:text="#{email.order.label.date}">Order date</span>
-        <span th:text="#{email.order.label.status}">Status</span>
-        <span th:text="#{email.order.label.label}">Label / catalog</span>
-        <span th:text="#{email.order.label.country}">Country</span>
-        <span th:text="#{email.order.label.location}">Location</span>
-        <span th:text="#{email.order.label.condition}">Condition</span>
-        <span th:text="#{email.order.label.total}">Total</span>
+                        <p style="margin:0 0 18px;"
+                        th:text="#{email.order.body}">
+                        </p>
 
-        <a th:href="${productUrl}" th:text="#{email.order.viewProduct}">View listing</a>
+                        <!-- Steps -->
+                        <table width="100%" style="margin:20px 0 24px;">
+                        <tr><td align="center">
 
-        <!-- Next steps -->
-        <p th:text="#{email.order.next.title}"></p>
+                        <table cellpadding="0" cellspacing="0"><tr>
 
-        <p th:if="${purchaseStatusKey == 'PENDING' and recipientIsBuyer}"
-        th:utext="#{email.order.next.pending(${amount})}"></p>
+                        <!-- Step 1 -->
+                        <td align="center">
+                        <div th:style="${currentStep >= 0} ? 'width:32px;height:32px;border-radius:50%;background:#e76f51;color:#fff;text-align:center;line-height:32px;' : 'width:32px;height:32px;border-radius:50%;background:#eee;color:#999;text-align:center;line-height:32px;'">1</div>
+                        <span th:text="#{email.order.step.pending}"></span>
+                        </td>
 
-        <p th:if="${purchaseStatusKey == 'PAID' and !recipientIsBuyer}"
-        th:text="#{email.order.next.paid}"></p>
+                        <td><div th:style="${currentStep >= 1} ? 'width:40px;height:3px;background:#e76f51;' : 'width:40px;height:3px;background:#ccc;'"></div></td>
 
-        <p th:if="${purchaseStatusKey == 'SHIPPED' and recipientIsBuyer}"
-        th:text="#{email.order.next.shipped}"></p>
+                        <!-- Step 2 -->
+                        <td align="center">
+                        <div th:style="${currentStep >= 1} ? 'width:32px;height:32px;border-radius:50%;background:#e76f51;color:#fff;text-align:center;line-height:32px;' : 'width:32px;height:32px;border-radius:50%;background:#eee;color:#999;text-align:center;line-height:32px;'">2</div>
+                        <span th:text="#{email.order.step.paid}"></span>
+                        </td>
 
-        <!-- Seller -->
-        <p th:text="#{email.order.seller.title}"></p>
-            <span th:text="#{email.order.seller.username}"></span>
-            <span th:text="#{email.order.seller.bank}"></span>
-            <span th:text="#{email.order.seller.email}"></span>
-        <p th:text="#{email.order.seller.noBank}"></p>
+                        <td><div th:style="${currentStep >= 2} ? 'width:40px;height:3px;background:#e76f51;' : 'width:40px;height:3px;background:#ccc;'"></div></td>
 
-        <!-- Buyer -->
-        <p th:text="#{email.order.buyer.title}"></p>
-            <span th:text="#{email.order.buyer.username}"></span>
-            <span th:text="#{email.order.buyer.name}"></span>
-            <span th:text="#{email.order.buyer.address}"></span>
-            <span th:text="#{email.order.buyer.email}"></span>
-        <p th:text="#{email.order.buyer.noAddress}"></p>
+                        <!-- Step 3 -->
+                        <td align="center">
+                        <div th:style="${currentStep >= 2} ? 'width:32px;height:32px;border-radius:50%;background:#e76f51;color:#fff;text-align:center;line-height:32px;' : 'width:32px;height:32px;border-radius:50%;background:#eee;color:#999;text-align:center;line-height:32px;'">3</div>
+                        <span th:text="#{email.order.step.shipped}"></span>
+                        </td>
 
-        <!-- CTA -->
-        <a th:href="${actionUrl}" th:text="#{email.order.cta}"></a>
+                        <td><div th:style="${currentStep >= 3} ? 'width:40px;height:3px;background:#e76f51;' : 'width:40px;height:3px;background:#ccc;'"></div></td>
 
-        <p>
-            <span th:text="#{email.order.altText}"></span><br>
-            <a th:href="${actionUrl}" th:text="${actionUrl}"></a>
-        </p>
+                        <!-- Step 4 -->
+                        <td align="center">
+                        <div th:style="${currentStep >= 3} ? 'width:32px;height:32px;border-radius:50%;background:#e76f51;color:#fff;text-align:center;line-height:32px;' : 'width:32px;height:32px;border-radius:50%;background:#eee;color:#999;text-align:center;line-height:32px;'">4</div>
+                        <span th:text="#{email.order.step.delivered}"></span>
+                        </td>
 
-        </td>
-        </tr>
+                        </tr></table>
 
-        <tr>
-            <td th:replace="~{email-base :: emailFooter}"></td>
-        </tr>
+                        </td></tr>
+                        </table>
 
-    </table>
+                        <!-- Order summary -->
+                        <div style="background:#f4f4f4;padding:18px;border-radius:8px;">
 
-        </td>
+                        <p><strong th:text="#{email.order.label.number}"></strong>:
+                        <span th:text="${purchaseId}"></span></p>
+
+                        <p><strong th:text="#{email.order.label.product}"></strong>:
+                        <span th:text="${productName}"></span></p>
+
+                        <p th:if="${formattedPurchaseDate}">
+                        <strong th:text="#{email.order.label.date}"></strong>:
+                        <span th:text="${formattedPurchaseDate}"></span></p>
+
+                        <p><strong th:text="#{email.order.label.status}"></strong>:
+                        <span th:text="${purchaseStatusDescription}"></span></p>
+
+                        <p th:if="${recordLabel}">
+                        <strong th:text="#{email.order.label.label}"></strong>:
+                        <span th:text="${recordLabel}"></span>
+                        </p>
+
+                        <p th:if="${editionCountry}">
+                        <strong th:text="#{email.order.label.country}"></strong>:
+                        <span th:text="${editionCountry}"></span>
+                        </p>
+
+                        <p th:if="${productLocation}">
+                        <strong th:text="#{email.order.label.location}"></strong>:
+                        <span th:text="${productLocation}"></span>
+                        </p>
+
+                        <p th:if="${sleeveCondition or recordCondition}">
+                        <strong th:text="#{email.order.label.condition}"></strong>:
+                        <span>
+                        <span th:if="${sleeveCondition}">Tapa <span th:text="${sleeveCondition}"></span>/10</span>
+                        <span th:if="${recordCondition}"> Disco <span th:text="${recordCondition}"></span>/10</span>
+                        </span>
+                        </p>
+
+                        <p>
+                        <a th:if="${productUrl}"
+                        th:href="${productUrl}"
+                        th:text="#{email.order.viewProduct}">
+                        </a>
+                        </p>
+
+                        <hr>
+
+                        <p><strong th:text="#{email.order.label.total}"></strong>:
+                        <span th:text="${amount}"></span></p>
+
+                        </div>
+
+                        <!-- Next steps -->
+                        <div th:if="${purchaseStatusKey == 'PENDING' and recipientIsBuyer}">
+                        <p th:text="#{email.order.next.title}"></p>
+                        <p th:utext="#{email.order.next.pending(${amount})}"></p>
+                        </div>
+
+                        <div th:if="${purchaseStatusKey == 'PAID' and !recipientIsBuyer}">
+                        <p th:text="#{email.order.next.title}"></p>
+                        <p th:text="#{email.order.next.paid}"></p>
+                        </div>
+
+                        <div th:if="${purchaseStatusKey == 'SHIPPED' and recipientIsBuyer}">
+                        <p th:text="#{email.order.next.title}"></p>
+                        <p th:text="#{email.order.next.shipped}"></p>
+                        </div>
+
+                        <!-- Seller -->
+                        <div th:if="${recipientIsBuyer}">
+                        <p th:text="#{email.order.seller.title}"></p>
+
+                        <p><strong th:text="#{email.order.seller.username}"></strong>
+                        <span th:text="${sellerUsername}"></span></p>
+
+                        <p th:if="${sellerCbuCvu}">
+                        <strong th:text="#{email.order.seller.bank}"></strong>
+                        <span th:text="${sellerCbuCvu}"></span></p>
+
+                        <p><strong th:text="#{email.order.seller.email}"></strong>
+                        <span th:text="${sellerEmail}"></span></p>
+
+                        <p th:if="${!sellerCbuCvu}"
+                        th:text="#{email.order.seller.noBank}">
+                        </p>
+                        </div>
+
+                        <!-- Buyer -->
+                        <div th:if="${!recipientIsBuyer}">
+                        <p th:text="#{email.order.buyer.title}"></p>
+
+                        <p><strong th:text="#{email.order.buyer.username}"></strong>
+                        <span th:text="${buyerUsername}"></span></p>
+
+                        <p th:if="${buyerFullName}">
+                        <strong th:text="#{email.order.buyer.name}"></strong>
+                        <span th:text="${buyerFullName}"></span></p>
+
+                        <p th:if="${buyerShippingAddress}">
+                        <strong th:text="#{email.order.buyer.address}"></strong>
+                        <span th:text="${buyerShippingAddress}"></span></p>
+
+                        <p><strong th:text="#{email.order.buyer.email}"></strong>
+                        <span th:text="${buyerEmail}"></span></p>
+
+                        <p th:if="${!buyerShippingAddress}"
+                        th:text="#{email.order.buyer.noAddress}">
+                        </p>
+                        </div>
+
+                        <!-- CTA -->
+                        <div style="text-align:center;margin-top:28px;">
+                        <a th:href="${actionUrl}"
+                        style="background:#264653;color:#e76f51;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;"
+                        th:text="#{email.order.cta}">
+                        </a>
+                        </div>
+
+                        <p style="font-size:13px;text-align:center;margin-top:24px;"
+                        th:text="#{email.order.altText}">
+                        </p>
+
+                        <p style="text-align:center;">
+                        <a th:href="${actionUrl}" th:text="${actionUrl}"></a>
+                        </p>
+
+                        </td>
+                        </tr>
+
+                        <tr>
+                        <td th:replace="~{email-base :: emailFooter}"></td>
+                    </tr>
+
+                </table>
+            </td>
         </tr>
     </table>
 </body>
