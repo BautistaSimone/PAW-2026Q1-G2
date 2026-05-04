@@ -344,22 +344,8 @@ public class UserController {
     public ModelAndView adminBanUser(
         @RequestParam("userId") final Long userId
     ) {
-        // Authorization enforced by Spring Security: only ROLE_ADMIN can reach this endpoint
-
         // Ban the user
         userService.ban(userId);
-
-        // Hide all their active products
-        final ProductSearchCriteria criteria = new ProductSearchCriteria(
-            null, Collections.emptyList(), null, null,
-            Collections.emptyList(), Collections.emptyList(), null, userId,
-            1, 1000000
-        );
-        final List<Product> userProducts = productService.listProducts(criteria).getResults();
-        for (Product p : userProducts) {
-            productService.hideProductByAdmin(p.getId());
-            reportService.deleteByProductId(p.getId());
-        }
 
         return new ModelAndView("redirect:/profile?tab=reports&banned=1");
     }

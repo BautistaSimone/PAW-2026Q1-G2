@@ -1,6 +1,8 @@
 package ar.edu.itba.paw.services;
 
 import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.ProductSearchCriteria;
 
 import ar.edu.itba.paw.persistence.UserDao;
 import ar.edu.itba.paw.models.User;
@@ -19,6 +24,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private ReportService reportService;
 
     @Autowired
     public UserServiceImpl(final UserDao userDao, final PasswordEncoder passwordEncoder) {
@@ -128,6 +139,20 @@ public class UserServiceImpl implements UserService {
 
 	@Override
     public void ban(final Long id) {
+
+        // Hide all their active products
+        final ProductSearchCriteria criteria = new ProductSearchCriteria(
+            null, Collections.emptyList(), null, null,
+            Collections.emptyList(), Collections.emptyList(), null, id,
+            1, 1000000
+        );
+
+        final List<Product> userProducts = productService.listProducts(criteria).getResults();
+        for (Product p : userProducts) {
+            productService.hideProductByAdmin(p.getId());
+            reportService.deleteByProductId(p.getId());
+        }
+
         userDao.ban(id);
     }
 

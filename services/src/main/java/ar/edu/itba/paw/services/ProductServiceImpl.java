@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -155,6 +156,32 @@ public class ProductServiceImpl implements ProductService {
 			page,
 			12
 		);
+    }
+
+    @Override
+    public List<Product> listProductsNotByUser(final Long userId) {
+
+        List<Product> userProducts = this.listProducts(
+            new ProductSearchCriteria(null, null, null, null, null, null, ProductSortOrder.NEWEST, userId, 1, 11)
+        ).getResults().stream().limit(10).collect(Collectors.toList());
+
+        return this.listProducts().getResults().stream()
+                .filter(p -> userProducts.stream().noneMatch(up -> up.getId().equals(p.getId())))
+                .limit(10).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Product> listProductsByArtistExcept(final String artist, final Long productId) {
+        return this.listProducts(
+            new ProductSearchCriteria(artist, null, null, null, null, null, ProductSortOrder.NEWEST, null, 1, 11)
+        ).getResults().stream().filter(p -> !p.getId().equals(productId)).limit(10).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Product> listProductsByUserExcept(final Long userId, final Long productId) {
+        return this.listProducts(
+            new ProductSearchCriteria(null, null, null, null, null, null, ProductSortOrder.NEWEST, userId, 1, 11)
+        ).getResults().stream().filter(p -> !p.getId().equals(productId)).limit(10).collect(Collectors.toList());
     }
 
     @Override

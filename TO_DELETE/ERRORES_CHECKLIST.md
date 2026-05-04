@@ -29,22 +29,22 @@
 
 ### ⚠️ GRAVE — Lógica de negocio en controllers
 
-- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/HomeController.java`
+- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/HomeController.java` - LISTO
 - **Línea**: 56–189
 - **Código**: `parsePriceParam`, normalización de precios, buckets de condición, armado de `ProductSearchCriteria`, intercambio min/max, deduplicación de sellers/ratings
 - **Regla violada**: [1] Sin lógica de negocio en controllers / [15.1] Servicios como Facades
 
-- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/ProductController.java`
+- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/ProductController.java` - LISTO
 - **Línea**: 403–463
 - **Código**: Construcción de criterios, filtros de listas (`stream().filter(...).limit(10)`), armado de mapas de ratings
 - **Regla violada**: [1] Sin lógica de negocio en controllers
 
-- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/UserController.java`
+- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/UserController.java` - PARECE FALSO, MODEL VIEW ES DE CONTROLLER
 - **Línea**: 242–331
 - **Código**: `enrichProfileModel` (paginación, mapas de imágenes, compras/ventas, reseñas, productos borrados)
 - **Regla violada**: [1] Sin lógica de negocio en controllers
 
-- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/UserController.java`
+- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/UserController.java` - LISTO
 - **Línea**: 349–362
 - **Código**: `userService.ban(userId); for (Product p : userProducts) { productService.hideProductByAdmin(...); reportService.deleteByProductId(...); }`
 - **Regla violada**: [1] Sin lógica de negocio en controllers / [15.1] Controller NO debe orquestar múltiples servicios

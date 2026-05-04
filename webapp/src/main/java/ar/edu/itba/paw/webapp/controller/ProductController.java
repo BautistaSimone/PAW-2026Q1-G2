@@ -428,19 +428,12 @@ public class ProductController {
         );
         mav.addObject("sellerReviews", reviewService.findBySellerId(product.getUserId(), 1, 3).getResults());
 
-        List<Product> sellerProducts = productService.listProducts(
-            new ProductSearchCriteria(null, null, null, null, null, null, ProductSortOrder.NEWEST, product.getUserId(), 1, 11)
-        ).getResults().stream().filter(p -> !p.getId().equals(product.getId())).limit(10).collect(Collectors.toList());
+        List<Product> sellerProducts = productService.listProductsByUserExcept(product.getUserId(), product.getId());
 
-        List<Product> relatedProducts = productService.listProducts(
-            new ProductSearchCriteria(product.getArtist(), null, null, null, null, null, ProductSortOrder.NEWEST, null, 1, 11)
-        ).getResults().stream().filter(p -> !p.getId().equals(product.getId())).limit(10).collect(Collectors.toList());
+        List<Product> relatedProducts = productService.listProductsByArtistExcept(product.getArtist(), product.getId());
 
         if (relatedProducts.isEmpty()) {
-            relatedProducts = productService.listProducts().getResults().stream()
-                .filter(p -> !p.getId().equals(product.getId()))
-                .filter(p -> sellerProducts.stream().noneMatch(sp -> sp.getId().equals(p.getId())))
-                .limit(10).collect(Collectors.toList());
+            relatedProducts = productService.listProductsNotByUser(product.getUserId());
         }
 
         final Set<Long> carouselSellerIds = new HashSet<>();
