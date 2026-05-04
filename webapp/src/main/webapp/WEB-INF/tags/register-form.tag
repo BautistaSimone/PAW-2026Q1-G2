@@ -7,7 +7,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<div class="container py-5" style="min-height: 70vh; display: flex; align-items: center;">
+<div class="container py-5 auth-page-container">
     <div class="row justify-content-center w-100">
         <div class="col-12 col-sm-11 col-md-9 col-lg-7 col-xl-6">
             <div class="auth-card">
@@ -91,8 +91,8 @@
                             <form:errors path="confirmPassword" cssClass="text-danger small"/>
                         </div>
 
-                        <hr class="my-4" style="border-color: var(--color-border); opacity: 0.6;" />
-                        <p class="small text-muted mb-3" style="font-weight: 600;"><spring:message code="Register.extraData.heading" /></p>
+                        <hr class="my-4 auth-divider" />
+                        <p class="small text-muted mb-3 auth-extra-data-heading"><spring:message code="Register.extraData.heading" /></p>
 
                         <div class="mb-3">
                             <label for="streetName" class="form-label"><spring:message code="Register.streetName.label" /></label>

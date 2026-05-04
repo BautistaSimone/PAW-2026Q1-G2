@@ -10,7 +10,7 @@
 
 <c:choose>
     <c:when test="${summary.count > 0}">
-        <span class="seller-rating-stars-wrap" style="display: inline-flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+        <span class="seller-rating-stars-wrap seller-rating-stars-span-1" >
             <span style="color: var(--color-accent); letter-spacing: 0.02em; font-size: ${starSize};" aria-hidden="true">
                 <c:forEach begin="1" end="5" var="i">
                     <c:choose>
@@ -23,10 +23,10 @@
             <span style="font-size: ${captionSize}; color: var(--color-text-muted); font-weight: 600;">
                 <c:out value="${summary.formattedAvg}"/>
                 <c:if test="${!isCompact}">
-                    <span style="font-weight: 400;"> (<c:out value="${summary.count}"/> reseña<c:if test="${summary.count != 1}">s</c:if>)</span>
+                    <span class="product-form-span-2" > (<c:out value="${summary.count}"/> reseña<c:if test="${summary.count != 1}">s</c:if>)</span>
                 </c:if>
                 <c:if test="${isCompact}">
-                    <span style="font-weight: 400;"> (<c:out value="${summary.count}"/>)</span>
+                    <span class="product-form-span-2" > (<c:out value="${summary.count}"/>)</span>
                 </c:if>
             </span>
         </span>

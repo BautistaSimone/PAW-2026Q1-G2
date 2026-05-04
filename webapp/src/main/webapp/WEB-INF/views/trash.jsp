@@ -17,7 +17,7 @@
             </a>
         </div>
 
-        <h1 class="mb-3" style="font-family: var(--font-heading); font-weight: 700;">
+        <h1 class="mb-3 profile-h2-22" >
             <i class="bi bi-trash3" aria-hidden="true"></i> <spring:message code="Trash.heading" />
         </h1>
 
@@ -53,7 +53,7 @@
                             <spring:message code="Trash.restore.confirm" var="confirmRestore" />
                             <form action="${restoreProductUrl}" method="post" class="mt-2" onsubmit="return confirm('${confirmRestore}');">
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                <button type="submit" class="btn btn-retro btn-retro-primary w-100" style="font-size: 0.85rem; padding: 0.4rem 0.75rem;">
+                                <button type="submit" class="btn btn-retro btn-retro-primary w-100 profile-button-3" >
                                     <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> <spring:message code="Trash.restore.button" />
                                 </button>
                             </form>
@@ -63,9 +63,9 @@
                 <ui:pagination result="${deletedProductsPage}" />
             </c:when>
             <c:otherwise>
-                <div class="empty-products-state" style="text-align: center; padding: 2rem;">
-                    <i class="bi bi-trash3" style="font-size: 2.5rem; color: var(--color-border);"></i>
-                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 1rem 0 0;">
+                <div class="empty-products-state profile-div-23" >
+                    <i class="bi bi-trash3 profile-i-4" ></i>
+                    <p class="profile-p-24" >
                         <spring:message code="Trash.empty" />
                     </p>
                 </div>

@@ -95,7 +95,7 @@
 
                             <div class="d-flex flex-column gap-3">
                                 <c:if test="${isBuyer}">
-                                    <h5 class="purchase-actions-section" style="color: var(--color-accent);">
+                                    <h5 class="purchase-actions-section product-detail-i-21" >
                                         <i class="bi bi-person-fill" aria-hidden="true"></i> <spring:message code="PurchasePanel.buyer.panel" />
                                     </h5>
                                     <c:choose>
@@ -113,7 +113,7 @@
                                                             <li><strong><spring:message code="PurchasePanel.buyer.pending.cbu" /></strong> <code class="purchase-mono"><c:out value="${orderSeller.cbuCvu}"/></code></li>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <li style="color: #b45309;"><strong><spring:message code="PurchasePanel.buyer.pending.cbu" /></strong> <spring:message code="PurchasePanel.buyer.pending.cbuEmpty" /></li>
+                                                            <li class="purchase-panel-li-1" ><strong><spring:message code="PurchasePanel.buyer.pending.cbu" /></strong> <spring:message code="PurchasePanel.buyer.pending.cbuEmpty" /></li>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </ul>
@@ -133,7 +133,7 @@
                                             <div class="alert-retro alert-retro-info">
                                                 <i class="bi bi-hourglass-split" aria-hidden="true"></i>
                                                 <spring:message code="PurchasePanel.buyer.paid.waiting" />
-                                                <a href="mailto:${orderSeller.email}" style="color: inherit; font-weight: 600;"><c:out value="${orderSeller.email}"/></a>
+                                                <a class="purchase-panel-a-2" href="mailto:${orderSeller.email}" ><c:out value="${orderSeller.email}"/></a>
                                                 <c:if test="${not empty orderSeller.username}"> (<c:out value="${orderSeller.username}"/>)</c:if>.
                                             </div>
                                         </c:when>
@@ -142,7 +142,7 @@
                                                 <i class="bi bi-truck" aria-hidden="true"></i>
                                                 <spring:message code="PurchasePanel.buyer.shipped.waiting" />
                                                 <c:if test="${fn:length(orderBuyer.formattedShippingAddress) gt 0}">
-                                                    <span class="d-block mt-2 small" style="opacity: 0.95;"><strong><spring:message code="PurchasePanel.buyer.shipped.address" /></strong> <c:out value="${orderBuyer.formattedShippingAddress}"/></span>
+                                                    <span class="d-block mt-2 small purchase-panel-span-3" ><strong><spring:message code="PurchasePanel.buyer.shipped.address" /></strong> <c:out value="${orderBuyer.formattedShippingAddress}"/></span>
                                                 </c:if>
                                             </div>
                                             <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
@@ -150,15 +150,15 @@
                                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                 <input type="hidden" name="token" value="${token}" />
                                                 <input type="hidden" name="newStatus" value="DELIVERED" />
-                                                <button type="submit" class="btn btn-retro btn-retro-primary w-100 btn-lg" style="background: #2e7d32;">
+                                                <button type="submit" class="btn btn-retro btn-retro-primary w-100 btn-lg purchase-panel-button-4" >
                                                     <i class="bi bi-check2-circle" aria-hidden="true"></i> <spring:message code="PurchasePanel.buyer.shipped.confirmDelivery" />
                                                 </button>
                                                 <form:errors path="newStatus" cssClass="text-danger mt-2" element="div" />
                                             </form:form>
                                         </c:when>
                                         <c:when test="${purchase.status eq 'DELIVERED'}">
-                                            <div class="alert-retro alert-retro-success text-center" style="padding: 1.5rem;">
-                                                <i class="bi bi-check-circle-fill" style="font-size: 1.5rem;" aria-hidden="true"></i>
+                                            <div class="alert-retro alert-retro-success text-center purchase-panel-div-5" >
+                                                <i class="bi bi-check-circle-fill purchase-panel-i-6"  aria-hidden="true"></i>
                                                 <br/><spring:message code="PurchasePanel.buyer.delivered.success" />
                                             </div>
                                             <c:if test="${not hasReview}">
@@ -169,20 +169,20 @@
                                             </c:if>
                                         </c:when>
                                         <c:otherwise>
-                                            <p style="color: var(--color-text-muted); text-align: center;"><spring:message code="PurchasePanel.buyer.waitingSeller" /></p>
+                                            <p class="purchase-panel-p-7" ><spring:message code="PurchasePanel.buyer.waitingSeller" /></p>
                                         </c:otherwise>
                                     </c:choose>
                                 </c:if>
 
                                 <c:if test="${isSeller}">
-                                    <h5 class="purchase-actions-section" style="color: #2e7d32;">
+                                    <h5 class="purchase-actions-section purchase-panel-h5-8" >
                                         <i class="bi bi-shop" aria-hidden="true"></i> <spring:message code="PurchasePanel.seller.panel" />
                                     </h5>
                                     <c:choose>
                                         <c:when test="${purchase.status eq 'PENDING'}">
                                             <div class="purchase-card-inset">
                                                 <p class="purchase-inset-title"><spring:message code="PurchasePanel.seller.pending.title" /></p>
-                                                <p class="mb-2" style="margin:0 0 0.5rem;font-size:0.95rem;"><spring:message code="PurchasePanel.seller.pending.amount" /> <strong style="color: var(--color-accent);"><ui:price value="${product.price}" /></strong></p>
+                                                <p class="mb-2 purchase-panel-p-9" ><spring:message code="PurchasePanel.seller.pending.amount" /> <strong class="product-detail-i-21" ><ui:price value="${product.price}" /></strong></p>
                                                 <ul class="purchase-inset-list mb-2">
                                                     <li><strong><spring:message code="PurchasePanel.seller.pending.buyer" /></strong> <c:out value="${orderBuyer.username}" default="—"/></li>
                                                     <li><strong><spring:message code="PurchasePanel.buyer.pending.email" /></strong> <a href="mailto:<c:out value='${orderBuyer.email}'/>" style="color: var(--color-accent); font-weight: 600;"><c:out value="${orderBuyer.email}"/></a></li>
@@ -200,7 +200,7 @@
                                                             <li><strong><spring:message code="PurchasePanel.seller.paid.address" /></strong> <c:out value="${orderBuyer.formattedShippingAddress}"/></li>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <li style="color: #b45309;"><spring:message code="PurchasePanel.seller.paid.addressEmpty" /></li>
+                                                            <li class="purchase-panel-li-1" ><spring:message code="PurchasePanel.seller.paid.addressEmpty" /></li>
                                                         </c:otherwise>
                                                     </c:choose>
                                                     <li><strong><spring:message code="PurchasePanel.buyer.pending.email" /></strong> <a href="mailto:<c:out value='${orderBuyer.email}'/>" style="color: inherit; font-weight: 600;"><c:out value="${orderBuyer.email}"/></a></li>
@@ -222,16 +222,16 @@
                                             </form:form>
                                         </c:when>
                                         <c:when test="${purchase.status eq 'DELIVERED'}">
-                                            <div class="alert-retro alert-retro-success text-center" style="padding: 1.5rem;">
-                                                <i class="bi bi-check-circle-fill" style="font-size: 1.5rem;" aria-hidden="true"></i>
+                                            <div class="alert-retro alert-retro-success text-center purchase-panel-div-5" >
+                                                <i class="bi bi-check-circle-fill purchase-panel-i-6"  aria-hidden="true"></i>
                                                 <br/><spring:message code="PurchasePanel.seller.delivered.success" />
                                             </div>
                                         </c:when>
                                         <c:when test="${purchase.status eq 'SHIPPED'}">
-                                            <p style="color: var(--color-text-muted); text-align: center; margin: 0;"><spring:message code="PurchasePanel.seller.shipped.waitingBuyer" /></p>
+                                            <p class="purchase-panel-p-10" ><spring:message code="PurchasePanel.seller.shipped.waitingBuyer" /></p>
                                         </c:when>
                                         <c:otherwise>
-                                            <p style="color: var(--color-text-muted); text-align: center;"><spring:message code="PurchasePanel.seller.waitingBuyer" /></p>
+                                            <p class="purchase-panel-p-7" ><spring:message code="PurchasePanel.seller.waitingBuyer" /></p>
                                         </c:otherwise>
                                     </c:choose>
                                 </c:if>

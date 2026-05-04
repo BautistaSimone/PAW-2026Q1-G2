@@ -7,7 +7,7 @@
 <%@ taglib prefix = "spring" uri = "http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<div class="container py-5" style="min-height: 70vh; display: flex; align-items: center;">
+<div class="container py-5 auth-page-container">
     <div class="row justify-content-center w-100">
         <div class="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
             <div class="auth-card">

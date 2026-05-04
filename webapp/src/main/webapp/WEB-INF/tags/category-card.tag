@@ -9,10 +9,8 @@
 <c:set var="catCardImage" value="${img ne null ? true : false}" />
 <c:set var="classes" value="category-card ${catCardCssClass}" />
 
-<button type="button"
-    class="${classes}"
-    style="background-image: url(<c:url value="${img}"/>);"
-    >
+<button type="button" class="${classes}">
+    <img src="<c:url value="${img}"/>" alt="" class="category-card-bg-img" />
     
     <h3><c:out value="${title}"/></h3>
     <p><c:out value="${text}"/></p>

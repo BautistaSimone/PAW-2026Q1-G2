@@ -24,6 +24,7 @@
 
     <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/style.css"/>"/>
     <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/components.css"/>"/>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/assets/css/inline-styles.css"/>"/>
 
 </head>
 <body class="${not empty bodyClass ? bodyClass : ''}">
