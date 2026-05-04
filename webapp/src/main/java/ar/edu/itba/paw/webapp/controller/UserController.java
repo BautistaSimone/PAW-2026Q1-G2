@@ -46,6 +46,8 @@ public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
+    private static final int PROFILE_PUBLICATIONS_PAGE_SIZE = 12;
+
     private final UserService userService;
     private final ProductService productService;
     private final ImageService imageService;
@@ -257,7 +259,7 @@ public class UserController {
             null,
             profileUser.getId(),
             page,
-            10
+            PROFILE_PUBLICATIONS_PAGE_SIZE
         );
 
         final PaginatedResult<Product> productsPage = productService.listProducts(criteria);

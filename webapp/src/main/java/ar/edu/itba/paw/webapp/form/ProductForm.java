@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -42,11 +43,13 @@ public class ProductForm {
     @NotNull
     @DecimalMin("1.0")
     @DecimalMax("10.0")
+    @Digits(integer = 2, fraction = 2)
     private BigDecimal sleeveCondition;
 
     @NotNull
     @DecimalMin("1.0")
     @DecimalMax("10.0")
+    @Digits(integer = 2, fraction = 2)
     private BigDecimal recordCondition;
 
     @NotNull

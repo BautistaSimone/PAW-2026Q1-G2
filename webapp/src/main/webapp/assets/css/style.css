@@ -2496,6 +2496,17 @@ details.filter-section:not([open]) .filter-section-chevron {
     height: auto;
 }
 
+.profile-publications-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding-bottom: 3rem;
+}
+
+.profile-publications-stack > nav {
+    margin-top: 0 !important;
+}
+
 .profile-data {
     flex: 1;
     min-width: 0;
