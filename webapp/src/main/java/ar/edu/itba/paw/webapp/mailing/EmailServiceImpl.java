@@ -1,4 +1,6 @@
-package ar.edu.itba.paw.services;
+package ar.edu.itba.paw.webapp.mailing;
+
+import ar.edu.itba.paw.services.EmailService;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -260,7 +262,8 @@ public class EmailServiceImpl implements EmailService {
             final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-            messageHelper.setSubject("Vinyland - " + title);
+            final Locale locale = LocaleContextHolder.getLocale();
+            messageHelper.setSubject(messageSource.getMessage("Email.order.subject", new Object[]{title}, locale));
             messageHelper.setTo(to);
             messageHelper.setFrom("no-reply@vinyland.com");
 
@@ -296,12 +299,14 @@ public class EmailServiceImpl implements EmailService {
         return t.length() <= maxLen ? t : t.substring(0, maxLen).trim() + "…";
     }
 
-    private static String formatAmount(final Product product) {
+    private String formatAmount(final Product product) {
         final NumberFormat priceFormat = NumberFormat.getNumberInstance(PRICE_LOCALE);
         priceFormat.setGroupingUsed(true);
         priceFormat.setMinimumFractionDigits(0);
         priceFormat.setMaximumFractionDigits(2);
-        return "$" + priceFormat.format(product.getPrice());
+        final Locale locale = LocaleContextHolder.getLocale();
+        final String currencySymbol = messageSource.getMessage("Global.currency.symbol", null, locale);
+        return currencySymbol + priceFormat.format(product.getPrice());
     }
 
     private static String safeProductLocation(final User seller) {

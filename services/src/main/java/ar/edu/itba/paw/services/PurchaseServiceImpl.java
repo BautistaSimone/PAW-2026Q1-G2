@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import java.util.Locale;
+
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -28,17 +32,21 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final ProductService productService;
     private final UserService userService;
     private final EmailService emailService;
+    private final MessageSource messageSource;
+
 
     @Autowired
     public PurchaseServiceImpl(
             final PurchaseDao purchaseDao, 
             final ProductService productService,
             final UserService userService,
-            final EmailService emailService) {
+            final EmailService emailService,
+            final MessageSource messageSource) {
         this.purchaseDao = purchaseDao;
         this.productService = productService;
         this.userService = userService;
         this.emailService = emailService;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -78,19 +86,19 @@ public class PurchaseServiceImpl implements PurchaseService {
             throw new IllegalStateException("Product is no longer available", e);
         }
 
-        runAfterCommit(() ->
+        runAfterCommit(() -> {
+            final Locale locale = LocaleContextHolder.getLocale();
             emailService.sendBuyerEmail(
                 buyer.getEmail(),
                 purchase,
                 product,
-                "Confirmación de compra — datos para pagar",
-                "Reservamos el vinilo para vos. Transferí el monto indicado al CBU/CVU del vendedor (o coordiná por email si no figura). "
-                    + "Guardá el comprobante. Cuando pagues, entrá al detalle del pedido con el botón de abajo y tocá «Notificar que ya he pagado».",
+                messageSource.getMessage("Email.purchase.buyer.confirmed.title", null, locale),
+                messageSource.getMessage("Email.purchase.buyer.confirmed.msg", null, locale),
                 buyer,
                 seller,
                 PurchaseStatus.PENDING
-            )
-        );
+            );
+        });
 
         return purchase;
     }
@@ -140,14 +148,13 @@ public class PurchaseServiceImpl implements PurchaseService {
         if (newStatus == PurchaseStatus.PAID && isBuyer && purchase.getStatus() == PurchaseStatus.PENDING) {
             purchaseDao.updateStatus(purchaseId, newStatus);
             // Notify seller to confirm payment
+            final Locale locale = LocaleContextHolder.getLocale();
             emailService.sendSellerEmail(
                 seller.getEmail(),
                 purchase,
                 product,
-                "El comprador ha pagado",
-                "El comprador " + buyer.getUsername() + " indicó que ya realizó la transferencia. "
-                    + "Verificá el ingreso en tu banco antes de despachar. En el correo tenés su nombre, email y dirección completa de envío. "
-                    + "Cuando esté todo listo, entrá al detalle del pedido y confirmá el envío.",
+                messageSource.getMessage("Email.purchase.seller.paid.title", null, locale),
+                messageSource.getMessage("Email.purchase.seller.paid.msg", new Object[]{buyer.getUsername()}, locale),
                 buyer,
                 seller,
                 PurchaseStatus.PAID
@@ -156,13 +163,13 @@ public class PurchaseServiceImpl implements PurchaseService {
         else if (newStatus == PurchaseStatus.SHIPPED && isSeller && purchase.getStatus() == PurchaseStatus.PAID) {
             purchaseDao.updateStatus(purchaseId, newStatus);
             // Notify buyer
+            final Locale locale = LocaleContextHolder.getLocale();
             emailService.sendBuyerEmail(
                 buyer.getEmail(),
                 purchase,
                 product,
-                "Tu vinilo ha sido enviado",
-                "El vendedor marcó el pedido como enviado. Si te pasó un código de seguimiento, guardalo. "
-                    + "Cuando recibas el disco, entrá al detalle de la compra y confirmá la entrega para cerrar la operación.",
+                messageSource.getMessage("Email.purchase.buyer.shipped.title", null, locale),
+                messageSource.getMessage("Email.purchase.buyer.shipped.msg", null, locale),
                 buyer,
                 seller,
                 PurchaseStatus.SHIPPED

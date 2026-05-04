@@ -38,7 +38,7 @@ import ar.edu.itba.paw.webapp.interceptor.VerificationInterceptor;
 
 @EnableWebMvc // Use all the defaults from webmvc
 @EnableTransactionManagement
-@ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.webapp.interceptor", "ar.edu.itba.paw.services", "ar.edu.itba.paw.persistence" })
+@ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.webapp.interceptor", "ar.edu.itba.paw.webapp.mailing", "ar.edu.itba.paw.services", "ar.edu.itba.paw.persistence" })
 @Configuration
 @PropertySource("classpath:application.properties")
 public class WebConfig implements WebMvcConfigurer {

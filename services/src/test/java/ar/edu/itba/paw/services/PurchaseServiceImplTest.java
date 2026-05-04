@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Optional;
+import org.springframework.context.MessageSource;
+
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,11 +40,15 @@ public class PurchaseServiceImplTest {
     @Mock
     private EmailService emailService;
 
+    @Mock
+    private MessageSource messageSource;
+
+
     private PurchaseServiceImpl purchaseService;
 
     @BeforeEach
     public void setUp() {
-        purchaseService = new PurchaseServiceImpl(purchaseDao, productService, userService, emailService);
+        purchaseService = new PurchaseServiceImpl(purchaseDao, productService, userService, emailService, messageSource);
     }
 
     private static Product product() {
