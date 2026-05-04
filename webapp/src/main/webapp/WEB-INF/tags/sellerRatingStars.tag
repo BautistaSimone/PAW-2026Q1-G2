@@ -23,7 +23,7 @@
             <span style="font-size: ${captionSize}; color: var(--color-text-muted); font-weight: 600;">
                 <c:out value="${summary.formattedAvg}"/>
                 <c:if test="${!isCompact}">
-                    <span class="product-form-span-2" > (<c:out value="${summary.count}"/> reseña<c:if test="${summary.count != 1}">s</c:if>)</span>
+                    <span class="product-form-span-2" > (<c:out value="${summary.count}"/> <spring:message code="SellerRating.reviews"/><c:if test="${summary.count != 1}">s</c:if>)</span>
                 </c:if>
                 <c:if test="${isCompact}">
                     <span class="product-form-span-2" > (<c:out value="${summary.count}"/>)</span>
@@ -32,6 +32,6 @@
         </span>
     </c:when>
     <c:otherwise>
-        <span style="font-size: ${captionSize}; color: var(--color-text-muted); font-style: italic;">Sin reseñas</span>
+        <span style="font-size: ${captionSize}; color: var(--color-text-muted); font-style: italic;"><spring:message code="SellerRating.noReviews"/></span>
     </c:otherwise>
 </c:choose>

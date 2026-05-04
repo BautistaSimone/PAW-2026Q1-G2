@@ -5,15 +5,15 @@
     <div class="footer-container">
         <div class="footer-content">
             <div class="footer-section-contact">
-                <h4 class="footer-title">Vinyland</h4>
+                <h4 class="footer-title"><spring:message code="Global.brand"/></h4>
                 <div class="footer-contact">
-                    <a href="mailto:vinyland67@gmail.com" class="footer-link">
+                    <a href="mailto:<spring:message code="Global.email"/>" class="footer-link">
                         <i class="bi bi-envelope" aria-hidden="true"></i>
-                        vinyland67@gmail.com
+                        <spring:message code="Global.email"/>
                     </a>
                     <a href="#" class="footer-link">
                         <i class="bi bi-geo-alt" aria-hidden="true"></i>
-                        Buenos Aires, Argentina
+                        <spring:message code="Global.location"/>
                     </a>
                 </div>
             </div>

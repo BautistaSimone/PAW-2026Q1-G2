@@ -14,7 +14,7 @@
             <div class="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
                 <div class="auth-card">
                     <div class="auth-card-header">
-                        <h2><i class="bi bi-vinyl" aria-hidden="true"></i> Vinyland</h2>
+                        <h2><i class="bi bi-vinyl" aria-hidden="true"></i> <spring:message code="Global.brand"/></h2>
                         <p><spring:message code="UpdatePassword.heading" /></p>
                     </div>
                     <div class="auth-card-body">

@@ -11,14 +11,14 @@
 
 <c:set var="modalCssClass" value="${not empty cssClass ? cssClass : ''}" />
 <c:set var="classes" value="modal ${modalCssClass}" />
-<c:set var="primary" value="${primaryBtn ne null ? primaryBtn : 'Aceptar'}" />
+<c:set var="primary" value="${primaryBtn ne null ? primaryBtn : '<spring:message code="Modal.button.primary"/>'}" />
 
 <div class="modal fade ${classes}" id="${id}" tabindex="-1" aria-labelledby="${id}Label" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel"><c:out value="${title}"/></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<spring:message code='Modal.button.close.ariaLabel'/>"></button>
             </div>
             <div class="modal-body">
                 <c:out value="${text}"/>
