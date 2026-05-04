@@ -19,7 +19,8 @@
                     </div>
                     <div class="auth-card-body">
 
-                        <form:form modelAttribute="updatePasswordForm" action="${pageContext.request.contextPath}/changePassword" method="POST">
+                        <c:url var="changePasswordUrl" value="/changePassword" />
+                        <form:form modelAttribute="updatePasswordForm" action="${changePasswordUrl}" method="POST">
 
                             <!-- Token hidden field -->
                             <form:hidden path="token" />

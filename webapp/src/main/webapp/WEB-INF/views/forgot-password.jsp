@@ -22,7 +22,8 @@
                             <spring:message code="ForgotPassword.message" />
                         </p>
 
-                        <form action="<c:out value='${pageContext.request.contextPath}'/>/resetPassword" method="POST">
+                        <c:url var="resetPasswordUrl" value="/resetPassword" />
+                        <form action="${resetPasswordUrl}" method="POST">
                             <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
                             <div class="mb-3">
                                 <label class="form-label"><spring:message code="ForgotPassword.email.label" /></label>

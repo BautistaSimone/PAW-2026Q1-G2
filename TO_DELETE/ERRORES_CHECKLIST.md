@@ -366,7 +366,7 @@
 - **Código**: `value="${cat.id}"`, `${selectedCategoryIds.contains(cat.id) ? 'checked' : ''}`, `${selectedLabels.contains(lbl) ? ...}`
 - **Regla violada**: [4] / [6] `<c:out>` obligatorio
 
-### ⚠️ GRAVE — `${pageContext.request.contextPath}` en vez de `<c:url>`
+### ⚠️ GRAVE — `${pageContext.request.contextPath}` en vez de `<c:url>` - LISTO
 
 - **Archivo**: `webapp/src/main/webapp/WEB-INF/views/account-not-verified.jsp`
 - **Línea**: 44
