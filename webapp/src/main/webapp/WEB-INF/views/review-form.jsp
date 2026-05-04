@@ -14,14 +14,14 @@
                         <a href="<c:url value='/purchases/${purchase.purchaseId}?token=${token}'/>"
                            style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none; transition: color 0.2s;"
                            onmouseover="this.style.color='var(--color-accent)';" onmouseout="this.style.color='var(--color-text-muted)';">
-                            <i class="bi bi-arrow-left" aria-hidden="true" style="font-size: 1.1rem;"></i>
+                            <i class="bi bi-arrow-left product-detail-i-1" aria-hidden="true" ></i>
                             <span><spring:message code="ReviewForm.backToOrder" /></span>
                         </a>
-                        <span style="color: var(--color-border);">|</span>
+                        <span class="review-form-span-1" >|</span>
                         <a href="<c:url value='/'/>"
                            style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none; transition: color 0.2s;"
                            onmouseover="this.style.color='var(--color-accent)';" onmouseout="this.style.color='var(--color-text-muted)';">
-                            <i class="bi bi-house" aria-hidden="true" style="font-size: 1rem;"></i>
+                            <i class="bi bi-house review-form-i-2" aria-hidden="true" ></i>
                             <span><spring:message code="ReviewForm.home" /></span>
                         </a>
                     </div>
@@ -40,7 +40,7 @@
                                 <div class="purchase-product-info">
                                     <h5><c:out value="${product.title}"/></h5>
                                     <p class="purchase-artist"><c:out value="${product.artist}"/></p>
-                                    <p style="color: var(--color-text-muted); margin: 0; font-size: 0.9rem;">
+                                    <p class="review-form-p-3" >
                                         <spring:message code="ReviewForm.seller" />: <strong><c:out value="${seller.username}"/></strong>
                                     </p>
                                 </div>
@@ -53,7 +53,7 @@
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                                 <div class="mb-4">
-                                    <label class="form-label" style="font-weight: 600; color: var(--color-text-main); font-size: 1rem;">
+                                    <label class="form-label review-form-label-4" >
                                         <spring:message code="ReviewForm.score.label" />
                                     </label>
                                     <div class="star-rating-input" role="radiogroup" aria-label="<spring:message code='ReviewForm.score.ariaLabel' />">
@@ -70,14 +70,14 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="reviewText" class="form-label" style="font-weight: 600; color: var(--color-text-main); font-size: 1rem;">
-                                        <spring:message code="ReviewForm.comment.label" /> <span style="color: var(--color-text-muted); font-weight: 400;"><spring:message code="ReviewForm.comment.optional" /></span>
+                                    <label for="reviewText" class="form-label review-form-label-4" >
+                                        <spring:message code="ReviewForm.comment.label" /> <span class="review-form-span-5" ><spring:message code="ReviewForm.comment.optional" /></span>
                                     </label>
                                     <spring:message code="ReviewForm.comment.placeholder" var="commentPlaceholder" />
-                                    <form:textarea path="text" id="reviewText" cssClass="form-control"
+                                    <form:textarea class="review-form-form-textarea-6" path="text" id="reviewText" cssClass="form-control"
                                                    rows="4" maxlength="2000"
                                                    placeholder="${commentPlaceholder}"
-                                                   style="resize: vertical; border-radius: 12px; border: 1.5px solid var(--color-border); padding: 1rem;"/>
+                                                   />
                                     <form:errors path="text" cssClass="text-danger mt-1" element="div" />
                                 </div>
 
@@ -100,46 +100,6 @@
         </div>
     </div>
 
-    <style>
-        .star-rating-input {
-            display: flex;
-            gap: 0.25rem;
-            flex-direction: row;
-        }
-        .star-radio {
-            position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .star-label {
-            cursor: pointer;
-            font-size: 2rem;
-            color: #d4d0cb;
-            transition: color 0.15s ease, transform 0.15s ease;
-            line-height: 1;
-        }
-        .star-label:hover,
-        .star-label:hover ~ .star-label {
-            color: #d4d0cb;
-        }
-        .star-radio:checked ~ .star-label {
-            color: #d4d0cb;
-        }
-        .star-radio:checked + .star-label,
-        .star-label:hover {
-            color: var(--color-accent, #e76f51);
-            transform: scale(1.15);
-        }
-        /* Highlight all stars up to and including hovered/checked */
-        .star-rating-input:has(.star-radio:checked) .star-label {
-            color: #d4d0cb;
-        }
-        .star-rating-input .star-radio:checked + .star-label,
-        .star-rating-input .star-radio:checked + .star-label ~ .star-label {
-            color: #d4d0cb;
-        }
-    </style>
 
     <script>
     (function() {

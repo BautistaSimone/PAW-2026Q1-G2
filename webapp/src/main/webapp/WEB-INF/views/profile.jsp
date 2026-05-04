@@ -30,7 +30,7 @@
                     <div class="profile-user-info">
                         <h1><c:out value="${user.username}" /></h1>
                         <c:if test="${not empty user.firstName or not empty user.lastName}">
-                            <p style="margin: 0.15rem 0 0.35rem; color: var(--color-text-muted); font-size: 1rem; font-weight: 500;">
+                            <p class="profile-p-1" >
                                 <c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/>
                             </p>
                         </c:if>
@@ -120,7 +120,7 @@
             </c:if>
 
             <!-- Tabs -->
-            <ul class="nav nav-tabs mt-4" id="profileTabs" role="tablist" style="border-bottom: 2px solid var(--color-border);">
+            <ul class="nav nav-tabs mt-4 profile-ul-2" id="profileTabs" role="tablist" >
                 <li class="nav-item" role="presentation">
                     <button class="nav-link<c:if test='${activePublications}'> active</c:if>" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications" type="button" role="tab" aria-controls="publications" aria-selected="${activePublications}" style="font-weight: 600;">
                         <i class="bi bi-vinyl" aria-hidden="true"></i> <spring:message code="Profile.tabs.publications" />
@@ -191,7 +191,7 @@
                                             <spring:message code="Profile.publications.deleteConfirm" var="confirmDelete" />
                                             <form action="${deleteProductUrl}" method="post" class="mt-2" onsubmit="return confirm('${confirmDelete}');">
                                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                                <button type="submit" class="btn btn-retro btn-retro-secondary w-100" style="font-size: 0.85rem; padding: 0.4rem 0.75rem; ">
+                                                <button type="submit" class="btn btn-retro btn-retro-secondary w-100 profile-button-3" >
                                                     <i class="bi bi-trash" aria-hidden="true"></i> <spring:message code="Profile.publications.deleteButton" />
                                                 </button>
                                             </form>
@@ -203,8 +203,8 @@
                         </c:when>
                         <c:otherwise>
                             <div class="empty-products-state">
-                                <i class="bi bi-vinyl" style="font-size: 2.5rem; color: var(--color-border);"></i>
-                                <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;">
+                                <i class="bi bi-vinyl profile-i-4" ></i>
+                                <p class="profile-p-5" >
                                     <c:choose>
                                         <c:when test="${isOwnProfile}"><spring:message code="Profile.publications.empty.own" /></c:when>
                                         <c:otherwise><spring:message code="Profile.publications.empty.other" /></c:otherwise>
@@ -223,8 +223,8 @@
                 <!-- Tab: Mis datos (solo perfil propio) -->
                 <c:if test="${isOwnProfile}">
                     <div class="tab-pane fade<c:if test='${activeMyData}'> show active</c:if>" id="mydata" role="tabpanel" aria-labelledby="mydata-tab">
-                        <div style="background: #fff; border-radius: 16px; padding: 1.5rem 1.25rem; border: 1px solid var(--color-border); max-width: 640px;">
-                            <p style="color: var(--color-text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+                        <div class="profile-div-6" >
+                            <p class="profile-p-7" >
                                 <spring:message code="Profile.myData.help" />
                             </p>
                             <c:url var="profileUpdateUrl" value="/profile/update"/>
@@ -291,26 +291,26 @@
                                 <div class="d-flex flex-column gap-3">
                                     <c:forEach items="${purchases}" var="purchase">
                                         <c:set var="pProduct" value="${purchaseProducts[purchase.purchaseId]}"/>
-                                        <div style="background: #fff; border-radius: 16px; padding: 1.25rem; border: 1px solid var(--color-border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 1rem;">
+                                        <div class="profile-div-8" >
                                             <c:if test="${pProduct != null}">
                                                 <img src="<c:url value='/images/product/${pProduct.id}'/>"
                                                      alt="" style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover;"
                                                      onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\' viewBox=\'0 0 60 60\'%3E%3Crect width=\'60\' height=\'60\' fill=\'%23e9e4dc\'/%3E%3Ctext x=\'30\' y=\'38\' text-anchor=\'middle\' font-size=\'22\' fill=\'%23b0a898\'%3E♪%3C/text%3E%3C/svg%3E';"/>
                                             </c:if>
-                                            <div style="flex: 1; min-width: 0;">
+                                            <div class="profile-div-9" >
                                                 <c:if test="${pProduct != null}">
-                                                    <div style="font-weight: 600; font-size: 1rem; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    <div class="profile-div-10" >
                                                         <c:out value="${pProduct.title}"/>
                                                     </div>
-                                                    <div style="font-size: 0.85rem; color: var(--color-text-muted);">
+                                                    <div class="profile-div-11" >
                                                         <c:out value="${pProduct.artist}"/> · <ui:price value="${pProduct.price}" />
                                                     </div>
                                                 </c:if>
-                                                <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.2rem;">
-                                                    <c:out value="${purchase.date}"/> · <span style="font-weight: 600;"><c:out value="${purchase.status.description}"/></span>
+                                                <div class="profile-div-12" >
+                                                    <c:out value="${purchase.date}"/> · <span class="profile-span-13" ><c:out value="${purchase.status.description}"/></span>
                                                 </div>
                                             </div>
-                                            <div style="display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0;">
+                                            <div class="profile-div-14" >
                                                 <a href="<c:url value='/purchases/${purchase.purchaseId}?token=${purchase.buyerToken}'/>"
                                                    class="btn btn-retro btn-retro-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
                                                     <i class="bi bi-eye" aria-hidden="true"></i> <spring:message code="Profile.reports.view" />
@@ -329,8 +329,8 @@
                             </c:when>
                             <c:otherwise>
                                 <div class="empty-products-state">
-                                    <i class="bi bi-bag" style="font-size: 2.5rem; color: var(--color-border);"></i>
-                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;"><spring:message code="Profile.purchases.empty" /></p>
+                                    <i class="bi bi-bag profile-i-4" ></i>
+                                    <p class="profile-p-5" ><spring:message code="Profile.purchases.empty" /></p>
                                     <a href="<c:url value='/'/>" class="btn btn-retro btn-retro-primary" style="justify-self: center;">
                                         <i class="bi bi-search" aria-hidden="true"></i> <spring:message code="Profile.purchases.explore" />
                                     </a>
@@ -348,26 +348,26 @@
                                 <div class="d-flex flex-column gap-3">
                                     <c:forEach items="${sales}" var="sale">
                                         <c:set var="sProduct" value="${saleProducts[sale.purchaseId]}"/>
-                                        <div style="background: #fff; border-radius: 16px; padding: 1.25rem; border: 1px solid var(--color-border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 1rem;">
+                                        <div class="profile-div-8" >
                                             <c:if test="${sProduct != null}">
                                                 <img src="<c:url value='/images/product/${sProduct.id}'/>"
                                                      alt="" style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover;"
                                                      onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\' viewBox=\'0 0 60 60\'%3E%3Crect width=\'60\' height=\'60\' fill=\'%23e9e4dc\'/%3E%3Ctext x=\'30\' y=\'38\' text-anchor=\'middle\' font-size=\'22\' fill=\'%23b0a898\'%3E♪%3C/text%3E%3C/svg%3E';"/>
                                             </c:if>
-                                            <div style="flex: 1; min-width: 0;">
+                                            <div class="profile-div-9" >
                                                 <c:if test="${sProduct != null}">
-                                                    <div style="font-weight: 600; font-size: 1rem; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    <div class="profile-div-10" >
                                                         <c:out value="${sProduct.title}"/>
                                                     </div>
-                                                    <div style="font-size: 0.85rem; color: var(--color-text-muted);">
+                                                    <div class="profile-div-11" >
                                                         <c:out value="${sProduct.artist}"/> · <ui:price value="${sProduct.price}" />
                                                     </div>
                                                 </c:if>
-                                                <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.2rem;">
-                                                    <c:out value="${sale.date}"/> · <span style="font-weight: 600;"><c:out value="${sale.status.description}"/></span>
+                                                <div class="profile-div-12" >
+                                                    <c:out value="${sale.date}"/> · <span class="profile-span-13" ><c:out value="${sale.status.description}"/></span>
                                                 </div>
                                             </div>
-                                            <div style="display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0;">
+                                            <div class="profile-div-14" >
                                                 <a href="<c:url value='/purchases/${sale.purchaseId}?token=${sale.sellerToken}'/>"
                                                    class="btn btn-retro btn-retro-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
                                                     <i class="bi bi-eye" aria-hidden="true"></i> <spring:message code="Profile.reports.view" />
@@ -380,8 +380,8 @@
                             </c:when>
                             <c:otherwise>
                                 <div class="empty-products-state">
-                                    <i class="bi bi-shop" style="font-size: 2.5rem; color: var(--color-border);"></i>
-                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;"><spring:message code="Profile.sales.empty" /></p>
+                                    <i class="bi bi-shop profile-i-4" ></i>
+                                    <p class="profile-p-5" ><spring:message code="Profile.sales.empty" /></p>
                                 </div>
                             </c:otherwise>
                         </c:choose>
@@ -394,15 +394,15 @@
                         <c:when test="${not empty receivedReviews}">
                             <div class="d-flex flex-column gap-3">
                                 <c:forEach items="${receivedReviews}" var="rev">
-                                    <div style="background: #fff; border-radius: 16px; padding: 1.25rem; border: 1px solid var(--color-border); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                                <div style="width: 36px; height: 36px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
+                                    <div class="profile-div-15" >
+                                        <div class="profile-div-16" >
+                                            <div class="profile-div-17" >
+                                                <div class="profile-div-18" >
                                                     <c:out value="${fn:substring(rev.buyerUsername, 0, 1)}"/>
                                                 </div>
-                                                <span style="font-weight: 600; color: var(--color-text-main);"><c:out value="${rev.buyerUsername}"/></span>
+                                                <span class="profile-span-19" ><c:out value="${rev.buyerUsername}"/></span>
                                             </div>
-                                            <div style="color: var(--color-accent); font-size: 1rem;">
+                                            <div class="profile-div-20" >
                                                 <c:forEach begin="1" end="5" var="i">
                                                     <c:choose>
                                                         <c:when test="${i <= rev.score}"><i class="bi bi-star-fill"></i></c:when>
@@ -412,7 +412,7 @@
                                             </div>
                                         </div>
                                         <c:if test="${not empty rev.text}">
-                                            <p style="color: var(--color-text-main); margin: 0; font-size: 0.95rem; line-height: 1.6;">
+                                            <p class="profile-p-21" >
                                                 <c:out value="${rev.text}"/>
                                             </p>
                                         </c:if>
@@ -423,8 +423,8 @@
                         </c:when>
                         <c:otherwise>
                             <div class="empty-products-state">
-                                <i class="bi bi-star" style="font-size: 2.5rem; color: var(--color-border);"></i>
-                                <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;">
+                                <i class="bi bi-star profile-i-4" ></i>
+                                <p class="profile-p-5" >
                                     <c:choose>
                                         <c:when test="${isOwnProfile}"><spring:message code="Profile.reviews.empty.own" /></c:when>
                                         <c:otherwise><spring:message code="Profile.reviews.empty.other" /></c:otherwise>
@@ -450,7 +450,7 @@
                                 <spring:message code="Trash.alert.restoreError" />
                             </div>
                         </c:if>
-                        <h2 class="h5 mb-3" style="font-family: var(--font-heading); font-weight: 700;">
+                        <h2 class="h5 mb-3 profile-h2-22" >
                             <i class="bi bi-trash3" aria-hidden="true"></i> <spring:message code="Trash.heading" />
                         </h2>
                         <c:choose>
@@ -472,7 +472,7 @@
                                             <spring:message code="Trash.restore.confirm" var="confirmRestore" />
                                             <form action="${restoreProductUrl}" method="post" class="mt-2" onsubmit="return confirm('${confirmRestore}');">
                                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                                <button type="submit" class="btn btn-retro btn-retro-primary w-100" style="font-size: 0.85rem; padding: 0.4rem 0.75rem;">
+                                                <button type="submit" class="btn btn-retro btn-retro-primary w-100 profile-button-3" >
                                                     <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> <spring:message code="Trash.restore.button" />
                                                 </button>
                                             </form>
@@ -482,9 +482,9 @@
                                 <ui:pagination result="${deletedProductsPage}" pageParamName="trashPage" />
                             </c:when>
                             <c:otherwise>
-                                <div class="empty-products-state" style="text-align: center; padding: 2rem;">
-                                    <i class="bi bi-trash3" style="font-size: 2.5rem; color: var(--color-border);"></i>
-                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 1rem 0 0;">
+                                <div class="empty-products-state profile-div-23" >
+                                    <i class="bi bi-trash3 profile-i-4" ></i>
+                                    <p class="profile-p-24" >
                                         <spring:message code="Trash.empty" />
                                     </p>
                                 </div>
@@ -500,28 +500,28 @@
                             <c:when test="${not empty reportedProducts}">
                                 <div class="d-flex flex-column gap-3">
                                     <c:forEach items="${reportedProducts}" var="rp">
-                                        <div style="background: #fff; border-radius: 16px; padding: 1.25rem; border: 1px solid var(--color-border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 1rem;">
+                                        <div class="profile-div-8" >
                                             <img src="<c:url value='/images/product/${rp.productId}'/>" alt=""
                                                  style="width: 70px; height: 70px; border-radius: 12px; object-fit: cover; flex-shrink: 0;"
                                                   onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'70\' height=\'70\' viewBox=\'0 0 70 70\'%3E%3Crect width=\'70\' height=\'70\' fill=\'%23e9e4dc\'/%3E%3Ctext x=\'35\' y=\'44\' text-anchor=\'middle\' font-size=\'26\' fill=\'%23b0a898\'%3E&#9834;%3C/text%3E%3C/svg%3E';"/>
-                                            <div style="flex: 1; min-width: 0;">
-                                                <div style="font-weight: 600; font-size: 1rem; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            <div class="profile-div-9" >
+                                                <div class="profile-div-10" >
                                                     <c:out value="${rp.productTitle}"/>
                                                 </div>
-                                                <div style="font-size: 0.85rem; color: var(--color-text-muted);">
+                                                <div class="profile-div-11" >
                                                     <c:out value="${rp.productArtist}"/>
                                                 </div>
-                                                <div style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
-                                                    <span style="background: #dc3545; color: #fff; font-weight: 700; font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 50px;">
+                                                <div class="profile-div-25" >
+                                                    <span class="profile-span-26" >
                                                         <i class="bi bi-flag-fill" aria-hidden="true"></i>
                                                         <spring:message code="Profile.reports.count" arguments="${rp.reportCount},${rp.reportCount}" />
                                                     </span>
-                                                    <span style="font-size: 0.8rem; color: var(--color-text-muted);">
+                                                    <span class="profile-span-27" >
                                                         <spring:message code="Profile.reports.publishedBy" /> <a href="<c:url value='/profile?userId=${rp.ownerUserId}'/>" style="color: var(--color-accent); text-decoration: none; font-weight: 600;"><c:out value="${rp.ownerUsername}"/></a>
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; flex-shrink: 0;">
+                                            <div class="profile-div-28" >
                                                 <spring:message code="Profile.reports.view" var="viewText" />
                                                 <a href="<c:url value='/products/${rp.productId}'/>" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem;" title="${viewText}">
                                                     <i class="bi bi-eye" aria-hidden="true"></i> <c:out value="${viewText}"/>
@@ -532,7 +532,7 @@
                                                 <form action="<c:out value='${hideUrl}'/>" method="post" style="margin: 0;" onsubmit="return confirm('${confirmHide}');">
                                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                     <input type="hidden" name="productId" value="<c:out value='${rp.productId}'/>" />
-                                                    <button type="submit" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem; color: #dc3545; border-color: #dc3545;" title="${hideText}">
+                                                    <button type="submit" class="btn btn-retro btn-retro-secondary profile-button-29"  title="${hideText}">
                                                         <i class="bi bi-x-circle" aria-hidden="true"></i> <c:out value="${hideText}"/>
                                                     </button>
                                                 </form>
@@ -546,7 +546,7 @@
                                                 <form action="<c:out value='${banUrl}'/>" method="post" style="margin: 0;" onsubmit="return confirm('${confirmBan}');">
                                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                     <input type="hidden" name="userId" value="<c:out value='${rp.ownerUserId}'/>" />
-                                                    <button type="submit" class="btn btn-retro btn-retro-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.7rem; color: #fff; background: #dc3545; border-color: #dc3545;" title="${banText}">
+                                                    <button type="submit" class="btn btn-retro btn-retro-secondary profile-button-30"  title="${banText}">
                                                         <i class="bi bi-person-x" aria-hidden="true"></i> <c:out value="${banText}"/>
                                                     </button>
                                                 </form>
@@ -557,8 +557,8 @@
                             </c:when>
                             <c:otherwise>
                                 <div class="empty-products-state">
-                                    <i class="bi bi-flag" style="font-size: 2.5rem; color: var(--color-border);"></i>
-                                    <p style="color: var(--color-text-muted); font-size: 1rem; margin: 0;"><spring:message code="Profile.reports.empty" /></p>
+                                    <i class="bi bi-flag profile-i-4" ></i>
+                                    <p class="profile-p-5" ><spring:message code="Profile.reports.empty" /></p>
                                 </div>
                             </c:otherwise>
                         </c:choose>

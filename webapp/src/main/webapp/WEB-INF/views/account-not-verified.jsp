@@ -9,7 +9,7 @@
 
     <ui:header showHeaderActions="false"/>
 
-    <div class="container py-5" style="min-height: 70vh; display: flex; align-items: center;">
+    <div class="container py-5 auth-page-container">
         <div class="row justify-content-center w-100">
             <div class="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
                 <div class="auth-card">
@@ -22,7 +22,7 @@
                     <div class="auth-card-body text-center">
 
                         <div class="mb-4">
-                            <i class="bi bi-envelope-exclamation text-warning" style="font-size: 3rem;"></i>
+                            <i class="bi bi-envelope-exclamation text-warning auth-icon-large"></i>
                         </div>
 
                         <h5 class="mb-3">

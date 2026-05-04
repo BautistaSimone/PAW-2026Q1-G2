@@ -72,7 +72,7 @@
                                 <spring:message code="ProductForm.recordLabel.placeholder" var="labelPlaceholder" />
                                 <form:input path="recordLabel" cssClass="form-control"
                                        placeholder="${labelPlaceholder}" required="required" list="record-label-suggestions" autocomplete="off" />
-                                <span class="input-group-text" style="border-color: var(--color-border);">–</span>
+                                <span class="input-group-text product-form-span-1" >–</span>
                                 <spring:message code="ProductForm.catalogNumber.placeholder" var="catalogPlaceholder" />
                                 <form:input path="catalogNumber" cssClass="form-control"
                                        placeholder="${catalogPlaceholder}" required="required" />
@@ -129,7 +129,7 @@
                             <label for="priceDisplay" class="form-label"><spring:message code="ProductForm.price.label" /> <span class="text-danger">*</span></label>
                             <form:hidden path="price" id="price" />
                             <div class="input-group">
-                                <span class="input-group-text" style="border-color: var(--color-border);">$</span>
+                                <span class="input-group-text product-form-span-1" >$</span>
                                 <spring:message code="ProductForm.price.placeholder" var="priceFormPlaceholder" />
                                 <input type="text" id="priceDisplay" class="form-control" inputmode="decimal"
                                        autocomplete="off" placeholder="${priceFormPlaceholder}" required="required" />
@@ -142,7 +142,7 @@
                                 <spring:message code="ProductForm.images.label" />
                                 <c:choose>
                                     <c:when test="${isEditing and hasExistingProductImages}">
-                                        <span class="text-muted" style="font-weight: 400;">(<spring:message code="ProductForm.images.optionalMark" />)</span>
+                                        <span class="text-muted product-form-span-2" >(<spring:message code="ProductForm.images.optionalMark" />)</span>
                                     </c:when>
                                     <c:otherwise>
                                         <span class="text-danger">*</span>

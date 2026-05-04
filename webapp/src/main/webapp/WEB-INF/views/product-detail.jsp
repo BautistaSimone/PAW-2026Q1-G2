@@ -47,7 +47,7 @@
                                         style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none; transition: color 0.2s;"
                                         onmouseover="this.style.color='var(--color-accent)';"
                                         onmouseout="this.style.color='var(--color-text-muted)';">
-                                        <i class="bi bi-arrow-left" aria-hidden="true" style="font-size: 1.1rem;"></i>
+                                        <i class="bi bi-arrow-left product-detail-i-1" aria-hidden="true" ></i>
                                         <span><spring:message code="ProductDetail.back" /></span>
                                     </a>
                                 </div>
@@ -56,8 +56,8 @@
                                     <!-- Left Side: Image Gallery -->
                                     <div class="col-lg-6 mb-4">
                                         <div id="productDetailGallery" class="product-detail-gallery">
-                                            <div class="product-gallery-main"
-                                                style="background: linear-gradient(135deg, #ffffff 0%, #f4f1ec 100%); border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,1); padding: 1rem; position: relative;">
+                                            <div class="product-gallery-main product-detail-div-2"
+                                                >
                                                 <c:choose>
                                                     <c:when test="${not empty productImageUrl}">
                                                         <img id="productGalleryMain"
@@ -102,36 +102,36 @@
                                     <!-- Right Side: Details -->
                                     <div class="col-lg-6">
                                         <!-- Main Info Card -->
-                                        <div
-                                            style="background: #ffffff; border-radius: 24px; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; margin-bottom: 2rem;">
+                                        <div class="product-detail-div-3"
+                                            >
                                             <!-- Decorative accent top -->
-                                            <div
-                                                style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--color-accent) 0%, #ff9f43 100%);">
+                                            <div class="product-detail-div-4"
+                                                >
                                             </div>
 
-                                            <h1
-                                                style="font-family: var(--font-heading); font-size: 2.5rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--color-text-main); line-height: 1.1;">
+                                            <h1 class="product-detail-h1-5"
+                                                >
                                                 <c:out value="${product.title}" />
                                             </h1>
-                                            <h2
-                                                style="font-size: 1.25rem; font-weight: 500; color: var(--color-text-muted); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-                                                <i class="bi bi-mic"
-                                                    style="color: var(--color-accent); opacity: 0.7;"></i>
+                                            <h2 class="product-detail-h2-6"
+                                                >
+                                                <i class="bi bi-mic product-detail-i-7"
+                                                    ></i>
                                                 <c:out value="${product.artist}" />
                                             </h2>
 
 
                                             <c:if
                                                 test="${not empty product.recordLabel or not empty product.catalogNumber or not empty product.editionCountry}">
-                                                <div
-                                                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; background: #fcfaf8; padding: 1.5rem; border-radius: 16px; border: 1px dashed rgba(231,111,81,0.2);">
+                                                <div class="product-detail-div-8"
+                                                    >
                                                     <c:if
                                                         test="${not empty product.recordLabel or not empty product.catalogNumber}">
                                                         <div>
-                                                            <span
-                                                                style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.2rem; font-weight: 700;"><spring:message code="ProductDetail.labelCatalog" /></span>
-                                                            <span
-                                                                style="font-weight: 600; color: var(--color-text-main); font-size: 0.95rem;">
+                                                            <span class="product-detail-span-9"
+                                                                ><spring:message code="ProductDetail.labelCatalog" /></span>
+                                                            <span class="product-detail-span-10"
+                                                                >
                                                                 <c:choose>
                                                                     <c:when
                                                                         test="${not empty product.recordLabel and not empty product.catalogNumber}">
@@ -150,10 +150,10 @@
                                                     </c:if>
                                                     <c:if test="${not empty product.editionCountry}">
                                                         <div>
-                                                            <span
-                                                                style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.2rem; font-weight: 700;"><spring:message code="ProductDetail.origin" /></span>
-                                                            <span
-                                                                style="font-weight: 600; color: var(--color-text-main); font-size: 0.95rem;">
+                                                            <span class="product-detail-span-9"
+                                                                ><spring:message code="ProductDetail.origin" /></span>
+                                                            <span class="product-detail-span-10"
+                                                                >
                                                                 <c:out value="${product.editionCountry}" />
                                                             </span>
                                                         </div>
@@ -161,27 +161,27 @@
                                                 </div>
                                             </c:if>
 
-                                            <div
-                                                style="margin-bottom: 2rem; display: flex; align-items: flex-end; gap: 0.5rem;">
-                                                <span
-                                                    style="font-family: var(--font-mono); font-size: 3rem; font-weight: 700; color: var(--color-accent); line-height: 1; letter-spacing: -1px;">
+                                            <div class="product-detail-div-11"
+                                                >
+                                                <span class="product-detail-span-12"
+                                                    >
                                                     <ui:price value="${product.price}" />
                                                 </span>
-                                                <span
-                                                    style="font-size: 1rem; color: var(--color-text-muted); font-weight: 600; padding-bottom: 0.4rem;">ARS</span>
+                                                <span class="product-detail-span-13"
+                                                    >ARS</span>
                                             </div>
 
                                             <c:choose>
                                                 <c:when test="${isOwnProduct}">
-                                                    <div class="alert-retro alert-retro-warning mb-0" role="status" style="border-radius: 16px;">
+                                                    <div class="alert-retro alert-retro-warning mb-0 product-detail-div-14" role="status" >
                                                         <i class="bi bi-info-circle" aria-hidden="true"></i>
                                                         <spring:message code="ProductDetail.isOwnProduct" />
                                                     </div>
                                                     <div class="d-grid mt-3">
-                                                        <button type="button" class="btn w-100" disabled
-                                                            style="background: #e0e0e0; color: #888; font-size: 1.15rem; padding: 1.1rem; border-radius: 99px; border: none; cursor: not-allowed; font-weight: 700;">
-                                                            <i class="bi bi-cart-fill" aria-hidden="true"
-                                                                style="font-size: 1.3rem;"></i> <spring:message code="ProductDetail.purchase.button" />
+                                                        <button type="button" class="btn w-100 product-detail-button-15" disabled
+                                                            >
+                                                            <i class="bi bi-cart-fill product-detail-i-16" aria-hidden="true"
+                                                                ></i> <spring:message code="ProductDetail.purchase.button" />
                                                         </button>
                                                     </div>
                                                 </c:when>
@@ -192,12 +192,12 @@
                                                             action="${purchasePostUrl}" method="POST" cssClass="w-100" data-single-submit="true">
                                                             <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
                                                             <input type="hidden" name="productId" value="<c:out value='${product.id}'/>" />
-                                                            <button type="submit" class="btn w-100"
-                                                                style="background: var(--color-accent); color: #fff; font-size: 1.15rem; padding: 1.1rem; border-radius: 99px; box-shadow: 0 8px 24px rgba(231, 111, 81, 0.4); border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: center; align-items: center; gap: 0.75rem; font-weight: 700;"
+                                                            <button type="submit" class="btn w-100 product-detail-button-17"
+                                                                
                                                                 onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 28px rgba(231, 111, 81, 0.5)'; this.style.background='var(--color-accent-hover)';"
                                                                 onmouseout="this.style.transform='none'; this.style.boxShadow='0 8px 24px rgba(231, 111, 81, 0.4)'; this.style.background='var(--color-accent)';">
-                                                                <i class="bi bi-cart-fill" aria-hidden="true"
-                                                                    style="font-size: 1.3rem;"></i> <spring:message code="ProductDetail.purchase.button" />
+                                                                <i class="bi bi-cart-fill product-detail-i-16" aria-hidden="true"
+                                                                    ></i> <spring:message code="ProductDetail.purchase.button" />
                                                             </button>
                                                         </form:form>
                                                     </div>
@@ -206,8 +206,8 @@
                                                             <c:url var="reportPostUrl" value="/products/${product.id}/report" />
                                                             <form action="<c:out value='${reportPostUrl}'/>" method="POST" class="w-100">
                                                                 <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
-                                                                <button type="submit" class="btn w-100"
-                                                                    style="background: transparent; color: var(--color-accent); font-size: 1rem; padding: 0.8rem; border-radius: 99px; border: 1px solid rgba(231, 111, 81, 0.5); transition: all 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-weight: 600;"
+                                                                <button type="submit" class="btn w-100 product-detail-button-18"
+                                                                    
                                                                     onmouseover="this.style.background='rgba(231, 111, 81, 0.08)'; this.style.borderColor='var(--color-accent)';"
                                                                     onmouseout="this.style.background='transparent'; this.style.borderColor='rgba(231, 111, 81, 0.5)';">
                                                                     <i class="bi bi-flag" aria-hidden="true"></i> <spring:message code="ProductDetail.report.button" />
@@ -226,13 +226,13 @@
                                     <div class="col-lg-6 mb-4">
                                         <!-- Seller Information Card -->
                                         <c:if test="${seller != null}">
-                                            <div style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px); border-radius: 20px; padding: 2rem; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 8px 32px rgba(0,0,0,0.03);">
-                                                <h5 style="font-family: var(--font-heading); font-weight: 700; margin-bottom: 1.5rem; font-size: 1.3rem; color: var(--color-text-main); display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 1rem;">
-                                                    <i class="bi bi-person-badge" style="color: var(--color-accent);"></i> <spring:message code="ProductDetail.seller.title" />
+                                            <div class="product-detail-div-19" >
+                                                <h5 class="product-detail-h5-20" >
+                                                    <i class="bi bi-person-badge product-detail-i-21" ></i> <spring:message code="ProductDetail.seller.title" />
                                                 </h5>
 
-                                                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                                                    <div style="width: 50px; height: 50px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; flex-shrink: 0;">
+                                                <div class="product-detail-div-22" >
+                                                    <div class="product-detail-div-23" >
                                                         <c:out value="${fn:substring(seller.username, 0, 1)}" />
                                                     </div>
                                                     <div>
@@ -249,41 +249,41 @@
                                                     </div>
                                                 </div>
 
-                                                <div style="display: flex; align-items: center; gap: 1rem; background: #fff; padding: 1.25rem; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 1.5rem;">
-                                                    <div style="width: 44px; height: 44px; background: rgba(231, 111, 81, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                                        <i class="bi bi-geo-alt-fill" aria-hidden="true" style="color: var(--color-accent); font-size: 1.2rem;"></i>
+                                                <div class="product-detail-div-24" >
+                                                    <div class="product-detail-div-25" >
+                                                        <i class="bi bi-geo-alt-fill product-detail-i-26" aria-hidden="true" ></i>
                                                     </div>
                                                     <div>
-                                                        <span style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem;"><spring:message code="ProductDetail.location" /></span>
-                                                        <span style="font-size: 1rem; font-weight: 600; color: var(--color-text-main);">
+                                                        <span class="product-detail-span-27" ><spring:message code="ProductDetail.location" /></span>
+                                                        <span class="product-detail-span-28" >
                                                             <c:out value="${seller.location}" />
                                                         </span>
                                                     </div>
                                                 </div>
 
-                                                <div style="background: #fff; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); padding: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                                                <div class="product-detail-div-29" >
                                                     <c:choose>
                                                         <c:when test="${not empty sellerReviews}">
-                                                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                                            <div class="product-detail-div-30" >
                                                                 <c:forEach items="${sellerReviews}" var="review" varStatus="st">
                                                                     <div style="padding-bottom: ${st.last ? '0' : '1rem'}; border-bottom: ${st.last ? 'none' : '1px solid rgba(0,0,0,0.05)'};">
-                                                                        <div style="display: flex; align-items: center; gap: 0.2rem; margin-bottom: 0.4rem; color: #ffb400; font-size: 0.85rem;">
+                                                                        <div class="product-detail-div-31" >
                                                                             <c:forEach begin="1" end="${review.score}">
                                                                                 <i class="bi bi-star-fill"></i>
                                                                             </c:forEach>
                                                                             <c:forEach begin="${review.score + 1}" end="5">
-                                                                                <i class="bi bi-star" style="color: #e0e0e0;"></i>
+                                                                                <i class="bi bi-star product-detail-i-32" ></i>
                                                                             </c:forEach>
                                                                         </div>
                                                                         <c:if test="${not empty review.text}">
-                                                                            <p style="margin: 0; font-size: 0.9rem; color: var(--color-text-muted); font-style: italic;">"<c:out value="${review.text}" />"</p>
+                                                                            <p class="product-detail-p-33" >"<c:out value="${review.text}" />"</p>
                                                                         </c:if>
                                                                     </div>
                                                                 </c:forEach>
                                                             </div>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <p style="margin: 0; font-size: 0.9rem; color: var(--color-text-muted); text-align: center;"><spring:message code="ProductDetail.seller.reviews.empty" /></p>
+                                                            <p class="product-detail-p-34" ><spring:message code="ProductDetail.seller.reviews.empty" /></p>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </div>
@@ -292,24 +292,24 @@
                                     </div>
                                     <div class="col-lg-6 mb-4">
                                         <!-- Details & Description Card -->
-                                        <div
-                                            style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px); border-radius: 20px; padding: 2rem; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 8px 32px rgba(0,0,0,0.03);">
-                                            <h5
-                                                style="font-family: var(--font-heading); font-weight: 700; margin-bottom: 1.5rem; font-size: 1.3rem; color: var(--color-text-main); display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 1rem;">
-                                                <i class="bi bi-music-note-list"
-                                                    style="color: var(--color-accent);"></i> <spring:message code="ProductDetail.details.title" />
+                                        <div class="product-detail-div-19"
+                                            >
+                                            <h5 class="product-detail-h5-20"
+                                                >
+                                                <i class="bi bi-music-note-list product-detail-i-21"
+                                                    ></i> <spring:message code="ProductDetail.details.title" />
                                             </h5>
 
-                                            <div style="margin-bottom: 1.5rem;">
-                                                <p
-                                                    style="margin-bottom: 0; line-height: 1.8; font-size: 0.98rem; color: var(--color-text-main);">
+                                            <div class="product-detail-div-35" >
+                                                <p class="product-detail-p-36"
+                                                    >
                                                     <c:out value="${product.description}" />
                                                 </p>
                                             </div>
 
                                             <c:if test="${not empty product.categories}">
-                                                <div
-                                                    style="margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;">
+                                                <div class="product-detail-div-37"
+                                                    >
                                                     <c:forEach items="${product.categories}" var="cat"
                                                         varStatus="status">
                                                         <c:url var="catFilterUrl" value="/">
@@ -327,27 +327,27 @@
 
                                             <div class="row g-3 mt-2 mb-4">
                                                 <div class="col-6">
-                                                    <div
-                                                        style="background: #fff; padding: 1.25rem 1rem; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-                                                        <span
-                                                            style="display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.5rem;"><spring:message code="ProductDetail.recordCondition" /></span>
-                                                        <span
-                                                            style="font-family: var(--font-mono); font-size: 1.85rem; font-weight: 700; color: var(--color-text-main);">
+                                                    <div class="product-detail-div-38"
+                                                        >
+                                                        <span class="product-detail-span-39"
+                                                            ><spring:message code="ProductDetail.recordCondition" /></span>
+                                                        <span class="product-detail-span-40"
+                                                            >
                                                             <c:out value="${product.recordCondition}" />
-                                                        </span><span
-                                                            style="font-family: var(--font-mono); font-size: 0.95rem; color: #a0a0a0; font-weight: 600;">/10</span>
+                                                        </span><span class="product-detail-span-41"
+                                                            >/10</span>
                                                     </div>
                                                 </div>
                                                 <div class="col-6">
-                                                    <div
-                                                        style="background: #fff; padding: 1.25rem 1rem; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-                                                        <span
-                                                            style="display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.5rem;"><spring:message code="ProductDetail.sleeveCondition" /></span>
-                                                        <span
-                                                            style="font-family: var(--font-mono); font-size: 1.85rem; font-weight: 700; color: var(--color-text-main);">
+                                                    <div class="product-detail-div-38"
+                                                        >
+                                                        <span class="product-detail-span-39"
+                                                            ><spring:message code="ProductDetail.sleeveCondition" /></span>
+                                                        <span class="product-detail-span-40"
+                                                            >
                                                             <c:out value="${product.sleeveCondition}" />
-                                                        </span><span
-                                                            style="font-family: var(--font-mono); font-size: 0.95rem; color: #a0a0a0; font-weight: 600;">/10</span>
+                                                        </span><span class="product-detail-span-41"
+                                                            >/10</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -394,10 +394,10 @@
                                                 </div>
                                             </c:when>
                                             <c:otherwise>
-                                                <div
-                                                    style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(8px); border-radius: 16px; padding: 2.5rem; border: 1px dashed rgba(231,111,81,0.2); text-align: center;">
-                                                    <p
-                                                        style="color: var(--color-text-muted); font-size: 1.05rem; margin: 0; font-weight: 500;">
+                                                <div class="product-detail-div-42"
+                                                    >
+                                                    <p class="product-detail-p-43"
+                                                        >
                                                         <spring:message code="ProductDetail.moreFrom.empty" />
                                                     </p>
                                                 </div>
@@ -438,10 +438,10 @@
                                                 </div>
                                             </c:when>
                                             <c:otherwise>
-                                                <div
-                                                    style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(8px); border-radius: 16px; padding: 2.5rem; border: 1px dashed rgba(231,111,81,0.2); text-align: center;">
-                                                    <p
-                                                        style="color: var(--color-text-muted); font-size: 1.05rem; margin: 0; font-weight: 500;">
+                                                <div class="product-detail-div-42"
+                                                    >
+                                                    <p class="product-detail-p-43"
+                                                        >
                                                         <spring:message code="ProductDetail.related.empty" />
                                                     </p>
                                                 </div>

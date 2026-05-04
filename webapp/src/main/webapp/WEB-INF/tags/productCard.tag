@@ -21,13 +21,13 @@
 
 <c:choose>
     <c:when test="${isLinkDisabled}">
-        <div class="card product-card text-decoration-none" style="cursor: default;" role="group" aria-label="${productCardNoLinkAria}">
+        <div class="card product-card text-decoration-none product-card-div-1"  role="group" aria-label="${productCardNoLinkAria}">
     </c:when>
     <c:otherwise>
-        <a href="${href}" class="card product-card text-decoration-none" style="cursor: pointer;">
+        <a href="${href}" class="card product-card text-decoration-none product-card-a-2" >
     </c:otherwise>
 </c:choose>
-    <div class="product-image-placeholder" style="position: relative;">
+    <div class="product-image-placeholder product-card-div-3" >
         <c:choose>
             <c:when test="${not empty imageUrl}">
                 <img
@@ -37,7 +37,7 @@
                 />
             </c:when>
             <c:otherwise>
-                <i class="bi bi-vinyl" aria-hidden="true" style="font-size: 2.5rem; color: #ccc;"></i>
+                <i class="bi bi-vinyl product-card-i-4" aria-hidden="true" ></i>
             </c:otherwise>
         </c:choose>
 
@@ -46,7 +46,7 @@
         </c:if>
     </div>
 
-    <div class="card-body" style="padding: 1rem 1.15rem;">
+    <div class="card-body product-card-div-5" >
         <h6 class="product-title"><c:out value='${title}'/></h6>
         <p class="product-artist"><c:out value='${artist}'/></p>
         <c:if test="${not empty categories}">
@@ -63,7 +63,7 @@
             <c:when test="${isOnSale && discountPercentage ne null && discountPercentage gt 0}">
                 <div class="price-wrapper">
                     <span class="album-price-original"><ui:price value="${price}" /></span>
-                    <span class="product-price" style="margin: 0;"><ui:price value="${price}" /></span>
+                    <span class="product-price product-card-span-6" ><ui:price value="${price}" /></span>
                 </div>
             </c:when>
             <c:otherwise>

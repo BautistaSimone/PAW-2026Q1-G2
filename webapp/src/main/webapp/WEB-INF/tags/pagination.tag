@@ -40,7 +40,7 @@
                 <c:choose>
                     <c:when test="${i == result.currentPage}">
                         <li class="page-item active" aria-current="page">
-                            <span class="page-link" style="background-color: var(--color-accent); border-color: var(--color-accent);">${i}</span>
+                            <span class="page-link pagination-span-1" >${i}</span>
                         </li>
                     </c:when>
                     <c:otherwise>
@@ -54,7 +54,7 @@
                             </c:forEach>
                             <c:param name="${pp}" value="${i}"/>
                         </c:url>
-                        <li class="page-item"><a class="page-link" style="color: var(--color-accent);" href="${pageUrl}">${i}</a></li>
+                        <li class="page-item"><a class="page-link product-detail-i-21"  href="${pageUrl}">${i}</a></li>
                     </c:otherwise>
                 </c:choose>
             </c:forEach>

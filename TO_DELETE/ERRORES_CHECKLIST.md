@@ -398,7 +398,7 @@
 - **Código**: `data-context="<c:out value='${pageContext.request.contextPath}' />"`
 - **Regla violada**: [4] / [15.12] Misma regla
 
-### CSS inline en JSPs/tags
+### CSS inline en JSPs/tags - LISTO
 
 Hay **CSS inline (style="...")** masivo en casi todas las vistas. Ejemplos representativos:
 

@@ -100,13 +100,13 @@
                         </c:when>
                         <c:otherwise>
                             <div class="empty-products-state">
-                                <i class="bi bi-vinyl" style="font-size: 3rem; color: var(--color-border);"></i>
+                                <i class="bi bi-vinyl home-i-1" ></i>
                                 <c:choose>
                                     <c:when test="${noProductsMatchFilters}">
-                                        <p style="color: var(--color-text-muted); font-size: 1.05rem;"><spring:message code="Home.empty.filtered" /></p>
+                                        <p class="home-p-2" ><spring:message code="Home.empty.filtered" /></p>
                                     </c:when>
                                     <c:otherwise>
-                                        <p style="color: var(--color-text-muted); font-size: 1.05rem;"><spring:message code="Home.empty.none" /></p>
+                                        <p class="home-p-2" ><spring:message code="Home.empty.none" /></p>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
