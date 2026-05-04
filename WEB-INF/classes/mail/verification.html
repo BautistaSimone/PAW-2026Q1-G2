@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar cuenta - Vinyland</title>
+
+    <th:block th:replace="~{email-base :: emailStyles}"></th:block>
+
+    <style type="text/css">
+        .verify-heading {
+            color: #2a9d8f;
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 16px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .callout {
+            background-color: #f1fbfa;
+            border-left: 5px solid #2a9d8f;
+            padding: 16px 18px;
+            margin: 22px 0;
+            font-style: italic;
+            color: #264653;
+            font-size: 15px;
+            line-height: 1.55;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .cta-verify {
+            display: inline-block;
+            background-color: #2a9d8f;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 15px;
+        }
+
+        .muted {
+            color: #5a6f78;
+            font-size: 13px;
+            margin: 24px 0 0;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body style="margin:0;padding:0;background-color:#f8f9fa;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa;padding:24px 16px;">
+    <tr>
+        <td align="center">
+
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0"
+                   style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);border:1px solid #e8e8e8;">
+
+                <!-- HEADER -->
+                <tr>
+                    <td th:replace="~{email-base :: emailHeader}"></td>
+                </tr>
+
+                <!-- BODY -->
+                <tr>
+                    <td style="padding:28px 24px 32px;font-family:Arial,Helvetica,sans-serif;color:#264653;font-size:16px;line-height:1.55;">
+
+                        <h1 class="verify-heading">
+                            Verificá tu cuenta
+                        </h1>
+
+                        <p style="margin:0 0 18px;color:#264653;">
+                            Hola <strong th:text="${recipientName}">usuario</strong>,
+                        </p>
+
+                        <p style="margin:0 0 18px;color:#264653;">
+                            Gracias por registrarte en Vinyland. Para activar tu cuenta, necesitás confirmar tu dirección de email.
+                        </p>
+
+                        <div class="callout">
+                            Este paso es necesario para garantizar la seguridad de tu cuenta.
+                        </div>
+
+                        <p style="margin:0 0 18px;color:#264653;">
+                            Hacé click en el siguiente botón para verificar tu cuenta:
+                        </p>
+
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:28px;">
+                            <tr>
+                                <td align="center">
+                                    <a th:href="${actionUrl}" class="cta-verify">
+                                        Verificar cuenta
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p class="muted">
+                            Si no creaste esta cuenta, podés ignorar este email.<br><br>
+                            ¿Problemas con el botón?<br>
+                            Abrí este enlace:<br>
+                            <a th:href="${actionUrl}" th:text="${actionUrl}"
+                               style="color:#264653;word-break:break-all;"></a>
+                        </p>
+
+                    </td>
+                </tr>
+
+                <!-- FOOTER -->
+                <tr>
+                    <td th:replace="~{email-base :: emailFooter}"></td>
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

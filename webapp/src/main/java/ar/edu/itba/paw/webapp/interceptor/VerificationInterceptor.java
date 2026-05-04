@@ -27,7 +27,7 @@ public class VerificationInterceptor implements HandlerInterceptor {
             PawAuthUser authUser = (PawAuthUser) auth.getPrincipal();
 
             if (authUser.getUser() != null && !authUser.getUser().getEnabled()) {
-                response.sendRedirect("/notVerified");
+                response.sendRedirect(request.getContextPath() + "/notVerified");
                 return false;
             }
         }
