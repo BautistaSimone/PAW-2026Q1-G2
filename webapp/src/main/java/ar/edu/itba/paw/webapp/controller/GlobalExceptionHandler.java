@@ -24,8 +24,8 @@ public class GlobalExceptionHandler {
     public ModelAndView handleResourceNotFound(final ResourceNotFoundException e) {
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("errorCode", "404");
-        mav.addObject("errorMessage", "El recurso solicitado no fue encontrado.");
-        mav.addObject("errorDescription", "Es posible que el contenido haya sido eliminado o que la dirección sea incorrecta.");
+        mav.addObject("errorMessageCode", "Error.404.message.resourceNotFound");
+        mav.addObject("errorDescriptionCode", "Error.404.description.resourceNotFound");
         return mav;
     }
 
@@ -34,8 +34,8 @@ public class GlobalExceptionHandler {
     public ModelAndView handleNoHandlerFound(final NoHandlerFoundException e) {
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("errorCode", "404");
-        mav.addObject("errorMessage", "La página que buscas no existe.");
-        mav.addObject("errorDescription", "Revisá la dirección o volvé al inicio para seguir navegando.");
+        mav.addObject("errorMessageCode", "Error.404.message.noHandler");
+        mav.addObject("errorDescriptionCode", "Error.404.description.noHandler");
         return mav;
     }
 
@@ -44,18 +44,25 @@ public class GlobalExceptionHandler {
     public ModelAndView handleMethodNotAllowed(final HttpRequestMethodNotSupportedException e) {
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("errorCode", "405");
-        mav.addObject("errorMessage", "Método HTTP no permitido.");
-        mav.addObject("errorDescription", "La acción que intentaste no es válida para esta página.");
+        mav.addObject("errorMessageCode", "Error.405.message");
+        mav.addObject("errorDescriptionCode", "Error.405.description");
         return mav;
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+    @ExceptionHandler({
+        IllegalArgumentException.class, 
+        IllegalStateException.class,
+        org.springframework.web.bind.MissingServletRequestParameterException.class,
+        org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class,
+        org.springframework.validation.BindException.class,
+        org.springframework.beans.TypeMismatchException.class
+    })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ModelAndView handleBadRequest(final RuntimeException e) {
+    public ModelAndView handleBadRequest(final Exception e) {
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("errorCode", "400");
-        mav.addObject("errorMessage", "Petición inválida.");
-        mav.addObject("errorDescription", "Los datos enviados no son correctos. Revisá e intentá nuevamente.");
+        mav.addObject("errorMessageCode", "Error.400.message.badRequest");
+        mav.addObject("errorDescriptionCode", "Error.400.description.badRequest");
         return mav;
     }
 
@@ -65,8 +72,8 @@ public class GlobalExceptionHandler {
         LOGGER.error("Database access error", e);
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("errorCode", "500");
-        mav.addObject("errorMessage", "Error en el servidor de datos.");
-        mav.addObject("errorDescription", "No pudimos procesar tu solicitud en este momento. Por favor intentá más tarde.");
+        mav.addObject("errorMessageCode", "Error.500.message.dataAccess");
+        mav.addObject("errorDescriptionCode", "Error.500.description.dataAccess");
         return mav;
     }
 
@@ -75,8 +82,8 @@ public class GlobalExceptionHandler {
     public ModelAndView handleInvalidUpload(final MultipartException e) {
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("errorCode", "400");
-        mav.addObject("errorMessage", "Archivo inválido.");
-        mav.addObject("errorDescription", "El archivo enviado no cumple con los límites permitidos.");
+        mav.addObject("errorMessageCode", "Error.400.message.invalidUpload");
+        mav.addObject("errorDescriptionCode", "Error.400.description.invalidUpload");
         return mav;
     }
 
@@ -85,8 +92,8 @@ public class GlobalExceptionHandler {
     public ModelAndView handleForbidden(final AccessDeniedException e) {
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("errorCode", "403");
-        mav.addObject("errorMessage", "No tenés permisos para acceder a esta página.");
-        mav.addObject("errorDescription", "Si creés que es un error, intentá iniciar sesión con otra cuenta.");
+        mav.addObject("errorMessageCode", "Error.403.message");
+        mav.addObject("errorDescriptionCode", "Error.403.description");
         return mav;
     }
 
@@ -96,8 +103,8 @@ public class GlobalExceptionHandler {
         LOGGER.error("Unhandled exception while processing request", e);
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("errorCode", "500");
-        mav.addObject("errorMessage", "Error interno del servidor.");
-        mav.addObject("errorDescription", "Algo salió mal de nuestro lado. Por favor intentá nuevamente más tarde.");
+        mav.addObject("errorMessageCode", "Error.500.message.generic");
+        mav.addObject("errorDescriptionCode", "Error.500.description.generic");
         return mav;
     }
 }

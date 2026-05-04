@@ -48,7 +48,7 @@ public class PasswordTokenServiceImplTest {
             1L,
             1L,
             "token",
-            Instant.now()
+            Instant.now().minus(Duration.ofMinutes(1))
         );
 
         Mockito.when(passwordTokenDao.findByToken("token")).thenReturn(Optional.of(token));
