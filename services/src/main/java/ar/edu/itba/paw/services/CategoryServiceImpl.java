@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.services;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Category> findAll() {
         return categoryDao.findAll();
     }

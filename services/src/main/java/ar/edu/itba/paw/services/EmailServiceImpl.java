@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.services;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
@@ -58,6 +60,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
+    @Transactional
     public void sendBuyerEmail(
             final String to,
             final Purchase purchase,
@@ -73,6 +76,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
+    @Transactional
     public void sendSellerEmail(
             final String to,
             final Purchase purchase,
@@ -88,6 +92,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
+    @Transactional
     public void sendProductReportEmail(final Product product, final User reporter, final User seller) {
 
         final Locale locale = LocaleContextHolder.getLocale();
@@ -133,6 +138,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
+    @Transactional
     public void sendPasswordResetEmail(String to, String resetToken, String username) {
 
         final Locale locale = LocaleContextHolder.getLocale();
@@ -169,6 +175,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
+    @Transactional
     public void sendVerificationEmail(String to, String resetToken, String username) {
 
         final Locale locale = LocaleContextHolder.getLocale();

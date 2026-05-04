@@ -933,7 +933,7 @@ Falta en la mayoría de tests de persistencia:
 
 ## 14. AOP y Transacciones
 
-### ⚠️ GRAVE — Falta @Transactional en servicios
+### ⚠️ GRAVE — Falta @Transactional en servicios - LISTO
 
 **Servicios SIN `@Transactional` en NINGÚN método:**
 - `ReportServiceImpl.java` — todos los métodos (líneas 27, 43, 48, 53)

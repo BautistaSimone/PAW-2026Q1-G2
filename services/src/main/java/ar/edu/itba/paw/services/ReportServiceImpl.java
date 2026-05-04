@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.services;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    @Transactional
     public Report report(long productId, long reporterUserId, long reportedUserId) {
         final Product product = productDao.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
@@ -55,16 +58,19 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean hasReported(final long productId, final long reporterUserId) {
         return reportDao.existsByProductAndReporter(productId, reporterUserId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReportedProduct> findAllGroupedByProduct() {
         return reportDao.findAllGroupedByProduct();
     }
 
     @Override
+    @Transactional
     public void deleteByProductId(final long productId) {
         reportDao.deleteByProductId(productId);
     }

@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.services;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +35,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional
     public Review create(long purchaseId, long buyerId, int score, String text) {
         final Purchase purchase = purchaseService.findById(purchaseId)
             .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
@@ -58,16 +61,19 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Review> findByPurchaseId(long purchaseId) {
         return reviewDao.findByPurchaseId(purchaseId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginatedResult<Review> findBySellerId(long sellerId, int page, int pageSize) {
         return reviewDao.findBySellerId(sellerId, page, pageSize);
     }
 
     @Override
+    @Transactional
     public SellerRatingSummary summaryForSeller(long sellerId) {
         return reviewDao.summaryForSeller(sellerId);
     }

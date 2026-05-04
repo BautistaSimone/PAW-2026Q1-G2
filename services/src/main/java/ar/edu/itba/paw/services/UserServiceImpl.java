@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.services;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Optional;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +48,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User createUser(
             final String email,
             final String password,
@@ -82,6 +85,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void updateUserProfile(
             final Long userId,
             final String firstName,
@@ -105,11 +109,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<User> findByEmail(final String email) {
         return userDao.findByEmail(email);
     }
 
     @Override
+	@Transactional
 	public void updatePassword(final Long userId, final String newPassword) {
 		// Encode password before storing
 		final String encodedPassword = passwordEncoder.encode(newPassword);
@@ -118,26 +124,31 @@ public class UserServiceImpl implements UserService {
 	}
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<User> findById(final Long id) {
         return userDao.findById(id);
     }
 
 	@Override
+    @Transactional(readOnly = true)
     public Boolean isPasswordEmpty(User usr) {
         return passwordEncoder.matches("", usr.getPassword());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Boolean isVerified(User usr) {
         return usr.getEnabled();
     }
 
 	@Override
+    @Transactional
     public void enable(final Long id) {
         userDao.enable(id);
     }
 
 	@Override
+    @Transactional
     public void ban(final Long id) {
 
         // Hide all their active products

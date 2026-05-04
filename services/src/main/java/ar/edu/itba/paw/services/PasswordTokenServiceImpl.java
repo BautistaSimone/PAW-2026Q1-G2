@@ -41,6 +41,7 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isValidPasswordResetToken(String token) {
         final Optional<Token> passTokenOpt = passwordTokenDao.findByToken(token);
 
@@ -72,11 +73,13 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Token> findByUserId(final Long userId) {
 		return passwordTokenDao.findByUserId(userId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Token> findByToken(final String token) {
         return passwordTokenDao.findByToken(token);
     }
@@ -85,6 +88,7 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
+                @Transactional
                 public void afterCommit() {
                     task.run();
                 }
