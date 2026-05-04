@@ -6,19 +6,22 @@
 <%@ attribute name="secondaryBtn" required="false" %>
 <%@ attribute name="cssClass" required="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <%@ taglib prefix="vl" tagdir="/WEB-INF/tags" %>
 
+<spring:message code="Modal.button.primary" var="defaultPrimary" />
+<spring:message code="Modal.button.close.ariaLabel" var="closeLabel" />
 <c:set var="modalCssClass" value="${not empty cssClass ? cssClass : ''}" />
-<c:set var="classes" value="modal ${modalCssClass}" />
-<c:set var="primary" value="${primaryBtn ne null ? primaryBtn : 'Aceptar'}" />
+<c:set var="primary" value="${not empty primaryBtn ? primaryBtn : defaultPrimary}" />
+<c:set var="secondary" value="${secondaryBtn}" />
 
-<div class="modal fade <c:out value='${classes}' />" id="<c:out value='${id}' />" tabindex="-1" aria-labelledby="<c:out value='${id}' />Label" aria-hidden="true">
+<div class="modal fade <c:out value='${modalCssClass}' />" id="<c:out value='${id}' />" tabindex="-1" aria-labelledby="<c:out value='${id}' />Label" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="<c:out value='${id}' />Label"><c:out value="${title}"/></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<c:out value='${closeLabel}' />"></button>
             </div>
             <div class="modal-body">
                 <c:out value="${text}"/>

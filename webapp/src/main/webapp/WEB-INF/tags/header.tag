@@ -12,8 +12,8 @@
     <div class="header-content">
         <div class="header-left">
             <a href="<c:url value="/"/>" class="header-logo-link" aria-label="<spring:message code='Header.logo.ariaLabel' />">
-                <img src="<c:url value="/assets/images/vinyl_disk.png"/>" alt="" class="header-logo-img" width="44" height="44" decoding="async" />
-                <span class="brand-name">Vinyland</span>
+                <img src="<c:url value="/assets/images/vinyl_disk.png"/>" alt="<spring:message code='Header.logo.alt'/>" class="header-logo-img" width="44" height="44" decoding="async" />
+                <span class="brand-name"><spring:message code="Global.brand"/></span>
             </a>
         </div>
 

@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
+<spring:message code="Global.currency.symbol" var="currencySymbol"/>
 <form class="filters-bar" method="get" action="<c:url value="/"/>" novalidate>
     <input type="hidden" name="sort" value="<c:out value="${selectedSort}" />" />
     <c:if test="${not empty activeSearchText}">
@@ -49,11 +50,11 @@
         <div class="filter-options">
             <p class="filter-hint mb-2"><spring:message code="Filters.price.suggested" /></p>
             <div class="filter-price-presets">
-                <button type="button" class="price-preset-btn" data-min="" data-max="15000"><spring:message code="Filters.price.lessThan" arguments="$15.000" /></button>
-                <button type="button" class="price-preset-btn" data-min="15000" data-max="30000"><spring:message code="Filters.price.range" arguments="$15.000,$30.000" /></button>
-                <button type="button" class="price-preset-btn" data-min="30000" data-max="60000"><spring:message code="Filters.price.range" arguments="$30.000,$60.000" /></button>
-                <button type="button" class="price-preset-btn" data-min="60000" data-max="120000"><spring:message code="Filters.price.range" arguments="$60.000,$120.000" /></button>
-                <button type="button" class="price-preset-btn" data-min="120000" data-max=""><spring:message code="Filters.price.moreThan" arguments="$120.000" /></button>
+                <button type="button" class="price-preset-btn" data-min="" data-max="15000"><spring:message code="Filters.price.lessThan" arguments="${currencySymbol}15.000" /></button>
+                <button type="button" class="price-preset-btn" data-min="15000" data-max="30000"><spring:message code="Filters.price.range" arguments="${currencySymbol}15.000,${currencySymbol}30.000" /></button>
+                <button type="button" class="price-preset-btn" data-min="30000" data-max="60000"><spring:message code="Filters.price.range" arguments="${currencySymbol}30.000,${currencySymbol}60.000" /></button>
+                <button type="button" class="price-preset-btn" data-min="60000" data-max="120000"><spring:message code="Filters.price.range" arguments="${currencySymbol}60.000,${currencySymbol}120.000" /></button>
+                <button type="button" class="price-preset-btn" data-min="120000" data-max=""><spring:message code="Filters.price.moreThan" arguments="${currencySymbol}120.000" /></button>
             </div>
             <div class="price-inputs filter-options pt-2">
                 <div class="price-input-group">

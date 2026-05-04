@@ -88,7 +88,7 @@
 
 ## 2. Maven y Gestión de Dependencias
 
-### Versiones no centralizadas en `<properties>` del POM raíz
+### Versiones no centralizadas en `<properties>` del POM raíz-LISTOOOOO
 
 - **Archivo**: `pom.xml` (raíz)
 - **Línea**: 203–207
@@ -590,7 +590,7 @@ Hay **CSS inline (style="...")** masivo en casi todas las vistas. Ejemplos repre
 
 ## 8. Internacionalización (i18n)
 
-### ⚠️ GRAVE — Texto hardcodeado en JSPs/tags
+### ⚠️ GRAVE — Texto hardcodeado en JSPs/tags - LISTO
 
 - **Archivos**: `account-not-verified.jsp` (L18), `forgot-password.jsp` (L16), `update-password.jsp` (L17), `verification-email-sent.jsp` (L17), `verification-status.jsp` (L17), `tags/header.tag` (L16), `tags/login-form.tag` (L15)
 - **Código**: `Vinyland` hardcodeado
@@ -641,7 +641,7 @@ Hay **CSS inline (style="...")** masivo en casi todas las vistas. Ejemplos repre
 - **Código**: `alt=""` en logo sin texto alternativo
 - **Regla violada**: [15.10] Alt text internacionalizado y significativo
 
-### Mezcla de mensaje i18n con texto alrededor
+### Mezcla de mensaje i18n con texto alrededor - LISTO
 
 - **Archivo**: `webapp/src/main/webapp/WEB-INF/views/home.jsp`
 - **Línea**: 62
@@ -653,14 +653,14 @@ Hay **CSS inline (style="...")** masivo en casi todas las vistas. Ejemplos repre
 - **Código**: `<spring:message code="ProductDetail.moreFrom" /><c:out value="${seller.username}" />`
 - **Regla violada**: [8] Misma regla — usar mensaje parametrizado
 
-### Archivo messages_es.properties vacío
+### Archivo messages_es.properties vacío - LISTO
 
 - **Archivo**: `webapp/src/main/resources/messages_es.properties`
 - **Línea**: archivo completo
 - **Código**: (vacío)
 - **Regla violada**: [8] Keys en AMBOS archivos — faltan todas las 440+ claves
 
-### Claves duplicadas en .properties
+### Claves duplicadas en .properties - LISTO
 
 - **Archivo**: `webapp/src/main/resources/messages.properties`
 - **Línea**: 25 y 245
@@ -672,14 +672,14 @@ Hay **CSS inline (style="...")** masivo en casi todas las vistas. Ejemplos repre
 - **Código**: `notVerified.title` duplicada
 - **Regla violada**: [8] Misma clave duplicada
 
-### Convención de claves no respetada
+### Convención de claves no respetada - LISTO
 
 - **Archivo**: `webapp/src/main/resources/messages.properties`
 - **Línea**: 25–31
 - **Código**: `notVerified.title` (minúsculas en vez de `NotVerified.title`)
 - **Regla violada**: [8] Convención `PageName.element.property` (PascalCase)
 
-### Literales de moneda/formato hardcodeados en arguments
+### Literales de moneda/formato hardcodeados en arguments - LISTO
 
 - **Archivo**: `webapp/src/main/webapp/WEB-INF/tags/filtersBar.tag`
 - **Línea**: 52–56
@@ -935,7 +935,7 @@ Falta en la mayoría de tests de persistencia:
 
 ## 14. AOP y Transacciones
 
-### ⚠️ GRAVE — Falta @Transactional en servicios
+### ⚠️ GRAVE — Falta @Transactional en servicios - LISTO
 
 **Servicios SIN `@Transactional` en NINGÚN método:**
 - `ReportServiceImpl.java` — todos los métodos (líneas 27, 43, 48, 53)

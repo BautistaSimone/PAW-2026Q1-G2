@@ -168,7 +168,7 @@
                                                     <ui:price value="${product.price}" />
                                                 </span>
                                                 <span class="product-detail-span-13"
-                                                    >ARS</span>
+                                                    ><spring:message code="Global.currency.ars"/></span>
                                             </div>
 
                                             <c:choose>
@@ -360,8 +360,7 @@
                                 <div class="recommendations-wrapper">
                                     <div class="mb-5">
                                         <h4 class="recommendations-title">
-                                            <spring:message code="ProductDetail.moreFrom" />
-                                            <c:out value="${seller.username}" />
+                                            <spring:message code="ProductDetail.moreFrom" arguments="${seller.username}" />
                                         </h4>
                                         <c:choose>
                                             <c:when test="${not empty sellerProducts}">

@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.services;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.ArrayList;
@@ -58,6 +60,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Product createProduct(
         final Long userId,
         final String title,
@@ -109,11 +112,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginatedResult<Product> listProducts() {
         return productDao.listProducts();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductSearchCriteria getProductSearchCriteria(
         final String searchText,
         final List<Long> categoryIds,
@@ -159,6 +164,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Product> listProductsNotByUser(final Long userId) {
 
         List<Product> userProducts = this.listProducts(
@@ -171,6 +177,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Product> listProductsByArtistExcept(final String artist, final Long productId) {
         return this.listProducts(
             new ProductSearchCriteria(artist, null, null, null, null, null, ProductSortOrder.NEWEST, null, 1, 11)
@@ -178,6 +185,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Product> listProductsByUserExcept(final Long userId, final Long productId) {
         return this.listProducts(
             new ProductSearchCriteria(null, null, null, null, null, null, ProductSortOrder.NEWEST, userId, 1, 11)
@@ -185,46 +193,55 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginatedResult<Product> listProducts(final ProductSearchCriteria criteria) {
         return productDao.findProducts(criteria);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginatedResult<Product> listUserDeletedProducts(final Long userId, final int page, final int pageSize) {
         return productDao.findProductsByUserIdAndState(userId, ProductState.USER_DELETED, page, pageSize);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<String> listDistinctArtists() {
         return productDao.listDistinctArtists();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<String> listDistinctRecordLabels() {
         return productDao.listDistinctRecordLabels();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Product> findById(final Long id) {
         return productDao.findById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Product> findByIdIfAvailable(final Long id) {
         return productDao.findByIdIfAvailable(id);
     }
 
     @Override
+    @Transactional
     public boolean reserveIfAvailable(final Long id) {
         return productDao.reserveIfAvailable(id);
     }
 
     @Override
+    @Transactional
     public void markAsSold(final Long id) {
         productDao.markAsSold(id);
     }
 
     @Override
+    @Transactional
     public boolean hideProductByUser(final Long productId, final Long ownerUserId) {
         final Product product = productDao.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
@@ -235,11 +252,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void hideProductByAdmin(final Long id) {
         productDao.markAsAdminHidden(id);
     }
 
     @Override
+    @Transactional
     public Product updateProduct(
         final Long ownerUserId,
         final Long productId,
@@ -281,6 +300,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public boolean restoreUserDeletedProduct(final Long productId, final Long ownerUserId) {
         final Product product = productDao.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));

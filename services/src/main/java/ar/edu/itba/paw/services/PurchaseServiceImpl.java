@@ -109,11 +109,13 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Purchase> findById(Long purchaseId) {
         return purchaseDao.findById(purchaseId);
     }
 
     @Override
+    @Transactional
     public Purchase updateStatus(Long purchaseId, String token, PurchaseStatus newStatus) {
         final Purchase purchase = purchaseDao.findById(purchaseId)
             .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
@@ -178,11 +180,13 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginatedResult<Purchase> findByBuyerId(Long buyerId, int page, int pageSize) {
         return purchaseDao.findByBuyerId(buyerId, page, pageSize);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginatedResult<Purchase> findBySellerId(Long sellerId, int page, int pageSize) {
         return purchaseDao.findBySellerId(sellerId, page, pageSize);
     }

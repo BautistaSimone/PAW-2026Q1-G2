@@ -4,7 +4,7 @@
 
 <c:set var="stepIndex" value="${status eq 'PENDING' ? 0 : status eq 'PAID' ? 1 : status eq 'SHIPPED' ? 2 : 3}" />
 
-<div class="purchase-stepper" role="group" aria-label="Progreso de la compra">
+<div class="purchase-stepper" role="group" aria-label="<spring:message code='PurchaseStepper.ariaLabel'/>">
     <%-- Step 0: Pendiente --%>
     <div class="purchase-step ${0 < stepIndex ? 'purchase-step--completed' : 0 == stepIndex ? 'purchase-step--current' : 'purchase-step--pending'}">
         <div class="purchase-step-icon" aria-hidden="true">
@@ -13,7 +13,7 @@
                 <c:otherwise><i class="bi bi-hourglass-split"></i></c:otherwise>
             </c:choose>
         </div>
-        <span class="purchase-step-label">Pendiente</span>
+        <span class="purchase-step-label"><spring:message code="PurchaseStepper.status.pending"/></span>
     </div>
 
     <div class="purchase-step-connector ${1 <= stepIndex ? 'purchase-step-connector--filled' : ''}" aria-hidden="true"></div>
@@ -26,7 +26,7 @@
                 <c:otherwise><i class="bi bi-credit-card"></i></c:otherwise>
             </c:choose>
         </div>
-        <span class="purchase-step-label">Pagado</span>
+        <span class="purchase-step-label"><spring:message code="PurchaseStepper.status.paid"/></span>
     </div>
 
     <div class="purchase-step-connector ${2 <= stepIndex ? 'purchase-step-connector--filled' : ''}" aria-hidden="true"></div>
@@ -39,7 +39,7 @@
                 <c:otherwise><i class="bi bi-truck"></i></c:otherwise>
             </c:choose>
         </div>
-        <span class="purchase-step-label">Enviado</span>
+        <span class="purchase-step-label"><spring:message code="PurchaseStepper.status.shipped"/></span>
     </div>
 
     <div class="purchase-step-connector ${3 <= stepIndex ? 'purchase-step-connector--filled' : ''}" aria-hidden="true"></div>
@@ -52,6 +52,6 @@
                 <c:otherwise><i class="bi bi-check-circle"></i></c:otherwise>
             </c:choose>
         </div>
-        <span class="purchase-step-label">Entregado</span>
+        <span class="purchase-step-label"><spring:message code="PurchaseStepper.status.delivered"/></span>
     </div>
 </div>

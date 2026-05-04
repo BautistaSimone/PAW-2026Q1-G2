@@ -43,6 +43,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isValidVerificationToken(String token) {
         final Optional<Token> verificationTokenOpt = verificationTokenDao.findByToken(token);
 
@@ -76,11 +77,13 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Token> findByUserId(final Long userId) {
 		return verificationTokenDao.findByUserId(userId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Token> findByToken(final String token) {
         return verificationTokenDao.findByToken(token);
     }
@@ -89,6 +92,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
+                @Transactional
                 public void afterCommit() {
                     task.run();
                 }
