@@ -43,26 +43,43 @@
     </th:block>
 </head>
 <body>
-
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="display:none;" aria-hidden="true">
     <tr>
-        <td th:fragment="emailHeader" class="email-header-cell" style="background-color:#ffd7a8;padding:28px 24px 20px;text-align:center;border-bottom:3px solid #e76f51;">
+        <td th:fragment="emailHeader"
+            class="email-header-cell"
+            style="background-color:#ffd7a8;padding:28px 24px 20px;text-align:center;border-bottom:3px solid #e76f51;">
+
             <div style="text-align:center;">
-                <span style="color:#e76f51;font-size:28px;font-weight:800;font-family:Arial,Helvetica,sans-serif;">V</span><span style="color:#264653;font-size:28px;font-weight:800;font-family:Arial,Helvetica,sans-serif;">INYLAND</span>
+                <span style="color:#e76f51;font-size:28px;font-weight:800;font-family:Arial,Helvetica,sans-serif;">V</span>
+                <span style="color:#264653;font-size:28px;font-weight:800;font-family:Arial,Helvetica,sans-serif;">INYLAND</span>
             </div>
-            <p style="color:#264653;font-size:14px;margin:10px 0 0;font-family:Arial,Helvetica,sans-serif;">La mejor experiencia analógica.</p>
+
+            <p style="color:#264653;font-size:14px;margin:10px 0 0;font-family:Arial,Helvetica,sans-serif;"
+               th:text="#{email.header.tagline}">
+                The best analog experience.
+            </p>
+
         </td>
     </tr>
 </table>
-
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="display:none;" aria-hidden="true">
     <tr>
-        <td th:fragment="emailFooter" class="email-footer-cell" style="background-color:#264653;padding:22px 24px;text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#c5d4dc;">
-            <p style="margin:0 0 8px;">&copy; 2026 Vinyland. Todos los derechos reservados.</p>
-            <p style="margin:0;">Si no solicitaste este correo, por favor contacta a soporte.</p>
+        <td th:fragment="emailFooter"
+            class="email-footer-cell"
+            style="background-color:#264653;padding:22px 24px;text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#c5d4dc;">
+
+            <p style="margin:0 0 8px;"
+               th:text="#{email.footer.rights}">
+                © 2026 Vinyland. All rights reserved.
+            </p>
+
+            <p style="margin:0;"
+               th:text="#{email.footer.unsubscribe}">
+                If you didn’t request this email, please contact support.
+            </p>
+
         </td>
     </tr>
 </table>
-
 </body>
 </html>

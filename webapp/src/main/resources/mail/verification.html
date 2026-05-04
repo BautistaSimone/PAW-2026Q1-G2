@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verificar cuenta - Vinyland</title>
+    <title th:text="#{email.verify.title}">Verify account - Vinyland</title>
 
     <th:block th:replace="~{email-base :: emailStyles}"></th:block>
 
@@ -51,64 +51,72 @@
 
 <body style="margin:0;padding:0;background-color:#f8f9fa;">
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa;padding:24px 16px;">
-    <tr>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa;padding:24px 16px;">
+        <tr>
         <td align="center">
 
             <table role="presentation" width="600" cellpadding="0" cellspacing="0"
-                   style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);border:1px solid #e8e8e8;">
+                style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);border:1px solid #e8e8e8;">
 
-                <!-- HEADER -->
                 <tr>
                     <td th:replace="~{email-base :: emailHeader}"></td>
                 </tr>
 
-                <!-- BODY -->
                 <tr>
-                    <td style="padding:28px 24px 32px;font-family:Arial,Helvetica,sans-serif;color:#264653;font-size:16px;line-height:1.55;">
+                <td style="padding:28px 24px 32px;font-family:Arial,Helvetica,sans-serif;color:#264653;font-size:16px;line-height:1.55;">
 
-                        <h1 class="verify-heading">
-                            Verificá tu cuenta
-                        </h1>
+                <h1 class="verify-heading" th:text="#{email.verify.heading}">
+                    Verify your account
+                </h1>
 
-                        <p style="margin:0 0 18px;color:#264653;">
-                            Hola <strong th:text="${recipientName}">usuario</strong>,
-                        </p>
+                <p style="margin:0 0 18px;color:#264653;"
+                th:text="#{email.reset.greeting(${recipientName})}">
+                    Hi, user
+                </p>
 
-                        <p style="margin:0 0 18px;color:#264653;">
-                            Gracias por registrarte en Vinyland. Para activar tu cuenta, necesitás confirmar tu dirección de email.
-                        </p>
+                <p style="margin:0 0 18px;color:#264653;"
+                th:text="#{email.verify.intro}">
+                    Thank you for signing up. Please verify your email address.
+                </p>
 
-                        <div class="callout">
-                            Este paso es necesario para garantizar la seguridad de tu cuenta.
-                        </div>
+                <div class="callout" th:text="#{email.verify.callout}">
+                    This step helps keep your account secure.
+                </div>
 
-                        <p style="margin:0 0 18px;color:#264653;">
-                            Hacé click en el siguiente botón para verificar tu cuenta:
-                        </p>
+                <p style="margin:0 0 18px;color:#264653;"
+                th:text="#{email.verify.instructions}">
+                    Click the button below to verify your account:
+                </p>
 
-                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:28px;">
-                            <tr>
-                                <td align="center">
-                                    <a th:href="${actionUrl}" class="cta-verify">
-                                        Verificar cuenta
-                                    </a>
-                                </td>
-                            </tr>
-                        </table>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:28px;">
+                    <tr>
+                        <td align="center">
+                            <a th:href="${actionUrl}" class="cta-verify"
+                            th:text="#{email.verify.cta}">
+                                Verify account
+                            </a>
+                        </td>
+                    </tr>
+                </table>
 
-                        <p class="muted">
-                            Si no creaste esta cuenta, podés ignorar este email.<br><br>
-                            ¿Problemas con el botón?<br>
-                            Abrí este enlace:<br>
-                            <a th:href="${actionUrl}" th:text="${actionUrl}"
-                               style="color:#264653;word-break:break-all;"></a>
-                        </p>
+                <p class="muted">
+                    <span th:text="#{email.verify.ignore}">
+                        If you didn’t create this account, you can ignore this email.
+                    </span>
+                    <br><br>
+                    <span th:text="#{email.reset.altText}">
+                        Having trouble with the button?
+                    </span><br>
+                    <span th:text="#{email.reset.copyLink}">
+                        Open this link:
+                    </span><br>
+                    <a th:href="${actionUrl}" th:text="${actionUrl}"
+                    style="color:#264653;word-break:break-all;"></a>
+                </p>
 
-                    </td>
+                </td>
                 </tr>
 
-                <!-- FOOTER -->
                 <tr>
                     <td th:replace="~{email-base :: emailFooter}"></td>
                 </tr>
@@ -116,8 +124,8 @@
             </table>
 
         </td>
-    </tr>
-</table>
+        </tr>
+    </table>
 
 </body>
 </html>
