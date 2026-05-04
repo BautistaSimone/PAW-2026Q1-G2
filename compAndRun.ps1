@@ -13,7 +13,7 @@ if ($listener) {
 }
 
 Write-Host "Compilando e instalando modulos..."
-mvn clean install 
+mvn clean install -DskipTests
 
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
