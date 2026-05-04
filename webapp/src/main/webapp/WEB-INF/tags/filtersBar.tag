@@ -1,6 +1,7 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <spring:message code="Global.currency.symbol" var="currencySymbol"/>
 <form class="filters-bar" method="get" action="<c:url value="/"/>" novalidate>
@@ -85,10 +86,14 @@
             <c:choose>
                 <c:when test="${not empty recordLabelsFilter}">
                     <c:forEach items="${recordLabelsFilter}" var="lbl">
+                        <c:set var="displayLabel" value="${lbl}" />
+                        <c:if test="${fn:length(lbl) > 24}">
+                            <c:set var="displayLabel" value="${fn:substring(lbl, 0, 24)}..." />
+                        </c:if>
                         <label class="filter-option">
                             <input type="checkbox" name="label" value="<c:out value="${lbl}" />"
                                 ${selectedLabels.contains(lbl) ? 'checked' : ''} />
-                            <span><c:out value="${lbl}" /></span>
+                            <span class="filter-record-label"><c:out value="${displayLabel}" /></span>
                         </label>
                     </c:forEach>
                 </c:when>
