@@ -49,6 +49,21 @@ CREATE TABLE IF NOT EXISTS products (
 	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+-- Compatibility for databases created before products.state replaced products.available.
+ALTER TABLE products ADD COLUMN IF NOT EXISTS available BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS state VARCHAR(32);
+UPDATE products SET state = CASE WHEN available THEN 'ACTIVE' ELSE 'ADMIN_HIDDEN' END WHERE state IS NULL;
+ALTER TABLE products ALTER COLUMN state SET DEFAULT 'ACTIVE';
+ALTER TABLE products ALTER COLUMN state SET NOT NULL;
+
+-- Compatibility for older product-location columns that are no longer written by ProductJdbcDao.
+ALTER TABLE products ADD COLUMN IF NOT EXISTS neighborhood VARCHAR(255) NOT NULL DEFAULT '';
+ALTER TABLE products ALTER COLUMN neighborhood SET DEFAULT '';
+UPDATE products SET neighborhood = '' WHERE neighborhood IS NULL;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS province VARCHAR(255) NOT NULL DEFAULT '';
+ALTER TABLE products ALTER COLUMN province SET DEFAULT '';
+UPDATE products SET province = '' WHERE province IS NULL;
+
 CREATE TABLE IF NOT EXISTS images (
 	image_id SERIAL PRIMARY KEY,
 	product_id INTEGER NOT NULL,

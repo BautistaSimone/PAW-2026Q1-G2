@@ -77,7 +77,7 @@
 - **Código**: `@Component`
 - **Regla violada**: [3] Anotaciones correctas: `@Service` para servicios
 
-### Modelo con SQL acoplado
+### Modelo con SQL acoplado-LISTO
 
 - **Archivo**: `models/src/main/java/ar/edu/itba/paw/models/ProductSortOrder.java`
 - **Línea**: 7–14
