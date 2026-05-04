@@ -119,47 +119,74 @@
                 </div>
             </c:if>
 
+            <c:url var="profileTabPublicationsUrl" value="/profile">
+                <c:if test="${not empty param.userId}">
+                    <c:param name="userId" value="${param.userId}"/>
+                </c:if>
+            </c:url>
+            <c:url var="profileTabMydataUrl" value="/profile">
+                <c:param name="tab" value="mydata"/>
+            </c:url>
+            <c:url var="profileTabPurchasesUrl" value="/profile">
+                <c:param name="tab" value="purchases"/>
+            </c:url>
+            <c:url var="profileTabSalesUrl" value="/profile">
+                <c:param name="tab" value="sales"/>
+            </c:url>
+            <c:url var="profileTabReviewsUrl" value="/profile">
+                <c:param name="tab" value="reviews"/>
+                <c:if test="${not empty param.userId}">
+                    <c:param name="userId" value="${param.userId}"/>
+                </c:if>
+            </c:url>
+            <c:url var="profileTabTrashUrl" value="/profile">
+                <c:param name="tab" value="trash"/>
+            </c:url>
+            <c:url var="profileTabReportsUrl" value="/profile">
+                <c:param name="tab" value="reports"/>
+            </c:url>
+
             <!-- Tabs -->
             <ul class="nav nav-tabs mt-4 profile-ul-2" id="profileTabs" role="tablist" >
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link<c:if test='${activePublications}'> active</c:if>" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications" type="button" role="tab" aria-controls="publications" aria-selected="${activePublications}" style="font-weight: 600;">
+                    <a class="nav-link<c:if test='${activePublications}'> active</c:if>" id="publications-tab" href="<c:out value='${profileTabPublicationsUrl}'/>" role="tab" aria-controls="publications" aria-selected="${activePublications}" style="font-weight: 600;">
                         <i class="bi bi-vinyl" aria-hidden="true"></i> <spring:message code="Profile.tabs.publications" />
-                    </button>
+                    </a>
                 </li>
                 <c:if test="${isOwnProfile}">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link<c:if test='${activeMyData}'> active</c:if>" id="mydata-tab" data-bs-toggle="tab" data-bs-target="#mydata" type="button" role="tab" aria-controls="mydata" aria-selected="${activeMyData}" style="font-weight: 600;">
+                        <a class="nav-link<c:if test='${activeMyData}'> active</c:if>" id="mydata-tab" href="<c:out value='${profileTabMydataUrl}'/>" role="tab" aria-controls="mydata" aria-selected="${activeMyData}" style="font-weight: 600;">
                             <i class="bi bi-person-lines-fill" aria-hidden="true"></i> <spring:message code="Profile.tabs.myData" />
-                        </button>
+                        </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link<c:if test='${activePurchases}'> active</c:if>" id="purchases-tab" data-bs-toggle="tab" data-bs-target="#purchases" type="button" role="tab" aria-controls="purchases" aria-selected="${activePurchases}" style="font-weight: 600;">
+                        <a class="nav-link<c:if test='${activePurchases}'> active</c:if>" id="purchases-tab" href="<c:out value='${profileTabPurchasesUrl}'/>" role="tab" aria-controls="purchases" aria-selected="${activePurchases}" style="font-weight: 600;">
                             <i class="bi bi-bag" aria-hidden="true"></i> <spring:message code="Profile.tabs.purchases" />
-                        </button>
+                        </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link<c:if test='${activeSales}'> active</c:if>" id="sales-tab" data-bs-toggle="tab" data-bs-target="#sales" type="button" role="tab" aria-controls="sales" aria-selected="${activeSales}" style="font-weight: 600;">
+                        <a class="nav-link<c:if test='${activeSales}'> active</c:if>" id="sales-tab" href="<c:out value='${profileTabSalesUrl}'/>" role="tab" aria-controls="sales" aria-selected="${activeSales}" style="font-weight: 600;">
                             <i class="bi bi-shop" aria-hidden="true"></i> <spring:message code="Profile.tabs.sales" />
-                        </button>
+                        </a>
                     </li>
                 </c:if>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link<c:if test='${activeReviews}'> active</c:if>" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="${activeReviews}" style="font-weight: 600;">
+                    <a class="nav-link<c:if test='${activeReviews}'> active</c:if>" id="reviews-tab" href="<c:out value='${profileTabReviewsUrl}'/>" role="tab" aria-controls="reviews" aria-selected="${activeReviews}" style="font-weight: 600;">
                         <i class="bi bi-star" aria-hidden="true"></i> <spring:message code="Profile.tabs.reviews" />
-                    </button>
+                    </a>
                 </li>
                 <c:if test="${isOwnProfile}">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link<c:if test='${activeTrash}'> active</c:if>" id="trash-tab" data-bs-toggle="tab" data-bs-target="#trash" type="button" role="tab" aria-controls="trash" aria-selected="${activeTrash}" style="font-weight: 600;">
+                        <a class="nav-link<c:if test='${activeTrash}'> active</c:if>" id="trash-tab" href="<c:out value='${profileTabTrashUrl}'/>" role="tab" aria-controls="trash" aria-selected="${activeTrash}" style="font-weight: 600;">
                             <i class="bi bi-trash3" aria-hidden="true"></i> <spring:message code="Profile.tabs.trash" />
-                        </button>
+                        </a>
                     </li>
                 </c:if>
                 <c:if test="${isOwnProfile and isAdmin}">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link<c:if test='${activeReports}'> active</c:if>" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="${activeReports}" style="font-weight: 600;">
+                        <a class="nav-link<c:if test='${activeReports}'> active</c:if>" id="reports-tab" href="<c:out value='${profileTabReportsUrl}'/>" role="tab" aria-controls="reports" aria-selected="${activeReports}" style="font-weight: 600;">
                             <i class="bi bi-flag" aria-hidden="true"></i> <spring:message code="Profile.tabs.reports" />
-                        </button>
+                        </a>
                     </li>
                 </c:if>
             </ul>
@@ -457,31 +484,33 @@
                         </h2>
                         <c:choose>
                             <c:when test="${not empty deletedProducts}">
-                                <div class="products-grid">
-                                    <c:forEach items="${deletedProducts}" var="product">
-                                        <div class="products-grid-item">
-                                            <ui:productCard
-                                                title="${product.title}"
-                                                artist="${product.artist}"
-                                                price="${product.price}"
-                                                installments="${product.installmentPrice}"
-                                                imageUrl="${deletedProductImageUrls[product.id]}"
-                                                categories="${product.categories}"
-                                                sellerRating="${sellerRating}"
-                                                href="#"
-                                                linkDisabled="true" />
-                                            <c:url var="restoreProductUrl" value="/products/${product.id}/restore" />
-                                            <spring:message code="Trash.restore.confirm" var="confirmRestore" />
-                                            <form action="${restoreProductUrl}" method="post" class="mt-2" onsubmit="return confirm('${confirmRestore}');">
-                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                                <button type="submit" class="btn btn-retro btn-retro-primary w-100 profile-button-3" >
-                                                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> <spring:message code="Trash.restore.button" />
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </c:forEach>
+                                <div class="profile-publications-stack deleted-products-stack">
+                                    <div class="products-grid profile-listings-grid">
+                                        <c:forEach items="${deletedProducts}" var="product">
+                                            <div class="products-grid-item">
+                                                <ui:productCard
+                                                    title="${product.title}"
+                                                    artist="${product.artist}"
+                                                    price="${product.price}"
+                                                    installments="${product.installmentPrice}"
+                                                    imageUrl="${deletedProductImageUrls[product.id]}"
+                                                    categories="${product.categories}"
+                                                    sellerRating="${sellerRating}"
+                                                    href="#"
+                                                    linkDisabled="true" />
+                                                <c:url var="restoreProductUrl" value="/products/${product.id}/restore" />
+                                                <spring:message code="Trash.restore.confirm" var="confirmRestore" />
+                                                <form action="${restoreProductUrl}" method="post" class="mt-2 flex-shrink-0" onsubmit="return confirm('${confirmRestore}');">
+                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                    <button type="submit" class="btn btn-retro btn-retro-primary w-100 profile-button-3" >
+                                                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> <spring:message code="Trash.restore.button" />
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </c:forEach>
+                                    </div>
+                                    <ui:pagination result="${deletedProductsPage}" pageParamName="trashPage" />
                                 </div>
-                                <ui:pagination result="${deletedProductsPage}" pageParamName="trashPage" />
                             </c:when>
                             <c:otherwise>
                                 <div class="empty-products-state profile-div-23" >
@@ -573,19 +602,6 @@
         </div>
     </div>
     <script>
-    (function () {
-        var tabList = document.getElementById('profileTabs');
-        if (tabList && window.history && window.history.replaceState && typeof URL !== 'undefined') {
-            tabList.addEventListener('shown.bs.tab', function (ev) {
-                if (!ev.target || ev.target.id !== 'trash-tab') {
-                    return;
-                }
-                var u = new URL(window.location.href);
-                u.searchParams.set('tab', 'trash');
-                window.history.replaceState({}, '', u.pathname + u.search + u.hash);
-            });
-        }
-    })();
     (function () {
         var form = document.getElementById('profileForm');
         var saveBtn = document.getElementById('profileSaveBtn');

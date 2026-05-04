@@ -18,10 +18,10 @@
                             <li class="breadcrumb-item"><a href="<c:url value='/profile'/>"><spring:message code="PurchasePanel.breadcrumb.profile" /></a></li>
                             <c:choose>
                                 <c:when test="${isBuyer}">
-                                    <li class="breadcrumb-item"><a href="<c:url value='/profile#purchases'/>"><spring:message code="PurchasePanel.breadcrumb.purchases" /></a></li>
+                                    <li class="breadcrumb-item"><a href="<c:url value='/profile'><c:param name='tab' value='purchases'/></c:url>"><spring:message code="PurchasePanel.breadcrumb.purchases" /></a></li>
                                 </c:when>
                                 <c:when test="${isSeller}">
-                                    <li class="breadcrumb-item"><a href="<c:url value='/profile#sales'/>"><spring:message code="PurchasePanel.breadcrumb.sales" /></a></li>
+                                    <li class="breadcrumb-item"><a href="<c:url value='/profile'><c:param name='tab' value='sales'/></c:url>"><spring:message code="PurchasePanel.breadcrumb.sales" /></a></li>
                                 </c:when>
                             </c:choose>
                             <li class="breadcrumb-item active" aria-current="page"><spring:message code="PurchasePanel.order.id" arguments="${purchase.purchaseId}" /></li>

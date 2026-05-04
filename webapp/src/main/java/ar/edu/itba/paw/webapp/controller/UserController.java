@@ -48,6 +48,7 @@ public class UserController {
 
     private static final int PROFILE_PUBLICATIONS_PAGE_SIZE = 12;
     private static final int PROFILE_OTHER_PAGE_SIZE = 3;
+    private static final int PROFILE_TRASH_PAGE_SIZE = 12;
 
     private final UserService userService;
     private final ProductService productService;
@@ -320,7 +321,7 @@ public class UserController {
                 mv.addObject("reportedProducts", reportedProducts);
             }
 
-            final PaginatedResult<Product> deletedPage = productService.listUserDeletedProducts(profileUser.getId(), trashPage, PROFILE_OTHER_PAGE_SIZE);
+            final PaginatedResult<Product> deletedPage = productService.listUserDeletedProducts(profileUser.getId(), trashPage, PROFILE_TRASH_PAGE_SIZE);
             final Map<Long, String> deletedProductImageUrls = new HashMap<>();
             for (Product product : deletedPage.getResults()) {
                 if (imageService.existsByProductId(product.getId())) {

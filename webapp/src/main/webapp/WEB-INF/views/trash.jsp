@@ -36,31 +36,33 @@
 
         <c:choose>
             <c:when test="${not empty deletedProducts}">
-                <div class="products-grid">
-                    <c:forEach items="${deletedProducts}" var="product">
-                        <div class="products-grid-item">
-                            <ui:productCard
-                                title="${product.title}"
-                                artist="${product.artist}"
-                                price="${product.price}"
-                                installments="${product.installmentPrice}"
-                                imageUrl="${productImageUrls[product.id]}"
-                                categories="${product.categories}"
-                                sellerRating="${sellerRating}"
-                                href="#"
-                                linkDisabled="true" />
-                            <c:url var="restoreProductUrl" value="/products/${product.id}/restore" />
-                            <spring:message code="Trash.restore.confirm" var="confirmRestore" />
-                            <form action="${restoreProductUrl}" method="post" class="mt-2" onsubmit="return confirm('${confirmRestore}');">
-                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                <button type="submit" class="btn btn-retro btn-retro-primary w-100 profile-button-3" >
-                                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> <spring:message code="Trash.restore.button" />
-                                </button>
-                            </form>
-                        </div>
-                    </c:forEach>
+                <div class="profile-publications-stack deleted-products-stack">
+                    <div class="products-grid profile-listings-grid">
+                        <c:forEach items="${deletedProducts}" var="product">
+                            <div class="products-grid-item">
+                                <ui:productCard
+                                    title="${product.title}"
+                                    artist="${product.artist}"
+                                    price="${product.price}"
+                                    installments="${product.installmentPrice}"
+                                    imageUrl="${productImageUrls[product.id]}"
+                                    categories="${product.categories}"
+                                    sellerRating="${sellerRating}"
+                                    href="#"
+                                    linkDisabled="true" />
+                                <c:url var="restoreProductUrl" value="/products/${product.id}/restore" />
+                                <spring:message code="Trash.restore.confirm" var="confirmRestore" />
+                                <form action="${restoreProductUrl}" method="post" class="mt-2 flex-shrink-0" onsubmit="return confirm('${confirmRestore}');">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                    <button type="submit" class="btn btn-retro btn-retro-primary w-100 profile-button-3" >
+                                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> <spring:message code="Trash.restore.button" />
+                                    </button>
+                                </form>
+                            </div>
+                        </c:forEach>
+                    </div>
+                    <ui:pagination result="${deletedProductsPage}" />
                 </div>
-                <ui:pagination result="${deletedProductsPage}" />
             </c:when>
             <c:otherwise>
                 <div class="empty-products-state profile-div-23" >
