@@ -47,6 +47,7 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     private static final int PROFILE_PUBLICATIONS_PAGE_SIZE = 12;
+    private static final int PROFILE_OTHER_PAGE_SIZE = 3;
 
     private final UserService userService;
     private final ProductService productService;
@@ -277,13 +278,13 @@ public class UserController {
         mv.addObject("userProducts", productsPage.getResults());
         mv.addObject("productImageUrls", productImageUrls);
 
-        PaginatedResult<ar.edu.itba.paw.models.Review> reviewsPage = reviewService.findBySellerId(profileUser.getId(), page, 10);
+        PaginatedResult<ar.edu.itba.paw.models.Review> reviewsPage = reviewService.findBySellerId(profileUser.getId(), page, PROFILE_OTHER_PAGE_SIZE);
         mv.addObject("receivedReviewsPage", reviewsPage);
         mv.addObject("receivedReviews", reviewsPage.getResults());
         mv.addObject("sellerRating", reviewService.summaryForSeller(profileUser.getId()));
 
         if (isOwnProfile && authUser != null) {
-            final PaginatedResult<Purchase> purchasesPage = purchaseService.findByBuyerId(profileUser.getId(), page, 10);
+            final PaginatedResult<Purchase> purchasesPage = purchaseService.findByBuyerId(profileUser.getId(), page, PROFILE_OTHER_PAGE_SIZE);
 
             final Map<Long, Product> purchaseProducts = new HashMap<>();
             final Map<Long, Boolean> purchaseHasReview = new HashMap<>();
@@ -299,7 +300,7 @@ public class UserController {
             mv.addObject("purchaseProducts", purchaseProducts);
             mv.addObject("purchaseHasReview", purchaseHasReview);
 
-            final PaginatedResult<Purchase> salesPage = purchaseService.findBySellerId(profileUser.getId(), page, 10);
+            final PaginatedResult<Purchase> salesPage = purchaseService.findBySellerId(profileUser.getId(), page, PROFILE_OTHER_PAGE_SIZE);
 
             final Map<Long, Product> saleProducts = new HashMap<>();
             for (Purchase s : salesPage.getResults()) {
@@ -319,7 +320,7 @@ public class UserController {
                 mv.addObject("reportedProducts", reportedProducts);
             }
 
-            final PaginatedResult<Product> deletedPage = productService.listUserDeletedProducts(profileUser.getId(), trashPage, 10);
+            final PaginatedResult<Product> deletedPage = productService.listUserDeletedProducts(profileUser.getId(), trashPage, PROFILE_OTHER_PAGE_SIZE);
             final Map<Long, String> deletedProductImageUrls = new HashMap<>();
             for (Product product : deletedPage.getResults()) {
                 if (imageService.existsByProductId(product.getId())) {
