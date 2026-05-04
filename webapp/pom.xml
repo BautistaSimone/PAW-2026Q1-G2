@@ -64,11 +64,9 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
-    <!-- TODO: Put version number in root POM, following the convention -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>
-      <version>1.2</version>
     </dependency>
     
     <!-- Logging -->
@@ -179,17 +177,6 @@
           <artifactId>maven-deploy-plugin</artifactId>
           <version>3.1.2</version>
 	    </plugin>
-		<plugin>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-maven-plugin</artifactId>
-			<version>9.4.58.v20250814</version>
-			<configuration>
-			  <scanIntervalSeconds>0</scanIntervalSeconds>
-			  <httpConnector>
-			    <port>8000</port>
-			  </httpConnector>
-		    </configuration>
-		</plugin>
       </plugins>
     </pluginManagement>
   </build>

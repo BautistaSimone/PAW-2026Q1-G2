@@ -31,8 +31,11 @@
     <ch.qos.logback.version>1.4.14</ch.qos.logback.version>
     <javax.validation.version>2.0.1.Final</javax.validation.version>
     <hibernate.validator.version>6.2.4.Final</hibernate.validator.version>
+    <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
+    <jstl.version>1.2</jstl.version>
     <spring-security.version>5.8.0</spring-security.version>
     <bcrypt.version>0.10.2</bcrypt.version>
+    <jetty-maven-plugin.version>9.4.58.v20250814</jetty-maven-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -202,8 +205,13 @@
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
-        <version>4.0.1</version>
+        <version>${javax.servlet-api.version}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jstl</artifactId>
+        <version>${jstl.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -224,6 +232,17 @@
           <version>${maven-war-plugin.version}</version>
           <configuration>
             <packagingExcludes>**/logback-test.xml</packagingExcludes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-maven-plugin</artifactId>
+          <version>${jetty-maven-plugin.version}</version>
+          <configuration>
+            <scanIntervalSeconds>0</scanIntervalSeconds>
+            <httpConnector>
+              <port>8000</port>
+            </httpConnector>
           </configuration>
         </plugin>
       </plugins>

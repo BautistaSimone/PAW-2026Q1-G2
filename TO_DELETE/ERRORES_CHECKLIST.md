@@ -88,7 +88,7 @@
 
 ## 2. Maven y Gestión de Dependencias
 
-### Versiones no centralizadas en `<properties>` del POM raíz
+### Versiones no centralizadas en `<properties>` del POM raíz-LISTOOOOO
 
 - **Archivo**: `pom.xml` (raíz)
 - **Línea**: 203–207
