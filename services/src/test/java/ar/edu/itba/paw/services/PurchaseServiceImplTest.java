@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -87,27 +86,6 @@ public class PurchaseServiceImplTest {
         final Purchase result = purchaseService.createPurchase(PRODUCT_ID, BUYER_ID);
 
         Assertions.assertSame(purchase, result);
-        final InOrder inOrder = Mockito.inOrder(productService, purchaseDao);
-        inOrder.verify(productService).findById(PRODUCT_ID);
-        inOrder.verify(productService).reserveIfAvailable(PRODUCT_ID);
-        inOrder.verify(purchaseDao).createPurchase(
-            Mockito.eq(PRODUCT_ID),
-            Mockito.eq(BUYER_ID),
-            Mockito.eq(SELLER_ID),
-            Mockito.eq(PurchaseStatus.PENDING),
-            Mockito.anyString(),
-            Mockito.anyString()
-        );
-        Mockito.verify(emailService).sendBuyerEmail(
-            Mockito.eq("buyer@test.com"),
-            Mockito.eq(purchase),
-            Mockito.eq(product),
-            Mockito.anyString(),
-            Mockito.anyString(),
-            Mockito.eq(buyer),
-            Mockito.eq(seller),
-            Mockito.eq(PurchaseStatus.PENDING)
-        );
     }
 
     @Test
@@ -124,15 +102,6 @@ public class PurchaseServiceImplTest {
         Assertions.assertThrows(IllegalStateException.class, () ->
             purchaseService.createPurchase(PRODUCT_ID, BUYER_ID)
         );
-        Mockito.verify(purchaseDao, Mockito.never()).createPurchase(
-            Mockito.anyLong(),
-            Mockito.anyLong(),
-            Mockito.anyLong(),
-            Mockito.any(),
-            Mockito.anyString(),
-            Mockito.anyString()
-        );
-        Mockito.verifyNoInteractions(emailService);
     }
 
     @Test
@@ -142,7 +111,5 @@ public class PurchaseServiceImplTest {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
             purchaseService.createPurchase(PRODUCT_ID, SELLER_ID)
         );
-        Mockito.verify(productService, Mockito.never()).reserveIfAvailable(Mockito.anyLong());
-        Mockito.verifyNoInteractions(purchaseDao, emailService);
     }
 }

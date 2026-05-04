@@ -713,7 +713,7 @@ Hay **CSS inline (style="...")** masivo en casi todas las vistas. Ejemplos repre
 
 ## 10. Unit Testing y Mocking
 
-### ⚠️ GRAVE — Uso de Mockito.verify()
+### ⚠️ GRAVE — Uso de Mockito.verify() - LISTO
 
 - **Archivo**: `services/src/test/java/ar/edu/itba/paw/services/PurchaseServiceImplTest.java`
 - **Línea**: 91–101, 127–135, 145–146
