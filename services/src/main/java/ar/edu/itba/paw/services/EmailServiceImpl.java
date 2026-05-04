@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -34,6 +35,8 @@ public class EmailServiceImpl implements EmailService {
     private static final DateTimeFormatter PURCHASE_DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final Locale PRICE_LOCALE = Locale.forLanguageTag("es-AR");
 
+    private final MessageSource messageSource;
+
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
     private final String baseUrl;
@@ -43,10 +46,12 @@ public class EmailServiceImpl implements EmailService {
     public EmailServiceImpl(
         final JavaMailSender javaMailSender,
         final SpringTemplateEngine templateEngine,
+        final MessageSource messageSource,
         @Value("${app.base.url:http://pawserver.it.itba.edu.ar/paw-2026a-02/}") final String baseUrl,
         @Value("${mail.username}") final String adminEmail) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
+        this.messageSource = messageSource;
         this.baseUrl = baseUrl;
         this.adminEmail = adminEmail;
     }
@@ -130,6 +135,8 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendPasswordResetEmail(String to, String resetToken, String username) {
 
+        final Locale locale = LocaleContextHolder.getLocale();
+
         String resetUrl = buildAbsoluteUrl("/changePassword?token=" + resetToken);
 
         final Context ctx = new Context(LocaleContextHolder.getLocale());
@@ -163,6 +170,9 @@ public class EmailServiceImpl implements EmailService {
     @Async
     @Override
     public void sendVerificationEmail(String to, String resetToken, String username) {
+
+        final Locale locale = LocaleContextHolder.getLocale();
+
         String resetUrl = buildAbsoluteUrl("/verifyEmail?token=" + resetToken);
 
         final Context ctx = new Context(LocaleContextHolder.getLocale());
