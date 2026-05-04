@@ -169,7 +169,7 @@
                 <div class="tab-pane fade<c:if test='${activePublications}'> show active</c:if>" id="publications" role="tabpanel" aria-labelledby="publications-tab">
                     <c:choose>
                         <c:when test="${not empty userProducts}">
-                            <div class="products-grid">
+                            <div class="products-grid profile-listings-grid">
                                 <c:forEach items="${userProducts}" var="product">
                                     <div class="products-grid-item">
                                         <c:url value="/products/${product.id}" var="productUrl"/>

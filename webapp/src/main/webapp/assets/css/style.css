@@ -575,7 +575,6 @@ img {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1.5rem;
-    row-gap: 6rem;
 }
 
 .products-grid .product-card {
@@ -2491,6 +2490,10 @@ details.filter-section:not([open]) .filter-section-chevron {
 
 .profile-page {
     padding: 1.5rem 0 4rem;
+}
+
+.profile-page .profile-listings-grid .product-card {
+    height: auto;
 }
 
 .profile-data {
