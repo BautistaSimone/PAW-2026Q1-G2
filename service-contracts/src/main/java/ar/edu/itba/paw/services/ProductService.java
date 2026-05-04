@@ -23,6 +23,17 @@ public interface ProductService {
         final BigDecimal price
     );
 
+    ProductSearchCriteria getProductSearchCriteria(
+        final String searchText,
+        final List<Long> categoryIds,
+        final String minPriceParam,
+        final String maxPriceParam,
+        final List<String> recordLabels,
+        final List<String> estadoParams,
+        final String sortParam,
+        final int page
+    );
+
     PaginatedResult<Product> listProducts();
 
     PaginatedResult<Product> listProducts(ProductSearchCriteria criteria);

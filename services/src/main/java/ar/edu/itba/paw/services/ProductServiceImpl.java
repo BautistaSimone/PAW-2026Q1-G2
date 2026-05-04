@@ -2,11 +2,14 @@ package ar.edu.itba.paw.services;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ar.edu.itba.paw.models.ConditionBucket;
+import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
@@ -107,6 +110,51 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public PaginatedResult<Product> listProducts() {
         return productDao.listProducts();
+    }
+
+    @Override
+    public ProductSearchCriteria getProductSearchCriteria(
+        final String searchText,
+        final List<Long> categoryIds,
+        final String minPriceParam,
+        final String maxPriceParam,
+        final List<String> recordLabels,
+        final List<String> estadoParams,
+        final String sortParam,
+        final int page
+    ) {
+        BigDecimal minPrice = parsePriceParam(minPriceParam);
+		BigDecimal maxPrice = parsePriceParam(maxPriceParam);
+		if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+			final BigDecimal tmp = minPrice;
+			minPrice = maxPrice;
+			maxPrice = tmp;
+		}
+
+		final List<ConditionBucket> buckets = new ArrayList<>();
+		if (estadoParams != null) {
+			for (String raw : estadoParams) {
+				ConditionBucket.parse(raw).ifPresent(buckets::add);
+			}
+		}
+
+		final String trimmedSearch = searchText != null ? searchText.trim() : "";
+		
+		final boolean hasActiveSearch = !trimmedSearch.isEmpty();
+		final ProductSortOrder sortOrder = ProductSortOrder.parse(sortParam).orElse(ProductSortOrder.NEWEST);
+
+		return new ProductSearchCriteria(
+			hasActiveSearch ? trimmedSearch : null,
+			categoryIds,
+			minPrice,
+			maxPrice,
+			recordLabels,
+			buckets,
+			sortOrder,
+			null,
+			page,
+			12
+		);
     }
 
     @Override
@@ -214,4 +262,24 @@ public class ProductServiceImpl implements ProductService {
         }
         return productDao.restoreUserDeletedProduct(productId);
     }
+
+	private static BigDecimal parsePriceParam(final String raw) {
+		if (raw == null || raw.isBlank()) {
+			return null;
+		}
+		String normalized = raw.trim();
+		if (normalized.contains(",")) {
+			normalized = normalized.replace(".", "").replace(",", ".");
+		} else if (normalized.matches("\\d{1,3}(\\.\\d{3})+")) {
+			normalized = normalized.replace(".", "");
+		}
+		if (normalized.endsWith(".")) {
+			normalized = normalized.substring(0, normalized.length() - 1);
+		}
+		try {
+			return new BigDecimal(normalized);
+		} catch (NumberFormatException ex) {
+			return null;
+		}
+	}
 }

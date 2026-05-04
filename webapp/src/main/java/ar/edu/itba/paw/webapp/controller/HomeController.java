@@ -53,26 +53,6 @@ public class HomeController {
 		this.reviewService = reviewService;
 	}
 
-	private static BigDecimal parsePriceParam(final String raw) {
-		if (raw == null || raw.isBlank()) {
-			return null;
-		}
-		String normalized = raw.trim();
-		if (normalized.contains(",")) {
-			normalized = normalized.replace(".", "").replace(",", ".");
-		} else if (normalized.matches("\\d{1,3}(\\.\\d{3})+")) {
-			normalized = normalized.replace(".", "");
-		}
-		if (normalized.endsWith(".")) {
-			normalized = normalized.substring(0, normalized.length() - 1);
-		}
-		try {
-			return new BigDecimal(normalized);
-		} catch (NumberFormatException ex) {
-			return null;
-		}
-	}
-
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ModelAndView home(
         @AuthenticationPrincipal PawAuthUser authUser,
@@ -86,46 +66,19 @@ public class HomeController {
 		@RequestParam(value = "page", defaultValue = "1") final int page
 	) {
 
-		BigDecimal minPrice = parsePriceParam(minPriceParam);
-		BigDecimal maxPrice = parsePriceParam(maxPriceParam);
-		if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
-			final BigDecimal tmp = minPrice;
-			minPrice = maxPrice;
-			maxPrice = tmp;
-		}
-
-		final List<ConditionBucket> buckets = new ArrayList<>();
-		if (estadoParams != null) {
-			for (String raw : estadoParams) {
-				ConditionBucket.parse(raw).ifPresent(buckets::add);
-			}
-		}
-
-		final String trimmedSearch = searchText != null ? searchText.trim() : "";
-		final boolean hasActiveSearch = !trimmedSearch.isEmpty();
-		final boolean hasActiveFilters = hasActiveSearch
-			|| (categoryIds != null && !categoryIds.isEmpty())
-			|| minPrice != null
-			|| maxPrice != null
-			|| (recordLabels != null && !recordLabels.isEmpty())
-			|| !buckets.isEmpty();
-
-		final ProductSortOrder sortOrder = ProductSortOrder.parse(sortParam).orElse(ProductSortOrder.NEWEST);
-
-		final ProductSearchCriteria criteria = new ProductSearchCriteria(
-			hasActiveSearch ? trimmedSearch : null,
-			categoryIds,
-			minPrice,
-			maxPrice,
-			recordLabels,
-			buckets,
-			sortOrder,
-			null,
-			page,
-			12
+		final ProductSearchCriteria criteria = productService.getProductSearchCriteria(
+			searchText,
+        	categoryIds,
+        	minPriceParam,
+        	maxPriceParam,
+        	recordLabels,
+       		estadoParams,
+        	sortParam,
+        	page
 		);
 
 		final PaginatedResult<Product> productsPage = productService.listProducts(criteria);
+
 		final Map<Long, String> productImageUrls = new HashMap<>();
 
 		for (Product product : productsPage.getResults()) {
@@ -154,6 +107,24 @@ public class HomeController {
 				if (label != null && !label.isBlank()) {
 					selectedLabels.add(label.trim());
 				}
+			}
+		}
+
+		final String trimmedSearch = searchText != null ? searchText.trim() : "";
+		
+		final boolean hasActiveSearch = !trimmedSearch.isEmpty();
+		final boolean hasActiveFilters = hasActiveSearch
+			|| (categoryIds != null && !categoryIds.isEmpty())
+			|| criteria.getMinPrice() != null
+			|| criteria.getMaxPrice() != null
+			|| (recordLabels != null && !recordLabels.isEmpty());
+
+		final ProductSortOrder sortOrder = ProductSortOrder.parse(sortParam).orElse(ProductSortOrder.NEWEST);
+
+		final List<ConditionBucket> buckets = new ArrayList<>();
+		if (estadoParams != null) {
+			for (String raw : estadoParams) {
+				ConditionBucket.parse(raw).ifPresent(buckets::add);
 			}
 		}
 
