@@ -471,12 +471,8 @@ public class ProductController {
             return new ModelAndView("redirect:/products/" + id + "?alreadyReported=1");
         }
 
-        reportService.report(id, authUser.getUser().getId());
+        reportService.report(id, authUser.getUser().getId(), product.getUserId());
 
-        User seller = userService.findById(product.getUserId())
-            .orElseThrow(ResourceNotFoundException::new);
-
-        emailService.sendProductReportEmail(product, authUser.getUser(), seller);
         return new ModelAndView("redirect:/products/" + id + "?reported=1");
     }
 

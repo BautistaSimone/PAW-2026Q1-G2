@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  * Stateless signed token so a link in the report email can hide a product without admin login.
  */
 @Component
-public class ProductReportRemovalTokenService {
+public class ProductReportRemovalTokenServiceImpl implements ProductReportRemovalTokenService {
 
     private static final String HMAC_ALG = "HmacSHA256";
     private static final Duration TOKEN_TTL = Duration.ofDays(14);
@@ -28,7 +28,7 @@ public class ProductReportRemovalTokenService {
     private final byte[] signingKey;
 
     @Autowired
-    public ProductReportRemovalTokenService(
+    public ProductReportRemovalTokenServiceImpl(
         @Value("${app.report.moderation.secret:}") final String explicitSecret,
         @Value("${auth.rememberme}") final String rememberMeFallback
     ) {
@@ -38,6 +38,7 @@ public class ProductReportRemovalTokenService {
         this.signingKey = keySource.getBytes(StandardCharsets.UTF_8);
     }
 
+    @Override
     public String createToken(final long productId) {
         final long expiryEpochSeconds = Instant.now().plus(TOKEN_TTL).getEpochSecond();
         final String payload = productId + String.valueOf(SEP) + expiryEpochSeconds;
@@ -46,9 +47,7 @@ public class ProductReportRemovalTokenService {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(combined.getBytes(StandardCharsets.UTF_8));
     }
 
-    /**
-     * @return true if token matches {@code productId}, signature is valid and token is not expired.
-     */
+    @Override
     public boolean isValid(final long productId, final String token) {
         if (token == null || token.isBlank()) {
             return false;

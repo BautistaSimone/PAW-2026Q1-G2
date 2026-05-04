@@ -6,7 +6,7 @@ import ar.edu.itba.paw.models.Report;
 import ar.edu.itba.paw.models.ReportedProduct;
 
 public interface ReportService {
-    Report report(long productId, long reporterUserId);
+    Report report(long productId, long reporterUserId, long reportedUserId);
     boolean hasReported(long productId, long reporterUserId);
     List<ReportedProduct> findAllGroupedByProduct();
     void deleteByProductId(long productId);

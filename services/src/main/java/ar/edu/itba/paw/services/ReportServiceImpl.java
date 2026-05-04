@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Report;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.ReportedProduct;
 import ar.edu.itba.paw.persistence.ReportDao;
 import ar.edu.itba.paw.persistence.ProductDao;
@@ -18,13 +19,19 @@ public class ReportServiceImpl implements ReportService {
     private final ProductDao productDao;
 
     @Autowired
+    EmailService emailService;
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
     public ReportServiceImpl(final ReportDao reportDao, final ProductDao productDao) {
         this.reportDao = reportDao;
         this.productDao = productDao;
     }
 
     @Override
-    public Report report(final long productId, final long reporterUserId) {
+    public Report report(long productId, long reporterUserId, long reportedUserId) {
         final Product product = productDao.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
@@ -35,6 +42,14 @@ public class ReportServiceImpl implements ReportService {
         if (reportDao.existsByProductAndReporter(productId, reporterUserId)) {
             throw new IllegalStateException("Already reported this product");
         }
+
+        User reporter = userService.findById(reporterUserId)
+            .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
+
+        User seller = userService.findById(reportedUserId)
+            .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
+
+        emailService.sendProductReportEmail(product, reporter, seller);
 
         return reportDao.create(productId, product.getUserId(), reporterUserId);
     }

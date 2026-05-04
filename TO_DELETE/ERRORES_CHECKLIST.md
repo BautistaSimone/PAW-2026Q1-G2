@@ -51,14 +51,14 @@
 
 ### ⚠️ GRAVE — Envío de mail desde controller
 
-- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/ProductController.java`
+- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/ProductController.java` - LISTO
 - **Línea**: 486
 - **Código**: `emailService.sendProductReportEmail(product, authUser.getUser(), seller);`
 - **Regla violada**: [1] / [12] Mails enviados SIEMPRE desde servicios, NUNCA desde controllers
 
 ### Controller orquesta múltiples servicios
 
-- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/ProductController.java`
+- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/ProductController.java` 
 - **Línea**: 481–486
 - **Código**: `reportService.report(...); userService.findById(...); emailService.sendProductReportEmail(...)`
 - **Regla violada**: [15.1] Servicios deben ser Facades — un método de alto nivel por caso de uso
