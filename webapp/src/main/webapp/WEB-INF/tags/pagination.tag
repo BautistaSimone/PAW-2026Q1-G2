@@ -10,6 +10,32 @@
 <c:if test="${result.totalPages > 1}">
     <nav aria-label="<spring:message code='Pagination.nav.ariaLabel' />" class="mt-4 mb-2">
         <ul class="pagination justify-content-center">
+
+            <%-- Primera página --%>
+            <c:choose>
+                <c:when test="${result.currentPage > 1}">
+                    <c:url var="firstUrl" value="">
+                        <c:forEach items="${param}" var="p">
+                            <c:if test="${p.key ne pp}">
+                                <c:forEach items="${paramValues[p.key]}" var="val">
+                                    <c:param name="${p.key}" value="${val}"/>
+                                </c:forEach>
+                            </c:if>
+                        </c:forEach>
+                        <c:param name="${pp}" value="1"/>
+                    </c:url>
+                    <li class="page-item">
+                        <a class="page-link" href="<c:out value='${firstUrl}' />" aria-label="<spring:message code='Pagination.first.ariaLabel' />">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                </c:when>
+                <c:otherwise>
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&laquo;&laquo;</span>
+                    </li>
+                </c:otherwise>
+            </c:choose>
             
             <c:choose>
                 <c:when test="${result.hasPreviousPage}">
@@ -80,6 +106,32 @@
                 <c:otherwise>
                     <li class="page-item disabled">
                         <span class="page-link" aria-hidden="true">&raquo;</span>
+                    </li>
+                </c:otherwise>
+            </c:choose>
+
+            <%-- Última página --%>
+            <c:choose>
+                <c:when test="${result.currentPage < result.totalPages}">
+                    <c:url var="lastUrl" value="">
+                        <c:forEach items="${param}" var="p">
+                            <c:if test="${p.key ne pp}">
+                                <c:forEach items="${paramValues[p.key]}" var="val">
+                                    <c:param name="${p.key}" value="${val}"/>
+                                </c:forEach>
+                            </c:if>
+                        </c:forEach>
+                        <c:param name="${pp}" value="${result.totalPages}"/>
+                    </c:url>
+                    <li class="page-item">
+                        <a class="page-link" href="<c:out value='${lastUrl}' />" aria-label="<spring:message code='Pagination.last.ariaLabel' />">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                </c:when>
+                <c:otherwise>
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&raquo;&raquo;</span>
                     </li>
                 </c:otherwise>
             </c:choose>

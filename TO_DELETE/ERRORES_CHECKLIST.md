@@ -462,7 +462,7 @@ Hay **CSS inline (style="...")** masivo en casi todas las vistas. Ejemplos repre
 - **Código**: `<p style="..."><c:out value="${rev.text}"/></p>`
 - **Regla violada**: [15.11] Misma regla
 
-### Paginación sin primera/última página
+### Paginación sin primera/última página - LISTO
 
 - **Archivo**: `webapp/src/main/webapp/WEB-INF/tags/pagination.tag`
 - **Línea**: bloque 10–87
