@@ -58,19 +58,19 @@
 
 ### Controller orquesta múltiples servicios
 
-- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/ProductController.java` 
+- **Archivo**: `webapp/src/main/java/ar/edu/itba/paw/webapp/controller/ProductController.java` - LISTO
 - **Línea**: 481–486
 - **Código**: `reportService.report(...); userService.findById(...); emailService.sendProductReportEmail(...)`
 - **Regla violada**: [15.1] Servicios deben ser Facades — un método de alto nivel por caso de uso
 
-### Servicio sin interfaz en service-contracts
+### Servicio sin interfaz en service-contracts - LISTO
 
 - **Archivo**: `services/src/main/java/ar/edu/itba/paw/services/ProductReportRemovalTokenService.java`
 - **Línea**: clase completa
 - **Código**: `public class ProductReportRemovalTokenService { ... }` (sin interfaz correspondiente)
 - **Regla violada**: [1] Interfaces obligatorias para servicios
 
-### Servicio con @Component en vez de @Service
+### Servicio con @Component en vez de @Service - ????????? QUIEN HIZO ESTO, POR FAVOR WTF  
 
 - **Archivo**: `services/src/main/java/ar/edu/itba/paw/services/ProductReportRemovalTokenService.java`
 - **Línea**: 21
