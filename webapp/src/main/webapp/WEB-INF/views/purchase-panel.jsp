@@ -84,9 +84,9 @@
                                         </c:if>
                                         <c:if test="${product.sleeveCondition ne null or product.recordCondition ne null}">
                                             <li><strong><spring:message code="PurchasePanel.details.status" /></strong>
-                                                <c:if test="${product.sleeveCondition ne null}"><c:out value="${product.sleeveCondition}"/>/10 <spring:message code="PurchasePanel.details.status.sleeve" /></c:if>
+                                                <c:if test="${product.sleeveCondition ne null}"><c:out value="${product.sleeveConditionDisplay}"/>/10 <spring:message code="PurchasePanel.details.status.sleeve" /></c:if>
                                                 <c:if test="${product.sleeveCondition ne null and product.recordCondition ne null}"> · </c:if>
-                                                <c:if test="${product.recordCondition ne null}"><c:out value="${product.recordCondition}"/>/10 <spring:message code="PurchasePanel.details.status.record" /></c:if>
+                                                <c:if test="${product.recordCondition ne null}"><c:out value="${product.recordConditionDisplay}"/>/10 <spring:message code="PurchasePanel.details.status.record" /></c:if>
                                             </li>
                                         </c:if>
                                     </ul>

@@ -100,6 +100,8 @@ public class ProductServiceImpl implements ProductService {
         if (recordCondition == null || recordCondition.compareTo(BigDecimal.ONE) < 0 || recordCondition.compareTo(BigDecimal.TEN) > 0) {
             throw new IllegalArgumentException("Record condition must be between 1 and 10");
         }
+        requireAtMostTwoFractionDigits(sleeveCondition, "Sleeve condition");
+        requireAtMostTwoFractionDigits(recordCondition, "Record condition");
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title cannot be empty");
         }
@@ -108,6 +110,13 @@ public class ProductServiceImpl implements ProductService {
         }
         if (description == null || description.trim().isEmpty()) {
             throw new IllegalArgumentException("Description cannot be empty");
+        }
+    }
+
+    private static void requireAtMostTwoFractionDigits(final BigDecimal value, final String fieldLabel) {
+        final int scale = value.stripTrailingZeros().scale();
+        if (scale > 2) {
+            throw new IllegalArgumentException(fieldLabel + " must have at most two decimal places");
         }
     }
 

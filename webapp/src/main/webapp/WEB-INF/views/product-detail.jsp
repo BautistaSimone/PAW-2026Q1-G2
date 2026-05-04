@@ -333,7 +333,7 @@
                                                             ><spring:message code="ProductDetail.recordCondition" /></span>
                                                         <span class="product-detail-span-40"
                                                             >
-                                                            <c:out value="${product.recordCondition}" />
+                                                            <c:out value="${product.recordConditionDisplay}" />
                                                         </span><span class="product-detail-span-41"
                                                             >/10</span>
                                                     </div>
@@ -345,7 +345,7 @@
                                                             ><spring:message code="ProductDetail.sleeveCondition" /></span>
                                                         <span class="product-detail-span-40"
                                                             >
-                                                            <c:out value="${product.sleeveCondition}" />
+                                                            <c:out value="${product.sleeveConditionDisplay}" />
                                                         </span><span class="product-detail-span-41"
                                                             >/10</span>
                                                     </div>

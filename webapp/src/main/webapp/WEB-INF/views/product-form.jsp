@@ -112,7 +112,7 @@
                         <div class="col-md-6">
                             <label for="sleeveCondition" class="form-label"><spring:message code="ProductForm.sleeveCondition.label" /> <span class="text-danger">*</span></label>
                             <spring:message code="ProductForm.sleeveCondition.placeholder" var="sleevePlaceholder" />
-                            <form:input type="number" path="sleeveCondition" min="1" max="10" step="0.1"
+                            <form:input type="number" path="sleeveCondition" min="1" max="10" step="0.01"
                                    cssClass="form-control" placeholder="${sleevePlaceholder}" required="required" />
                             <form:errors path="sleeveCondition" cssClass="text-danger" element="div" />
                         </div>
@@ -120,7 +120,7 @@
                         <div class="col-md-6">
                             <label for="recordCondition" class="form-label"><spring:message code="ProductForm.recordCondition.label" /> <span class="text-danger">*</span></label>
                             <spring:message code="ProductForm.recordCondition.placeholder" var="recordPlaceholder" />
-                            <form:input type="number" path="recordCondition" min="1" max="10" step="0.1"
+                            <form:input type="number" path="recordCondition" min="1" max="10" step="0.01"
                                    cssClass="form-control" placeholder="${recordPlaceholder}" required="required" />
                             <form:errors path="recordCondition" cssClass="text-danger" element="div" />
                         </div>

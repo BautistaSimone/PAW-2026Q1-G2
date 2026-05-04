@@ -111,7 +111,7 @@
 .product-detail-div-37 { margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
 .product-detail-div-38 { background: #fff; padding: 1.25rem 1rem; border-radius: 16px; border: 1px solid rgba(0,0,0,0.04); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
 .product-detail-span-39 { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.5rem; }
-.product-detail-span-40 { font-family: var(--font-mono); font-size: 1.85rem; font-weight: 700; color: var(--color-text-main); }
+.product-detail-span-40 { font-family: var(--font-mono); font-size: 1.85rem; font-weight: 700; color: var(--color-text-main); min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
 .product-detail-span-41 { font-family: var(--font-mono); font-size: 0.95rem; color: #a0a0a0; font-weight: 600; }
 .product-detail-div-42 { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(8px); border-radius: 16px; padding: 2.5rem; border: 1px dashed rgba(231,111,81,0.2); text-align: center; }
 .product-detail-p-43 { color: var(--color-text-muted); font-size: 1.05rem; margin: 0; font-weight: 500; }

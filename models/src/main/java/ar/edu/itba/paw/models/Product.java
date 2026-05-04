@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.models;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -88,6 +89,22 @@ public class Product {
 
     public BigDecimal getRecordCondition() {
         return recordCondition;
+    }
+
+    /** Truncated to 2 decimal places for display (legacy DB values). */
+    public BigDecimal getRecordConditionDisplay() {
+        if (recordCondition == null) {
+            return null;
+        }
+        return recordCondition.setScale(2, RoundingMode.DOWN);
+    }
+
+    /** Truncated to 2 decimal places for display (legacy DB values). */
+    public BigDecimal getSleeveConditionDisplay() {
+        if (sleeveCondition == null) {
+            return null;
+        }
+        return sleeveCondition.setScale(2, RoundingMode.DOWN);
     }
 
     public BigDecimal getPrice() {
