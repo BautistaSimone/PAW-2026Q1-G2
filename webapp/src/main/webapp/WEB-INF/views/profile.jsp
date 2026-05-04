@@ -516,7 +516,10 @@
                                                 <div class="profile-div-25" >
                                                     <span class="profile-span-26" >
                                                         <i class="bi bi-flag-fill" aria-hidden="true"></i>
-                                                        <spring:message code="Profile.reports.count" arguments="${rp.reportCount},${rp.reportCount}" />
+                                                        <spring:message code="Profile.reports.count">
+                                                            <spring:argument value="${rp.reportCount}" />
+                                                            <spring:argument value="${rp.reportCount}" />
+                                                        </spring:message>
                                                     </span>
                                                     <span class="profile-span-27" >
                                                         <spring:message code="Profile.reports.publishedBy" /> <a href="<c:url value='/profile?userId=${rp.ownerUserId}'/>" style="color: var(--color-accent); text-decoration: none; font-weight: 600;"><c:out value="${rp.ownerUsername}"/></a>

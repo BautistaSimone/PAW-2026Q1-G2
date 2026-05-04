@@ -183,7 +183,7 @@
                         <p><strong th:text="#{email.order.buyer.email}"></strong>
                         <span th:text="${buyerEmail}"></span></p>
 
-                        <p th:if="${!buyerShippingAddress != null}"
+                        <p th:if="${buyerShippingAddress == null}"
                         th:text="#{email.order.buyer.noAddress}">
                         </p>
                         </div>
