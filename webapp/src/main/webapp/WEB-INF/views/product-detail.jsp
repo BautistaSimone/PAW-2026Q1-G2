@@ -275,8 +275,8 @@
                                                                                 <i class="bi bi-star" style="color: #e0e0e0;"></i>
                                                                             </c:forEach>
                                                                         </div>
-                                                                        <c:if test="${not empty review.comment}">
-                                                                            <p style="margin: 0; font-size: 0.9rem; color: var(--color-text-muted); font-style: italic;">"<c:out value="${review.comment}" />"</p>
+                                                                        <c:if test="${not empty review.text}">
+                                                                            <p style="margin: 0; font-size: 0.9rem; color: var(--color-text-muted); font-style: italic;">"<c:out value="${review.text}" />"</p>
                                                                         </c:if>
                                                                     </div>
                                                                 </c:forEach>

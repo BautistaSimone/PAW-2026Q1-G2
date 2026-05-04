@@ -31,6 +31,28 @@ public class ProductServiceImpl implements ProductService {
         return t.isEmpty() ? null : t;
     }
 
+    private static String toTitleCase(final String s) {
+        final String t = trimToNull(s);
+        if (t == null) {
+            return null;
+        }
+        final String[] words = t.split("\\s+");
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < words.length; i++) {
+            final String word = words[i];
+            if (!word.isEmpty()) {
+                sb.append(Character.toUpperCase(word.charAt(0)));
+                if (word.length() > 1) {
+                    sb.append(word.substring(1).toLowerCase());
+                }
+                if (i < words.length - 1) {
+                    sb.append(" ");
+                }
+            }
+        }
+        return sb.toString();
+    }
+
     @Override
     public Product createProduct(
         final Long userId,
@@ -48,7 +70,7 @@ public class ProductServiceImpl implements ProductService {
         validateProductFields(title, artist, description, sleeveCondition, recordCondition, price);
 
         return productDao.createProduct(
-            userId, trimToNull(title), trimToNull(artist), trimToNull(recordLabel),
+            userId, trimToNull(title), trimToNull(artist), toTitleCase(recordLabel),
             trimToNull(catalogNumber), trimToNull(editionCountry), categoryIds, trimToNull(description),
             sleeveCondition, recordCondition, price
         );
@@ -168,7 +190,7 @@ public class ProductServiceImpl implements ProductService {
             productId,
             trimToNull(title),
             trimToNull(artist),
-            trimToNull(recordLabel),
+            toTitleCase(recordLabel),
             trimToNull(catalogNumber),
             trimToNull(editionCountry),
             categoryIds,
