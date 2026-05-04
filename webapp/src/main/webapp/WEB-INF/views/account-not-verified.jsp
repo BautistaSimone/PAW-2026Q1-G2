@@ -41,7 +41,8 @@
                         </c:if>
 
                         <!-- Resend verification email -->
-                        <form:form action="${pageContext.request.contextPath}/sendVerificationEmail" method="POST">
+                        <c:url var="sendVerificationUrl" value="/sendVerificationEmail" />
+                        <form:form action="${sendVerificationUrl}" method="POST">
                             <div class="d-grid mt-4">
                                 <button type="submit" class="btn-accent">
                                     <i class="bi bi-envelope"></i>

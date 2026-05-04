@@ -9,8 +9,9 @@
 <ui:layout title="${loginTitle}" bodyClass="auth-page-bg">
 
     <ui:header showHeaderActions="false"/>
+    <c:url var="loginUrl" value="/login" />
     <ui:login-form
-        action="${pageContext.request.contextPath}/login"
+        action="${loginUrl}"
         method="POST"
         buttonLabel="${loginButton}"
     />

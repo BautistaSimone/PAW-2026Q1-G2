@@ -8,8 +8,9 @@
 <spring:message code="Register.button" var="registerButton" />
 <ui:layout title="${registerTitle}" bodyClass="auth-page-bg">
     <ui:header showHeaderActions="false"/>
+    <c:url var="registerUrl" value="/register" />
     <ui:register-form
-        action="${pageContext.request.contextPath}/register"
+        action="${registerUrl}"
         method="POST"
         buttonLabel="${registerButton}"
     />

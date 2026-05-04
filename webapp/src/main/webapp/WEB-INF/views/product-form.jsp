@@ -169,7 +169,8 @@
                             </div>
                             <c:if test="${isEditing and hasExistingProductImages}">
                                 <form:hidden path="imageLayout" id="imageLayout" />
-                                <script type="application/json" id="existing-image-ids-json" data-context="<c:out value='${pageContext.request.contextPath}' />">[<c:forEach items="${existingProductImageIds}" var="iid" varStatus="st"><c:if test="${!st.first}">,</c:if><c:out value="${iid}" /></c:forEach>]</script>
+                                <c:url var="ctxPath" value="/" />
+                                <script type="application/json" id="existing-image-ids-json" data-context="<c:out value='${ctxPath}' />">[<c:forEach items="${existingProductImageIds}" var="iid" varStatus="st"><c:if test="${!st.first}">,</c:if><c:out value="${iid}" /></c:forEach>]</script>
                             </c:if>
                             <form:errors path="images" cssClass="text-danger" element="div" />
                             <span id="sellNoImagesMsg" class="d-none"><spring:message code="ProductForm.images.error.none" /></span>

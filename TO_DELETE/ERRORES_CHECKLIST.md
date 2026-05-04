@@ -366,7 +366,7 @@
 - **Código**: `value="${cat.id}"`, `${selectedCategoryIds.contains(cat.id) ? 'checked' : ''}`, `${selectedLabels.contains(lbl) ? ...}`
 - **Regla violada**: [4] / [6] `<c:out>` obligatorio
 
-### ⚠️ GRAVE — `${pageContext.request.contextPath}` en vez de `<c:url>`
+### ⚠️ GRAVE — `${pageContext.request.contextPath}` en vez de `<c:url>` - LISTO
 
 - **Archivo**: `webapp/src/main/webapp/WEB-INF/views/account-not-verified.jsp`
 - **Línea**: 44
@@ -713,7 +713,7 @@ Hay **CSS inline (style="...")** masivo en casi todas las vistas. Ejemplos repre
 
 ## 10. Unit Testing y Mocking
 
-### ⚠️ GRAVE — Uso de Mockito.verify()
+### ⚠️ GRAVE — Uso de Mockito.verify() - LISTO
 
 - **Archivo**: `services/src/test/java/ar/edu/itba/paw/services/PurchaseServiceImplTest.java`
 - **Línea**: 91–101, 127–135, 145–146
@@ -837,14 +837,14 @@ Falta en la mayoría de tests de persistencia:
 - **Código**: Clase sin `private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class)`
 - **Regla violada**: [11] Logger por clase
 
-### ⚠️ GRAVE — DEBUG en producción
+### ⚠️ GRAVE — DEBUG en producción - LISTO
 
 - **Archivo**: `webapp/src/main/resources/logback.xml`
 - **Línea**: 30–32
 - **Código**: `<logger name="ar.edu.itba.paw.services" level="DEBUG" additivity="false">`
 - **Regla violada**: [11] Producción NO en DEBUG (GRAVE)
 
-### Falta additivity="false"
+### Falta additivity="false" - LISTO
 
 - **Archivo**: `webapp/src/main/resources/logback.xml`
 - **Línea**: 26–28
