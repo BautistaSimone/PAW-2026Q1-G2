@@ -720,7 +720,7 @@ Hay **CSS inline (style="...")** masivo en casi todas las vistas. Ejemplos repre
 - **Código**: `inOrder.verify(productService).findById(...)`, `Mockito.verify(emailService)...`, `Mockito.verifyNoInteractions(emailService)`
 - **Regla violada**: [10] / [15.8] NO usar `Mockito.verify()` ni `verifyNoInteractions` — verificar output, no implementación
 
-### DAOs sin tests
+### DAOs sin tests -LISTOOO
 
 - `persistence/src/main/java/ar/edu/itba/paw/persistence/CategoryJdbcDao.java` — sin tests
 - `persistence/src/main/java/ar/edu/itba/paw/persistence/PurchaseJdbcDao.java` — sin tests
