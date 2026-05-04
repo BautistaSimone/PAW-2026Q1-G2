@@ -84,38 +84,38 @@
                         <p><strong th:text="#{email.order.label.product}"></strong>:
                         <span th:text="${productName}"></span></p>
 
-                        <p th:if="${formattedPurchaseDate}">
+                        <p th:if="${formattedPurchaseDate != null}">
                         <strong th:text="#{email.order.label.date}"></strong>:
                         <span th:text="${formattedPurchaseDate}"></span></p>
 
                         <p><strong th:text="#{email.order.label.status}"></strong>:
                         <span th:text="${purchaseStatusDescription}"></span></p>
 
-                        <p th:if="${recordLabel}">
+                        <p th:if="${recordLabel != null}">
                         <strong th:text="#{email.order.label.label}"></strong>:
                         <span th:text="${recordLabel}"></span>
                         </p>
 
-                        <p th:if="${editionCountry}">
+                        <p th:if="${editionCountry != null}">
                         <strong th:text="#{email.order.label.country}"></strong>:
                         <span th:text="${editionCountry}"></span>
                         </p>
 
-                        <p th:if="${productLocation}">
+                        <p th:if="${productLocation != null}">
                         <strong th:text="#{email.order.label.location}"></strong>:
                         <span th:text="${productLocation}"></span>
                         </p>
 
-                        <p th:if="${sleeveCondition or recordCondition}">
-                        <strong th:text="#{email.order.label.condition}"></strong>:
-                        <span>
-                        <span th:if="${sleeveCondition}">Tapa <span th:text="${sleeveCondition}"></span>/10</span>
-                        <span th:if="${recordCondition}"> Disco <span th:text="${recordCondition}"></span>/10</span>
-                        </span>
+                        <p th:if="${sleeveCondition != null or recordCondition != null}">
+                            <strong th:text="#{email.order.label.condition}"></strong>:
+                            <span>
+                            <span th:if="${sleeveCondition != null}">Tapa <span th:text="${sleeveCondition}"></span>/10</span>
+                            <span th:if="${recordCondition != null}"> Disco <span th:text="${recordCondition}"></span>/10</span>
+                            </span>
                         </p>
 
                         <p>
-                        <a th:if="${productUrl}"
+                        <a th:if="${productUrl != null}"
                         th:href="${productUrl}"
                         th:text="#{email.order.viewProduct}">
                         </a>
@@ -151,14 +151,14 @@
                         <p><strong th:text="#{email.order.seller.username}"></strong>
                         <span th:text="${sellerUsername}"></span></p>
 
-                        <p th:if="${sellerCbuCvu}">
+                        <p th:if="${sellerCbuCvu != null}">
                         <strong th:text="#{email.order.seller.bank}"></strong>
                         <span th:text="${sellerCbuCvu}"></span></p>
 
                         <p><strong th:text="#{email.order.seller.email}"></strong>
                         <span th:text="${sellerEmail}"></span></p>
 
-                        <p th:if="${!sellerCbuCvu}"
+                        <p th:if="${sellerCbuCvu == null}"
                         th:text="#{email.order.seller.noBank}">
                         </p>
                         </div>
@@ -170,18 +170,18 @@
                         <p><strong th:text="#{email.order.buyer.username}"></strong>
                         <span th:text="${buyerUsername}"></span></p>
 
-                        <p th:if="${buyerFullName}">
+                        <p th:if="${buyerFullName != null}">
                         <strong th:text="#{email.order.buyer.name}"></strong>
                         <span th:text="${buyerFullName}"></span></p>
 
-                        <p th:if="${buyerShippingAddress}">
+                        <p th:if="${buyerShippingAddress != null}">
                         <strong th:text="#{email.order.buyer.address}"></strong>
                         <span th:text="${buyerShippingAddress}"></span></p>
 
                         <p><strong th:text="#{email.order.buyer.email}"></strong>
                         <span th:text="${buyerEmail}"></span></p>
 
-                        <p th:if="${!buyerShippingAddress}"
+                        <p th:if="${!buyerShippingAddress != null}"
                         th:text="#{email.order.buyer.noAddress}">
                         </p>
                         </div>
