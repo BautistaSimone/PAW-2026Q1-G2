@@ -23,11 +23,11 @@
         <appender-ref ref="errors" />
     </root>
 
-    <logger name="ar.edu.itba.paw" level="INFO"> 
+    <logger name="ar.edu.itba.paw" level="INFO" additivity="false"> 
         <appender-ref ref="general" /> 
     </logger> 
 
-    <logger name="ar.edu.itba.paw.services" level="DEBUG" additivity="false"> 
+    <logger name="ar.edu.itba.paw.services" level="INFO" additivity="false"> 
         <appender-ref ref="general" /> 
     </logger> 
 </configuration>

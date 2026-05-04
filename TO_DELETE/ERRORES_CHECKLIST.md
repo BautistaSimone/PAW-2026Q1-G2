@@ -837,14 +837,14 @@ Falta en la mayoría de tests de persistencia:
 - **Código**: Clase sin `private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class)`
 - **Regla violada**: [11] Logger por clase
 
-### ⚠️ GRAVE — DEBUG en producción
+### ⚠️ GRAVE — DEBUG en producción - LISTO
 
 - **Archivo**: `webapp/src/main/resources/logback.xml`
 - **Línea**: 30–32
 - **Código**: `<logger name="ar.edu.itba.paw.services" level="DEBUG" additivity="false">`
 - **Regla violada**: [11] Producción NO en DEBUG (GRAVE)
 
-### Falta additivity="false"
+### Falta additivity="false" - LISTO
 
 - **Archivo**: `webapp/src/main/resources/logback.xml`
 - **Línea**: 26–28
