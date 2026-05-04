@@ -8,6 +8,9 @@ import java.util.Locale;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -25,6 +28,8 @@ import ar.edu.itba.paw.models.User;
 
 @Service
 public class EmailServiceImpl implements EmailService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     private static final DateTimeFormatter PURCHASE_DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final Locale PRICE_LOCALE = Locale.forLanguageTag("es-AR");
@@ -115,9 +120,9 @@ public class EmailServiceImpl implements EmailService {
             messageHelper.setText(htmlContent, true);
 
             javaMailSender.send(mimeMessage);
-            System.out.println("Product report email sent for product: " + product.getId());
+            LOGGER.info("Product report email sent for product: {}", product.getId());
         } catch (MessagingException e) {
-            e.printStackTrace();
+            LOGGER.error("Error sending product report email for product: {}", product.getId(), e);
         }
     }
 
@@ -151,7 +156,7 @@ public class EmailServiceImpl implements EmailService {
             javaMailSender.send(mimeMessage);
 
         } catch (MessagingException e) {
-            e.printStackTrace();
+            LOGGER.error("Error sending password reset email to: {}", to, e);
         }
     }
 
@@ -183,7 +188,7 @@ public class EmailServiceImpl implements EmailService {
 
             javaMailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            e.printStackTrace();
+            LOGGER.error("Error sending verification email to: {}", to, e);
         }
     }
 
@@ -246,10 +251,10 @@ public class EmailServiceImpl implements EmailService {
             messageHelper.setText(htmlContent, true);
 
             javaMailSender.send(mimeMessage);
-            System.out.println("Email effectively sent to: " + to + " | Action URL: " + actionUrl);
+            LOGGER.info("Email effectively sent to: {} | Action URL: {}", to, actionUrl);
 
         } catch (MessagingException e) {
-            e.printStackTrace();
+            LOGGER.error("Error sending order email to: {} for purchase: {}", to, purchase.getPurchaseId(), e);
         }
     }
 

@@ -77,7 +77,7 @@
 - **Código**: `@Component`
 - **Regla violada**: [3] Anotaciones correctas: `@Service` para servicios
 
-### Modelo con SQL acoplado
+### Modelo con SQL acoplado-LISTO
 
 - **Archivo**: `models/src/main/java/ar/edu/itba/paw/models/ProductSortOrder.java`
 - **Línea**: 7–14
@@ -807,7 +807,7 @@ Falta en la mayoría de tests de persistencia:
 
 ## 11. Logging
 
-### ⚠️ GRAVE — System.out.println y printStackTrace
+### ⚠️ GRAVE — System.out.println y printStackTrace - LISTO
 
 - **Archivo**: `services/src/main/java/ar/edu/itba/paw/services/EmailServiceImpl.java`
 - **Línea**: 119
@@ -824,14 +824,14 @@ Falta en la mayoría de tests de persistencia:
 - **Código**: `e.printStackTrace();`
 - **Regla violada**: [11] / [15.5] NUNCA printStackTrace() — usar SLF4J con throwable como último argumento
 
-### Excepciones suprimidas (catch sin log/rethrow)
+### Excepciones suprimidas (catch sin log/rethrow) - LISTO
 
 - **Archivo**: `services/src/main/java/ar/edu/itba/paw/services/EmailServiceImpl.java`
 - **Línea**: 120–122, 150–152, 178–180, 244–246
 - **Código**: `} catch (MessagingException e) { e.printStackTrace(); }` — sin logger ni rethrow
 - **Regla violada**: [11] / [15.5] No suprimir excepciones
 
-### Falta logger en EmailServiceImpl
+### Falta logger en EmailServiceImpl - LISTO
 
 - **Archivo**: `services/src/main/java/ar/edu/itba/paw/services/EmailServiceImpl.java`
 - **Código**: Clase sin `private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class)`

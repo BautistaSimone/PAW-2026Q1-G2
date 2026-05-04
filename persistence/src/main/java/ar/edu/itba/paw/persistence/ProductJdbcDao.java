@@ -83,6 +83,19 @@ public class ProductJdbcDao implements ProductDao {
         }
     }
 
+    private static String orderBySql(final ProductSortOrder sortOrder) {
+        return switch (sortOrder) {
+            case NEWEST -> "p.published DESC, p.product_id DESC";
+            case OLDEST -> "p.published ASC, p.product_id ASC";
+            case PRICE_ASC -> "p.price ASC";
+            case PRICE_DESC -> "p.price DESC";
+            case NAME_ASC -> "LOWER(p.title) ASC";
+            case NAME_DESC -> "LOWER(p.title) DESC";
+            case CONDITION_DESC -> "(p.sleeve_condition + p.record_condition) / 2.0 DESC";
+            case CONDITION_ASC -> "(p.sleeve_condition + p.record_condition) / 2.0 ASC";
+        };
+    }
+
     private Product mapProduct(
         final Long productId,
         final Long userId,
@@ -261,7 +274,7 @@ public class ProductJdbcDao implements ProductDao {
             "FROM products p "
         ).append(whereSql);
 
-        selectSql.append(" ORDER BY ").append(criteria.getSortOrder().getSqlOrderBy()).append(" LIMIT ? OFFSET ?");
+        selectSql.append(" ORDER BY ").append(orderBySql(criteria.getSortOrder())).append(" LIMIT ? OFFSET ?");
         args.add(criteria.getPageSize());
         args.add((criteria.getPage() - 1) * criteria.getPageSize());
 
@@ -301,7 +314,7 @@ public class ProductJdbcDao implements ProductDao {
             "SELECT p.product_id, p.user_id, p.title, p.artist, p.record_label, p.catalog_number, p.edition_country, p.description, " +
             "p.sleeve_condition, p.record_condition, p.published, p.price " +
             "FROM products p " + whereSql +
-            "ORDER BY " + ProductSortOrder.NEWEST.getSqlOrderBy() + " LIMIT ? OFFSET ?";
+            "ORDER BY " + orderBySql(ProductSortOrder.NEWEST) + " LIMIT ? OFFSET ?";
         selectArgs.add(safePageSize);
         selectArgs.add((safePage - 1) * safePageSize);
 
