@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.webapp.mailing;
+package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.services.EmailService;
 
