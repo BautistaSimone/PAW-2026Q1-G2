@@ -109,8 +109,10 @@
                         <p th:if="${sleeveCondition != null or recordCondition != null}">
                             <strong th:text="#{email.order.label.condition}"></strong>:
                             <span>
-                            <span th:if="${sleeveCondition != null}">Tapa <span th:text="${sleeveCondition}"></span>/10</span>
-                            <span th:if="${recordCondition != null}"> Disco <span th:text="${recordCondition}"></span>/10</span>
+
+                        <p th:utext="#{email.order.next.pending(${amount})}"></p>
+                            <span th:if="${sleeveCondition != null}">Tapa <span th:utext="#{email.condition.cover(${sleeveCondition})}"></span>/10</span>
+                            <span th:if="${recordCondition != null}"> Disco <span th:utext="#{email.condition.disk(${recordCondition})}"></span>/10</span>
                             </span>
                         </p>
 
