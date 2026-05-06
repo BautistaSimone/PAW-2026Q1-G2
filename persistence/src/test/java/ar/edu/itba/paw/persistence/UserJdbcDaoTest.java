@@ -23,7 +23,7 @@ import ar.edu.itba.paw.models.User;
 public class UserJdbcDaoTest {
 
     @Autowired
-    private UserJdbcDao userDao;
+    private UserJpaDao userDao;
 
     @Autowired
     private DataSource dataSource;

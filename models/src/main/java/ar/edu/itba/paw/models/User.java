@@ -1,10 +1,30 @@
 package ar.edu.itba.paw.models;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Id;
+import javax.persistence.Column;
+
+@Entity
+@Table(name = "users")
 public class User {
 
-    private final Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_userid_seq")
+    @SequenceGenerator(sequenceName = "users_userid_seq", name = "users_userid_seq", allocationSize = 1)
+    @Column(name = "user_id")
+    private Long id;
+
+    @Column(length = 255, nullable = false, unique = true)
     private final String email;
+
+    @Column(length = 255, nullable = false)
     private final String password;
+    
+    @Column(length = 255, nullable = false)
     private final String username;
     private final Boolean mod;
     private final Boolean enabled;
@@ -19,7 +39,6 @@ public class User {
     private final String cbuCvu;
 
     public User(
-            final Long id,
             final String email,
             final String password,
             final String username,
@@ -34,7 +53,6 @@ public class User {
             final String province,
             final String extraAddressInfo,
             final String cbuCvu) {
-        this.id = id;
         this.email = email;
         this.password = password;
         this.username = username;
@@ -49,11 +67,6 @@ public class User {
         this.province = province;
         this.extraAddressInfo = extraAddressInfo;
         this.cbuCvu = cbuCvu;
-    }
-
-    /** Backward-compatible constructor: profile fields are null. */
-    public User(final Long id, final String email, final String password, final String username, final Boolean mod) {
-        this(id, email, password, username, mod, false, false, null, null, null, null, null, null, null, null);
     }
 
     private static boolean nonBlank(final String s) {

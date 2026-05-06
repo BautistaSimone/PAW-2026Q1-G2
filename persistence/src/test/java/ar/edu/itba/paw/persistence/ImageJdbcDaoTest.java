@@ -31,7 +31,7 @@ public class ImageJdbcDaoTest {
     private ProductJdbcDao productDao;
 
     @Autowired
-    private UserJdbcDao userDao;
+    private UserJpaDao userDao;
 
     @Test
     public void testCreateImageStoresBinaryDataAndContentType() {
