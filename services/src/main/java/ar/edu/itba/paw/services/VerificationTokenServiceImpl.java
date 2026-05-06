@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import ar.edu.itba.paw.models.Token;
+import ar.edu.itba.paw.models.VerificationToken;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.persistence.VerificationTokenDao;
 
@@ -38,7 +38,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         this.emailService = emailService;
     }
 
-    private boolean isTokenExpired(Token verificationToken) {
+    private boolean isTokenExpired(VerificationToken verificationToken) {
         return verificationToken.getExpirationDate().isBefore(Instant.now());
     }
 
@@ -78,13 +78,13 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Token> findByUserId(final Long userId) {
+    public Optional<VerificationToken> findByUserId(final Long userId) {
 		return verificationTokenDao.findByUserId(userId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Token> findByToken(final String token) {
+    public Optional<VerificationToken> findByToken(final String token) {
         return verificationTokenDao.findByToken(token);
     }
 

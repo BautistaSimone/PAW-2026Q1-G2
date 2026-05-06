@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import ar.edu.itba.paw.models.Token;
+import ar.edu.itba.paw.models.PasswordToken;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.persistence.PasswordTokenDao;
 
@@ -36,7 +36,7 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
         this.emailService = emailService;
     }
 
-    private boolean isTokenExpired(Token passToken) {
+    private boolean isTokenExpired(PasswordToken passToken) {
         return passToken.getExpirationDate().isBefore(Instant.now());
     }
 
@@ -74,13 +74,13 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Token> findByUserId(final Long userId) {
+    public Optional<PasswordToken> findByUserId(final Long userId) {
 		return passwordTokenDao.findByUserId(userId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Token> findByToken(final String token) {
+    public Optional<PasswordToken> findByToken(final String token) {
         return passwordTokenDao.findByToken(token);
     }
 
