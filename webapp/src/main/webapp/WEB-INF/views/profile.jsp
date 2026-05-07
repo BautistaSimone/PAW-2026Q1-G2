@@ -340,12 +340,12 @@
                                                 </div>
                                             </div>
                                             <div class="profile-div-14" >
-                                                <a href="<c:url value='/purchases/${purchase.purchaseId}?token=${purchase.buyerToken}'/>"
+                                                <a href="<c:url value='/purchases/${purchase.purchaseId}'/>"
                                                    class="btn btn-retro btn-retro-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
                                                     <i class="bi bi-eye" aria-hidden="true"></i> <spring:message code="Profile.reports.view" />
                                                 </a>
                                                 <c:if test="${purchase.status eq 'DELIVERED' and not purchaseHasReview[purchase.purchaseId]}">
-                                                    <a href="<c:url value='/purchases/${purchase.purchaseId}/review?token=${purchase.buyerToken}'/>"
+                                                    <a href="<c:url value='/purchases/${purchase.purchaseId}/review'/>"
                                                        class="btn btn-retro btn-retro-primary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
                                                         <i class="bi bi-star" aria-hidden="true"></i> <spring:message code="PurchasePanel.buyer.delivered.review" />
                                                     </a>
@@ -397,7 +397,7 @@
                                                 </div>
                                             </div>
                                             <div class="profile-div-14" >
-                                                <a href="<c:url value='/purchases/${sale.purchaseId}?token=${sale.sellerToken}'/>"
+                                                <a href="<c:url value='/purchases/${sale.purchaseId}'/>"
                                                    class="btn btn-retro btn-retro-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
                                                     <i class="bi bi-eye" aria-hidden="true"></i> <spring:message code="Profile.reports.view" />
                                                 </a>

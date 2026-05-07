@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
@@ -79,20 +78,29 @@ public class PurchaseController {
         } catch (IllegalArgumentException e) {
             return new ModelAndView("redirect:/products/" + form.getProductId() + "?purchaseError=1");
         }
-        return new ModelAndView("redirect:/purchases/" + purchase.getPurchaseId() + "?token=" + purchase.getBuyerToken());
+        return new ModelAndView("redirect:/purchases/" + purchase.getPurchaseId());
     }
 
     @RequestMapping(value = "/purchases/{id:\\d+}", method = RequestMethod.GET)
     public ModelAndView getPurchase(
+        @AuthenticationPrincipal PawAuthUser authUser,
         @PathVariable("id") final Long id,
-        @RequestParam("token") final String token,
         @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form
     ) {
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        final Long userId = authUser.getUser().getId();
+
         Purchase purchase = purchaseService.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
 
-        if (!token.equals(purchase.getBuyerToken()) && !token.equals(purchase.getSellerToken())) {
-            throw new IllegalArgumentException("Invalid token for this purchase");
+        final boolean isBuyer = userId.equals(purchase.getBuyerId());
+        final boolean isSeller = userId.equals(purchase.getSellerId());
+
+        if (!isBuyer && !isSeller) {
+            throw new IllegalArgumentException("You are not authorized to view this purchase");
         }
 
         Product product = productService.findById(purchase.getProductId())
@@ -110,10 +118,8 @@ public class PurchaseController {
         mav.addObject("product", product);
         mav.addObject("orderBuyer", orderBuyer);
         mav.addObject("orderSeller", orderSeller);
-        boolean isBuyer = token.equals(purchase.getBuyerToken());
         mav.addObject("isBuyer", isBuyer);
-        mav.addObject("isSeller", token.equals(purchase.getSellerToken()));
-        mav.addObject("token", token);
+        mav.addObject("isSeller", isSeller);
 
         if (isBuyer && purchase.getStatus() == PurchaseStatus.DELIVERED) {
             mav.addObject("hasReview", reviewService.findByPurchaseId(id).isPresent());
@@ -124,12 +130,17 @@ public class PurchaseController {
 
     @RequestMapping(value = "/purchases/{id:\\d+}/status", method = RequestMethod.POST)
     public ModelAndView updateStatus(
+        @AuthenticationPrincipal PawAuthUser authUser,
         @PathVariable("id") final Long id,
         @Valid @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form,
         final BindingResult errors
     ) {
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
         if (errors.hasErrors()) {
-            return getPurchase(id, form.getToken(), form);
+            return getPurchase(authUser, id, form);
         }
 
         PurchaseStatus statusObj;
@@ -137,15 +148,18 @@ public class PurchaseController {
             statusObj = PurchaseStatus.valueOf(form.getNewStatus());
         } catch (IllegalArgumentException e) {
             errors.rejectValue("newStatus", "Pattern.purchaseForm.newStatus");
-            return getPurchase(id, form.getToken(), form);
+            return getPurchase(authUser, id, form);
         }
 
-        Purchase updated = purchaseService.updateStatus(id, form.getToken(), statusObj);
+        Purchase updated = purchaseService.updateStatus(id, authUser.getUser().getId(), statusObj);
 
-        if (statusObj == PurchaseStatus.DELIVERED && form.getToken().equals(updated.getBuyerToken())) {
-            return new ModelAndView("redirect:/purchases/" + id + "/review?token=" + form.getToken());
+        if (statusObj == PurchaseStatus.DELIVERED) {
+            final boolean isBuyer = authUser.getUser().getId().equals(updated.getBuyerId());
+            if (isBuyer) {
+                return new ModelAndView("redirect:/purchases/" + id + "/review");
+            }
         }
 
-        return new ModelAndView("redirect:/purchases/" + id + "?token=" + form.getToken() + "&updated=1");
+        return new ModelAndView("redirect:/purchases/" + id + "?updated=1");
     }
 }

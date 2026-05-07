@@ -15,9 +15,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import java.util.Locale;
 
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
@@ -124,7 +121,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Transactional
-    public Purchase updateStatus(Long purchaseId, String token, PurchaseStatus newStatus) {
+    public Purchase updateStatus(Long purchaseId, Long userId, PurchaseStatus newStatus) {
         final Purchase purchase = purchaseDao.findById(purchaseId)
             .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
 
@@ -137,11 +134,11 @@ public class PurchaseServiceImpl implements PurchaseService {
         final User buyer = userService.findById(purchase.getBuyerId())
             .orElseThrow(() -> new IllegalStateException("Buyer missing"));
 
-        boolean isBuyer = MessageDigest.isEqual(token.getBytes(StandardCharsets.UTF_8), purchase.getBuyerToken().getBytes(StandardCharsets.UTF_8));
-        boolean isSeller = MessageDigest.isEqual(token.getBytes(StandardCharsets.UTF_8), purchase.getSellerToken().getBytes(StandardCharsets.UTF_8));
+        final boolean isBuyer = userId.equals(purchase.getBuyerId());
+        final boolean isSeller = userId.equals(purchase.getSellerId());
 
         if (!isBuyer && !isSeller) {
-            throw new IllegalArgumentException("Invalid token for this purchase");
+            throw new IllegalArgumentException("You are not authorized to update this purchase");
         }
 
         // State Machine Validations

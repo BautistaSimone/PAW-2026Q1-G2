@@ -121,7 +121,6 @@
                                             <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
                                             <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}" data-single-submit="true">
                                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                                <input type="hidden" name="token" value="${token}" />
                                                 <input type="hidden" name="newStatus" value="PAID" />
                                                 <button type="submit" class="btn btn-retro btn-retro-primary w-100 btn-lg">
                                                     <i class="bi bi-credit-card" aria-hidden="true"></i> <spring:message code="PurchasePanel.buyer.pending.notifyPaid" />
@@ -148,7 +147,6 @@
                                             <c:url var="statusPostUrl" value='/purchases/${purchase.purchaseId}/status'/>
                                             <form:form modelAttribute="purchaseStatusForm" method="POST" action="${statusPostUrl}" data-single-submit="true">
                                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                                <input type="hidden" name="token" value="${token}" />
                                                 <input type="hidden" name="newStatus" value="DELIVERED" />
                                                 <button type="submit" class="btn btn-retro btn-retro-primary w-100 btn-lg purchase-panel-button-4" >
                                                     <i class="bi bi-check2-circle" aria-hidden="true"></i> <spring:message code="PurchasePanel.buyer.shipped.confirmDelivery" />
@@ -162,7 +160,7 @@
                                                 <br/><spring:message code="PurchasePanel.buyer.delivered.success" />
                                             </div>
                                             <c:if test="${not hasReview}">
-                                                <a href="<c:url value='/purchases/${purchase.purchaseId}/review?token=${token}'/>"
+                                                <a href="<c:url value='/purchases/${purchase.purchaseId}/review'/>"
                                                    class="btn btn-retro btn-retro-primary w-100 btn-lg mt-3">
                                                     <i class="bi bi-star" aria-hidden="true"></i> <spring:message code="PurchasePanel.buyer.delivered.review" />
                                                 </a>
