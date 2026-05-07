@@ -72,7 +72,7 @@ public class EmailServiceImpl implements EmailService {
             final User buyer,
             final User seller,
             final PurchaseStatus currentStatus) {
-        final String tokenUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId() + "?token=" + purchase.getBuyerToken());
+        final String tokenUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId());
         sendOrderEmail(to, product, purchase, title, message, tokenUrl, buyer, seller, true, currentStatus);
     }
 
@@ -88,7 +88,7 @@ public class EmailServiceImpl implements EmailService {
             final User buyer,
             final User seller,
             final PurchaseStatus currentStatus) {
-        final String tokenUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId() + "?token=" + purchase.getSellerToken());
+        final String tokenUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId());
         sendOrderEmail(to, product, purchase, title, message, tokenUrl, buyer, seller, false, currentStatus);
     }
 

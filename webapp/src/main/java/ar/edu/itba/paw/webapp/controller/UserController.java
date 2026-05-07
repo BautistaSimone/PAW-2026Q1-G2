@@ -162,6 +162,10 @@ public class UserController {
         @RequestParam(value = "page", defaultValue = "1") final int page,
         @RequestParam(value = "trashPage", defaultValue = "1") final int trashPage
     ) {
+        if (page < 1 || trashPage < 1) {
+            throw new IllegalArgumentException("Page number must be positive");
+        }
+
         final boolean isOwnProfile;
         final User profileUser;
 
@@ -359,6 +363,10 @@ public class UserController {
         @AuthenticationPrincipal final PawAuthUser authUser,
         @RequestParam(value = "page", defaultValue = "1") final int page
     ) {
+        if (page < 1) {
+            throw new IllegalArgumentException("Page number must be positive");
+        }
+
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }

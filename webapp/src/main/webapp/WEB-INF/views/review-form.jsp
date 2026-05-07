@@ -11,7 +11,7 @@
                                 <div class="row justify-content-center">
                                     <div class="col-lg-7 col-xl-6">
                                         <div class="mb-3 d-flex flex-wrap align-items-center gap-3">
-                                            <a href="<c:url value='/purchases/${purchase.purchaseId}?token=${token}'/>"
+                                            <a href="<c:url value='/purchases/${purchase.purchaseId}'/>"
                                                 style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none; transition: color 0.2s;"
                                                 onmouseover="this.style.color='var(--color-accent)';"
                                                 onmouseout="this.style.color='var(--color-text-muted)';">
@@ -62,7 +62,6 @@
 
                                                 <c:url var="reviewPostUrl"
                                                     value="/purchases/${purchase.purchaseId}/review">
-                                                    <c:param name="token" value="${token}" />
                                                 </c:url>
                                                 <form:form modelAttribute="reviewForm" method="POST"
                                                     action="${reviewPostUrl}" data-single-submit="true">
@@ -117,7 +116,7 @@
                                                 </form:form>
 
                                                 <div class="text-center mt-3">
-                                                    <a href="<c:url value='/purchases/${purchase.purchaseId}?token=${token}'/>"
+                                                    <a href="<c:url value='/purchases/${purchase.purchaseId}'/>"
                                                         style="color: var(--color-text-muted); text-decoration: none; font-size: 0.9rem;">
                                                         <spring:message code="ReviewForm.skip" />
                                                     </a>
