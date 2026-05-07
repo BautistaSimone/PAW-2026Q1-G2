@@ -349,7 +349,7 @@
                                                             <c:url var="profileUpdateUrl" value="/profile/update" />
                                                             <form:form modelAttribute="userProfileForm"
                                                                 action="${profileUpdateUrl}" method="post"
-                                                                cssClass="user-profile-form" id="profileForm">
+                                                                cssClass="user-profile-form" id="profileForm" novalidate="true">
                                                                 <input type="hidden" name="${_csrf.parameterName}"
                                                                     value="${_csrf.token}" />
                                                                 <div class="row g-2">

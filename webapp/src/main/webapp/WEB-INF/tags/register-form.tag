@@ -18,7 +18,8 @@
                 <div class="auth-card-body">
                     <form:form modelAttribute="registerForm"
                             action="${action}"
-                            method="${method}">
+                            method="${method}"
+                            novalidate="novalidate">
                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                         <div class="row g-2">
