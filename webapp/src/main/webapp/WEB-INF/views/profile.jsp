@@ -411,6 +411,9 @@
                                 <div class="empty-products-state">
                                     <i class="bi bi-shop profile-i-4" ></i>
                                     <p class="profile-p-5" ><spring:message code="Profile.sales.empty" /></p>
+                                    <a href="<c:url value='/products/new'/>" class="btn btn-retro btn-retro-primary" style="justify-self: center;">
+                                        <i class="bi bi-plus-lg" aria-hidden="true"></i> <spring:message code="Profile.sales.publishVinyl" />
+                                    </a>
                                 </div>
                             </c:otherwise>
                         </c:choose>
