@@ -197,6 +197,7 @@ public class UserController {
         if (errors.hasErrors()) {
             final ModelAndView mv = new ModelAndView("profile");
             enrichProfileModel(mv, profileUser, true, authUser, 1, 1);
+            mv.addObject("hasProfileUpdateErrors", true);
             mv.addObject("userProfileForm", form);
             return mv;
         }

@@ -6,7 +6,7 @@
                     <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
                         <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
                             <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-                                <c:set var="activeMyData" value="${isOwnProfile and param.tab eq 'mydata'}" />
+                                <c:set var="activeMyData" value="${isOwnProfile and (param.tab eq 'mydata' or hasProfileUpdateErrors)}" />
                                 <c:set var="activePurchases" value="${isOwnProfile and param.tab eq 'purchases'}" />
                                 <c:set var="activeSales" value="${isOwnProfile and param.tab eq 'sales'}" />
                                 <c:set var="activeReviews" value="${param.tab eq 'reviews'}" />
