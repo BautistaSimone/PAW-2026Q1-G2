@@ -3069,6 +3069,33 @@ details.filter-section:not([open]) .filter-section-chevron {
     color: #fff;
 }
 
+.btn-retro-danger {
+    background: #e63946;
+    color: #fff;
+    border: 1.5px solid #e63946;
+}
+
+.btn-retro-danger:hover {
+    background: #d62828;
+    border-color: #d62828;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+    color: #fff;
+}
+
+.btn-retro-danger-outline {
+    background: transparent;
+    color: #e63946;
+    border: 1.5px solid #e63946;
+}
+
+.btn-retro-danger-outline:hover {
+    background: #e63946;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+}
+
 .btn-retro-dark {
     background: var(--color-text-main);
     color: #fff;

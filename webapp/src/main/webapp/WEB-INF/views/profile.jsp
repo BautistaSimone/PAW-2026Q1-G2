@@ -829,7 +829,8 @@
                                                                                         name="productId"
                                                                                         value="<c:out value='${rp.productId}'/>" />
                                                                                     <button type="submit"
-                                                                                        class="btn btn-retro btn-retro-secondary profile-button-29"
+                                                                                        class="btn btn-retro btn-retro-danger-outline"
+                                                                                        style="font-size: 0.78rem; padding: 0.35rem 0.7rem;"
                                                                                         title="${hideText}">
                                                                                         <i class="bi bi-x-circle"
                                                                                             aria-hidden="true"></i>
@@ -865,7 +866,8 @@
                                                                                     <input type="hidden" name="userId"
                                                                                         value="<c:out value='${rp.ownerUserId}'/>" />
                                                                                     <button type="submit"
-                                                                                        class="btn btn-retro btn-retro-secondary profile-button-30"
+                                                                                        class="btn btn-retro btn-retro-danger"
+                                                                                        style="font-size: 0.78rem; padding: 0.35rem 0.7rem;"
                                                                                         title="${banText}">
                                                                                         <i class="bi bi-person-x"
                                                                                             aria-hidden="true"></i>
