@@ -87,7 +87,7 @@ public class ReportJdbcDaoTest {
         reportDao.create(productId, ownerId, otherReporterId);
         reportDao.create(otherProductId, ownerId, reporterId);
 
-        final List<ReportedProduct> reportedProducts = reportDao.findAllGroupedByProduct();
+        final List<ReportedProduct> reportedProducts = reportDao.findAllGroupedByProduct(1, 10).getResults();
 
         Assertions.assertEquals(2, reportedProducts.size());
         final ReportedProduct mostReported = reportedProducts.get(0);

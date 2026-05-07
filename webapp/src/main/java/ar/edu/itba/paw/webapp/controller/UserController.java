@@ -309,9 +309,10 @@ public class UserController {
             // Load reports for admins (checked via Spring Security role)
             if (authUser != null && authUser.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-                final List<ar.edu.itba.paw.models.ReportedProduct> reportedProducts = reportService
-                        .findAllGroupedByProduct();
-                mv.addObject("reportedProducts", reportedProducts);
+                final PaginatedResult<ar.edu.itba.paw.models.ReportedProduct> reportsPage = reportService
+                        .findAllGroupedByProduct(page, PROFILE_OTHER_PAGE_SIZE);
+                mv.addObject("reportsPage", reportsPage);
+                mv.addObject("reportedProducts", reportsPage.getResults());
             }
 
             final PaginatedResult<Product> deletedPage = productService.listUserDeletedProducts(profileUser.getId(),

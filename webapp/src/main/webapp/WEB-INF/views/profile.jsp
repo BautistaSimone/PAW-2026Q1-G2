@@ -876,6 +876,7 @@
                                                                         </div>
                                                                     </c:forEach>
                                                                 </div>
+                                                                <ui:pagination result="${reportsPage}" />
                                                             </c:when>
                                                             <c:otherwise>
                                                                 <div class="empty-products-state">
