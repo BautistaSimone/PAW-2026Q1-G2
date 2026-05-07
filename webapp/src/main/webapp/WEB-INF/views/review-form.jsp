@@ -78,7 +78,8 @@
                                                                 <input type="radio" name="score" id="star${i}"
                                                                     value="${i}" class="star-radio" ${reviewForm.score
                                                                     !=null && reviewForm.score==i ? 'checked' : '' } />
-                                                                <spring:message code="ReviewForm.score.star" var="starTitle">
+                                                                <spring:message code="ReviewForm.score.star"
+                                                                    var="starTitle">
                                                                     <spring:argument value="${i}" />
                                                                     <spring:argument value="${i}" />
                                                                 </spring:message>

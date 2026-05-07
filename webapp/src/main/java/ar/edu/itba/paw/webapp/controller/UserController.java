@@ -60,13 +60,13 @@ public class UserController {
 
     @Autowired
     public UserController(
-        final UserService userService,
-        final ProductService productService,
-        final ImageService imageService,
-        final PurchaseService purchaseService,
-        final ReviewService reviewService,
-        final ReportService reportService,
-        final VerificationTokenService verificationTokenService) {
+            final UserService userService,
+            final ProductService productService,
+            final ImageService imageService,
+            final PurchaseService purchaseService,
+            final ReviewService reviewService,
+            final ReportService reportService,
+            final VerificationTokenService verificationTokenService) {
 
         this.userService = userService;
         this.productService = productService;
@@ -91,9 +91,8 @@ public class UserController {
 
     @RequestMapping(value = "/register")
     public ModelAndView register(
-        @AuthenticationPrincipal PawAuthUser authUser,
-        @ModelAttribute RegisterForm form
-        ) {
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @ModelAttribute RegisterForm form) {
 
         // Don't allow logged in users
         if (authUser != null)
@@ -106,9 +105,8 @@ public class UserController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ModelAndView createUser(
-        @Valid @ModelAttribute RegisterForm form,
-        final BindingResult errors
-        ) {
+            @Valid @ModelAttribute RegisterForm form,
+            final BindingResult errors) {
 
         ModelAndView mv = new ModelAndView("register");
         mv.addObject("registerForm", form);
@@ -144,10 +142,9 @@ public class UserController {
         final PawAuthUser authUser = new PawAuthUser(user);
 
         final Authentication auth = new UsernamePasswordAuthenticationToken(
-            authUser,
-            null,
-            authUser.getAuthorities()
-        );
+                authUser,
+                null,
+                authUser.getAuthorities());
 
         SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -157,28 +154,23 @@ public class UserController {
 
     @RequestMapping(value = "/profile")
     public ModelAndView profile(
-        @AuthenticationPrincipal PawAuthUser authUser,
-        @RequestParam(value = "userId", required = false) final Long userId,
-        @RequestParam(value = "page", defaultValue = "1") final int page,
-        @RequestParam(value = "trashPage", defaultValue = "1") final int trashPage
-    ) {
-        if (page < 1 || trashPage < 1) {
-            throw new IllegalArgumentException("Page number must be positive");
-        }
-
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @RequestParam(value = "userId", required = false) final Long userId,
+            @RequestParam(value = "page", defaultValue = "1") final int page,
+            @RequestParam(value = "trashPage", defaultValue = "1") final int trashPage) {
         final boolean isOwnProfile;
         final User profileUser;
 
         if (userId != null) {
             profileUser = userService.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
             isOwnProfile = (authUser != null && authUser.getUser().getId().equals(userId));
         } else {
             if (authUser == null) {
                 return new ModelAndView("redirect:/login");
             }
             profileUser = userService.findById(authUser.getUser().getId())
-                .orElseThrow(() -> new IllegalStateException("User not found"));
+                    .orElseThrow(() -> new IllegalStateException("User not found"));
             isOwnProfile = true;
         }
 
@@ -192,16 +184,15 @@ public class UserController {
 
     @RequestMapping(value = "/profile/update", method = RequestMethod.POST)
     public ModelAndView updateProfile(
-        @AuthenticationPrincipal PawAuthUser authUser,
-        @Valid @ModelAttribute("userProfileForm") final UserProfileForm form,
-        final BindingResult errors
-    ) {
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @Valid @ModelAttribute("userProfileForm") final UserProfileForm form,
+            final BindingResult errors) {
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }
 
         final User profileUser = userService.findById(authUser.getUser().getId())
-            .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new IllegalStateException("User not found"));
 
         if (errors.hasErrors()) {
             final ModelAndView mv = new ModelAndView("profile");
@@ -211,18 +202,18 @@ public class UserController {
         }
 
         userService.updateUserProfile(
-            profileUser.getId(),
-            form.getFirstName(),
-            form.getLastName(),
-            form.getStreetName(),
-            form.getStreetNumber(),
-            form.getNeighborhood(),
-            form.getProvince(),
-            form.getExtraAddressInfo(),
-            form.getCbuCvu());
+                profileUser.getId(),
+                form.getFirstName(),
+                form.getLastName(),
+                form.getStreetName(),
+                form.getStreetNumber(),
+                form.getNeighborhood(),
+                form.getProvince(),
+                form.getExtraAddressInfo(),
+                form.getCbuCvu());
 
         final User refreshed = userService.findById(profileUser.getId())
-            .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new IllegalStateException("User not found"));
         refreshAuthenticationPrincipal(authUser, refreshed);
 
         return new ModelAndView("redirect:/profile?tab=mydata&updated=1");
@@ -231,42 +222,39 @@ public class UserController {
     private static void refreshAuthenticationPrincipal(final PawAuthUser current, final User refreshedUser) {
         final Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
         final PawAuthUser newPrincipal = new PawAuthUser(
-            refreshedUser.getEmail(),
-            refreshedUser.getPassword(),
-            current.isEnabled(),
-            current.isAccountNonExpired(),
-            current.isCredentialsNonExpired(),
-            current.isAccountNonLocked(),
-            new ArrayList<>(current.getAuthorities()),
-            refreshedUser
-        );
+                refreshedUser.getEmail(),
+                refreshedUser.getPassword(),
+                current.isEnabled(),
+                current.isAccountNonExpired(),
+                current.isCredentialsNonExpired(),
+                current.isAccountNonLocked(),
+                new ArrayList<>(current.getAuthorities()),
+                refreshedUser);
         SecurityContextHolder.getContext().setAuthentication(
-            new UsernamePasswordAuthenticationToken(
-                newPrincipal,
-                currentAuth != null ? currentAuth.getCredentials() : null,
-                newPrincipal.getAuthorities()));
+                new UsernamePasswordAuthenticationToken(
+                        newPrincipal,
+                        currentAuth != null ? currentAuth.getCredentials() : null,
+                        newPrincipal.getAuthorities()));
     }
 
     private void enrichProfileModel(
-        final ModelAndView mv,
-        final User profileUser,
-        final boolean isOwnProfile,
-        final PawAuthUser authUser,
-        final int page,
-        final int trashPage
-    ) {
+            final ModelAndView mv,
+            final User profileUser,
+            final boolean isOwnProfile,
+            final PawAuthUser authUser,
+            final int page,
+            final int trashPage) {
         final ProductSearchCriteria criteria = new ProductSearchCriteria(
-            null,
-            Collections.emptyList(),
-            null,
-            null,
-            Collections.emptyList(),
-            Collections.emptyList(),
-            null,
-            profileUser.getId(),
-            page,
-            PROFILE_PUBLICATIONS_PAGE_SIZE
-        );
+                null,
+                Collections.emptyList(),
+                null,
+                null,
+                Collections.emptyList(),
+                Collections.emptyList(),
+                null,
+                profileUser.getId(),
+                page,
+                PROFILE_PUBLICATIONS_PAGE_SIZE);
 
         final PaginatedResult<Product> productsPage = productService.listProducts(criteria);
 
@@ -283,20 +271,21 @@ public class UserController {
         mv.addObject("userProducts", productsPage.getResults());
         mv.addObject("productImageUrls", productImageUrls);
 
-        PaginatedResult<ar.edu.itba.paw.models.Review> reviewsPage = reviewService.findBySellerId(profileUser.getId(), page, PROFILE_OTHER_PAGE_SIZE);
+        PaginatedResult<ar.edu.itba.paw.models.Review> reviewsPage = reviewService.findBySellerId(profileUser.getId(),
+                page, PROFILE_OTHER_PAGE_SIZE);
         mv.addObject("receivedReviewsPage", reviewsPage);
         mv.addObject("receivedReviews", reviewsPage.getResults());
         mv.addObject("sellerRating", reviewService.summaryForSeller(profileUser.getId()));
 
         if (isOwnProfile && authUser != null) {
-            final PaginatedResult<Purchase> purchasesPage = purchaseService.findByBuyerId(profileUser.getId(), page, PROFILE_OTHER_PAGE_SIZE);
+            final PaginatedResult<Purchase> purchasesPage = purchaseService.findByBuyerId(profileUser.getId(), page,
+                    PROFILE_OTHER_PAGE_SIZE);
 
             final Map<Long, Product> purchaseProducts = new HashMap<>();
             final Map<Long, Boolean> purchaseHasReview = new HashMap<>();
             for (Purchase p : purchasesPage.getResults()) {
-                productService.findById(p.getProductId()).ifPresent(prod ->
-                    purchaseProducts.put(p.getPurchaseId(), prod)
-                );
+                productService.findById(p.getProductId())
+                        .ifPresent(prod -> purchaseProducts.put(p.getPurchaseId(), prod));
                 purchaseHasReview.put(p.getPurchaseId(), reviewService.findByPurchaseId(p.getPurchaseId()).isPresent());
             }
 
@@ -305,13 +294,12 @@ public class UserController {
             mv.addObject("purchaseProducts", purchaseProducts);
             mv.addObject("purchaseHasReview", purchaseHasReview);
 
-            final PaginatedResult<Purchase> salesPage = purchaseService.findBySellerId(profileUser.getId(), page, PROFILE_OTHER_PAGE_SIZE);
+            final PaginatedResult<Purchase> salesPage = purchaseService.findBySellerId(profileUser.getId(), page,
+                    PROFILE_OTHER_PAGE_SIZE);
 
             final Map<Long, Product> saleProducts = new HashMap<>();
             for (Purchase s : salesPage.getResults()) {
-                productService.findById(s.getProductId()).ifPresent(prod ->
-                    saleProducts.put(s.getPurchaseId(), prod)
-                );
+                productService.findById(s.getProductId()).ifPresent(prod -> saleProducts.put(s.getPurchaseId(), prod));
             }
 
             mv.addObject("salesPage", salesPage);
@@ -321,11 +309,13 @@ public class UserController {
             // Load reports for admins (checked via Spring Security role)
             if (authUser != null && authUser.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-                final List<ar.edu.itba.paw.models.ReportedProduct> reportedProducts = reportService.findAllGroupedByProduct();
+                final List<ar.edu.itba.paw.models.ReportedProduct> reportedProducts = reportService
+                        .findAllGroupedByProduct();
                 mv.addObject("reportedProducts", reportedProducts);
             }
 
-            final PaginatedResult<Product> deletedPage = productService.listUserDeletedProducts(profileUser.getId(), trashPage, PROFILE_TRASH_PAGE_SIZE);
+            final PaginatedResult<Product> deletedPage = productService.listUserDeletedProducts(profileUser.getId(),
+                    trashPage, PROFILE_TRASH_PAGE_SIZE);
             final Map<Long, String> deletedProductImageUrls = new HashMap<>();
             for (Product product : deletedPage.getResults()) {
                 if (imageService.existsByProductId(product.getId())) {
@@ -340,9 +330,9 @@ public class UserController {
 
     @RequestMapping(value = "/profile/admin/hide-product", method = RequestMethod.POST)
     public ModelAndView adminHideProduct(
-        @RequestParam("productId") final Long productId
-    ) {
-        // Authorization enforced by Spring Security: only ROLE_ADMIN can reach this endpoint
+            @RequestParam("productId") final Long productId) {
+        // Authorization enforced by Spring Security: only ROLE_ADMIN can reach this
+        // endpoint
         productService.hideProductByAdmin(productId);
         reportService.deleteByProductId(productId);
         return new ModelAndView("redirect:/profile?tab=reports&hidden=1");
@@ -350,8 +340,7 @@ public class UserController {
 
     @RequestMapping(value = "/profile/admin/ban-user", method = RequestMethod.POST)
     public ModelAndView adminBanUser(
-        @RequestParam("userId") final Long userId
-    ) {
+            @RequestParam("userId") final Long userId) {
         // Ban the user
         userService.ban(userId);
 
@@ -360,13 +349,8 @@ public class UserController {
 
     @RequestMapping(value = "/profile/trash", method = RequestMethod.GET)
     public ModelAndView trash(
-        @AuthenticationPrincipal final PawAuthUser authUser,
-        @RequestParam(value = "page", defaultValue = "1") final int page
-    ) {
-        if (page < 1) {
-            throw new IllegalArgumentException("Page number must be positive");
-        }
-
+            @AuthenticationPrincipal final PawAuthUser authUser,
+            @RequestParam(value = "page", defaultValue = "1") final int page) {
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }

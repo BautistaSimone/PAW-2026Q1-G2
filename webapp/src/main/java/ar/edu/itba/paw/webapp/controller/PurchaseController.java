@@ -34,11 +34,10 @@ public class PurchaseController {
 
     @Autowired
     public PurchaseController(
-        final PurchaseService purchaseService,
-        final ProductService productService,
-        final ReviewService reviewService,
-        final UserService userService
-    ) {
+            final PurchaseService purchaseService,
+            final ProductService productService,
+            final ReviewService reviewService,
+            final UserService userService) {
         this.purchaseService = purchaseService;
         this.productService = productService;
         this.reviewService = reviewService;
@@ -47,10 +46,9 @@ public class PurchaseController {
 
     @RequestMapping(value = "/purchases", method = RequestMethod.POST)
     public ModelAndView createPurchase(
-        @AuthenticationPrincipal PawAuthUser authUser,
-        @Valid @ModelAttribute("purchaseCreateForm") final PurchaseCreateForm form,
-        final BindingResult errors
-    ) {
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @Valid @ModelAttribute("purchaseCreateForm") final PurchaseCreateForm form,
+            final BindingResult errors) {
 
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
@@ -64,10 +62,11 @@ public class PurchaseController {
         }
 
         final User user = userService.findById(authUser.getUser().getId())
-            .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new IllegalStateException("User not found"));
 
         if (!user.hasCompleteBuyerDataForPurchase()) {
-            return new ModelAndView("redirect:/profile?tab=mydata&missingData=purchase&productId=" + form.getProductId());
+            return new ModelAndView(
+                    "redirect:/profile?tab=mydata&missingData=purchase&productId=" + form.getProductId());
         }
 
         final Purchase purchase;
@@ -83,10 +82,9 @@ public class PurchaseController {
 
     @RequestMapping(value = "/purchases/{id:\\d+}", method = RequestMethod.GET)
     public ModelAndView getPurchase(
-        @AuthenticationPrincipal PawAuthUser authUser,
-        @PathVariable("id") final Long id,
-        @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form
-    ) {
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @PathVariable("id") final Long id,
+            @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form) {
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }
@@ -94,7 +92,7 @@ public class PurchaseController {
         final Long userId = authUser.getUser().getId();
 
         Purchase purchase = purchaseService.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
 
         final boolean isBuyer = userId.equals(purchase.getBuyerId());
         final boolean isSeller = userId.equals(purchase.getSellerId());
@@ -104,14 +102,14 @@ public class PurchaseController {
         }
 
         Product product = productService.findById(purchase.getProductId())
-            .orElseThrow(() -> new IllegalStateException("Product missing"));
+                .orElseThrow(() -> new IllegalStateException("Product missing"));
 
         final User orderBuyer = userService.findById(purchase.getBuyerId())
-            .orElseThrow(() -> new IllegalStateException("Buyer missing"));
+                .orElseThrow(() -> new IllegalStateException("Buyer missing"));
         /* seller_user_id en la compra (no solo product.user_id) + nombres explícitos para evitar sombras en EL/JSP */
         final User orderSeller = userService.findById(purchase.getSellerId())
-            .orElseGet(() -> userService.findById(product.getUserId())
-                .orElseThrow(() -> new IllegalStateException("Seller missing")));
+                .orElseGet(() -> userService.findById(product.getUserId())
+                        .orElseThrow(() -> new IllegalStateException("Seller missing")));
 
         ModelAndView mav = new ModelAndView("purchase-panel");
         mav.addObject("purchase", purchase);
@@ -130,11 +128,10 @@ public class PurchaseController {
 
     @RequestMapping(value = "/purchases/{id:\\d+}/status", method = RequestMethod.POST)
     public ModelAndView updateStatus(
-        @AuthenticationPrincipal PawAuthUser authUser,
-        @PathVariable("id") final Long id,
-        @Valid @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form,
-        final BindingResult errors
-    ) {
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @PathVariable("id") final Long id,
+            @Valid @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form,
+            final BindingResult errors) {
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }

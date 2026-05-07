@@ -33,11 +33,10 @@ public class ReviewController {
 
     @Autowired
     public ReviewController(
-        final ReviewService reviewService,
-        final PurchaseService purchaseService,
-        final ProductService productService,
-        final UserService userService
-    ) {
+            final ReviewService reviewService,
+            final PurchaseService purchaseService,
+            final ProductService productService,
+            final UserService userService) {
         this.reviewService = reviewService;
         this.purchaseService = purchaseService;
         this.productService = productService;
@@ -46,19 +45,18 @@ public class ReviewController {
 
     @RequestMapping(value = "/purchases/{id:\\d+}/review", method = RequestMethod.GET)
     public ModelAndView showReviewForm(
-        @AuthenticationPrincipal PawAuthUser authUser,
-        @PathVariable("id") final Long id,
-        @ModelAttribute("reviewForm") final ReviewForm form
-    ) {
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @PathVariable("id") final Long id,
+            @ModelAttribute("reviewForm") final ReviewForm form) {
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }
 
         final Purchase purchase = purchaseService.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
 
         if (!authUser.getUser().getId().equals(purchase.getBuyerId())) {
-            throw new IllegalArgumentException("Only the buyer can leave a review");
+            throw new IllegalArgumentException("Only the buyer can review this purchase");
         }
 
         if (purchase.getStatus() != PurchaseStatus.DELIVERED) {
@@ -70,10 +68,10 @@ public class ReviewController {
         }
 
         final Product product = productService.findById(purchase.getProductId())
-            .orElseThrow(() -> new IllegalStateException("Product not found"));
+                .orElseThrow(() -> new IllegalStateException("Product not found"));
 
         final User seller = userService.findById(product.getUserId())
-            .orElseThrow(() -> new IllegalStateException("Seller not found"));
+                .orElseThrow(() -> new IllegalStateException("Seller not found"));
 
         ModelAndView mav = new ModelAndView("review-form");
         mav.addObject("purchase", purchase);
@@ -84,27 +82,26 @@ public class ReviewController {
 
     @RequestMapping(value = "/purchases/{id:\\d+}/review", method = RequestMethod.POST)
     public ModelAndView submitReview(
-        @AuthenticationPrincipal PawAuthUser authUser,
-        @PathVariable("id") final Long id,
-        @Valid @ModelAttribute("reviewForm") final ReviewForm form,
-        final BindingResult errors
-    ) {
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @PathVariable("id") final Long id,
+            @Valid @ModelAttribute("reviewForm") final ReviewForm form,
+            final BindingResult errors) {
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }
 
         final Purchase purchase = purchaseService.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
 
         if (!authUser.getUser().getId().equals(purchase.getBuyerId())) {
-            throw new IllegalArgumentException("Only the buyer can leave a review");
+            throw new IllegalArgumentException("Only the buyer can review this purchase");
         }
 
         if (errors.hasErrors()) {
             final Product product = productService.findById(purchase.getProductId())
-                .orElseThrow(() -> new IllegalStateException("Product not found"));
+                    .orElseThrow(() -> new IllegalStateException("Product not found"));
             final User seller = userService.findById(product.getUserId())
-                .orElseThrow(() -> new IllegalStateException("Seller not found"));
+                    .orElseThrow(() -> new IllegalStateException("Seller not found"));
 
             ModelAndView mav = new ModelAndView("review-form");
             mav.addObject("purchase", purchase);

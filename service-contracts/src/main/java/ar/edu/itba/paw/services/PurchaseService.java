@@ -9,8 +9,12 @@ import ar.edu.itba.paw.models.PurchaseStatus;
 
 public interface PurchaseService {
     Purchase createPurchase(Long productId, Long userId);
+
     Optional<Purchase> findById(Long purchaseId);
+
     Purchase updateStatus(Long purchaseId, Long userId, PurchaseStatus newStatus);
+
     PaginatedResult<Purchase> findByBuyerId(Long buyerId, int page, int pageSize);
+
     PaginatedResult<Purchase> findBySellerId(Long sellerId, int page, int pageSize);
 }

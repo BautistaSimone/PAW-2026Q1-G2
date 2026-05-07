@@ -14,7 +14,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import java.util.Locale;
 
-
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
@@ -31,10 +30,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final EmailService emailService;
     private final MessageSource messageSource;
 
-
     @Autowired
     public PurchaseServiceImpl(
-            final PurchaseDao purchaseDao, 
+            final PurchaseDao purchaseDao,
             final ProductService productService,
             final UserService userService,
             final EmailService emailService,
@@ -57,17 +55,17 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         final Product product = productService.findById(productId)
-            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         if (product.getUserId().equals(userId)) {
             throw new IllegalArgumentException("Users cannot buy their own products");
         }
 
         final User seller = userService.findById(product.getUserId())
-            .orElseThrow(() -> new IllegalArgumentException("Seller not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Seller not found"));
 
         final User buyer = userService.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("Buyer not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Buyer not found"));
 
         if (!productService.reserveIfAvailable(productId)) {
             throw new IllegalStateException("Product is no longer available");
@@ -78,7 +76,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         final Purchase purchase;
         try {
-            purchase = purchaseDao.createPurchase(productId, userId, seller.getId(), PurchaseStatus.PENDING, buyerToken, sellerToken);
+            purchase = purchaseDao.createPurchase(productId, userId, seller.getId(), PurchaseStatus.PENDING, buyerToken,
+                    sellerToken);
         } catch (DataIntegrityViolationException e) {
             throw new IllegalStateException("Product is no longer available", e);
         }
@@ -86,15 +85,14 @@ public class PurchaseServiceImpl implements PurchaseService {
         runAfterCommit(() -> {
             final Locale locale = LocaleContextHolder.getLocale();
             emailService.sendBuyerEmail(
-                buyer.getEmail(),
-                purchase,
-                product,
-                messageSource.getMessage("Email.purchase.buyer.confirmed.title", null, locale),
-                messageSource.getMessage("Email.purchase.buyer.confirmed.msg", null, locale),
-                buyer,
-                seller,
-                PurchaseStatus.PENDING
-            );
+                    buyer.getEmail(),
+                    purchase,
+                    product,
+                    messageSource.getMessage("Email.purchase.buyer.confirmed.title", null, locale),
+                    messageSource.getMessage("Email.purchase.buyer.confirmed.msg", null, locale),
+                    buyer,
+                    seller,
+                    PurchaseStatus.PENDING);
         });
 
         return purchase;
@@ -123,16 +121,16 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Transactional
     public Purchase updateStatus(Long purchaseId, Long userId, PurchaseStatus newStatus) {
         final Purchase purchase = purchaseDao.findById(purchaseId)
-            .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
 
         final Product product = productService.findById(purchase.getProductId())
-            .orElseThrow(() -> new IllegalStateException("Product missing"));
+                .orElseThrow(() -> new IllegalStateException("Product missing"));
 
         final User seller = userService.findById(product.getUserId())
-            .orElseThrow(() -> new IllegalStateException("Seller missing"));
+                .orElseThrow(() -> new IllegalStateException("Seller missing"));
 
         final User buyer = userService.findById(purchase.getBuyerId())
-            .orElseThrow(() -> new IllegalStateException("Buyer missing"));
+                .orElseThrow(() -> new IllegalStateException("Buyer missing"));
 
         final boolean isBuyer = userId.equals(purchase.getBuyerId());
         final boolean isSeller = userId.equals(purchase.getSellerId());
@@ -147,37 +145,33 @@ public class PurchaseServiceImpl implements PurchaseService {
             // Notify seller to confirm payment
             final Locale locale = LocaleContextHolder.getLocale();
             emailService.sendSellerEmail(
-                seller.getEmail(),
-                purchase,
-                product,
-                messageSource.getMessage("Email.purchase.seller.paid.title", null, locale),
-                messageSource.getMessage("Email.purchase.seller.paid.msg", new Object[]{buyer.getUsername()}, locale),
-                buyer,
-                seller,
-                PurchaseStatus.PAID
-            );
-        } 
-        else if (newStatus == PurchaseStatus.SHIPPED && isSeller && purchase.getStatus() == PurchaseStatus.PAID) {
+                    seller.getEmail(),
+                    purchase,
+                    product,
+                    messageSource.getMessage("Email.purchase.seller.paid.title", null, locale),
+                    messageSource.getMessage("Email.purchase.seller.paid.msg", new Object[] { buyer.getUsername() },
+                            locale),
+                    buyer,
+                    seller,
+                    PurchaseStatus.PAID);
+        } else if (newStatus == PurchaseStatus.SHIPPED && isSeller && purchase.getStatus() == PurchaseStatus.PAID) {
             purchaseDao.updateStatus(purchaseId, newStatus);
             // Notify buyer
             final Locale locale = LocaleContextHolder.getLocale();
             emailService.sendBuyerEmail(
-                buyer.getEmail(),
-                purchase,
-                product,
-                messageSource.getMessage("Email.purchase.buyer.shipped.title", null, locale),
-                messageSource.getMessage("Email.purchase.buyer.shipped.msg", null, locale),
-                buyer,
-                seller,
-                PurchaseStatus.SHIPPED
-            );
-        }
-        else if (newStatus == PurchaseStatus.DELIVERED && isBuyer && purchase.getStatus() == PurchaseStatus.SHIPPED) {
+                    buyer.getEmail(),
+                    purchase,
+                    product,
+                    messageSource.getMessage("Email.purchase.buyer.shipped.title", null, locale),
+                    messageSource.getMessage("Email.purchase.buyer.shipped.msg", null, locale),
+                    buyer,
+                    seller,
+                    PurchaseStatus.SHIPPED);
+        } else if (newStatus == PurchaseStatus.DELIVERED && isBuyer && purchase.getStatus() == PurchaseStatus.SHIPPED) {
             purchaseDao.updateStatus(purchaseId, newStatus);
             productService.markAsSold(purchase.getProductId());
-        }
-        else {
-            throw new IllegalStateException("Invalid state transition or unathorized role.");
+        } else {
+            throw new IllegalStateException("Invalid state transition or unauthorized role.");
         }
 
         return purchaseDao.findById(purchaseId).get();
