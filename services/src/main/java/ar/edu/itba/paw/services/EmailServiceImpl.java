@@ -232,7 +232,8 @@ public class EmailServiceImpl implements EmailService {
         ctx.setVariable("purchaseId", purchase.getPurchaseId());
         ctx.setVariable("currentStep", currentStatus.ordinal());
         ctx.setVariable("purchaseStatusKey", currentStatus.name());
-        ctx.setVariable("purchaseStatusDescription", currentStatus.getDescription());
+        final Locale locale = LocaleContextHolder.getLocale();
+        ctx.setVariable("purchaseStatusDescription", messageSource.getMessage("PurchaseStatus." + currentStatus.name(), null, locale));
         ctx.setVariable("formattedPurchaseDate", purchase.getDate() != null
                 ? purchase.getDate().format(PURCHASE_DATE_FMT)
                 : "");
@@ -262,7 +263,6 @@ public class EmailServiceImpl implements EmailService {
             final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-            final Locale locale = LocaleContextHolder.getLocale();
             messageHelper.setSubject(messageSource.getMessage("Email.order.subject", new Object[] { title }, locale));
             messageHelper.setTo(to);
             messageHelper.setFrom("no-reply@vinyland.com");

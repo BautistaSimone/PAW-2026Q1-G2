@@ -62,7 +62,7 @@
                                                             arguments="${purchase.purchaseId}" />
                                                     </h4>
                                                     <span class="purchase-status-badge">
-                                                        <c:out value="${purchase.status.description}" />
+                                                        <spring:message code="PurchaseStatus.${purchase.status}" />
                                                     </span>
                                                 </div>
                                                 <ui:purchase-stepper status="${purchase.status}" />

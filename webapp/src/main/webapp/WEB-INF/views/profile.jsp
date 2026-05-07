@@ -491,8 +491,7 @@
                                                                                 <div class="profile-div-12">
                                                                                     <c:out value="${purchase.date}" /> ·
                                                                                     <span class="profile-span-13">
-                                                                                        <c:out
-                                                                                            value="${purchase.status.description}" />
+                                                                                        <spring:message code="PurchaseStatus.${purchase.status}" />
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
@@ -576,8 +575,7 @@
                                                                                 <div class="profile-div-12">
                                                                                     <c:out value="${sale.date}" /> ·
                                                                                     <span class="profile-span-13">
-                                                                                        <c:out
-                                                                                            value="${sale.status.description}" />
+                                                                                        <spring:message code="PurchaseStatus.${sale.status}" />
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
