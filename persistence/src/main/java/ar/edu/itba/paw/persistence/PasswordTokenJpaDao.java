@@ -29,7 +29,7 @@ public class PasswordTokenJpaDao implements PasswordTokenDao {
     @Override
     public PasswordToken createToken(final Long userId, final String token, final Instant expirationDate) {
 
-        final PasswordToken passwordToken new PasswordToken(
+        final PasswordToken passwordToken = new PasswordToken(
             userId,
             token,
             expirationDate
@@ -47,7 +47,7 @@ public class PasswordTokenJpaDao implements PasswordTokenDao {
 
     @Override
     public Optional<PasswordToken> findByUserId(final Long userId) {
-        final TypedQuery<User> query = em.createQuery("FROM PasswordToken WHERE userId = :user_id", PasswordToken.class);
+        final TypedQuery<PasswordToken> query = em.createQuery("FROM PasswordToken WHERE userId = :user_id", PasswordToken.class);
 
         query.setParameter("user_id", userId);
         return query.getResultList().stream().findFirst();
@@ -56,7 +56,7 @@ public class PasswordTokenJpaDao implements PasswordTokenDao {
     @Override
     public Optional<PasswordToken> findByToken(final String token) {
 
-        final TypedQuery<User> query = em.createQuery("FROM PasswordToken WHERE token = :token", PasswordToken.class);
+        final TypedQuery<PasswordToken> query = em.createQuery("FROM PasswordToken WHERE token = :token", PasswordToken.class);
 
         query.setParameter("token", token);
         return query.getResultList().stream().findFirst();

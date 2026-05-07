@@ -20,6 +20,11 @@ public class PasswordToken extends Token {
     @Column(name = "token_id")
     private Long tokenId;
 
+    PasswordToken() {
+        // Just for Hibernate, we love you!
+        super();
+    }
+
     public PasswordToken(final Long userId, final String token, final Instant expirationDate) {
         super(userId, token, expirationDate);
     }

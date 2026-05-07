@@ -7,7 +7,7 @@ import java.time.Instant;
 import ar.edu.itba.paw.models.VerificationToken;
 
 public interface VerificationTokenDao {
-    Token createToken(final Long userId, final String token, final Instant expirationDate);
+    VerificationToken createToken(final Long userId, final String token, final Instant expirationDate);
 
     Optional<VerificationToken> findByUserId(final Long userId);
     Optional<VerificationToken> findByToken(final String token);

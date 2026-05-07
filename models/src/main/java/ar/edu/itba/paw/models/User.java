@@ -19,40 +19,44 @@ public class User {
     private Long id;
 
     @Column(length = 255, nullable = false, unique = true)
-    private final String email;
+    private String email;
 
     @Column(length = 255, nullable = false)
-    private final String password;
+    private String password;
     
     @Column(length = 255, nullable = false)
-    private final String username;
-    private final Boolean mod;
-    private final Boolean enabled;
-    private final Boolean banned;
-    private final String firstName;
-    private final String lastName;
-    private final String streetName;
-    private final String streetNumber;
-    private final String neighborhood;
-    private final String province;
-    private final String extraAddressInfo;
-    private final String cbuCvu;
+    private String username;
+    private Boolean mod;
+    private Boolean enabled;
+    private Boolean banned;
+    private String firstName;
+    private String lastName;
+    private String streetName;
+    private String streetNumber;
+    private String neighborhood;
+    private String province;
+    private String extraAddressInfo;
+    private String cbuCvu;
+
+    User() {
+        // Just for Hibernate, we love you!
+    }
 
     public User(
-            final String email,
-            final String password,
-            final String username,
-            final Boolean mod,
-            final Boolean enabled,
-            final Boolean banned,
-            final String firstName,
-            final String lastName,
-            final String streetName,
-            final String streetNumber,
-            final String neighborhood,
-            final String province,
-            final String extraAddressInfo,
-            final String cbuCvu) {
+            String email,
+            String password,
+            String username,
+            Boolean mod,
+            Boolean enabled,
+            Boolean banned,
+            String firstName,
+            String lastName,
+            String streetName,
+            String streetNumber,
+            String neighborhood,
+            String province,
+            String extraAddressInfo,
+            String cbuCvu) {
         this.email = email;
         this.password = password;
         this.username = username;

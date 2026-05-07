@@ -29,7 +29,7 @@ public class VerificationTokenJpaDao implements VerificationTokenDao {
     @Override
     public VerificationToken createToken(final Long userId, final String token, final Instant expirationDate) {
 
-        final VerificationToken verificationToken new VerificationToken(
+        final VerificationToken verificationToken = new VerificationToken(
             userId,
             token,
             expirationDate
@@ -47,7 +47,7 @@ public class VerificationTokenJpaDao implements VerificationTokenDao {
 
     @Override
     public Optional<VerificationToken> findByUserId(final Long userId) {
-        final TypedQuery<User> query = em.createQuery("FROM VerificationToken WHERE userId = :user_id", VerificationToken.class);
+        final TypedQuery<VerificationToken> query = em.createQuery("FROM VerificationToken WHERE userId = :user_id", VerificationToken.class);
 
         query.setParameter("user_id", userId);
         return query.getResultList().stream().findFirst();
@@ -56,7 +56,7 @@ public class VerificationTokenJpaDao implements VerificationTokenDao {
     @Override
     public Optional<VerificationToken> findByToken(final String token) {
 
-        final TypedQuery<User> query = em.createQuery("FROM VerificationToken WHERE token = :token", VerificationToken.class);
+        final TypedQuery<VerificationToken> query = em.createQuery("FROM VerificationToken WHERE token = :token", VerificationToken.class);
 
         query.setParameter("token", token);
         return query.getResultList().stream().findFirst();

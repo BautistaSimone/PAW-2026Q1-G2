@@ -19,8 +19,8 @@ import ar.edu.itba.paw.models.User;
 @Rollback   // Clean database before testing
 @Transactional
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestConfiguration.class)
-public class UserJdbcDaoTest {
+@ContextConfiguration(classes = TestConfigurationJpa.class)
+public class UserJpaDaoTest {
 
     @Autowired
     private UserJpaDao userDao;

@@ -7,6 +7,9 @@ import java.sql.Timestamp;
 import java.util.UUID;
 import javax.sql.DataSource;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,18 +22,21 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-import ar.edu.itba.paw.models.Token;
+import ar.edu.itba.paw.models.PasswordToken;
 
 @Rollback
 @Transactional
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestConfiguration.class)
-public class PasswordTokenJdbcDaoTest {
+@ContextConfiguration(classes = TestConfigurationJpa.class)
+public class PasswordTokenJpaDaoTest {
 
     private static final int EXPIRATION = 60 * 24;
  
     @Autowired
-    private PasswordTokenJdbcDao passwordTokenDao;
+    private PasswordTokenJpaDao passwordTokenDao;
+
+    @PersistenceContext
+    private EntityManager em;
 
     @Autowired
     private DataSource dataSource;
@@ -60,7 +66,7 @@ public class PasswordTokenJdbcDaoTest {
 
     @Test
     public void testCreatePasswordToken() {
-        final Token token = passwordTokenDao.createToken(userId, tkn, expirationDate);
+        final PasswordToken token = passwordTokenDao.createToken(userId, tkn, expirationDate);
 
         Assertions.assertNotNull(token);
         Assertions.assertEquals(expirationDate, token.getExpirationDate());
@@ -72,7 +78,7 @@ public class PasswordTokenJdbcDaoTest {
     public void testFindByUserId() {
         passwordTokenDao.createToken(userId, tkn, expirationDate);
 
-        Optional<Token> result = passwordTokenDao.findByUserId(userId);
+        Optional<PasswordToken> result = passwordTokenDao.findByUserId(userId);
 
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(expirationDate, result.get().getExpirationDate());
@@ -83,7 +89,7 @@ public class PasswordTokenJdbcDaoTest {
     public void testFindByToken() {
         passwordTokenDao.createToken(userId, tkn, expirationDate);
 
-        Optional<Token> result = passwordTokenDao.findByToken(tkn);
+        Optional<PasswordToken> result = passwordTokenDao.findByToken(tkn);
 
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(expirationDate, result.get().getExpirationDate());

@@ -19,18 +19,18 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-import ar.edu.itba.paw.models.Token;
+import ar.edu.itba.paw.models.VerificationToken;
 
 @Rollback
 @Transactional
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestConfiguration.class)
-public class VerificationTokenJdbcDaoTest {
+@ContextConfiguration(classes = TestConfigurationJpa.class)
+public class VerificationTokenJpaDaoTest {
 
     private static final int EXPIRATION = 60 * 24;
  
     @Autowired
-    private VerificationTokenJdbcDao verificationTokenDao;
+    private VerificationTokenJpaDao verificationTokenDao;
 
     @Autowired
     private DataSource dataSource;
@@ -60,7 +60,7 @@ public class VerificationTokenJdbcDaoTest {
 
     @Test
     public void testCreateVerificationToken() {
-        final Token token = verificationTokenDao.createToken(userId, tkn, expirationDate);
+        final VerificationToken token = verificationTokenDao.createToken(userId, tkn, expirationDate);
 
         Assertions.assertNotNull(token);
         Assertions.assertEquals(expirationDate, token.getExpirationDate());
@@ -72,7 +72,7 @@ public class VerificationTokenJdbcDaoTest {
     public void testFindByUserId() {
         verificationTokenDao.createToken(userId, tkn, expirationDate);
 
-        Optional<Token> result = verificationTokenDao.findByUserId(userId);
+        Optional<VerificationToken> result = verificationTokenDao.findByUserId(userId);
 
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(expirationDate, result.get().getExpirationDate());
@@ -83,7 +83,7 @@ public class VerificationTokenJdbcDaoTest {
     public void testFindByToken() {
         verificationTokenDao.createToken(userId, tkn, expirationDate);
 
-        Optional<Token> result = verificationTokenDao.findByToken(tkn);
+        Optional<VerificationToken> result = verificationTokenDao.findByToken(tkn);
 
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(expirationDate, result.get().getExpirationDate());
