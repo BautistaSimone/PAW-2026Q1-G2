@@ -461,9 +461,14 @@
                                                 <c:if test="${isOwnProfile}">
                                                     <div class="tab-pane fade<c:if test='${activePurchases}'> show active</c:if>"
                                                         id="purchases" role="tabpanel" aria-labelledby="purchases-tab">
-                                                        <c:choose>
-                                                            <c:when test="${not empty purchases}">
-                                                                <div class="d-flex flex-column gap-3">
+                                                        <div class="products-layout-grid" style="align-items: start; margin-top: 1rem;">
+                                                            <aside class="products-filters-column">
+                                                                <ui:purchaseFiltersBar activeTab="purchases" />
+                                                            </aside>
+                                                            <section class="products-content-column" style="width: 100%;">
+                                                                <c:choose>
+                                                                    <c:when test="${not empty purchases}">
+                                                                        <div class="d-flex flex-column gap-3">
                                                                     <c:forEach items="${purchases}" var="purchase">
                                                                         <c:set var="pProduct"
                                                                             value="${purchaseProducts[purchase.purchaseId]}" />
@@ -537,7 +542,9 @@
                                                                     </a>
                                                                 </div>
                                                             </c:otherwise>
-                                                        </c:choose>
+                                                                </c:choose>
+                                                            </section>
+                                                        </div>
                                                     </div>
                                                 </c:if>
 
@@ -545,9 +552,14 @@
                                                 <c:if test="${isOwnProfile}">
                                                     <div class="tab-pane fade<c:if test='${activeSales}'> show active</c:if>"
                                                         id="sales" role="tabpanel" aria-labelledby="sales-tab">
-                                                        <c:choose>
-                                                            <c:when test="${not empty sales}">
-                                                                <div class="d-flex flex-column gap-3">
+                                                        <div class="products-layout-grid" style="align-items: start; margin-top: 1rem;">
+                                                            <aside class="products-filters-column">
+                                                                <ui:purchaseFiltersBar activeTab="sales" />
+                                                            </aside>
+                                                            <section class="products-content-column" style="width: 100%;">
+                                                                <c:choose>
+                                                                    <c:when test="${not empty sales}">
+                                                                        <div class="d-flex flex-column gap-3">
                                                                     <c:forEach items="${sales}" var="sale">
                                                                         <c:set var="sProduct"
                                                                             value="${saleProducts[sale.purchaseId]}" />
@@ -609,10 +621,11 @@
                                                                     </a>
                                                                 </div>
                                                             </c:otherwise>
-                                                        </c:choose>
+                                                                </c:choose>
+                                                            </section>
+                                                        </div>
                                                     </div>
                                                 </c:if>
-
                                                 <!-- Tab: Reseñas recibidas -->
                                                 <div class="tab-pane fade<c:if test='${activeReviews}'> show active</c:if>"
                                                     id="reviews" role="tabpanel" aria-labelledby="reviews-tab">

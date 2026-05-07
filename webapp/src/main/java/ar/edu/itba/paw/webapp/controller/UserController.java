@@ -38,6 +38,7 @@ import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
+import ar.edu.itba.paw.models.PurchaseStatus;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 
@@ -157,7 +158,8 @@ public class UserController {
             @AuthenticationPrincipal PawAuthUser authUser,
             @RequestParam(value = "userId", required = false) final Long userId,
             @RequestParam(value = "page", defaultValue = "1") final int page,
-            @RequestParam(value = "trashPage", defaultValue = "1") final int trashPage) {
+            @RequestParam(value = "trashPage", defaultValue = "1") final int trashPage,
+            @RequestParam(value = "status", required = false) final List<String> statuses) {
         final boolean isOwnProfile;
         final User profileUser;
 
@@ -174,8 +176,24 @@ public class UserController {
             isOwnProfile = true;
         }
 
+        List<PurchaseStatus> purchaseStatuses = new ArrayList<>();
+        List<String> validStatusesStr = new ArrayList<>();
+        if (statuses != null) {
+            for (String s : statuses) {
+                try {
+                    PurchaseStatus ps = PurchaseStatus.valueOf(s);
+                    purchaseStatuses.add(ps);
+                    validStatusesStr.add(ps.name());
+                } catch (IllegalArgumentException e) {
+                    // Ignore invalid statuses
+                }
+            }
+        }
+
         final ModelAndView mv = new ModelAndView("profile");
-        enrichProfileModel(mv, profileUser, isOwnProfile, authUser, page, trashPage);
+        enrichProfileModel(mv, profileUser, isOwnProfile, authUser, page, trashPage, purchaseStatuses);
+        mv.addObject("selectedStatuses", validStatusesStr);
+
         if (isOwnProfile) {
             mv.addObject("userProfileForm", UserProfileForm.fromUser(profileUser));
         }
@@ -196,7 +214,8 @@ public class UserController {
 
         if (errors.hasErrors()) {
             final ModelAndView mv = new ModelAndView("profile");
-            enrichProfileModel(mv, profileUser, true, authUser, 1, 1);
+            enrichProfileModel(mv, profileUser, true, authUser, 1, 1, Collections.emptyList());
+            mv.addObject("selectedStatuses", Collections.emptyList());
             mv.addObject("hasProfileUpdateErrors", true);
             mv.addObject("userProfileForm", form);
             return mv;
@@ -244,7 +263,8 @@ public class UserController {
             final boolean isOwnProfile,
             final PawAuthUser authUser,
             final int page,
-            final int trashPage) {
+            final int trashPage,
+            final List<PurchaseStatus> statuses) {
         final ProductSearchCriteria criteria = new ProductSearchCriteria(
                 null,
                 Collections.emptyList(),
@@ -279,7 +299,7 @@ public class UserController {
         mv.addObject("sellerRating", reviewService.summaryForSeller(profileUser.getId()));
 
         if (isOwnProfile && authUser != null) {
-            final PaginatedResult<Purchase> purchasesPage = purchaseService.findByBuyerId(profileUser.getId(), page,
+            final PaginatedResult<Purchase> purchasesPage = purchaseService.findByBuyerId(profileUser.getId(), statuses, page,
                     PROFILE_OTHER_PAGE_SIZE);
 
             final Map<Long, Product> purchaseProducts = new HashMap<>();
@@ -295,7 +315,7 @@ public class UserController {
             mv.addObject("purchaseProducts", purchaseProducts);
             mv.addObject("purchaseHasReview", purchaseHasReview);
 
-            final PaginatedResult<Purchase> salesPage = purchaseService.findBySellerId(profileUser.getId(), page,
+            final PaginatedResult<Purchase> salesPage = purchaseService.findBySellerId(profileUser.getId(), statuses, page,
                     PROFILE_OTHER_PAGE_SIZE);
 
             final Map<Long, Product> saleProducts = new HashMap<>();

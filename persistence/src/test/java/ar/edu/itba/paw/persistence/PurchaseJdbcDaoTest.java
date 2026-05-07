@@ -123,7 +123,7 @@ public class PurchaseJdbcDaoTest {
         purchaseDao.createPurchase(secondProductId, buyerId, sellerId, PurchaseStatus.PAID, "b2", "s2");
         purchaseDao.createPurchase(otherBuyerProductId, otherBuyerId, otherSellerId, PurchaseStatus.PAID, "b3", "s3");
 
-        final PaginatedResult<Purchase> result = purchaseDao.findByBuyerId(buyerId, 1, 10);
+        final PaginatedResult<Purchase> result = purchaseDao.findByBuyerId(buyerId, java.util.Collections.emptyList(), 1, 10);
 
         Assertions.assertEquals(2, result.getTotalCount());
         Assertions.assertEquals(1, result.getCurrentPage());
@@ -140,7 +140,7 @@ public class PurchaseJdbcDaoTest {
         purchaseDao.createPurchase(secondProductId, otherBuyerId, sellerId, PurchaseStatus.PAID, "b2", "s2");
         purchaseDao.createPurchase(otherSellerProductId, buyerId, otherSellerId, PurchaseStatus.PAID, "b3", "s3");
 
-        final List<Purchase> purchases = purchaseDao.findBySellerId(sellerId, 1, 10).getResults();
+        final List<Purchase> purchases = purchaseDao.findBySellerId(sellerId, java.util.Collections.emptyList(), 1, 10).getResults();
 
         Assertions.assertEquals(2, purchases.size());
         Assertions.assertTrue(purchases.stream().allMatch(purchase -> purchase.getSellerId().equals(sellerId)));
@@ -148,7 +148,7 @@ public class PurchaseJdbcDaoTest {
 
     @Test
     public void findByBuyerIdReturnsEmptyPageWhenBuyerHasNoPurchases() {
-        final PaginatedResult<Purchase> result = purchaseDao.findByBuyerId(buyerId, 1, 10);
+        final PaginatedResult<Purchase> result = purchaseDao.findByBuyerId(buyerId, java.util.Collections.emptyList(), 1, 10);
 
         Assertions.assertTrue(result.getResults().isEmpty());
         Assertions.assertEquals(0, result.getTotalCount());

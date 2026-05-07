@@ -10,6 +10,6 @@ public interface PurchaseDao {
     Purchase createPurchase(Long productId, Long buyerId, Long sellerId, PurchaseStatus status, String buyerToken, String sellerToken);
     Optional<Purchase> findById(Long purchaseId);
     void updateStatus(Long purchaseId, PurchaseStatus status);
-    PaginatedResult<Purchase> findByBuyerId(Long buyerId, int page, int pageSize);
-    PaginatedResult<Purchase> findBySellerId(Long sellerId, int page, int pageSize);
+    PaginatedResult<Purchase> findByBuyerId(Long buyerId, List<PurchaseStatus> statuses, int page, int pageSize);
+    PaginatedResult<Purchase> findBySellerId(Long sellerId, List<PurchaseStatus> statuses, int page, int pageSize);
 }

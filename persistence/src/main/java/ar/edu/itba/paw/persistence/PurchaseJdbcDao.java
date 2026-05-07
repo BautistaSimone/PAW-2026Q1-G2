@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -76,40 +77,74 @@ public class PurchaseJdbcDao implements PurchaseDao {
             .stream().findAny();
     }
 
+    private String buildStatusFilter(List<PurchaseStatus> statuses, List<Object> params) {
+        if (statuses == null || statuses.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(" AND (");
+        for (int i = 0; i < statuses.size(); i++) {
+            if (i > 0) sb.append(" OR ");
+            sb.append("payment_method LIKE ?");
+            params.add(statuses.get(i).name() + "|%");
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
     @Override
-    public PaginatedResult<Purchase> findByBuyerId(Long buyerId, int page, int pageSize) {
+    public PaginatedResult<Purchase> findByBuyerId(Long buyerId, List<PurchaseStatus> statuses, int page, int pageSize) {
+        List<Object> countParams = new ArrayList<>();
+        countParams.add(buyerId);
+        String countSql = "SELECT COUNT(*) FROM purchases WHERE buyer_user_id = ?" + buildStatusFilter(statuses, countParams);
+        
         final Long totalCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM purchases WHERE buyer_user_id = ?",
+            countSql,
             Long.class,
-            buyerId
+            countParams.toArray()
         );
 
         if (totalCount == null || totalCount == 0) {
             return new PaginatedResult<>(Collections.emptyList(), page, pageSize, 0);
         }
 
+        List<Object> params = new ArrayList<>();
+        params.add(buyerId);
+        String sql = "SELECT * FROM purchases WHERE buyer_user_id = ?" + buildStatusFilter(statuses, params) + " ORDER BY date DESC LIMIT ? OFFSET ?";
+        params.add(pageSize);
+        params.add((page - 1) * pageSize);
+
         List<Purchase> purchases = jdbcTemplate.query(
-            "SELECT * FROM purchases WHERE buyer_user_id = ? ORDER BY date DESC LIMIT ? OFFSET ?",
-            PURCHASE_ROW_MAPPER, buyerId, pageSize, (page - 1) * pageSize);
+            sql,
+            PURCHASE_ROW_MAPPER, params.toArray());
         
         return new PaginatedResult<>(purchases, page, pageSize, totalCount);
     }
 
     @Override
-    public PaginatedResult<Purchase> findBySellerId(Long sellerId, int page, int pageSize) {
+    public PaginatedResult<Purchase> findBySellerId(Long sellerId, List<PurchaseStatus> statuses, int page, int pageSize) {
+        List<Object> countParams = new ArrayList<>();
+        countParams.add(sellerId);
+        String countSql = "SELECT COUNT(*) FROM purchases WHERE seller_user_id = ?" + buildStatusFilter(statuses, countParams);
+        
         final Long totalCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM purchases WHERE seller_user_id = ?",
+            countSql,
             Long.class,
-            sellerId
+            countParams.toArray()
         );
 
         if (totalCount == null || totalCount == 0) {
             return new PaginatedResult<>(Collections.emptyList(), page, pageSize, 0);
         }
 
+        List<Object> params = new ArrayList<>();
+        params.add(sellerId);
+        String sql = "SELECT * FROM purchases WHERE seller_user_id = ?" + buildStatusFilter(statuses, params) + " ORDER BY date DESC LIMIT ? OFFSET ?";
+        params.add(pageSize);
+        params.add((page - 1) * pageSize);
+
         List<Purchase> purchases = jdbcTemplate.query(
-            "SELECT * FROM purchases WHERE seller_user_id = ? ORDER BY date DESC LIMIT ? OFFSET ?",
-            PURCHASE_ROW_MAPPER, sellerId, pageSize, (page - 1) * pageSize);
+            sql,
+            PURCHASE_ROW_MAPPER, params.toArray());
         
         return new PaginatedResult<>(purchases, page, pageSize, totalCount);
     }

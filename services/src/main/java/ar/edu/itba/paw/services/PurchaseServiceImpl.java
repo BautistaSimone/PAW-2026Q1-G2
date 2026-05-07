@@ -179,13 +179,13 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginatedResult<Purchase> findByBuyerId(Long buyerId, int page, int pageSize) {
-        return purchaseDao.findByBuyerId(buyerId, page, pageSize);
+    public PaginatedResult<Purchase> findByBuyerId(Long buyerId, List<PurchaseStatus> statuses, int page, int pageSize) {
+        return purchaseDao.findByBuyerId(buyerId, statuses, page, pageSize);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PaginatedResult<Purchase> findBySellerId(Long sellerId, int page, int pageSize) {
-        return purchaseDao.findBySellerId(sellerId, page, pageSize);
+    public PaginatedResult<Purchase> findBySellerId(Long sellerId, List<PurchaseStatus> statuses, int page, int pageSize) {
+        return purchaseDao.findBySellerId(sellerId, statuses, page, pageSize);
     }
 }
