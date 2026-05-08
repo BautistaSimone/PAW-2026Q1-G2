@@ -831,25 +831,28 @@
                                                                                 <spring:message
                                                                                     code="Profile.reports.hide"
                                                                                     var="hideText" />
-                                                                                <form
-                                                                                    action="<c:out value='${hideUrl}'/>"
-                                                                                    method="post" style="margin: 0;"
-                                                                                    onsubmit="return confirm('${confirmHide}');">
-                                                                                    <input type="hidden"
-                                                                                        name="${_csrf.parameterName}"
-                                                                                        value="${_csrf.token}" />
-                                                                                    <input type="hidden"
-                                                                                        name="productId"
-                                                                                        value="<c:out value='${rp.productId}'/>" />
-                                                                                    <button type="submit"
+                                                                                <button type="button"
+                                                                                        data-bs-toggle="modal" data-bs-target="#hideModal-${rp.productId}"
                                                                                         class="btn btn-retro btn-retro-danger-outline"
                                                                                         style="font-size: 0.78rem; padding: 0.35rem 0.7rem;"
                                                                                         title="${hideText}">
                                                                                         <i class="bi bi-x-circle"
                                                                                             aria-hidden="true"></i>
                                                                                         <c:out value="${hideText}" />
-                                                                                    </button>
-                                                                                </form>
+                                                                                </button>
+
+                                                                                <spring:message code="Profile.reports.hideConfirm" var="hideConfirmText" />
+                                                                                <spring:message code="Global.cancel" var="cancelText" />
+                                                                                <ui:confirmFormModal 
+                                                                                    id="hideModal-${rp.productId}" 
+                                                                                    title="${hideText}" 
+                                                                                    message="${hideConfirmText}"
+                                                                                    confirmBtnText="${hideText}"
+                                                                                    cancelBtnText="${cancelText}"
+                                                                                    actionUrl="${hideUrl}"
+                                                                                    hiddenInputName="productId"
+                                                                                    hiddenInputValue="${rp.productId}"
+                                                                                    confirmBtnClass="btn-retro-danger" />
                                                                                 <spring:message
                                                                                     code="Profile.reports.profile"
                                                                                     var="profileText" />
@@ -869,24 +872,27 @@
                                                                                 <spring:message
                                                                                     code="Profile.reports.ban"
                                                                                     var="banText" />
-                                                                                <form
-                                                                                    action="<c:out value='${banUrl}'/>"
-                                                                                    method="post" style="margin: 0;"
-                                                                                    onsubmit="return confirm('${confirmBan}');">
-                                                                                    <input type="hidden"
-                                                                                        name="${_csrf.parameterName}"
-                                                                                        value="${_csrf.token}" />
-                                                                                    <input type="hidden" name="userId"
-                                                                                        value="<c:out value='${rp.ownerUserId}'/>" />
-                                                                                    <button type="submit"
+                                                                                <button type="button"
+                                                                                        data-bs-toggle="modal" data-bs-target="#banModal-${rp.productId}"
                                                                                         class="btn btn-retro btn-retro-danger"
                                                                                         style="font-size: 0.78rem; padding: 0.35rem 0.7rem;"
                                                                                         title="${banText}">
                                                                                         <i class="bi bi-person-x"
                                                                                             aria-hidden="true"></i>
                                                                                         <c:out value="${banText}" />
-                                                                                    </button>
-                                                                                </form>
+                                                                                </button>
+
+                                                                                <spring:message code="Profile.reports.banConfirm" var="banConfirmText" />
+                                                                                <ui:confirmFormModal 
+                                                                                    id="banModal-${rp.productId}" 
+                                                                                    title="${banText}" 
+                                                                                    message="${banConfirmText}"
+                                                                                    confirmBtnText="${banText}"
+                                                                                    cancelBtnText="${cancelText}"
+                                                                                    actionUrl="${banUrl}"
+                                                                                    hiddenInputName="userId"
+                                                                                    hiddenInputValue="${rp.ownerUserId}"
+                                                                                    confirmBtnClass="btn-retro-danger" />
                                                                             </div>
                                                                         </div>
                                                                     </c:forEach>

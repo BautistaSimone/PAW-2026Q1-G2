@@ -13,6 +13,10 @@
     --color-text-main: #264653;
     --color-text-muted: #6c757d;
     --color-card-bg: #ffffff;
+    /* Aliases used by some tags / utilities */
+    --color-surface: var(--color-card-bg);
+    --color-text: var(--color-text-main);
+    --color-text-light: var(--color-text-muted);
     --color-vinyl-dark: #1a1a1a;
     --color-border: #e8e2da;
     --color-input-bg: #fdfcfa;
@@ -2027,6 +2031,23 @@ details.filter-section:not([open]) .filter-section-chevron {
     color: var(--color-accent);
     font-weight: 600;
     font-size: 0.88rem;
+}
+
+/* Confirm modals (e.g. admin ban/hide): opaque panel even when nested in tab panes / stacking contexts */
+.confirm-form-modal.modal .modal-dialog {
+    opacity: 1;
+}
+
+.confirm-form-modal .modal-content {
+    background-color: var(--color-card-bg, #ffffff);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.confirm-form-modal .modal-header,
+.confirm-form-modal .modal-body,
+.confirm-form-modal .modal-footer {
+    background-color: var(--color-card-bg, #ffffff);
 }
 
 /* Legacy auth modal classes (kept for backward compat) */
