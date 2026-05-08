@@ -48,11 +48,11 @@ public class EmailServiceImpl implements EmailService {
 
     @Autowired
     public EmailServiceImpl(
-        final JavaMailSender javaMailSender,
-        final SpringTemplateEngine templateEngine,
-        final MessageSource messageSource,
-        @Value("${app.base.url:http://pawserver.it.itba.edu.ar/paw-2026a-02/}") final String baseUrl,
-        @Value("${mail.username}") final String adminEmail) {
+            final JavaMailSender javaMailSender,
+            final SpringTemplateEngine templateEngine,
+            final MessageSource messageSource,
+            @Value("${app.base.url:http://pawserver.it.itba.edu.ar/paw-2026a-02/}") final String baseUrl,
+            @Value("${mail.username}") final String adminEmail) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.messageSource = messageSource;
@@ -72,8 +72,8 @@ public class EmailServiceImpl implements EmailService {
             final User buyer,
             final User seller,
             final PurchaseStatus currentStatus) {
-        final String tokenUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId() + "?token=" + purchase.getBuyerToken());
-        sendOrderEmail(to, product, purchase, title, message, tokenUrl, buyer, seller, true, currentStatus);
+        final String purchaseUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId());
+        sendOrderEmail(to, product, purchase, title, message, purchaseUrl, buyer, seller, true, currentStatus);
     }
 
     @Async
@@ -88,8 +88,8 @@ public class EmailServiceImpl implements EmailService {
             final User buyer,
             final User seller,
             final PurchaseStatus currentStatus) {
-        final String tokenUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId() + "?token=" + purchase.getSellerToken());
-        sendOrderEmail(to, product, purchase, title, message, tokenUrl, buyer, seller, false, currentStatus);
+        final String purchaseUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId());
+        sendOrderEmail(to, product, purchase, title, message, purchaseUrl, buyer, seller, false, currentStatus);
     }
 
     @Async
@@ -100,7 +100,7 @@ public class EmailServiceImpl implements EmailService {
         final Locale locale = LocaleContextHolder.getLocale();
 
         final Context ctx = new Context(LocaleContextHolder.getLocale());
-        
+
         ctx.setVariable("title",
                 messageSource.getMessage("email.report.heading", null, locale));
 
@@ -123,8 +123,7 @@ public class EmailServiceImpl implements EmailService {
             final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
             messageHelper.setSubject(
-                messageSource.getMessage("email.report.title", null, locale)
-            );
+                    messageSource.getMessage("email.report.title", null, locale));
             messageHelper.setTo(adminEmail);
             messageHelper.setFrom("no-reply@vinyland.com");
 
@@ -149,9 +148,9 @@ public class EmailServiceImpl implements EmailService {
 
         final Context ctx = new Context(LocaleContextHolder.getLocale());
         ctx.setVariable("title",
-            messageSource.getMessage("email.reset.heading", null, locale));
+                messageSource.getMessage("email.reset.heading", null, locale));
         ctx.setVariable("message",
-            messageSource.getMessage("email.reset.instructions", null, locale));
+                messageSource.getMessage("email.reset.instructions", null, locale));
         ctx.setVariable("recipientName", username);
         ctx.setVariable("actionUrl", resetUrl);
 
@@ -160,8 +159,7 @@ public class EmailServiceImpl implements EmailService {
             final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
             messageHelper.setSubject(
-                messageSource.getMessage("email.reset.title", null, locale)
-            );
+                    messageSource.getMessage("email.reset.title", null, locale));
             messageHelper.setTo(to);
             messageHelper.setFrom("no-reply@vinyland.com");
 
@@ -186,7 +184,7 @@ public class EmailServiceImpl implements EmailService {
 
         final Context ctx = new Context(LocaleContextHolder.getLocale());
         ctx.setVariable("title",
-            messageSource.getMessage("email.verify.heading", null, locale));
+                messageSource.getMessage("email.verify.heading", null, locale));
         ctx.setVariable("message",
                 messageSource.getMessage("email.verify.instructions", null, locale));
         ctx.setVariable("recipientName", username);
@@ -197,8 +195,7 @@ public class EmailServiceImpl implements EmailService {
             final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
             messageHelper.setSubject(
-                messageSource.getMessage("email.verify.title", null, locale)
-            );
+                    messageSource.getMessage("email.verify.title", null, locale));
             messageHelper.setTo(to);
             messageHelper.setFrom("no-reply@vinyland.com");
 
@@ -235,9 +232,11 @@ public class EmailServiceImpl implements EmailService {
         ctx.setVariable("purchaseId", purchase.getPurchaseId());
         ctx.setVariable("currentStep", currentStatus.ordinal());
         ctx.setVariable("purchaseStatusKey", currentStatus.name());
-        ctx.setVariable("purchaseStatusDescription", currentStatus.getDescription());
+        final Locale locale = LocaleContextHolder.getLocale();
+        ctx.setVariable("purchaseStatusDescription", messageSource.getMessage("PurchaseStatus." + currentStatus.name(), null, locale));
         ctx.setVariable("formattedPurchaseDate", purchase.getDate() != null
-                ? purchase.getDate().format(PURCHASE_DATE_FMT) : "");
+                ? purchase.getDate().format(PURCHASE_DATE_FMT)
+                : "");
 
         ctx.setVariable("buyer", buyer);
         ctx.setVariable("seller", seller);
@@ -255,15 +254,16 @@ public class EmailServiceImpl implements EmailService {
         ctx.setVariable("catalogNumber", nullToEmpty(product.getCatalogNumber()));
         ctx.setVariable("editionCountry", nullToEmpty(product.getEditionCountry()));
         ctx.setVariable("productLocation", safeProductLocation(seller));
-        ctx.setVariable("sleeveCondition", product.getSleeveCondition() != null ? product.getSleeveCondition().toPlainString() : "");
-        ctx.setVariable("recordCondition", product.getRecordCondition() != null ? product.getRecordCondition().toPlainString() : "");
+        ctx.setVariable("sleeveCondition",
+                product.getSleeveCondition() != null ? product.getSleeveCondition().toPlainString() : "");
+        ctx.setVariable("recordCondition",
+                product.getRecordCondition() != null ? product.getRecordCondition().toPlainString() : "");
 
         try {
             final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-            final Locale locale = LocaleContextHolder.getLocale();
-            messageHelper.setSubject(messageSource.getMessage("Email.order.subject", new Object[]{title}, locale));
+            messageHelper.setSubject(messageSource.getMessage("Email.order.subject", new Object[] { title }, locale));
             messageHelper.setTo(to);
             messageHelper.setFrom("no-reply@vinyland.com");
 

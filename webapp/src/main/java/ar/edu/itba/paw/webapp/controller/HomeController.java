@@ -35,17 +35,16 @@ public class HomeController {
 	private final ImageService imageService;
 	private final ProductService productService;
 	private final CategoryService categoryService;
-    private final UserService userService;
-    private final ReviewService reviewService;
+	private final UserService userService;
+	private final ReviewService reviewService;
 
 	@Autowired
 	public HomeController(
-		final ProductService productService,
-		final ImageService imageService,
-		final CategoryService categoryService,
-		final UserService userService,
-		final ReviewService reviewService
-	) {
+			final ProductService productService,
+			final ImageService imageService,
+			final CategoryService categoryService,
+			final UserService userService,
+			final ReviewService reviewService) {
 		this.productService = productService;
 		this.imageService = imageService;
 		this.categoryService = categoryService;
@@ -55,27 +54,25 @@ public class HomeController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ModelAndView home(
-        @AuthenticationPrincipal PawAuthUser authUser,
-		@RequestParam(value = "search-text", required = false) final String searchText,
-		@RequestParam(value = "categories", required = false) final List<Long> categoryIds,
-		@RequestParam(value = "minPrice", required = false) final String minPriceParam,
-		@RequestParam(value = "maxPrice", required = false) final String maxPriceParam,
-		@RequestParam(value = "label", required = false) final List<String> recordLabels,
-		@RequestParam(value = "estado", required = false) final List<String> estadoParams,
-		@RequestParam(value = "sort", required = false) final String sortParam,
-		@RequestParam(value = "page", defaultValue = "1") final int page
-	) {
+			@AuthenticationPrincipal PawAuthUser authUser,
+			@RequestParam(value = "search-text", required = false) final String searchText,
+			@RequestParam(value = "categories", required = false) final List<Long> categoryIds,
+			@RequestParam(value = "minPrice", required = false) final String minPriceParam,
+			@RequestParam(value = "maxPrice", required = false) final String maxPriceParam,
+			@RequestParam(value = "label", required = false) final List<String> recordLabels,
+			@RequestParam(value = "estado", required = false) final List<String> estadoParams,
+			@RequestParam(value = "sort", required = false) final String sortParam,
+			@RequestParam(value = "page", defaultValue = "1") final int page) {
 
 		final ProductSearchCriteria criteria = productService.getProductSearchCriteria(
-			searchText,
-        	categoryIds,
-        	minPriceParam,
-        	maxPriceParam,
-        	recordLabels,
-       		estadoParams,
-        	sortParam,
-        	page
-		);
+				searchText,
+				categoryIds,
+				minPriceParam,
+				maxPriceParam,
+				recordLabels,
+				estadoParams,
+				sortParam,
+				page);
 
 		final PaginatedResult<Product> productsPage = productService.listProducts(criteria);
 
@@ -111,13 +108,13 @@ public class HomeController {
 		}
 
 		final String trimmedSearch = searchText != null ? searchText.trim() : "";
-		
+
 		final boolean hasActiveSearch = !trimmedSearch.isEmpty();
 		final boolean hasActiveFilters = hasActiveSearch
-			|| (categoryIds != null && !categoryIds.isEmpty())
-			|| criteria.getMinPrice() != null
-			|| criteria.getMaxPrice() != null
-			|| (recordLabels != null && !recordLabels.isEmpty());
+				|| (categoryIds != null && !categoryIds.isEmpty())
+				|| criteria.getMinPrice() != null
+				|| criteria.getMaxPrice() != null
+				|| (recordLabels != null && !recordLabels.isEmpty());
 
 		final ProductSortOrder sortOrder = ProductSortOrder.parse(sortParam).orElse(ProductSortOrder.NEWEST);
 

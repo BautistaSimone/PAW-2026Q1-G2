@@ -145,8 +145,6 @@
 .profile-span-26 { background: #dc3545; color: #fff; font-weight: 700; font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 50px; }
 .profile-span-27 { font-size: 0.8rem; color: var(--color-text-muted); }
 .profile-div-28 { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; flex-shrink: 0; }
-.profile-button-29 { font-size: 0.78rem; padding: 0.35rem 0.7rem; color: #dc3545; border-color: #dc3545; }
-.profile-button-30 { font-size: 0.78rem; padding: 0.35rem 0.7rem; color: #fff; background: #dc3545; border-color: #dc3545; }
 .purchase-panel-li-1 { color: #b45309; }
 .purchase-panel-a-2 { color: inherit; font-weight: 600; }
 .purchase-panel-span-3 { opacity: 0.95; }

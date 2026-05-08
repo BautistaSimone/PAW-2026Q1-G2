@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Report;
 import ar.edu.itba.paw.models.ReportedProduct;
 
@@ -75,8 +76,16 @@ public class ReportJdbcDao implements ReportDao {
     }
 
     @Override
-    public List<ReportedProduct> findAllGroupedByProduct() {
-        return jdbcTemplate.query(
+    public PaginatedResult<ReportedProduct> findAllGroupedByProduct(int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        final Integer totalCount = jdbcTemplate.queryForObject(
+            "SELECT COUNT(DISTINCT r.product_id) FROM reports r", Integer.class
+        );
+
+        int total = totalCount != null ? totalCount : 0;
+        int maxPage = (int) Math.ceil((double) total / pageSize);
+
+        List<ReportedProduct> results = jdbcTemplate.query(
             "SELECT r.product_id, r.owner_user_id, COUNT(*) AS report_count, "
                 + "p.title AS product_title, p.artist AS product_artist, "
                 + "u.username AS owner_username "
@@ -84,9 +93,13 @@ public class ReportJdbcDao implements ReportDao {
                 + "JOIN products p ON r.product_id = p.product_id "
                 + "JOIN users u ON r.owner_user_id = u.user_id "
                 + "GROUP BY r.product_id, r.owner_user_id, p.title, p.artist, u.username "
-                + "ORDER BY report_count DESC",
-            REPORTED_PRODUCT_ROW_MAPPER
+                + "ORDER BY report_count DESC "
+                + "OFFSET ? LIMIT ?",
+            REPORTED_PRODUCT_ROW_MAPPER,
+            offset, pageSize
         );
+
+        return new PaginatedResult<>(results, page, maxPage, total);
     }
 
     @Override

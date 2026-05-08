@@ -177,7 +177,10 @@
                                                         <i class="bi bi-info-circle" aria-hidden="true"></i>
                                                         <spring:message code="ProductDetail.isOwnProduct" />
                                                     </div>
-                                                    <div class="d-grid mt-3">
+                                                    <div class="d-grid gap-2 mt-3">
+                                                        <a href="<c:url value='/products/${product.id}/edit'/>" class="btn btn-retro btn-retro-primary w-100">
+                                                            <i class="bi bi-pencil-square" aria-hidden="true"></i> <spring:message code="Profile.publications.editButton" />
+                                                        </a>
                                                         <button type="button" class="btn w-100 product-detail-button-15" disabled
                                                             >
                                                             <i class="bi bi-cart-fill product-detail-i-16" aria-hidden="true"
