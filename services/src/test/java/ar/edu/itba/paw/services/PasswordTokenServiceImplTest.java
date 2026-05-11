@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import ar.edu.itba.paw.models.Token;
+import ar.edu.itba.paw.models.PasswordToken;
 import ar.edu.itba.paw.persistence.PasswordTokenDao;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,7 +28,7 @@ public class PasswordTokenServiceImplTest {
 
     @Test
     public void testAcceptPasswordTokenWhenNotExpired() {
-        Token token = new Token(
+        PasswordToken token = new PasswordToken(
             1L,
             1L,
             "token",
@@ -44,7 +44,7 @@ public class PasswordTokenServiceImplTest {
 
     @Test
     public void testRejectPasswordTokenWhenExpired() {
-        Token token = new Token(
+        PasswordToken token = new PasswordToken(
             1L,
             1L,
             "token",

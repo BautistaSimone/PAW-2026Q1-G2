@@ -39,7 +39,7 @@ import ar.edu.itba.paw.services.VerificationTokenService;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.models.Token;
+import ar.edu.itba.paw.models.VerificationToken;
 import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
 
 @Controller
@@ -114,7 +114,7 @@ public class VerificationController {
             return mv;
         }
 
-        final Token verificationToken = verificationTokenService.findByToken(token).get();
+        final VerificationToken verificationToken = verificationTokenService.findByToken(token).get();
 
         userService.enable(verificationToken.getUserId());
 

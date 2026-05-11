@@ -35,12 +35,12 @@ public class VerificationTokenJpaDao implements VerificationTokenDao {
             expirationDate
         );
 
-        em.persist(verificationToken);
-
         // Delete previous token, we don't want more than one per user
         em.createQuery("DELETE VerificationToken WHERE userId = :user_id")
             .setParameter("user_id", userId)
             .executeUpdate();
+
+        em.persist(verificationToken);
 
         return verificationToken;
     }

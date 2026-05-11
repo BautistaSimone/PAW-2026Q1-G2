@@ -45,12 +45,12 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     @Override
     @Transactional(readOnly = true)
     public boolean isValidVerificationToken(String token) {
-        final Optional<Token> verificationTokenOpt = verificationTokenDao.findByToken(token);
+        final Optional<VerificationToken> verificationTokenOpt = verificationTokenDao.findByToken(token);
 
         if (!verificationTokenOpt.isPresent())
             return false;
 
-        final Token verificationToken = verificationTokenOpt.get();
+        final VerificationToken verificationToken = verificationTokenOpt.get();
         return !isTokenExpired(verificationToken);
     }
 

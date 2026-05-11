@@ -22,6 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.PasswordToken;
 
 @Rollback
@@ -38,23 +39,34 @@ public class PasswordTokenJpaDaoTest {
     @PersistenceContext
     private EntityManager em;
 
-    @Autowired
-    private DataSource dataSource;
-
-    private JdbcTemplate jdbcTemplate;
-
     private long userId;
     private String tkn;
     private Instant expirationDate;
 
     @BeforeEach
     public void setUp() {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-
-        userId = jdbcTemplate.queryForObject(
-            "INSERT INTO users (email, password, username, mod) VALUES ('user@test.com', 'pass', 'User', false) CALL IDENTITY()",
-            Long.class
+        User user = new User(
+            "user@test.com",
+            "pass",
+            "User",
+            false,
+            true,
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
         );
+
+        em.persist(user);
+        
+        em.flush();
+
+        userId = user.getId();
 
         tkn = UUID.randomUUID().toString();
         expirationDate = Instant.now().plus(Duration.ofMinutes(EXPIRATION));
@@ -71,7 +83,13 @@ public class PasswordTokenJpaDaoTest {
         Assertions.assertNotNull(token);
         Assertions.assertEquals(expirationDate, token.getExpirationDate());
         Assertions.assertEquals(tkn, token.getToken());
-        Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "password_tokens"));
+
+        Long count = em.createQuery(
+            "SELECT COUNT(pt) FROM PasswordToken pt",
+            Long.class
+        ).getSingleResult();
+
+        Assertions.assertEquals(1L, count);
     }
 
     @Test

@@ -43,12 +43,12 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
     @Override
     @Transactional(readOnly = true)
     public boolean isValidPasswordResetToken(String token) {
-        final Optional<Token> passTokenOpt = passwordTokenDao.findByToken(token);
+        final Optional<PasswordToken> passTokenOpt = passwordTokenDao.findByToken(token);
 
         if (!passTokenOpt.isPresent())
             return false;
 
-        final Token passToken = passTokenOpt.get();
+        final PasswordToken passToken = passTokenOpt.get();
         return !isTokenExpired(passToken);
     }
 

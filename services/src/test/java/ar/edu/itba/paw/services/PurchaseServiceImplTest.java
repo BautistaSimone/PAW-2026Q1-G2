@@ -72,8 +72,41 @@ public class PurchaseServiceImplTest {
     @Test
     public void createPurchaseReservesProductBeforeCreatingPurchase() {
         final Product product = product();
-        final User seller = new User(SELLER_ID, "seller@test.com", "password", "seller", false);
-        final User buyer = new User(BUYER_ID, "buyer@test.com", "password", "buyer", false);
+        final User seller = new User(
+            SELLER_ID, 
+            "seller@test.com", 
+            "password", 
+            "seller", 
+            false, 
+            true, 
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+            );
+        final User buyer = new User(
+            BUYER_ID, 
+            "buyer@test.com", 
+            "password", 
+            "buyer", 
+            false, 
+            true, 
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+            );
+
         final Purchase purchase = new Purchase(99L, PRODUCT_ID, BUYER_ID, SELLER_ID, LocalDate.now(), PurchaseStatus.PENDING, "buyer-token", "seller-token");
 
         Mockito.when(productService.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
@@ -97,8 +130,40 @@ public class PurchaseServiceImplTest {
     @Test
     public void createPurchaseRejectsUnavailableProduct() {
         final Product product = product();
-        final User seller = new User(SELLER_ID, "seller@test.com", "password", "seller", false);
-        final User buyer = new User(BUYER_ID, "buyer@test.com", "password", "buyer", false);
+        final User seller = new User(
+            SELLER_ID, 
+            "seller@test.com", 
+            "password", 
+            "seller", 
+            false, 
+            true, 
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+            );
+        final User buyer = new User(
+            BUYER_ID, 
+            "buyer@test.com", 
+            "password", 
+            "buyer", 
+            false, 
+            true, 
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+            );
 
         Mockito.when(productService.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         Mockito.when(userService.findById(SELLER_ID)).thenReturn(Optional.of(seller));

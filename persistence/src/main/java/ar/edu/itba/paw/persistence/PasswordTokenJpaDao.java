@@ -35,12 +35,12 @@ public class PasswordTokenJpaDao implements PasswordTokenDao {
             expirationDate
         );
 
-        em.persist(passwordToken);
-
         // Delete previous token, we don't want more than one per user
         em.createQuery("DELETE PasswordToken WHERE userId = :user_id")
             .setParameter("user_id", userId)
             .executeUpdate();
+
+        em.persist(passwordToken);
 
         return passwordToken;
     }

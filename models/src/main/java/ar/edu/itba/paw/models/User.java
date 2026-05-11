@@ -73,6 +73,39 @@ public class User {
         this.cbuCvu = cbuCvu;
     }
 
+    public User(
+            Long id,
+            String email,
+            String password,
+            String username,
+            Boolean mod,
+            Boolean enabled,
+            Boolean banned,
+            String firstName,
+            String lastName,
+            String streetName,
+            String streetNumber,
+            String neighborhood,
+            String province,
+            String extraAddressInfo,
+            String cbuCvu) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.mod = mod;
+        this.enabled = enabled;
+        this.banned = banned;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.streetName = streetName;
+        this.streetNumber = streetNumber;
+        this.neighborhood = neighborhood;
+        this.province = province;
+        this.extraAddressInfo = extraAddressInfo;
+        this.cbuCvu = cbuCvu;
+    }
+
     private static boolean nonBlank(final String s) {
         return s != null && !s.trim().isEmpty();
     }

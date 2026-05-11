@@ -28,6 +28,12 @@ public class VerificationToken extends Token {
         super(userId, token, expirationDate);
     }
 
+    public VerificationToken(final Long tokenId, final Long userId, final String token, final Instant expirationDate) {
+        super(userId, token, expirationDate);
+
+        this.tokenId = tokenId;
+    }
+
     public Long getTokenId() {
         return tokenId;
     }

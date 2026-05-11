@@ -7,6 +7,9 @@ import java.sql.Timestamp;
 import java.util.UUID;
 import javax.sql.DataSource;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +23,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import ar.edu.itba.paw.models.VerificationToken;
+import ar.edu.itba.paw.models.User;
 
 @Rollback
 @Transactional
@@ -32,10 +36,8 @@ public class VerificationTokenJpaDaoTest {
     @Autowired
     private VerificationTokenJpaDao verificationTokenDao;
 
-    @Autowired
-    private DataSource dataSource;
-
-    private JdbcTemplate jdbcTemplate;
+    @PersistenceContext
+    private EntityManager em;
 
     private long userId;
     private String tkn;
@@ -43,12 +45,28 @@ public class VerificationTokenJpaDaoTest {
 
     @BeforeEach
     public void setUp() {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-
-        userId = jdbcTemplate.queryForObject(
-            "INSERT INTO users (email, password, username, mod) VALUES ('user@test.com', 'pass', 'User', false) CALL IDENTITY()",
-            Long.class
+        User user = new User(
+            "user@test.com",
+            "pass",
+            "User",
+            false,
+            true,
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
         );
+
+        em.persist(user);
+        
+        em.flush();
+
+        userId = user.getId();
 
         tkn = UUID.randomUUID().toString();
         expirationDate = Instant.now().plus(Duration.ofMinutes(EXPIRATION));
@@ -65,7 +83,13 @@ public class VerificationTokenJpaDaoTest {
         Assertions.assertNotNull(token);
         Assertions.assertEquals(expirationDate, token.getExpirationDate());
         Assertions.assertEquals(tkn, token.getToken());
-        Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "verification_tokens"));
+
+        Long count = em.createQuery(
+            "SELECT COUNT(vt) FROM VerificationToken vt",
+            Long.class
+        ).getSingleResult();
+
+        Assertions.assertEquals(1L, count);
     }
 
     @Test
