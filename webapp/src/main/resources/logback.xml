@@ -18,13 +18,21 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    
+
+    <logger name="org.hibernate.internal.util.EntityPrinter" level="WARN" additivity="false" />
+    <logger name="org.hibernate.engine.internal.TwoPhaseLoad" level="INFO" additivity="false" />
+    <logger name="org.hibernate.loader.Loader" level="INFO" additivity="false" />
+
     <root level="WARN">
         <appender-ref ref="errors" />
     </root>
 
     <logger name="ar.edu.itba.paw" level="INFO" additivity="false"> 
         <appender-ref ref="general" /> 
+    </logger> 
+
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false"> 
+        <appender-ref ref="STDOUT" /> 
     </logger> 
 
     <logger name="ar.edu.itba.paw.services" level="INFO" additivity="false"> 
