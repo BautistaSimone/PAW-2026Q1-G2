@@ -13,16 +13,15 @@ import javax.persistence.Lob;
 @Table(name = "images")
 public class Image {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "images_imageid_seq")
-    @SequenceGenerator(sequenceName = "images_imageid_seq", name = "images_imageid_eq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "images_image_id_seq")
+    @SequenceGenerator(sequenceName = "images_image_id_seq", name = "images_image_id_seq", allocationSize = 1)
     @Column(name = "image_id")
     private Long imageId;
 
     @Column(name = "product_id", nullable = false)
     private Long productId;
 
-    @Lob
-    @Column(nullable = false, columnDefinition = "BYTEA")
+    @Column(name = "data", nullable = false)
     private byte[] data;
 
     @Column(name = "content_type", nullable = false)

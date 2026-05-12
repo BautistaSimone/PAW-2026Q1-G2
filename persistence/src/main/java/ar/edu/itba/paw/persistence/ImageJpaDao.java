@@ -56,13 +56,14 @@ public class ImageJpaDao implements ImageDao {
 
     @Override
     public boolean existsByProductId(final Long productId) {
+        TypedQuery<Long> query = em.createQuery(
+            "SELECT COUNT(i) FROM Image i WHERE i.productId = :productId",
+            Long.class
+        );
 
-        TypedQuery<Image> count = em.createQuery("FROM Image WHERE productId = :product_id", Image.class);
-        count.setParameter("product_id", productId);
+        query.setParameter("productId", productId);
 
-        final Integer imageCount = count.getResultList().size();
-        
-        return imageCount != null && imageCount > 0;
+        return query.getSingleResult() > 0;
     }
 
     @Override
