@@ -1,40 +1,76 @@
 package ar.edu.itba.paw.models;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Id;
+import javax.persistence.Column;
+import javax.persistence.ManyToMany;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 
+@Entity
+@Table(name = "products")
 public class Product {
 
-    private final Long productId;
-    private final Long userId;
-    private final String title;
-    private final String artist;
-    private final String recordLabel;
-    private final String catalogNumber;
-    private final String editionCountry;
-    private final List<Category> categories;
-    private final String description;
-    private final BigDecimal sleeveCondition;
-    private final BigDecimal recordCondition;
-    private final LocalDate published;
-    private final BigDecimal price;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "products_productid_seq")
+    @SequenceGenerator(sequenceName = "products_productid_seq", name = "products_productid_seq", allocationSize = 1)
+    @Column(name = "product_id")
+    private Long productId;
+
+
+    @Column(name = "user_id", nullable = false, unique = true)
+    private Long userId;
+    private String title;
+    private String artist;
+
+    @Column(name = "record_label", length = 255, nullable = false)
+    private String recordLabel;
+
+    @Column(name = "catalog_number", length = 255, nullable = false)
+    private String catalogNumber;
+
+    @Column(name = "edition_country", length = 255, nullable = false)
+    private String editionCountry;
+
+    @ManyToMany
+    private List<Category> categories;
+
+    @Column(length = 255, nullable = false)
+    private String description;
+
+    @Column(name = "sleeve_condition")
+    private BigDecimal sleeveCondition;
+
+    @Column(name = "record_condition")
+    private BigDecimal recordCondition;
+    private LocalDate published;
+    private BigDecimal price;
+
+    Product() {
+        // Just for Hibernate, we love you!
+    }
 
     public Product(
-        final Long productId,
-        final Long userId,
-        final String title,
-        final String artist,
-        final String recordLabel,
-        final String catalogNumber,
-        final String editionCountry,
-        final List<Category> categories,
-        final String description,
-        final BigDecimal sleeveCondition,
-        final BigDecimal recordCondition,
-        final LocalDate published,
-        final BigDecimal price
+        Long productId,
+        Long userId,
+        String title,
+        String artist,
+        String recordLabel,
+        String catalogNumber,
+        String editionCountry,
+        List<Category> categories,
+        String description,
+        BigDecimal sleeveCondition,
+        BigDecimal recordCondition,
+        LocalDate published,
+        BigDecimal price
     ) {
         this.productId = productId;
         this.userId = userId;
@@ -51,6 +87,33 @@ public class Product {
         this.price = price;
     }
 
+    public Product(
+        Long userId,
+        String title,
+        String artist,
+        String recordLabel,
+        String catalogNumber,
+        String editionCountry,
+        List<Category> categories,
+        String description,
+        BigDecimal sleeveCondition,
+        BigDecimal recordCondition,
+        LocalDate published,
+        BigDecimal price
+    ) {
+        this.userId = userId;
+        this.title = title;
+        this.artist = artist;
+        this.recordLabel = recordLabel;
+        this.catalogNumber = catalogNumber;
+        this.editionCountry = editionCountry;
+        this.categories = categories;
+        this.description = description;
+        this.sleeveCondition = sleeveCondition;
+        this.recordCondition = recordCondition;
+        this.published = published;
+        this.price = price;
+    }
     public Long getId() {
         return productId;
     }

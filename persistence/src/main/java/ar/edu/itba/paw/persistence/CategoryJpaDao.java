@@ -1,6 +1,10 @@
 package ar.edu.itba.paw.persistence;
 
 import javax.sql.DataSource;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
 
 import java.util.List;
 
@@ -14,29 +18,20 @@ import ar.edu.itba.paw.models.Category;
 @Repository
 public class CategoryJdbcDao implements CategoryDao {
 
-    private static final RowMapper<Category> CATEGORY_ROW_MAPPER = (rs, rowNum) ->
-        new Category(
-            rs.getLong("category_id"),
-            rs.getString("name")
-        );
-
-    private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public CategoryJdbcDao(final DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
+    @PersistenceContext
+    private EntityManager em;
 
     @Override
     public List<Category> findAll() {
-        return jdbcTemplate.query(
-            "SELECT category_id, name FROM categories ORDER BY name ASC",
-            CATEGORY_ROW_MAPPER
-        );
+        final TypedQuery<Category> query = em.createQuery("FROM Category ORDER BY name ASC", Category.class);
+        return query.getResultList();
     }
 
     @Override
     public List<Category> findByProductId(final Long productId) {
+        final TypedQuery<Category> query = em.createQuery("FROM Category WHERE productId = :product_id", Category.class);
+        query.setParameter("product_id", productId);
+        return query.getResultList();
         return jdbcTemplate.query(
             "SELECT c.category_id, c.name FROM categories c " +
             "JOIN products_categories pc ON c.category_id = pc.category_id " +

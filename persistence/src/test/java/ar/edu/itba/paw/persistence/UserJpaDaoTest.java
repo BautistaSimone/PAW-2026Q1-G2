@@ -23,7 +23,7 @@ import ar.edu.itba.paw.models.User;
 @Rollback   // Clean database before testing
 @Transactional
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestConfigurationJpa.class)
+@ContextConfiguration(classes = TestConfiguration.class)
 public class UserJpaDaoTest {
 
     @Autowired

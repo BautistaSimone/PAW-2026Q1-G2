@@ -28,7 +28,7 @@ import ar.edu.itba.paw.models.PasswordToken;
 @Rollback
 @Transactional
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestConfigurationJpa.class)
+@ContextConfiguration(classes = TestConfiguration.class)
 public class PasswordTokenJpaDaoTest {
 
     private static final int EXPIRATION = 60 * 24;

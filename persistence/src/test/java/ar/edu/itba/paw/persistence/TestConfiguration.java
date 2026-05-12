@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @ComponentScan({ "ar.edu.itba.paw.persistence" })
 @Configuration
-public class TestConfigurationJpa {
+public class TestConfiguration {
 
     @Bean
     public DataSource dataSource() {
