@@ -973,6 +973,62 @@ details.filter-section:not([open]) .filter-section-chevron {
     white-space: nowrap;
 }
 
+.record-label-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.record-label-search-input {
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.86rem;
+    font-family: var(--font-body);
+    color: var(--color-text-main);
+    background: var(--color-input-bg);
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.record-label-search-input:focus {
+    outline: none;
+    background: #fff;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(231, 111, 81, 0.12);
+}
+
+.record-label-selected {
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.record-label-group-title {
+    margin: 0 0 0.25rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+.record-label-selected-options,
+.record-label-results {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.record-label-results {
+    max-height: 18rem;
+    overflow-y: auto;
+    padding-right: 0.1rem;
+}
+
+.record-label-filter-source {
+    display: none !important;
+}
+
 .filter-hint,
 .filter-empty-hint {
     font-size: 0.78rem;

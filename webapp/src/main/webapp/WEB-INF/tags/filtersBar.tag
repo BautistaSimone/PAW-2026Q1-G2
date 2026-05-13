@@ -1,7 +1,6 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <spring:message code="Global.currency.symbol" var="currencySymbol"/>
 <form class="filters-bar" method="get" action="<c:url value="/"/>" novalidate>
@@ -84,18 +83,30 @@
         </summary>
         <div class="filter-options">
             <c:choose>
-                <c:when test="${not empty recordLabelsFilter}">
-                    <c:forEach items="${recordLabelsFilter}" var="lbl">
-                        <c:set var="displayLabel" value="${lbl}" />
-                        <c:if test="${fn:length(lbl) > 24}">
-                            <c:set var="displayLabel" value="${fn:substring(lbl, 0, 24)}..." />
-                        </c:if>
-                        <label class="filter-option">
-                            <input type="checkbox" name="label" value="<c:out value="${lbl}" />"
-                                ${selectedLabels.contains(lbl) ? 'checked' : ''} />
-                            <span class="filter-record-label"><c:out value="${displayLabel}" /></span>
-                        </label>
-                    </c:forEach>
+                <c:when test="${not empty recordLabelsFilter or not empty selectedLabels}">
+                    <div class="record-label-filter" data-initial-limit="10">
+                        <spring:message code="Filters.labels.search.placeholder" var="labelSearchPlaceholder" />
+                        <input id="recordLabelSearch" type="text" class="record-label-search-input"
+                               placeholder="<c:out value='${labelSearchPlaceholder}' />" autocomplete="off" />
+                        <div class="record-label-selected" hidden>
+                            <p class="record-label-group-title"><spring:message code="Filters.labels.selected" /></p>
+                            <div class="record-label-selected-options"></div>
+                        </div>
+                        <div class="record-label-results"></div>
+                        <p class="record-label-no-results filter-empty-hint mb-0" hidden>
+                            <spring:message code="Filters.labels.noResults" />
+                        </p>
+                    </div>
+                    <select id="recordLabelFilterSource" class="record-label-filter-source" hidden="hidden" aria-hidden="true" tabindex="-1">
+                        <c:forEach items="${recordLabelsFilter}" var="lbl">
+                            <option value="<c:out value='${lbl}' />" data-selected="${selectedLabels.contains(lbl) ? 'true' : 'false'}"><c:out value="${lbl}" /></option>
+                        </c:forEach>
+                        <c:forEach items="${selectedLabels}" var="selectedLabel">
+                            <c:if test="${not recordLabelsFilter.contains(selectedLabel)}">
+                                <option value="<c:out value='${selectedLabel}' />" data-selected="true"><c:out value="${selectedLabel}" /></option>
+                            </c:if>
+                        </c:forEach>
+                    </select>
                 </c:when>
                 <c:otherwise>
                     <p class="filter-empty-hint mb-0"><spring:message code="Filters.labels.empty" /></p>
@@ -156,6 +167,127 @@
         window.VinylandPriceFormat.attachFormattedPriceInput(minPriceInput);
         window.VinylandPriceFormat.attachFormattedPriceInput(maxPriceInput);
     }
+
+    function normalizeLabel(value) {
+        return (value || '').trim().toLowerCase();
+    }
+
+    function initRecordLabelFilter() {
+        var labelFilter = form.querySelector('.record-label-filter');
+        var source = document.getElementById('recordLabelFilterSource');
+        if (!labelFilter || !source) {
+            return;
+        }
+
+        var searchInput = document.getElementById('recordLabelSearch');
+        var selectedBlock = labelFilter.querySelector('.record-label-selected');
+        var selectedOptions = labelFilter.querySelector('.record-label-selected-options');
+        var resultsOptions = labelFilter.querySelector('.record-label-results');
+        var noResults = labelFilter.querySelector('.record-label-no-results');
+        var initialLimit = parseInt(labelFilter.getAttribute('data-initial-limit'), 10) || 10;
+        var labelsByKey = Object.create(null);
+        var labels = [];
+        var selectedKeys = Object.create(null);
+
+        Array.prototype.slice.call(source.options).forEach(function (option) {
+            var value = option.value;
+            var key = normalizeLabel(value);
+            if (!key || labelsByKey[key]) {
+                if (key && labelsByKey[key] && option.getAttribute('data-selected') === 'true') {
+                    selectedKeys[key] = true;
+                }
+                return;
+            }
+
+            labelsByKey[key] = { key: key, name: value };
+            labels.push(labelsByKey[key]);
+            if (option.getAttribute('data-selected') === 'true') {
+                selectedKeys[key] = true;
+            }
+        });
+
+        function selectedLabelObjects() {
+            return labels.filter(function (label) {
+                return !!selectedKeys[label.key];
+            });
+        }
+
+        function filteredLabelObjects() {
+            var searchTerm = normalizeLabel(searchInput ? searchInput.value : '');
+            var availableLabels = labels.filter(function (label) {
+                return !selectedKeys[label.key];
+            });
+
+            if (!searchTerm) {
+                return availableLabels.slice(0, initialLimit);
+            }
+
+            return availableLabels.filter(function (label) {
+                return normalizeLabel(label.name).indexOf(searchTerm) !== -1;
+            });
+        }
+
+        function createLabelOption(label) {
+            var optionLabel = document.createElement('label');
+            optionLabel.className = 'filter-option record-label-option';
+
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'label';
+            checkbox.value = label.name;
+            checkbox.checked = !!selectedKeys[label.key];
+
+            var text = document.createElement('span');
+            text.className = 'filter-record-label';
+            text.title = label.name;
+            text.textContent = label.name;
+
+            checkbox.addEventListener('change', function () {
+                if (checkbox.checked) {
+                    selectedKeys[label.key] = true;
+                } else {
+                    delete selectedKeys[label.key];
+                }
+                renderLabels();
+                checkChanges();
+            });
+
+            optionLabel.appendChild(checkbox);
+            optionLabel.appendChild(text);
+            return optionLabel;
+        }
+
+        function renderLabels() {
+            var selected = selectedLabelObjects();
+            var visible = filteredLabelObjects();
+            var hasSearch = !!normalizeLabel(searchInput ? searchInput.value : '');
+
+            selectedOptions.textContent = '';
+            resultsOptions.textContent = '';
+
+            selected.forEach(function (label) {
+                selectedOptions.appendChild(createLabelOption(label));
+            });
+            visible.forEach(function (label) {
+                resultsOptions.appendChild(createLabelOption(label));
+            });
+
+            selectedBlock.hidden = selected.length === 0;
+            noResults.hidden = !hasSearch || visible.length > 0;
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', renderLabels);
+            searchInput.addEventListener('keydown', function (ev) {
+                if (ev.key === 'Enter') {
+                    ev.preventDefault();
+                }
+            });
+        }
+        renderLabels();
+    }
+
+    initRecordLabelFilter();
 
     // Function to serialize form state for comparison
     function getSerializedState() {
