@@ -118,7 +118,7 @@
                                                 >
                                                 <i class="bi bi-mic product-detail-i-7"
                                                     ></i>
-                                                <c:out value="${product.artist}" />
+                                                <span class="product-detail-artist-text"><c:out value="${product.artist}" /></span>
                                             </h2>
 
 
