@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindingResult;
 import javax.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
 
 import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.Image;
@@ -400,6 +402,7 @@ public class ProductController {
     public ModelAndView productDetail(
         @PathVariable("id") final Long id,
         @AuthenticationPrincipal final PawAuthUser authUser,
+        final HttpServletRequest request,
         @ModelAttribute("purchaseCreateForm") final ar.edu.itba.paw.webapp.form.PurchaseCreateForm purchaseForm
     ) {
         final Product product = productService.findByIdIfAvailable(id)
@@ -407,6 +410,7 @@ public class ProductController {
 
         final ModelAndView mav = new ModelAndView("product-detail");
         mav.addObject("product", product);
+        mav.addObject("productDetailBackUrl", resolveProductDetailBackUrl(request, id));
 
         final boolean isOwnProduct = authUser != null
             && product.getUserId().equals(authUser.getUser().getId());
@@ -449,6 +453,72 @@ public class ProductController {
         mav.addObject("sellerRatings", sellerRatings);
 
         return mav;
+    }
+
+    static String resolveProductDetailBackUrl(final HttpServletRequest request, final Long productId) {
+        final String fallbackUrl = "/";
+        final String referer = request.getHeader("Referer");
+        if (referer == null || referer.isBlank()) {
+            return fallbackUrl;
+        }
+
+        try {
+            final URI refererUri = URI.create(referer);
+            if ((refererUri.isAbsolute() || refererUri.getHost() != null)
+                && !isSameOrigin(refererUri, request)) {
+                return fallbackUrl;
+            }
+
+            final String backPath = internalPathFromReferer(refererUri.getRawPath(), request.getContextPath());
+            if (backPath == null || isSameProductDetailPath(backPath, productId)) {
+                return fallbackUrl;
+            }
+
+            final String query = refererUri.getRawQuery();
+            return query == null || query.isBlank() ? backPath : backPath + "?" + query;
+        } catch (IllegalArgumentException e) {
+            return fallbackUrl;
+        }
+    }
+
+    private static boolean isSameOrigin(final URI refererUri, final HttpServletRequest request) {
+        final String refererHost = refererUri.getHost();
+        if (refererHost == null || !refererHost.equalsIgnoreCase(request.getServerName())) {
+            return false;
+        }
+        if (refererUri.getScheme() != null && !refererUri.getScheme().equalsIgnoreCase(request.getScheme())) {
+            return false;
+        }
+        return effectivePort(refererUri.getScheme(), refererUri.getPort())
+            == effectivePort(request.getScheme(), request.getServerPort());
+    }
+
+    private static int effectivePort(final String scheme, final int port) {
+        if (port > 0) {
+            return port;
+        }
+        if ("https".equalsIgnoreCase(scheme)) {
+            return 443;
+        }
+        return 80;
+    }
+
+    private static String internalPathFromReferer(final String rawPath, final String contextPath) {
+        String path = rawPath == null || rawPath.isBlank() ? "/" : rawPath;
+        if (contextPath != null && !contextPath.isBlank()) {
+            if (path.equals(contextPath)) {
+                return "/";
+            }
+            if (!path.startsWith(contextPath + "/")) {
+                return null;
+            }
+            path = path.substring(contextPath.length());
+        }
+        return path.startsWith("/") ? path : "/" + path;
+    }
+
+    private static boolean isSameProductDetailPath(final String path, final Long productId) {
+        return path.equals("/products/" + productId);
     }
 
     @RequestMapping(value = "/products/{id:\\d+}/report", method = RequestMethod.POST)

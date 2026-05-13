@@ -43,7 +43,8 @@
                                 </c:if>
 
                                 <div class="mb-4">
-                                    <a href="<c:url value='/'/>"
+                                    <c:url var="productDetailBackHref" value="${productDetailBackUrl}" />
+                                    <a href="<c:out value='${productDetailBackHref}'/>"
                                         style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--color-text-muted); font-weight: 500; text-decoration: none; transition: color 0.2s;"
                                         onmouseover="this.style.color='var(--color-accent)';"
                                         onmouseout="this.style.color='var(--color-text-muted)';">
