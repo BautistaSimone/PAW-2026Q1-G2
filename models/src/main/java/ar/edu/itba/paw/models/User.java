@@ -29,13 +29,26 @@ public class User {
     private Boolean mod;
     private Boolean enabled;
     private Boolean banned;
+
+    @Column(name = "first_name", length = 100)
     private String firstName;
+
+    @Column(name = "last_name", length = 100)
     private String lastName;
+
+    @Column(name = "street_name")
     private String streetName;
+
+    @Column(name = "street_number", length = 20)
     private String streetNumber;
+
     private String neighborhood;
     private String province;
+
+    @Column(name = "extra_address_info", length = 500)
     private String extraAddressInfo;
+
+    @Column(name = "cbu_cvu", length = 22)
     private String cbuCvu;
 
     User() {
@@ -228,6 +241,50 @@ public class User {
 
     public String getCbuCvu() {
         return cbuCvu;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public void setBanned(Boolean banned) {
+        this.banned = banned;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setStreetName(String streetName) {
+        this.streetName = streetName;
+    }
+
+    public void setStreetNumber(String streetNumber) {
+        this.streetNumber = streetNumber;
+    }
+
+    public void setNeighborhood(String neighborhood) {
+        this.neighborhood = neighborhood;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public void setExtraAddressInfo(String extraAddressInfo) {
+        this.extraAddressInfo = extraAddressInfo;
+    }
+
+    public void setCbuCvu(String cbuCvu) {
+        this.cbuCvu = cbuCvu;
     }
 
     @Override

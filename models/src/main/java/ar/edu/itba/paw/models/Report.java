@@ -2,13 +2,39 @@ package ar.edu.itba.paw.models;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Id;
+import javax.persistence.Column;
+
+@Entity
+@Table(name = "reports")
 public class Report {
 
-    private final Long reportId;
-    private final Long productId;
-    private final Long ownerUserId;
-    private final Long reporterUserId;
-    private final LocalDateTime createdAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reports_report_id_seq")
+    @SequenceGenerator(sequenceName = "reports_report_id_seq", name = "reports_report_id_seq", allocationSize = 1)
+    @Column(name = "report_id")
+    private Long reportId;
+
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
+
+    @Column(name = "owner_user_id", nullable = false)
+    private Long ownerUserId;
+
+    @Column(name = "reporter_user_id", nullable = false)
+    private Long reporterUserId;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    Report() {
+        // Just for Hibernate, we love you!
+    }
 
     public Report(
             final Long reportId,
@@ -21,6 +47,15 @@ public class Report {
         this.ownerUserId = ownerUserId;
         this.reporterUserId = reporterUserId;
         this.createdAt = createdAt;
+    }
+
+    public Report(
+            final Long productId,
+            final Long ownerUserId,
+            final Long reporterUserId) {
+        this.productId = productId;
+        this.ownerUserId = ownerUserId;
+        this.reporterUserId = reporterUserId;
     }
 
     public Long getReportId() {

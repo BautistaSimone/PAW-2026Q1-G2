@@ -1,79 +1,96 @@
 package ar.edu.itba.paw.persistence;
 
-import javax.sql.DataSource;
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Optional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.Purchase;
+import ar.edu.itba.paw.models.PurchaseStatus;
 import ar.edu.itba.paw.models.Review;
 import ar.edu.itba.paw.models.SellerRatingSummary;
+import ar.edu.itba.paw.models.User;
 
 @Rollback
 @Transactional
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestConfiguration.class)
-public class ReviewJdbcDaoTest {
+public class ReviewJpaDaoTest {
 
     @Autowired
-    private ReviewJdbcDao reviewDao;
+    private ReviewJpaDao reviewDao;
 
     @Autowired
-    private DataSource dataSource;
+    private UserJpaDao userDao;
 
-    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private ProductJpaDao productDao;
+
+    @Autowired
+    private PurchaseJpaDao purchaseDao;
+
+    @PersistenceContext
+    private EntityManager em;
 
     private long sellerId;
     private long buyerId;
-    private long productId;
     private long purchaseId;
 
     @BeforeEach
     public void setUp() {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+        final User seller = userDao.createUser("review-seller@test.com", "pass", "Seller",
+            false, true, null, null, null, null, null, null, null, null);
+        final User buyer = userDao.createUser("review-buyer@test.com", "pass", "Buyer",
+            false, true, null, null, null, null, null, null, null, null);
 
-        sellerId = jdbcTemplate.queryForObject(
-            "INSERT INTO users (email, password, username, mod) VALUES ('seller@test.com', 'pass', 'Seller', false) CALL IDENTITY()",
-            Long.class
+        sellerId = seller.getId();
+        buyerId = buyer.getId();
+
+        final Product product = productDao.createProduct(
+            sellerId, "Test Album", "Test Artist", "Label", "CAT", "Argentina",
+            Collections.emptyList(), "desc", BigDecimal.valueOf(8),
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
         );
-        buyerId = jdbcTemplate.queryForObject(
-            "INSERT INTO users (email, password, username, mod) VALUES ('buyer@test.com', 'pass', 'Buyer', false) CALL IDENTITY()",
-            Long.class
+
+        final Purchase purchase = purchaseDao.createPurchase(
+            product.getId(), buyerId, sellerId, PurchaseStatus.DELIVERED, "token1", "token2"
         );
-        productId = jdbcTemplate.queryForObject(
-            "INSERT INTO products (user_id, title, artist, description, sleeve_condition, record_condition, published, price) " +
-            "VALUES (" + sellerId + ", 'Test Album', 'Test Artist', 'desc', 8, 9, CURRENT_DATE, 1000) CALL IDENTITY()",
-            Long.class
-        );
-        purchaseId = jdbcTemplate.queryForObject(
-            "INSERT INTO purchases (product_id, buyer_user_id, seller_user_id, date, payment_method, confirmed) " +
-            "VALUES (" + productId + ", " + buyerId + ", " + sellerId + ", CURRENT_DATE, 'DELIVERED|token1|token2', true) CALL IDENTITY()",
-            Long.class
-        );
+        purchaseId = purchase.getPurchaseId();
+        em.flush();
     }
 
     @Test
     public void testCreateReview() {
         final Review review = reviewDao.create(purchaseId, sellerId, buyerId, 4, "Great seller!");
+        em.flush();
 
         Assertions.assertNotNull(review);
         Assertions.assertEquals(4, review.getScore());
-        Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "reviews"));
+
+        final long count = em.createQuery("SELECT COUNT(r) FROM Review r", Long.class).getSingleResult();
+        Assertions.assertEquals(1, count);
     }
 
     @Test
     public void testFindByPurchaseId() {
         reviewDao.create(purchaseId, sellerId, buyerId, 5, "Excellent");
+        em.flush();
+        em.clear();
 
-        var result = reviewDao.findByPurchaseId(purchaseId);
+        final Optional<Review> result = reviewDao.findByPurchaseId(purchaseId);
 
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(5, result.get().getScore());
@@ -83,8 +100,10 @@ public class ReviewJdbcDaoTest {
     @Test
     public void testFindBySellerId() {
         reviewDao.create(purchaseId, sellerId, buyerId, 3, "OK");
+        em.flush();
+        em.clear();
 
-        var reviews = reviewDao.findBySellerId(sellerId, 1, 10).getResults();
+        final var reviews = reviewDao.findBySellerId(sellerId, 1, 10).getResults();
 
         Assertions.assertEquals(1, reviews.size());
         Assertions.assertEquals(3, reviews.get(0).getScore());
@@ -93,8 +112,9 @@ public class ReviewJdbcDaoTest {
     @Test
     public void testSummaryForSeller() {
         reviewDao.create(purchaseId, sellerId, buyerId, 4, "Good");
+        em.flush();
 
-        SellerRatingSummary summary = reviewDao.summaryForSeller(sellerId);
+        final SellerRatingSummary summary = reviewDao.summaryForSeller(sellerId);
 
         Assertions.assertEquals(1, summary.getCount());
         Assertions.assertEquals(4.0, summary.getAvgScore(), 0.01);
@@ -102,7 +122,7 @@ public class ReviewJdbcDaoTest {
 
     @Test
     public void testSummaryForSellerWithNoReviews() {
-        SellerRatingSummary summary = reviewDao.summaryForSeller(sellerId);
+        final SellerRatingSummary summary = reviewDao.summaryForSeller(sellerId);
 
         Assertions.assertEquals(0, summary.getCount());
         Assertions.assertEquals(0.0, summary.getAvgScore(), 0.01);

@@ -1,0 +1,17 @@
+INSERT INTO categories (name) SELECT 'Rock'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Rock');
+INSERT INTO categories (name) SELECT 'Pop'         WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Pop');
+INSERT INTO categories (name) SELECT 'Jazz'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Jazz');
+INSERT INTO categories (name) SELECT 'Blues'       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Blues');
+INSERT INTO categories (name) SELECT 'Electrónica' WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Electrónica');
+INSERT INTO categories (name) SELECT 'Hip Hop'     WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Hip Hop');
+INSERT INTO categories (name) SELECT 'Indie'       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Indie');
+INSERT INTO categories (name) SELECT 'Reggae'      WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Reggae');
+INSERT INTO categories (name) SELECT 'Reggaeton'   WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Reggaeton');
+INSERT INTO categories (name) SELECT 'Clásica'     WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Clásica');
+INSERT INTO categories (name) SELECT 'Folk'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Folk');
+INSERT INTO categories (name) SELECT 'Metal'       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Metal');
+INSERT INTO categories (name) SELECT 'Punk'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Punk');
+INSERT INTO categories (name) SELECT 'Soul'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Soul');
+INSERT INTO categories (name) SELECT 'Funk'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Funk');
+INSERT INTO categories (name) SELECT 'Tango'       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Tango');
+INSERT INTO categories (name) SELECT 'Cumbia'      WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Cumbia');

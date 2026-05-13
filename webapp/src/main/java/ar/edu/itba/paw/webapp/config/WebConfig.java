@@ -9,7 +9,6 @@ import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.orm.jpa.JpaVendorAdapter;
@@ -161,6 +160,16 @@ public class WebConfig implements WebMvcConfigurer {
 
         return factoryBean;
     }
+    @Bean
+    public DataSourceInitializer dataSourceInitializer() {
+        final DataSourceInitializer initializer = new DataSourceInitializer();
+        initializer.setDataSource(dataSource());
+        final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+        populator.addScript(new ClassPathResource("seed.sql"));
+        initializer.setDatabasePopulator(populator);
+        return initializer;
+    }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(verificationInterceptor)
