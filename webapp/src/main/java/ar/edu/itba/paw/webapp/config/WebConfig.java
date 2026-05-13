@@ -165,7 +165,7 @@ public class WebConfig implements WebMvcConfigurer {
         final DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource());
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(new ClassPathResource("seed.sql"));
+        populator.addScript(new ClassPathResource("schema.sql"));
         initializer.setDatabasePopulator(populator);
         return initializer;
     }

@@ -53,8 +53,8 @@ mvn test
 - **Interface-driven**: Services and DAOs should always have a corresponding interface in the `-contracts` modules.
 
 ### Database
-- The database schema is managed by Hibernate via `hbm2ddl.auto=update` (tables are created/updated from JPA entity annotations).
-- Seed data (default categories) is loaded from `persistence/src/main/resources/seed.sql` via `DataSourceInitializer` in `WebConfig.java`.
+- The database schema is defined in `persistence/src/main/resources/schema.sql` (DDL + seed data). Hibernate also manages the schema via `hbm2ddl.auto=update`.
+- `WebConfig.java` uses `DataSourceInitializer` to execute `schema.sql` on startup (the `CREATE TABLE IF NOT EXISTS` statements are safe alongside Hibernate's auto-update).
 - Local PostgreSQL credentials (default):
   - **Host**: `localhost`
   - **Database**: `paw`
