@@ -257,7 +257,7 @@ public class ProductJpaDao implements ProductDao {
 
     @Override
     public List<String> listDistinctArtists() {
-        final TypedQuery<String> query = em.createQuery("SELECT DISTINCT TRIM(artist) FROM Product WHERE" +
+        final TypedQuery<String> query = em.createQuery("SELECT DISTINCT TRIM(artist) AS value FROM Product WHERE" +
         " artist IS NOT NULL AND state = :state AND TRIM(artist) <> '' ORDER BY value ASC", String.class);
         query.setParameter("state", ProductState.ACTIVE.getPersistenceValue());
         return query.getResultList();
@@ -265,7 +265,7 @@ public class ProductJpaDao implements ProductDao {
 
     @Override
     public List<String> listDistinctRecordLabels() {
-        final TypedQuery<String> query = em.createQuery("SELECT DISTINCT TRIM(record_label) FROM Product WHERE" +
+        final TypedQuery<String> query = em.createQuery("SELECT DISTINCT TRIM(record_label) AS value FROM Product WHERE" +
         " record_label IS NOT NULL AND state = :state AND TRIM(record_label) <> '' ORDER BY value ASC", String.class);
         query.setParameter("state", ProductState.ACTIVE.getPersistenceValue());
         return query.getResultList();
