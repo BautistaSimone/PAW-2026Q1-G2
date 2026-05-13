@@ -64,6 +64,10 @@ public class HomeController {
 			@RequestParam(value = "sort", required = false) final String sortParam,
 			@RequestParam(value = "page", defaultValue = "1") final int page) {
 
+		if (page < 1) {
+			throw new IllegalArgumentException("Invalid page");
+		}
+
 		final ProductSearchCriteria criteria = productService.getProductSearchCriteria(
 				searchText,
 				categoryIds,

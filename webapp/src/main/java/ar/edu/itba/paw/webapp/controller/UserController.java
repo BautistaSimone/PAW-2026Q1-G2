@@ -160,6 +160,13 @@ public class UserController {
             @RequestParam(value = "page", defaultValue = "1") final int page,
             @RequestParam(value = "trashPage", defaultValue = "1") final int trashPage,
             @RequestParam(value = "status", required = false) final List<String> statuses) {
+        if (page < 1) {
+            throw new IllegalArgumentException("Invalid page");
+        }
+        if (trashPage < 1) {
+            throw new IllegalArgumentException("Invalid trash page");
+        }
+
         final boolean isOwnProfile;
         final User profileUser;
 
@@ -373,6 +380,10 @@ public class UserController {
     public ModelAndView trash(
             @AuthenticationPrincipal final PawAuthUser authUser,
             @RequestParam(value = "page", defaultValue = "1") final int page) {
+        if (page < 1) {
+            throw new IllegalArgumentException("Invalid page");
+        }
+
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }
