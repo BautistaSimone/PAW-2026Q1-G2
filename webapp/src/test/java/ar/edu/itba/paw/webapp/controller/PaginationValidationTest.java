@@ -20,7 +20,7 @@ class PaginationValidationTest {
         final UserController controller = new UserController(null, null, null, null, null, null, null);
 
         assertThrows(IllegalArgumentException.class, () ->
-            controller.profile(null, null, -1, 1, null)
+            controller.profile(null, null, -1, 1, null, null)
         );
     }
 
@@ -29,7 +29,7 @@ class PaginationValidationTest {
         final UserController controller = new UserController(null, null, null, null, null, null, null);
 
         assertThrows(IllegalArgumentException.class, () ->
-            controller.profile(null, null, 1, -1, null)
+            controller.profile(null, null, 1, -1, null, null)
         );
     }
 

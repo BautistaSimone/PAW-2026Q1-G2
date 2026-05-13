@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.ui.Model;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -159,7 +161,8 @@ public class UserController {
             @RequestParam(value = "userId", required = false) final Long userId,
             @RequestParam(value = "page", defaultValue = "1") final int page,
             @RequestParam(value = "trashPage", defaultValue = "1") final int trashPage,
-            @RequestParam(value = "status", required = false) final List<String> statuses) {
+            @RequestParam(value = "status", required = false) final List<String> statuses,
+            final Model model) {
         if (page < 1) {
             throw new IllegalArgumentException("Invalid page");
         }
@@ -201,7 +204,7 @@ public class UserController {
         enrichProfileModel(mv, profileUser, isOwnProfile, authUser, page, trashPage, purchaseStatuses);
         mv.addObject("selectedStatuses", validStatusesStr);
 
-        if (isOwnProfile) {
+        if (isOwnProfile && !model.containsAttribute("userProfileForm")) {
             mv.addObject("userProfileForm", UserProfileForm.fromUser(profileUser));
         }
         return mv;
@@ -211,22 +214,21 @@ public class UserController {
     public ModelAndView updateProfile(
             @AuthenticationPrincipal PawAuthUser authUser,
             @Valid @ModelAttribute("userProfileForm") final UserProfileForm form,
-            final BindingResult errors) {
+            final BindingResult errors,
+            final RedirectAttributes redirectAttributes) {
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }
 
+        if (errors.hasErrors()) {
+            redirectAttributes.addFlashAttribute(
+                    BindingResult.MODEL_KEY_PREFIX + "userProfileForm", errors);
+            redirectAttributes.addFlashAttribute("userProfileForm", form);
+            return new ModelAndView("redirect:/profile?tab=mydata");
+        }
+
         final User profileUser = userService.findById(authUser.getUser().getId())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
-
-        if (errors.hasErrors()) {
-            final ModelAndView mv = new ModelAndView("profile");
-            enrichProfileModel(mv, profileUser, true, authUser, 1, 1, Collections.emptyList());
-            mv.addObject("selectedStatuses", Collections.emptyList());
-            mv.addObject("hasProfileUpdateErrors", true);
-            mv.addObject("userProfileForm", form);
-            return mv;
-        }
 
         userService.updateUserProfile(
                 profileUser.getId(),
