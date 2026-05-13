@@ -5,8 +5,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
-
 import java.util.List;
+import java.util.Collections;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Repository;
 import ar.edu.itba.paw.models.Category;
 
 @Repository
-public class CategoryJdbcDao implements CategoryDao {
+public class CategoryJpaDao implements CategoryDao {
 
     @PersistenceContext
     private EntityManager em;
@@ -27,16 +28,23 @@ public class CategoryJdbcDao implements CategoryDao {
         return query.getResultList();
     }
 
+
+    @Override
+    public Optional<Category> findById(final Long id) {
+        return Optional.ofNullable(em.find(Category.class, id));
+    }
+
     @Override
     public List<Category> findByProductId(final Long productId) {
-        final TypedQuery<Category> query = em.createQuery("FROM Category WHERE productId = :product_id", Category.class);
-        query.setParameter("product_id", productId);
-        return query.getResultList();
-        return jdbcTemplate.query(
-            "SELECT c.category_id, c.name FROM categories c " +
-            "JOIN products_categories pc ON c.category_id = pc.category_id " +
-            "WHERE pc.product_id = ? ORDER BY c.name ASC",
-            CATEGORY_ROW_MAPPER, productId
-        );
+        // final TypedQuery<Category> query = em.createQuery("FROM Category WHERE productId = :product_id", Category.class);
+        // query.setParameter("product_id", productId);
+        // return query.getResultList();
+        // return jdbcTemplate.query(
+        //     "SELECT c.category_id, c.name FROM categories c " +
+        //     "JOIN products_categories pc ON c.category_id = pc.category_id " +
+        //     "WHERE pc.product_id = ? ORDER BY c.name ASC",
+        //     CATEGORY_ROW_MAPPER, productId
+        // );
+        return Collections.emptyList();
     }
 }

@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductState;
 
@@ -17,7 +18,7 @@ public interface ProductDao {
         final String recordLabel,
         final String catalogNumber,
         final String editionCountry,
-        final List<Long> categoryIds,
+        final List<Category> categoryIds,
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
@@ -58,7 +59,7 @@ public interface ProductDao {
         final String recordLabel,
         final String catalogNumber,
         final String editionCountry,
-        final List<Long> categoryIds,
+        final List<Category> categories,
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,

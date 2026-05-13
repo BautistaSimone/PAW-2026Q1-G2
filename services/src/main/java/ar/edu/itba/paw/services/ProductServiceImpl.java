@@ -15,6 +15,7 @@ import ar.edu.itba.paw.models.ConditionBucket;
 import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductState;
 import ar.edu.itba.paw.persistence.ProductDao;
@@ -24,9 +25,12 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductDao productDao;
 
+    private final CategoryService categoryService;
+
     @Autowired
-    public ProductServiceImpl(final ProductDao productDao) {
+    public ProductServiceImpl(final ProductDao productDao, final CategoryService categoryService) {
         this.productDao = productDao;
+        this.categoryService = categoryService;
     }
 
     private static String trimToNull(final String s) {
@@ -76,9 +80,20 @@ public class ProductServiceImpl implements ProductService {
     ) {
         validateProductFields(title, artist, description, sleeveCondition, recordCondition, price);
 
+        List<Category> categories = new ArrayList<>(); 
+
+        // FIXME: Use Category object directly in webapp
+        for (Long id : categoryIds) {
+            Optional<Category> categoryOpt = categoryService.findById(id);
+
+            if (categoryOpt.isPresent()) {
+                categories.add(categoryOpt.get());
+            }
+        }
+
         return productDao.createProduct(
             userId, trimToNull(title), trimToNull(artist), toTitleCase(recordLabel),
-            trimToNull(catalogNumber), trimToNull(editionCountry), categoryIds, trimToNull(description),
+            trimToNull(catalogNumber), trimToNull(editionCountry), categories, trimToNull(description),
             sleeveCondition, recordCondition, price
         );
     }
@@ -289,6 +304,18 @@ public class ProductServiceImpl implements ProductService {
         }
         validateProductFields(title, artist, description, sleeveCondition, recordCondition, price);
 
+        List<Category> categories = new ArrayList<>(); 
+
+        // FIXME: Use Category object directly in webapp
+        for (Long id : categoryIds) {
+            Optional<Category> categoryOpt = categoryService.findById(id);
+
+            if (categoryOpt.isPresent()) {
+                categories.add(categoryOpt.get());
+            }
+        }
+
+
         final boolean ok = productDao.updateProduct(
             productId,
             trimToNull(title),
@@ -296,7 +323,7 @@ public class ProductServiceImpl implements ProductService {
             toTitleCase(recordLabel),
             trimToNull(catalogNumber),
             trimToNull(editionCountry),
-            categoryIds,
+            categories,
             trimToNull(description),
             sleeveCondition,
             recordCondition,

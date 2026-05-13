@@ -5,6 +5,8 @@ import javax.persistence.Table;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.JoinTable;
+import javax.persistence.JoinColumn;
 import javax.persistence.Id;
 import javax.persistence.Column;
 import javax.persistence.ManyToMany;
@@ -24,7 +26,6 @@ public class Product {
     @Column(name = "product_id")
     private Long productId;
 
-
     @Column(name = "user_id", nullable = false, unique = true)
     private Long userId;
     private String title;
@@ -39,8 +40,15 @@ public class Product {
     @Column(name = "edition_country", length = 255, nullable = false)
     private String editionCountry;
 
+    // TODO: Check how it behaves with deletion
     @ManyToMany
+    @JoinTable(
+        name = "products_categories", 
+        joinColumns = { @JoinColumn(name = "product_id") }, 
+        inverseJoinColumns = { @JoinColumn(name = "category_id") }
+    )
     private List<Category> categories;
+    
 
     @Column(length = 255, nullable = false)
     private String description;
@@ -114,6 +122,7 @@ public class Product {
         this.published = published;
         this.price = price;
     }
+
     public Long getId() {
         return productId;
     }
@@ -186,4 +195,51 @@ public class Product {
         return published;
     }
 
+    public void setUserId(Long userId) {
+        userId = userId;
+    }
+
+    public void setTitle(String title) {
+        title = title;
+    }
+
+    public void setArtist(String artist) {
+        artist = artist;
+    }
+
+    public void setRecordLabel(String record) {
+        recordLabel = record;
+    }
+
+    public void setCatalogNumber(String catalog) {
+        catalogNumber = catalog;
+    }
+
+    public void setEditionCountry(String editionCountry) {
+        editionCountry = editionCountry;
+    }
+
+    public void setCategories(List<Category> categories) {
+        categories = categories;
+    }
+
+    public void setSleeveCondition(BigDecimal sleeve) {
+        sleeveCondition = sleeve;
+    }
+
+    public void setRecordCondition(BigDecimal record) {
+        recordCondition = record;
+    }
+
+    public void setPrice(BigDecimal price) {
+        price = price;
+    }
+
+    public void setDescription(String description) {
+        description = description;
+    }
+
+    public void setPublished(LocalDate published) {
+        published = published;
+    }
 }

@@ -35,7 +35,7 @@ public class ImageJpaDaoTest {
     private UserJpaDao userDao;
 
     @Autowired
-    private ProductJdbcDao productDao;
+    private ProductJpaDao productDao;
 
     @PersistenceContext
     private EntityManager em;

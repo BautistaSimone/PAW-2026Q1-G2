@@ -1,6 +1,9 @@
 package ar.edu.itba.paw.persistence;
 
 import javax.sql.DataSource;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -29,35 +32,13 @@ import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.ProductState;
 
 @Repository
-public class ProductJdbcDao implements ProductDao {
+public class ProductJpaDao implements ProductDao {
 
-    private static final RowMapper<Category> CATEGORY_ROW_MAPPER = (rs, rowNum) ->
-        new Category(
-            rs.getLong("category_id"),
-            rs.getString("name")
-        );
-
-    private final JdbcTemplate jdbcTemplate;
-    private final SimpleJdbcInsert productInsert;
-    private final SimpleJdbcInsert productCategoryInsert;
-
-    @Autowired
-    public ProductJdbcDao(final DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-        this.productInsert = new SimpleJdbcInsert(dataSource)
-            .withTableName("products")
-            .usingGeneratedKeyColumns("product_id");
-        this.productCategoryInsert = new SimpleJdbcInsert(dataSource)
-            .withTableName("products_categories");
-    }
+    @PersistenceContext
+    private EntityManager em;
 
     private List<Category> findCategoriesByProductId(final Long productId) {
-        return jdbcTemplate.query(
-            "SELECT c.category_id, c.name FROM categories c " +
-            "JOIN products_categories pc ON c.category_id = pc.category_id " +
-            "WHERE pc.product_id = ? ORDER BY c.name ASC",
-            CATEGORY_ROW_MAPPER, productId
-        );
+        return Collections.emptyList(); // TODO: Refactor methods that used this
     }
 
     private static String normalizeRecordLabel(final String recordLabel) {
@@ -96,57 +77,9 @@ public class ProductJdbcDao implements ProductDao {
         };
     }
 
-    private Product mapProduct(
-        final Long productId,
-        final Long userId,
-        final String title,
-        final String artist,
-        final String recordLabel,
-        final String catalogNumber,
-        final String editionCountry,
-        final String description,
-        final BigDecimal sleeveCondition,
-        final BigDecimal recordCondition,
-        final LocalDate published,
-        final BigDecimal price
-    ) {
-        final List<Category> categories = findCategoriesByProductId(productId);
-        return new Product(
-            productId, userId, title, artist, recordLabel, catalogNumber, editionCountry, categories, description,
-            sleeveCondition, recordCondition, published, price
-        );
-    }
-
-    private Product mapProductFromRow(final Map<String, Object> row) {
-        final String label = Optional.ofNullable((String) row.get("record_label")).orElse("");
-        final String catNum = Optional.ofNullable((String) row.get("catalog_number")).orElse("");
-        final String country = Optional.ofNullable((String) row.get("edition_country")).orElse("");
-        return mapProduct(
-            ((Number) row.get("product_id")).longValue(),
-            ((Number) row.get("user_id")).longValue(),
-            (String) row.get("title"),
-            (String) row.get("artist"),
-            label,
-            catNum,
-            country,
-            (String) row.get("description"),
-            (BigDecimal) row.get("sleeve_condition"),
-            (BigDecimal) row.get("record_condition"),
-            ((Date) row.get("published")).toLocalDate(),
-            (BigDecimal) row.get("price")
-        );
-    }
-
-    private void insertProductCategories(final Long productId, final List<Long> categoryIds) {
-        if (categoryIds == null) {
-            return;
-        }
-        for (Long categoryId : categoryIds) {
-            final Map<String, Object> pcValues = new HashMap<>();
-            pcValues.put("product_id", productId);
-            pcValues.put("category_id", categoryId);
-            productCategoryInsert.execute(pcValues);
-        }
+    @Override
+    public Optional<Product> findById(final Long id) {
+        return Optional.ofNullable(em.find(Product.class, id));
     }
 
     @Override
@@ -157,40 +90,36 @@ public class ProductJdbcDao implements ProductDao {
         final String recordLabel,
         final String catalogNumber,
         final String editionCountry,
-        final List<Long> categoryIds,
+        final List<Category> category,
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
         final BigDecimal price
     ) {
-        final Map<String, Object> values = new HashMap<>();
+
         final LocalDate published = LocalDate.now();
         final String normalizedLabel = normalizeRecordLabel(recordLabel);
         final String normalizedCatNum = normalizeRecordLabel(catalogNumber);
         final String normalizedCountry = normalizeRecordLabel(editionCountry);
 
-        values.put("user_id", userId);
-        values.put("title", title);
-        values.put("artist", artist);
-        values.put("record_label", normalizedLabel);
-        values.put("catalog_number", normalizedCatNum);
-        values.put("edition_country", normalizedCountry);
-        values.put("sleeve_condition", sleeveCondition);
-        values.put("record_condition", recordCondition);
-        values.put("price", price);
-        values.put("description", description);
-        values.put("published", Date.valueOf(published));
-        values.put("state", ProductState.ACTIVE.getPersistenceValue());
-
-        final Number id = productInsert.executeAndReturnKey(values);
-        final Long productId = id.longValue();
-
-        insertProductCategories(productId, categoryIds);
-
-        return mapProduct(
-            productId, userId, title, artist, normalizedLabel, normalizedCatNum, normalizedCountry, description,
-            sleeveCondition, recordCondition, published, price
+        final Product product = new Product(
+            userId,
+            title,
+            artist,
+            normalizedLabel,
+            normalizedCatNum,
+            normalizedCountry,
+            category,
+            description,
+            sleeveCondition,
+            recordCondition,
+            published,
+            price
         );
+
+        em.persist(product);
+
+        return product;
     }
 
     @Override
@@ -200,88 +129,89 @@ public class ProductJdbcDao implements ProductDao {
 
     @Override
     public PaginatedResult<Product> findProducts(final ProductSearchCriteria criteria) {
-        final StringBuilder whereSql = new StringBuilder("WHERE p.state = ? ");
-        final List<Object> args = new ArrayList<>();
-        args.add(ProductState.ACTIVE.getPersistenceValue());
+        // final StringBuilder whereSql = new StringBuilder("WHERE p.state = :state ");
+        // final List<Object> args = new ArrayList<>();
+        // args.add(ProductState.ACTIVE.getPersistenceValue());
 
-        if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
-            final String likeNeedle = escapeForLike(criteria.getSearchText().trim()).toLowerCase(Locale.ROOT);
-            whereSql.append(" AND (");
-            whereSql.append("LOWER(p.title) LIKE '%' || ? || '%' ESCAPE '\\' OR ");
-            whereSql.append("LOWER(p.artist) LIKE '%' || ? || '%' ESCAPE '\\' OR ");
-            whereSql.append("LOWER(p.description) LIKE '%' || ? || '%' ESCAPE '\\'");
-            whereSql.append(")");
-            args.add(likeNeedle);
-            args.add(likeNeedle);
-            args.add(likeNeedle);
-        }
+        // if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
+        //     final String likeNeedle = escapeForLike(criteria.getSearchText().trim()).toLowerCase(Locale.ROOT);
+        //     whereSql.append(" AND (");
+        //     whereSql.append("LOWER(p.title) LIKE '%' || :title || '%' ESCAPE '\\' OR ");
+        //     whereSql.append("LOWER(p.artist) LIKE '%' || :artist || '%' ESCAPE '\\' OR ");
+        //     whereSql.append("LOWER(p.description) LIKE '%' || :description || '%' ESCAPE '\\'");
+        //     whereSql.append(")");
+        //     args.add(likeNeedle);
+        //     args.add(likeNeedle);
+        //     args.add(likeNeedle);
+        // }
 
-        if (!criteria.getCategoryIds().isEmpty()) {
-            whereSql.append(" AND EXISTS (SELECT 1 FROM products_categories pc WHERE pc.product_id = p.product_id AND pc.category_id IN (");
-            whereSql.append(String.join(",", Collections.nCopies(criteria.getCategoryIds().size(), "?")));
-            whereSql.append(")) ");
-            args.addAll(criteria.getCategoryIds());
-        }
+        // if (!criteria.getCategoryIds().isEmpty()) {
+        //     whereSql.append(" AND EXISTS (SELECT 1 FROM products_categories pc WHERE pc.product_id = p.product_id AND pc.category_id IN (");
+        //     whereSql.append(String.join(",", Collections.nCopies(criteria.getCategoryIds().size(), "?")));
+        //     whereSql.append(")) ");
+        //     args.addAll(criteria.getCategoryIds());
+        // }
 
-        if (criteria.getMinPrice() != null) {
-            whereSql.append(" AND p.price >= ? ");
-            args.add(criteria.getMinPrice());
-        }
+        // if (criteria.getMinPrice() != null) {
+        //     whereSql.append(" AND p.price >= ? ");
+        //     args.add(criteria.getMinPrice());
+        // }
 
-        if (criteria.getMaxPrice() != null) {
-            whereSql.append(" AND p.price <= ? ");
-            args.add(criteria.getMaxPrice());
-        }
+        // if (criteria.getMaxPrice() != null) {
+        //     whereSql.append(" AND p.price <= ? ");
+        //     args.add(criteria.getMaxPrice());
+        // }
 
-        if (!criteria.getRecordLabels().isEmpty()) {
-            whereSql.append(" AND p.record_label IN (");
-            whereSql.append(String.join(",", Collections.nCopies(criteria.getRecordLabels().size(), "?")));
-            whereSql.append(") ");
-            args.addAll(criteria.getRecordLabels());
-        }
+        // if (!criteria.getRecordLabels().isEmpty()) {
+        //     whereSql.append(" AND p.record_label IN (");
+        //     whereSql.append(String.join(",", Collections.nCopies(criteria.getRecordLabels().size(), "?")));
+        //     whereSql.append(") ");
+        //     args.addAll(criteria.getRecordLabels());
+        // }
 
-        if (!criteria.getConditionBuckets().isEmpty()) {
-            whereSql.append(" AND (");
-            boolean first = true;
-            for (ConditionBucket bucket : criteria.getConditionBuckets()) {
-                if (!first) {
-                    whereSql.append(" OR ");
-                }
-                first = false;
-                appendConditionBucketSql(whereSql, bucket);
-            }
-            whereSql.append(") ");
-        }
+        // if (!criteria.getConditionBuckets().isEmpty()) {
+        //     whereSql.append(" AND (");
+        //     boolean first = true;
+        //     for (ConditionBucket bucket : criteria.getConditionBuckets()) {
+        //         if (!first) {
+        //             whereSql.append(" OR ");
+        //         }
+        //         first = false;
+        //         appendConditionBucketSql(whereSql, bucket);
+        //     }
+        //     whereSql.append(") ");
+        // }
 
-        if (criteria.getUserId() != null) {
-            whereSql.append(" AND p.user_id = ? ");
-            args.add(criteria.getUserId());
-        }
+        // if (criteria.getUserId() != null) {
+        //     whereSql.append(" AND p.user_id = ? ");
+        //     args.add(criteria.getUserId());
+        // }
 
-        final Long totalCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM products p " + whereSql.toString(),
-            Long.class,
-            args.toArray()
-        );
+        // final Long totalCount = jdbcTemplate.queryForObject(
+        //     "SELECT COUNT(*) FROM products p " + whereSql.toString(),
+        //     Long.class,
+        //     args.toArray()
+        // );
 
-        if (totalCount == null || totalCount == 0) {
-            return new PaginatedResult<>(Collections.emptyList(), criteria.getPage(), criteria.getPageSize(), 0);
-        }
+        // if (totalCount == null || totalCount == 0) {
+        //     return new PaginatedResult<>(Collections.emptyList(), criteria.getPage(), criteria.getPageSize(), 0);
+        // }
 
-        final StringBuilder selectSql = new StringBuilder(
-            "SELECT p.product_id, p.user_id, p.title, p.artist, p.record_label, p.catalog_number, p.edition_country, p.description, " +
-            "p.sleeve_condition, p.record_condition, p.published, p.price " +
-            "FROM products p "
-        ).append(whereSql);
+        // final StringBuilder selectSql = new StringBuilder(
+        //     "SELECT p.product_id, p.user_id, p.title, p.artist, p.record_label, p.catalog_number, p.edition_country, p.description, " +
+        //     "p.sleeve_condition, p.record_condition, p.published, p.price " +
+        //     "FROM products p "
+        // ).append(whereSql);
 
-        selectSql.append(" ORDER BY ").append(orderBySql(criteria.getSortOrder())).append(" LIMIT ? OFFSET ?");
-        args.add(criteria.getPageSize());
-        args.add((criteria.getPage() - 1) * criteria.getPageSize());
+        // selectSql.append(" ORDER BY ").append(orderBySql(criteria.getSortOrder())).append(" LIMIT ? OFFSET ?");
+        // args.add(criteria.getPageSize());
+        // args.add((criteria.getPage() - 1) * criteria.getPageSize());
 
-        final List<Map<String, Object>> rows = jdbcTemplate.queryForList(selectSql.toString(), args.toArray());
-        final List<Product> products = rows.stream().map(this::mapProductFromRow).collect(Collectors.toList());
+        // final List<Map<String, Object>> rows = jdbcTemplate.queryForList(selectSql.toString(), args.toArray());
+        // final List<Product> products = rows.stream().map(this::mapProductFromRow).collect(Collectors.toList());
 
-        return new PaginatedResult<>(products, criteria.getPage(), criteria.getPageSize(), totalCount);
+        // return new PaginatedResult<>(products, criteria.getPage(), criteria.getPageSize(), totalCount);
+        return new PaginatedResult<>(Collections.emptyList(), 1, 0, 0);
     }
 
     @Override
@@ -291,119 +221,101 @@ public class ProductJdbcDao implements ProductDao {
         final int page,
         final int pageSize
     ) {
-        final int safePage = page < 1 ? 1 : page;
-        final int safePageSize = pageSize < 1 ? 12 : pageSize;
-        final String stateVal = state.getPersistenceValue();
+        // final int safePage = page < 1 ? 1 : page;
+        // final int safePageSize = pageSize < 1 ? 12 : pageSize;
+        // final String stateVal = state.getPersistenceValue();
 
-        final String whereSql = "WHERE p.user_id = ? AND p.state = ? ";
-        final Long totalCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM products p " + whereSql,
-            Long.class,
-            userId,
-            stateVal
-        );
+        // final String whereSql = "WHERE p.user_id = ? AND p.state = ? ";
+        // final Long totalCount = jdbcTemplate.queryForObject(
+        //     "SELECT COUNT(*) FROM products p " + whereSql,
+        //     Long.class,
+        //     userId,
+        //     stateVal
+        // );
 
-        if (totalCount == null || totalCount == 0) {
-            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
-        }
+        // if (totalCount == null || totalCount == 0) {
+        //     return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
+        // }
 
-        final List<Object> selectArgs = new ArrayList<>();
-        selectArgs.add(userId);
-        selectArgs.add(stateVal);
-        final String selectSql =
-            "SELECT p.product_id, p.user_id, p.title, p.artist, p.record_label, p.catalog_number, p.edition_country, p.description, " +
-            "p.sleeve_condition, p.record_condition, p.published, p.price " +
-            "FROM products p " + whereSql +
-            "ORDER BY " + orderBySql(ProductSortOrder.NEWEST) + " LIMIT ? OFFSET ?";
-        selectArgs.add(safePageSize);
-        selectArgs.add((safePage - 1) * safePageSize);
+        // final List<Object> selectArgs = new ArrayList<>();
+        // selectArgs.add(userId);
+        // selectArgs.add(stateVal);
+        // final String selectSql =
+        //     "SELECT p.product_id, p.user_id, p.title, p.artist, p.record_label, p.catalog_number, p.edition_country, p.description, " +
+        //     "p.sleeve_condition, p.record_condition, p.published, p.price " +
+        //     "FROM products p " + whereSql +
+        //     "ORDER BY " + orderBySql(ProductSortOrder.NEWEST) + " LIMIT ? OFFSET ?";
+        // selectArgs.add(safePageSize);
+        // selectArgs.add((safePage - 1) * safePageSize);
 
-        final List<Map<String, Object>> rows = jdbcTemplate.queryForList(selectSql, selectArgs.toArray());
-        final List<Product> products = rows.stream().map(this::mapProductFromRow).collect(Collectors.toList());
+        // final List<Map<String, Object>> rows = jdbcTemplate.queryForList(selectSql, selectArgs.toArray());
+        // final List<Product> products = rows.stream().map(this::mapProductFromRow).collect(Collectors.toList());
 
-        return new PaginatedResult<>(products, safePage, safePageSize, totalCount);
+        // return new PaginatedResult<>(products, safePage, safePageSize, totalCount);
+        return new PaginatedResult<>(Collections.emptyList(), 1, 0, 0);
     }
 
     @Override
     public List<String> listDistinctArtists() {
-        return jdbcTemplate.query(
-            "SELECT DISTINCT TRIM(artist) AS value FROM products WHERE state = ? " +
-            "AND artist IS NOT NULL AND TRIM(artist) <> '' ORDER BY value ASC",
-            (rs, rowNum) -> rs.getString(1),
-            ProductState.ACTIVE.getPersistenceValue()
-        );
+        final TypedQuery<String> query = em.createQuery("SELECT DISTINCT TRIM(artist) FROM Product WHERE" +
+        " artist IS NOT NULL AND state = :state AND TRIM(artist) <> '' ORDER BY value ASC", String.class);
+        query.setParameter("state", ProductState.ACTIVE.getPersistenceValue());
+        return query.getResultList();
     }
 
     @Override
     public List<String> listDistinctRecordLabels() {
-        return jdbcTemplate.query(
-            "SELECT DISTINCT TRIM(record_label) AS value FROM products WHERE state = ? " +
-            "AND record_label IS NOT NULL AND TRIM(record_label) <> '' ORDER BY value ASC",
-            (rs, rowNum) -> rs.getString(1),
-            ProductState.ACTIVE.getPersistenceValue()
-        );
-    }
-
-    @Override
-    public Optional<Product> findById(final Long id) {
-        final List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-            "SELECT product_id, user_id, title, artist, record_label, catalog_number, edition_country, description, sleeve_condition, record_condition, " +
-            "published, price FROM products WHERE product_id = ?",
-            id
-        );
-
-        return rows.stream().findFirst().map(this::mapProductFromRow);
+        final TypedQuery<String> query = em.createQuery("SELECT DISTINCT TRIM(record_label) FROM Product WHERE" +
+        " record_label IS NOT NULL AND state = :state AND TRIM(record_label) <> '' ORDER BY value ASC", String.class);
+        query.setParameter("state", ProductState.ACTIVE.getPersistenceValue());
+        return query.getResultList();
     }
 
     @Override
     public Optional<Product> findByIdIfAvailable(final Long id) {
-        final List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-            "SELECT product_id, user_id, title, artist, record_label, catalog_number, edition_country, description, sleeve_condition, record_condition, " +
-            "published, price FROM products WHERE product_id = ? AND state = ?",
-            id,
-            ProductState.ACTIVE.getPersistenceValue()
-        );
-
-        return rows.stream().findFirst().map(this::mapProductFromRow);
+        final TypedQuery<Product> query = em.createQuery("FROM Product WHERE productId = :product_id AND state = :state", Product.class);
+        query.setParameter("product_id", id);
+        query.setParameter("state", ProductState.ACTIVE.getPersistenceValue());
+        return query.getResultList().stream().findFirst();
     }
 
     @Override
     public boolean reserveIfAvailable(final Long id) {
-        return jdbcTemplate.update(
-            "UPDATE products SET state = ? WHERE product_id = ? AND state = ?",
-            ProductState.RESERVED.getPersistenceValue(),
-            id,
-            ProductState.ACTIVE.getPersistenceValue()
-        ) == 1;
+        return em.createQuery(
+            "UPDATE Product SET state = :state WHERE productId = :product_id AND state = :state_cond")
+            .setParameter("state", ProductState.RESERVED.getPersistenceValue())
+            .setParameter("product_id", id)
+            .setParameter("state_cond", ProductState.ACTIVE.getPersistenceValue())
+            .executeUpdate() >= 1;
     }
 
     @Override
     public void markAsSold(final Long id) {
-        jdbcTemplate.update(
-            "UPDATE products SET state = ? WHERE product_id = ? AND state = ?",
-            ProductState.SOLD.getPersistenceValue(),
-            id,
-            ProductState.RESERVED.getPersistenceValue()
-        );
+        em.createQuery(
+            "UPDATE Product SET state = :state WHERE productId = :product_id AND state = :state_cond")
+            .setParameter("state", ProductState.SOLD.getPersistenceValue())
+            .setParameter("product_id", id)
+            .setParameter("state_cond", ProductState.RESERVED.getPersistenceValue())
+            .executeUpdate();
     }
 
     @Override
     public boolean markAsUserDeleted(final Long id) {
-        return jdbcTemplate.update(
-            "UPDATE products SET state = ? WHERE product_id = ? AND state = ?",
-            ProductState.USER_DELETED.getPersistenceValue(),
-            id,
-            ProductState.ACTIVE.getPersistenceValue()
-        ) == 1;
+        return em.createQuery(
+            "UPDATE Product SET state = :state WHERE productId = :product_id AND state = :state_cond")
+            .setParameter("state", ProductState.USER_DELETED.getPersistenceValue())
+            .setParameter("product_id", id)
+            .setParameter("state_cond", ProductState.ACTIVE.getPersistenceValue())
+            .executeUpdate() >= 1;
     }
 
     @Override
     public void markAsAdminHidden(final Long id) {
-        jdbcTemplate.update(
-            "UPDATE products SET state = ? WHERE product_id = ?",
-            ProductState.ADMIN_HIDDEN.getPersistenceValue(),
-            id
-        );
+        em.createQuery(
+            "UPDATE Product SET state = :state WHERE productId = :product_id")
+            .setParameter("state", ProductState.ADMIN_HIDDEN.getPersistenceValue())
+            .setParameter("product_id", id)
+            .executeUpdate();
     }
 
     @Override
@@ -414,7 +326,7 @@ public class ProductJdbcDao implements ProductDao {
         final String recordLabel,
         final String catalogNumber,
         final String editionCountry,
-        final List<Long> categoryIds,
+        final List<Category> categories,
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
@@ -424,39 +336,37 @@ public class ProductJdbcDao implements ProductDao {
         final String normalizedCatNum = normalizeRecordLabel(catalogNumber);
         final String normalizedCountry = normalizeRecordLabel(editionCountry);
 
-        final int updated = jdbcTemplate.update(
-            "UPDATE products SET title = ?, artist = ?, record_label = ?, catalog_number = ?, edition_country = ?, " +
-            "description = ?, sleeve_condition = ?, record_condition = ?, price = ? " +
-            "WHERE product_id = ? AND state = ?",
-            title,
-            artist,
-            normalizedLabel,
-            normalizedCatNum,
-            normalizedCountry,
-            description,
-            sleeveCondition,
-            recordCondition,
-            price,
-            productId,
-            ProductState.ACTIVE.getPersistenceValue()
-        );
+        Optional<Product> productOpt = findById(productId);
 
-        if (updated != 1) {
+        if (!productOpt.isPresent())
             return false;
-        }
 
-        jdbcTemplate.update("DELETE FROM products_categories WHERE product_id = ?", productId);
-        insertProductCategories(productId, categoryIds);
+        final Product product = productOpt.get();
+
+        product.setTitle(title);
+        product.setArtist(artist);
+        product.setRecordLabel(recordLabel);
+        product.setCatalogNumber(catalogNumber);
+        product.setEditionCountry(editionCountry);
+        product.setCategories(categories);
+        product.setDescription(description);
+        product.setSleeveCondition(sleeveCondition);
+        product.setRecordCondition(recordCondition);
+        product.setPrice(price);
+
+        em.refresh(product);
+
         return true;
     }
 
     @Override
     public boolean restoreUserDeletedProduct(final Long id) {
-        return jdbcTemplate.update(
-            "UPDATE products SET state = ? WHERE product_id = ? AND state = ?",
-            ProductState.ACTIVE.getPersistenceValue(),
-            id,
-            ProductState.USER_DELETED.getPersistenceValue()
-        ) == 1;
+
+        return em.createQuery(
+            "UPDATE Product SET state = :state WHERE productId = :product_id AND state = :state_cond")
+            .setParameter("state", ProductState.ACTIVE.getPersistenceValue())
+            .setParameter("product_id", id)
+            .setParameter("state_cond", ProductState.USER_DELETED.getPersistenceValue())
+            .executeUpdate() >= 1;
     }
 }
