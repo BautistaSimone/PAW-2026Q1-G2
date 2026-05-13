@@ -457,6 +457,10 @@ public class ProductController {
 
     static String resolveProductDetailBackUrl(final HttpServletRequest request, final Long productId) {
         final String fallbackUrl = "/";
+        if ("1".equals(request.getParameter("created"))) {
+            return fallbackUrl;
+        }
+
         final String referer = request.getHeader("Referer");
         if (referer == null || referer.isBlank()) {
             return fallbackUrl;

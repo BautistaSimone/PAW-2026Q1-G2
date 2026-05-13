@@ -15,6 +15,14 @@ class ProductControllerBackUrlTest {
     }
 
     @Test
+    void fallsBackWhenProductWasJustCreated() {
+        final MockHttpServletRequest request = requestFrom("http://localhost:8000/products/new");
+        request.setParameter("created", "1");
+
+        assertEquals("/", ProductController.resolveProductDetailBackUrl(request, 12L));
+    }
+
+    @Test
     void fallsBackWhenRefererIsMissing() {
         final MockHttpServletRequest request = requestFrom(null);
 
