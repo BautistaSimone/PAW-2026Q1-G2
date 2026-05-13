@@ -2386,6 +2386,84 @@ details.filter-section:not([open]) .filter-section-chevron {
     border-top: 2px solid var(--color-border);
 }
 
+/* Custom autocomplete */
+.vinyland-autocomplete-field {
+    position: relative;
+}
+
+.input-group > .vinyland-autocomplete-field {
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+}
+
+.input-group > .vinyland-autocomplete-field:focus-within {
+    z-index: 4;
+}
+
+.input-group > .vinyland-autocomplete-field .form-control {
+    width: 100%;
+}
+
+.input-group > .vinyland-autocomplete-field:not(:last-child) .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.vinyland-autocomplete-source {
+    display: none !important;
+}
+
+.vinyland-autocomplete-menu {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    left: 0;
+    right: 0;
+    z-index: 1400;
+    max-height: 14rem;
+    overflow-y: auto;
+    padding: 0.35rem;
+    background: var(--color-card-bg);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    animation: dropdown-in 0.15s ease;
+}
+
+.vinyland-autocomplete-option {
+    padding: 0.62rem 0.75rem;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-main);
+    cursor: pointer;
+    font-size: 0.92rem;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background var(--transition), color var(--transition);
+}
+
+.vinyland-autocomplete-option:hover,
+.vinyland-autocomplete-option-active {
+    background: var(--color-accent);
+    color: #fff;
+}
+
+.vinyland-autocomplete-option:focus {
+    outline: none;
+}
+
+@media (max-width: 575.98px) {
+    .vinyland-autocomplete-menu {
+        max-height: 11rem;
+    }
+
+    .vinyland-autocomplete-option {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}
+
 /* Image preview */
 .sell-images-preview {
     margin-top: 1rem;
