@@ -38,7 +38,7 @@ import ar.edu.itba.paw.webapp.form.UpdatePasswordForm;
 import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.models.Token;
+import ar.edu.itba.paw.models.PasswordToken;
 
 @Controller
 public class PasswordController {
@@ -118,10 +118,10 @@ public class PasswordController {
             return mv;
         }
 
-        final Optional<Token> passTokenOpt = passwordTokenService.findByToken(form.getToken());
+        final Optional<PasswordToken> passTokenOpt = passwordTokenService.findByToken(form.getToken());
 
         // We already know it exists
-        final Token passToken = passTokenOpt.get();
+        final PasswordToken passToken = passTokenOpt.get();
 
         userService.updatePassword(passToken.getUserId(), form.getNewPassword());
 

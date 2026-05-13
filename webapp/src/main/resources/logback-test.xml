@@ -8,4 +8,13 @@
     <root level="DEBUG">
         <appender-ref ref="CONSOLE"/>
     </root>
+
+    <logger name="org.hibernate.internal.util.EntityPrinter" level="WARN" additivity="false" />
+    <logger name="org.hibernate.engine.internal.TwoPhaseLoad" level="INFO" additivity="false" />
+    <logger name="org.hibernate.loader.Loader" level="INFO" additivity="false" />
+
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false"> 
+        <appender-ref ref="STDOUT" /> 
+    </logger> 
+    
 </configuration>

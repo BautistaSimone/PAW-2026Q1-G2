@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import ar.edu.itba.paw.models.Token;
+import ar.edu.itba.paw.models.VerificationToken;
 import ar.edu.itba.paw.persistence.VerificationTokenDao;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,7 +28,7 @@ public class VerificationTokenServiceImplTest {
 
     @Test
     public void testAcceptVerificationTokenWhenNotExpired() {
-        Token token = new Token(
+        VerificationToken token = new VerificationToken(
             1L,
             1L,
             "token",
@@ -44,7 +44,7 @@ public class VerificationTokenServiceImplTest {
 
     @Test
     public void testRejectVerificationTokenWhenExpired() {
-        Token token = new Token(
+        VerificationToken token = new VerificationToken(
             1L,
             1L,
             "token",

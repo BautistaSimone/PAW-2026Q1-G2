@@ -2,6 +2,10 @@ package ar.edu.itba.paw.persistence;
 
 import javax.sql.DataSource;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
@@ -20,20 +24,13 @@ import ar.edu.itba.paw.models.User;
 @Transactional
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestConfiguration.class)
-public class UserJdbcDaoTest {
+public class UserJpaDaoTest {
 
     @Autowired
-    private UserJdbcDao userDao;
+    private UserJpaDao userDao;
 
-    @Autowired
-    private DataSource dataSource;
-
-    private JdbcTemplate jdbcTemplate;
-
-    @BeforeEach
-    public void setUp() {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-    }
+    @PersistenceContext
+    private EntityManager em;
 
     @Test
     public void testCreateUserWhenUserDoesNotExist() {
@@ -64,6 +61,12 @@ public class UserJdbcDaoTest {
         Assertions.assertNotNull(user);
         Assertions.assertEquals(username, user.getUsername());
         Assertions.assertEquals(password, user.getPassword());
-        Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "users"));
+
+        Long count = em.createQuery(
+            "SELECT COUNT(u) FROM User u",
+            Long.class
+        ).getSingleResult();
+
+        Assertions.assertEquals(1L, count);
     }
 }

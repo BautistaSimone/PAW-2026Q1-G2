@@ -7,6 +7,9 @@ import java.sql.Timestamp;
 import java.util.UUID;
 import javax.sql.DataSource;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,23 +22,22 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-import ar.edu.itba.paw.models.Token;
+import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.PasswordToken;
 
 @Rollback
 @Transactional
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestConfiguration.class)
-public class PasswordTokenJdbcDaoTest {
+public class PasswordTokenJpaDaoTest {
 
     private static final int EXPIRATION = 60 * 24;
  
     @Autowired
-    private PasswordTokenJdbcDao passwordTokenDao;
+    private PasswordTokenJpaDao passwordTokenDao;
 
-    @Autowired
-    private DataSource dataSource;
-
-    private JdbcTemplate jdbcTemplate;
+    @PersistenceContext
+    private EntityManager em;
 
     private long userId;
     private String tkn;
@@ -43,12 +45,28 @@ public class PasswordTokenJdbcDaoTest {
 
     @BeforeEach
     public void setUp() {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-
-        userId = jdbcTemplate.queryForObject(
-            "INSERT INTO users (email, password, username, mod) VALUES ('user@test.com', 'pass', 'User', false) CALL IDENTITY()",
-            Long.class
+        User user = new User(
+            "user@test.com",
+            "pass",
+            "User",
+            false,
+            true,
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
         );
+
+        em.persist(user);
+        
+        em.flush();
+
+        userId = user.getId();
 
         tkn = UUID.randomUUID().toString();
         expirationDate = Instant.now().plus(Duration.ofMinutes(EXPIRATION));
@@ -60,19 +78,25 @@ public class PasswordTokenJdbcDaoTest {
 
     @Test
     public void testCreatePasswordToken() {
-        final Token token = passwordTokenDao.createToken(userId, tkn, expirationDate);
+        final PasswordToken token = passwordTokenDao.createToken(userId, tkn, expirationDate);
 
         Assertions.assertNotNull(token);
         Assertions.assertEquals(expirationDate, token.getExpirationDate());
         Assertions.assertEquals(tkn, token.getToken());
-        Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "password_tokens"));
+
+        Long count = em.createQuery(
+            "SELECT COUNT(pt) FROM PasswordToken pt",
+            Long.class
+        ).getSingleResult();
+
+        Assertions.assertEquals(1L, count);
     }
 
     @Test
     public void testFindByUserId() {
         passwordTokenDao.createToken(userId, tkn, expirationDate);
 
-        Optional<Token> result = passwordTokenDao.findByUserId(userId);
+        Optional<PasswordToken> result = passwordTokenDao.findByUserId(userId);
 
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(expirationDate, result.get().getExpirationDate());
@@ -83,7 +107,7 @@ public class PasswordTokenJdbcDaoTest {
     public void testFindByToken() {
         passwordTokenDao.createToken(userId, tkn, expirationDate);
 
-        Optional<Token> result = passwordTokenDao.findByToken(tkn);
+        Optional<PasswordToken> result = passwordTokenDao.findByToken(tkn);
 
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(expirationDate, result.get().getExpirationDate());

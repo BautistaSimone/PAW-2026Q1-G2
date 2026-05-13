@@ -1,40 +1,62 @@
 package ar.edu.itba.paw.models;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Id;
+import javax.persistence.Column;
+
+@Entity
+@Table(name = "users")
 public class User {
 
-    private final Long id;
-    private final String email;
-    private final String password;
-    private final String username;
-    private final Boolean mod;
-    private final Boolean enabled;
-    private final Boolean banned;
-    private final String firstName;
-    private final String lastName;
-    private final String streetName;
-    private final String streetNumber;
-    private final String neighborhood;
-    private final String province;
-    private final String extraAddressInfo;
-    private final String cbuCvu;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_userid_seq")
+    @SequenceGenerator(sequenceName = "users_userid_seq", name = "users_userid_seq", allocationSize = 1)
+    @Column(name = "user_id")
+    private Long id;
+
+    @Column(length = 255, nullable = false, unique = true)
+    private String email;
+
+    @Column(length = 255, nullable = false)
+    private String password;
+    
+    @Column(length = 255, nullable = false)
+    private String username;
+    private Boolean mod;
+    private Boolean enabled;
+    private Boolean banned;
+    private String firstName;
+    private String lastName;
+    private String streetName;
+    private String streetNumber;
+    private String neighborhood;
+    private String province;
+    private String extraAddressInfo;
+    private String cbuCvu;
+
+    User() {
+        // Just for Hibernate, we love you!
+    }
 
     public User(
-            final Long id,
-            final String email,
-            final String password,
-            final String username,
-            final Boolean mod,
-            final Boolean enabled,
-            final Boolean banned,
-            final String firstName,
-            final String lastName,
-            final String streetName,
-            final String streetNumber,
-            final String neighborhood,
-            final String province,
-            final String extraAddressInfo,
-            final String cbuCvu) {
-        this.id = id;
+            String email,
+            String password,
+            String username,
+            Boolean mod,
+            Boolean enabled,
+            Boolean banned,
+            String firstName,
+            String lastName,
+            String streetName,
+            String streetNumber,
+            String neighborhood,
+            String province,
+            String extraAddressInfo,
+            String cbuCvu) {
         this.email = email;
         this.password = password;
         this.username = username;
@@ -51,9 +73,37 @@ public class User {
         this.cbuCvu = cbuCvu;
     }
 
-    /** Backward-compatible constructor: profile fields are null. */
-    public User(final Long id, final String email, final String password, final String username, final Boolean mod) {
-        this(id, email, password, username, mod, false, false, null, null, null, null, null, null, null, null);
+    public User(
+            Long id,
+            String email,
+            String password,
+            String username,
+            Boolean mod,
+            Boolean enabled,
+            Boolean banned,
+            String firstName,
+            String lastName,
+            String streetName,
+            String streetNumber,
+            String neighborhood,
+            String province,
+            String extraAddressInfo,
+            String cbuCvu) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.mod = mod;
+        this.enabled = enabled;
+        this.banned = banned;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.streetName = streetName;
+        this.streetNumber = streetNumber;
+        this.neighborhood = neighborhood;
+        this.province = province;
+        this.extraAddressInfo = extraAddressInfo;
+        this.cbuCvu = cbuCvu;
     }
 
     private static boolean nonBlank(final String s) {

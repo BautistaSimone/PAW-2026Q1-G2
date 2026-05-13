@@ -5,6 +5,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,16 +26,19 @@ import ar.edu.itba.paw.models.User;
 @Transactional
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestConfiguration.class)
-public class ImageJdbcDaoTest {
+public class ImageJpaDaoTest {
 
     @Autowired
-    private ImageJdbcDao imageDao;
+    private ImageJpaDao imageDao;
 
     @Autowired
-    private ProductJdbcDao productDao;
+    private UserJpaDao userDao;
 
     @Autowired
-    private UserJdbcDao userDao;
+    private ProductJpaDao productDao;
+
+    @PersistenceContext
+    private EntityManager em;
 
     @Test
     public void testCreateImageStoresBinaryDataAndContentType() {

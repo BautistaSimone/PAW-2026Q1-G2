@@ -2,22 +2,24 @@ package ar.edu.itba.paw.models;
 
 import java.time.Instant;
 
-public class Token {
- 
-    private Long tokenId;
-    private String token;
-    private Long userId;
-    private Instant expirationDate;
+import javax.persistence.MappedSuperclass;
 
-    public Token(final Long tokenId, final Long userId, final String token, final Instant expirationDate) {
-        this.tokenId = tokenId;
+@MappedSuperclass
+abstract class Token {
+ 
+    protected String token;
+    protected Long userId;
+    protected Instant expirationDate;
+
+    Token() {
+
+    }
+
+    public Token(final Long userId, final String token, final Instant expirationDate) {
+        super();
         this.userId = userId;
         this.token = token;
         this.expirationDate = expirationDate;
-    }
-
-    public Long getTokenId() {
-        return tokenId;
     }
 
     public Long getUserId() {

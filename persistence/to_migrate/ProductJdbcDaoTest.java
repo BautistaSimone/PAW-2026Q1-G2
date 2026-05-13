@@ -33,7 +33,7 @@ public class ProductJdbcDaoTest {
     private ProductJdbcDao productDao;
 
     @Autowired
-    private UserJdbcDao userDao;
+    private UserJpaDao userDao;
 
     @Autowired
     private DataSource dataSource;
