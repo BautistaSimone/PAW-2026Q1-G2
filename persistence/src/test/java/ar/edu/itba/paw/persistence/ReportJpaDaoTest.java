@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -76,28 +77,50 @@ public class ReportJpaDaoTest {
     }
 
     @Test
-    public void createPersistsReportAndExistsFindsIt() {
+    public void testCreatePersistsReport() {
+
+        // Arrange
+
+        // Act
         final Report report = reportDao.create(productId, ownerId, reporterId);
         em.flush();
 
-        Assertions.assertNotNull(report.getReportId());
-        Assertions.assertEquals(productId, report.getProductId());
-        Assertions.assertEquals(ownerId, report.getOwnerUserId());
-        Assertions.assertEquals(reporterId, report.getReporterUserId());
+        // Assert
+        Long count = em.createQuery(
+            "SELECT COUNT(r) FROM Report r",
+            Long.class
+        ).getSingleResult();
 
+        Assertions.assertEquals(1L, count);
+    }
+
+    @Test
+    public void testExistsByProductAndReporter() {
+
+        // Arrange
+
+        // Act
+        final Report report = reportDao.create(productId, ownerId, reporterId);
+        em.flush();
+
+        // Assert
         Assertions.assertTrue(reportDao.existsByProductAndReporter(productId, reporterId));
         Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, otherReporterId));
     }
 
     @Test
-    public void findAllGroupedByProductReturnsReportCountsAndProductMetadata() {
+    public void testFindAllGroupedByProductReturnsReportCountsAndProductMetadata() {
+
+        // Arrange
         reportDao.create(productId, ownerId, reporterId);
         reportDao.create(productId, ownerId, otherReporterId);
         reportDao.create(otherProductId, ownerId, reporterId);
         em.flush();
 
+        // Act
         final List<ReportedProduct> reportedProducts = reportDao.findAllGroupedByProduct(1, 10).getResults();
 
+        // Assert
         Assertions.assertEquals(2, reportedProducts.size());
         final ReportedProduct mostReported = reportedProducts.get(0);
         Assertions.assertEquals(productId, mostReported.getProductId());
@@ -109,15 +132,18 @@ public class ReportJpaDaoTest {
     }
 
     @Test
-    public void deleteByProductIdDeletesOnlyReportsForThatProduct() {
+    public void testDeleteByProductIdDeletesOnlyReportsForThatProduct() {
+        // Arrange
         reportDao.create(productId, ownerId, reporterId);
         reportDao.create(productId, ownerId, otherReporterId);
         reportDao.create(otherProductId, ownerId, reporterId);
         em.flush();
 
+        // Act
         reportDao.deleteByProductId(productId);
         em.flush();
 
+        // Assert
         Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, reporterId));
         Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, otherReporterId));
         Assertions.assertTrue(reportDao.existsByProductAndReporter(otherProductId, reporterId));

@@ -74,9 +74,13 @@ public class ReviewJpaDaoTest {
 
     @Test
     public void testCreateReview() {
+        // Arrange
+
+        // Act
         final Review review = reviewDao.create(purchaseId, sellerId, buyerId, 4, "Great seller!");
         em.flush();
 
+        // Assert
         Assertions.assertNotNull(review);
         Assertions.assertEquals(4, review.getScore());
 
@@ -86,12 +90,15 @@ public class ReviewJpaDaoTest {
 
     @Test
     public void testFindByPurchaseId() {
+        // Arrange
         reviewDao.create(purchaseId, sellerId, buyerId, 5, "Excellent");
         em.flush();
         em.clear();
 
+        // Act
         final Optional<Review> result = reviewDao.findByPurchaseId(purchaseId);
 
+        // Assert
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(5, result.get().getScore());
         Assertions.assertEquals("Buyer", result.get().getBuyerUsername());
@@ -99,18 +106,22 @@ public class ReviewJpaDaoTest {
 
     @Test
     public void testFindBySellerId() {
+        // Arrange
         reviewDao.create(purchaseId, sellerId, buyerId, 3, "OK");
         em.flush();
         em.clear();
 
+        // Act
         final var reviews = reviewDao.findBySellerId(sellerId, 1, 10).getResults();
 
+        // Assert
         Assertions.assertEquals(1, reviews.size());
         Assertions.assertEquals(3, reviews.get(0).getScore());
     }
 
     @Test
     public void testSummaryForSeller() {
+        // Arrange
         reviewDao.create(purchaseId, sellerId, buyerId, 4, "Good");
         em.flush();
 

@@ -78,8 +78,12 @@ public class VerificationTokenJpaDaoTest {
 
     @Test
     public void testCreateVerificationToken() {
+        // Arrange
+
+        // Act
         final VerificationToken token = verificationTokenDao.createToken(userId, tkn, expirationDate);
 
+        // Assert
         Assertions.assertNotNull(token);
         Assertions.assertEquals(expirationDate, token.getExpirationDate());
         Assertions.assertEquals(tkn, token.getToken());
@@ -94,10 +98,13 @@ public class VerificationTokenJpaDaoTest {
 
     @Test
     public void testFindByUserId() {
+        // Arrange
         verificationTokenDao.createToken(userId, tkn, expirationDate);
 
+        // Act
         Optional<VerificationToken> result = verificationTokenDao.findByUserId(userId);
 
+        // Assert
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(expirationDate, result.get().getExpirationDate());
         Assertions.assertEquals(tkn, result.get().getToken());
@@ -105,10 +112,13 @@ public class VerificationTokenJpaDaoTest {
 
     @Test
     public void testFindByToken() {
+        // Arrange
         verificationTokenDao.createToken(userId, tkn, expirationDate);
 
+        // Act
         Optional<VerificationToken> result = verificationTokenDao.findByToken(tkn);
 
+        // Assert
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(expirationDate, result.get().getExpirationDate());
         Assertions.assertEquals(userId, result.get().getUserId());

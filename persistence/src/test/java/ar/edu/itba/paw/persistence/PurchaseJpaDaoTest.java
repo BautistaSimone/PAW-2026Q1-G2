@@ -83,15 +83,38 @@ public class PurchaseJpaDaoTest {
     }
 
     @Test
-    public void createPurchasePersistsPurchaseAndFindsItById() {
+    public void testCreatePurchase() {
+        // Arrange
+
+        // Act
         final Purchase purchase = purchaseDao.createPurchase(
             productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token"
         );
         em.flush();
         em.clear();
 
+        // Assert
+        Long count = em.createQuery(
+            "SELECT COUNT(p) FROM Purchase p",
+            Long.class
+        ).getSingleResult();
+
+        Assertions.assertEquals(1L, count);
+    }
+
+    @Test
+    public void testFindsById() {
+        // Arrange
+        final Purchase purchase = purchaseDao.createPurchase(
+            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token"
+        );
+        em.flush();
+        em.clear();
+
+        // Act
         final Purchase reloaded = purchaseDao.findById(purchase.getPurchaseId()).orElseThrow();
 
+        // Assert
         Assertions.assertEquals(productId, reloaded.getProductId());
         Assertions.assertEquals(buyerId, reloaded.getBuyerId());
         Assertions.assertEquals(sellerId, reloaded.getSellerId());
@@ -101,16 +124,19 @@ public class PurchaseJpaDaoTest {
     }
 
     @Test
-    public void updateStatusChangesStatusAndConfirmedFlag() {
+    public void testUpdateStatusChangesStatusAndConfirmedFlag() {
+        // Arrange
         final Purchase purchase = purchaseDao.createPurchase(
             productId, buyerId, sellerId, PurchaseStatus.PAID, "buyer-token", "seller-token"
         );
         em.flush();
 
+        // Act
         purchaseDao.updateStatus(purchase.getPurchaseId(), PurchaseStatus.DELIVERED);
         em.flush();
         em.clear();
 
+        // Assert
         final Purchase reloaded = purchaseDao.findById(purchase.getPurchaseId()).orElseThrow();
         Assertions.assertEquals(PurchaseStatus.DELIVERED, reloaded.getStatus());
         Assertions.assertEquals("buyer-token", reloaded.getBuyerToken());
@@ -119,7 +145,9 @@ public class PurchaseJpaDaoTest {
     }
 
     @Test
-    public void findByBuyerIdFiltersPurchases() {
+    public void testFindByBuyerIdFiltersPurchases() {
+
+        // Arrange
         final long secondProductId = createProduct(sellerId, "Second Purchase Album");
         final long otherBuyerProductId = createProduct(otherSellerId, "Other Buyer Album");
 
@@ -128,8 +156,10 @@ public class PurchaseJpaDaoTest {
         purchaseDao.createPurchase(otherBuyerProductId, otherBuyerId, otherSellerId, PurchaseStatus.PAID, "b3", "s3");
         em.flush();
 
+        // Act
         final PaginatedResult<Purchase> result = purchaseDao.findByBuyerId(buyerId, Collections.emptyList(), 1, 10);
 
+        // Assert
         Assertions.assertEquals(2, result.getTotalCount());
         Assertions.assertEquals(1, result.getCurrentPage());
         Assertions.assertEquals(1, result.getTotalPages());
@@ -138,7 +168,8 @@ public class PurchaseJpaDaoTest {
     }
 
     @Test
-    public void findBySellerIdFiltersPurchases() {
+    public void testFindBySellerIdFiltersPurchases() {
+        // Arrange
         final long secondProductId = createProduct(sellerId, "Second Seller Album");
         final long otherSellerProductId = createProduct(otherSellerId, "Other Seller Album");
 
@@ -147,16 +178,22 @@ public class PurchaseJpaDaoTest {
         purchaseDao.createPurchase(otherSellerProductId, buyerId, otherSellerId, PurchaseStatus.PAID, "b3", "s3");
         em.flush();
 
+        // Act
         final List<Purchase> purchases = purchaseDao.findBySellerId(sellerId, Collections.emptyList(), 1, 10).getResults();
 
+        // Assert
         Assertions.assertEquals(2, purchases.size());
         Assertions.assertTrue(purchases.stream().allMatch(p -> p.getSellerId().equals(sellerId)));
     }
 
     @Test
-    public void findByBuyerIdReturnsEmptyPageWhenBuyerHasNoPurchases() {
+    public void testFindByBuyerIdReturnsEmptyPageWhenBuyerHasNoPurchases() {
+        // Arrange
+
+        // Act
         final PaginatedResult<Purchase> result = purchaseDao.findByBuyerId(buyerId, Collections.emptyList(), 1, 10);
 
+        // Assert
         Assertions.assertTrue(result.getResults().isEmpty());
         Assertions.assertEquals(0, result.getTotalCount());
         Assertions.assertEquals(0, result.getTotalPages());

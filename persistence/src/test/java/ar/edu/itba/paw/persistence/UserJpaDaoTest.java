@@ -34,14 +34,14 @@ public class UserJpaDaoTest {
 
     @Test
     public void testCreateUserWhenUserDoesNotExist() {
-        // 1. Arrange
+        // Arrange
         final String email = "[EMAIL_ADDRESS]";
         final String password = "[PASSWORD]";
         final String username = "[USERNAME]";
         final Boolean mod = false;
         final Boolean enabled = false;
 
-        // 2. Exercise
+        // Act
         final User user = userDao.createUser(
                 email,
                 password,
@@ -57,7 +57,7 @@ public class UserJpaDaoTest {
                 null,
                 null);
 
-        // 3. Assert
+        // Assert
         Assertions.assertNotNull(user);
         Assertions.assertEquals(username, user.getUsername());
         Assertions.assertEquals(password, user.getPassword());
