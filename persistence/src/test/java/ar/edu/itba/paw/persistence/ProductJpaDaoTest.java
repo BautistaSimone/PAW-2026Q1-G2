@@ -47,6 +47,8 @@ public class ProductJpaDaoTest {
 
     @Test
     public void testCreateProductAllowsMoreThanOneProductPerUser() {
+
+        // Arrange
         final User user = userDao.createUser("seller@test.com", "password", "seller",
             false, true, null, null, null, null, null, null, null, null);
 

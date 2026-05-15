@@ -41,7 +41,99 @@ public class ImageJpaDaoTest {
     private EntityManager em;
 
     @Test
-    public void testCreateImageStoresBinaryDataAndContentType() {
+    public void testFindImageById() {
+
+        // Arrange
+        final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null, null, null, null, null, null);
+        final Product product = productDao.createProduct(
+            user.getId(),
+            "Dynamo",
+            "Soda Stereo",
+            "Sony Music",
+            "EPC 85930",
+            "Argentina",
+            Collections.emptyList(),
+            "Edicion original",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(32000)
+        );
+        final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
+        final Image createdImage = imageDao.createImage(product.getId(), imageData, "image/jpeg");
+        
+
+        // Act
+        final Optional<Image> imageById = imageDao.findById(createdImage.getImageId());
+
+        // Assert
+        Assertions.assertTrue(imageById.isPresent());
+        Assertions.assertArrayEquals(imageData, imageById.get().getData());
+        Assertions.assertEquals("image/jpeg", imageById.get().getContentType());
+    }
+
+    @Test
+    public void testFindImageByProductId() {
+
+        // Arrange
+        final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null, null, null, null, null, null);
+        final Product product = productDao.createProduct(
+            user.getId(),
+            "Dynamo",
+            "Soda Stereo",
+            "Sony Music",
+            "EPC 85930",
+            "Argentina",
+            Collections.emptyList(),
+            "Edicion original",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(32000)
+        );
+        final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
+        final Image createdImage = imageDao.createImage(product.getId(), imageData, "image/jpeg");
+        
+        // Act
+        final Optional<Image> imageByProduct = imageDao.findByProductId(product.getId());
+
+        // Assert
+        Assertions.assertTrue(imageByProduct.isPresent());
+        Assertions.assertArrayEquals(imageData, imageByProduct.get().getData());
+        Assertions.assertEquals("image/jpeg", imageByProduct.get().getContentType());
+    }
+
+    @Test
+    public void testDeleteImageByProductId() {
+
+        // Arrange
+        final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null, null, null, null, null, null);
+        final Product product = productDao.createProduct(
+            user.getId(),
+            "Dynamo",
+            "Soda Stereo",
+            "Sony Music",
+            "EPC 85930",
+            "Argentina",
+            Collections.emptyList(),
+            "Edicion original",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(32000)
+        );
+        final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
+        final Image createdImage = imageDao.createImage(product.getId(), imageData, "image/jpeg");
+        
+        // Act
+        final Integer deleted = imageDao.deleteByProductId(product.getId());
+
+        // Assert
+        Assertions.assertEquals(1, deleted);
+        Assertions.assertFalse(imageDao.existsByProductId(product.getId()));
+    }
+
+    @Test
+    public void testCreateImage() {
+
+        // Arrange
         final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null, null, null, null, null, null);
         final Product product = productDao.createProduct(
             user.getId(),
@@ -58,18 +150,10 @@ public class ImageJpaDaoTest {
         );
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
 
+        // Act
         final Image createdImage = imageDao.createImage(product.getId(), imageData, "image/jpeg");
-        final Optional<Image> imageById = imageDao.findById(createdImage.getImageId());
-        final Optional<Image> imageByProduct = imageDao.findByProductId(product.getId());
 
+        // Assert
         Assertions.assertNotNull(createdImage);
-        Assertions.assertTrue(imageById.isPresent());
-        Assertions.assertTrue(imageByProduct.isPresent());
-        Assertions.assertArrayEquals(imageData, imageById.get().getData());
-        Assertions.assertEquals("image/jpeg", imageById.get().getContentType());
-        Assertions.assertTrue(imageDao.existsByProductId(product.getId()));
-
-        Assertions.assertEquals(1, imageDao.deleteByProductId(product.getId()));
-        Assertions.assertFalse(imageDao.existsByProductId(product.getId()));
     }
 }

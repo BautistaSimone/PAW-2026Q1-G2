@@ -46,14 +46,18 @@ public class CategoryJpaDaoTest {
 
     @Test
     public void findAllReturnsEveryCategorySortedByName() {
+
+        // Arrange
         insertCategory("Rock");
         insertCategory("Ambient");
         insertCategory("Jazz");
 
         em.flush();
 
+        // Act
         final List<Category> categories = categoryDao.findAll();
 
+        // Assert
         Assertions.assertEquals(3, categories.size());
         Assertions.assertEquals(
             List.of("Ambient", "Jazz", "Rock"),
@@ -63,6 +67,7 @@ public class CategoryJpaDaoTest {
 
     @Test
     public void findByProductIdReturnsOnlyLinkedCategories() {
+        // Arrange
         final User user = userDao.createUser("cat-seller@test.com", "password", "seller",
             false, true, null, null, null, null, null, null, null, null);
 
@@ -79,13 +84,16 @@ public class CategoryJpaDaoTest {
         em.flush();
         em.clear();
 
+        // Act
         final List<Category> categories = categoryDao.findByProductId(product.getId());
 
+        // Assert
         Assertions.assertEquals(2, categories.size());
     }
 
     @Test
     public void findByProductIdReturnsEmptyWhenProductHasNoCategories() {
+        // Arrange
         final User user = userDao.createUser("cat-empty@test.com", "password", "seller",
             false, true, null, null, null, null, null, null, null, null);
         insertCategory("Unlinked");
@@ -99,8 +107,10 @@ public class CategoryJpaDaoTest {
         em.flush();
         em.clear();
 
+        // Act
         final List<Category> categories = categoryDao.findByProductId(product.getId());
 
+        // Assert
         Assertions.assertTrue(categories.isEmpty());
     }
 }
