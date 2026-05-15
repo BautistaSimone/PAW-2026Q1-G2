@@ -1,37 +1,45 @@
 package ar.edu.itba.paw.persistence;
 
+import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
-import javax.sql.DataSource;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Report;
 import ar.edu.itba.paw.models.ReportedProduct;
+import ar.edu.itba.paw.models.User;
 
 @Rollback
 @Transactional
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestConfiguration.class)
-public class ReportJdbcDaoTest {
+public class ReportJpaDaoTest {
 
     @Autowired
-    private ReportJdbcDao reportDao;
+    private ReportJpaDao reportDao;
 
     @Autowired
-    private DataSource dataSource;
+    private UserJpaDao userDao;
 
-    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private ProductJpaDao productDao;
+
+    @PersistenceContext
+    private EntityManager em;
+
     private long ownerId;
     private long reporterId;
     private long otherReporterId;
@@ -40,43 +48,43 @@ public class ReportJdbcDaoTest {
 
     @BeforeEach
     public void setUp() {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-        ownerId = insertUser("report-owner", "Owner");
-        reporterId = insertUser("report-reporter", "Reporter");
-        otherReporterId = insertUser("report-other-reporter", "Other Reporter");
-        productId = insertProduct(ownerId, "Reported Album", "Reported Artist");
-        otherProductId = insertProduct(ownerId, "Other Reported Album", "Other Artist");
-    }
+        final User owner = userDao.createUser("report-owner@test.com", "pass", "Owner",
+            false, true, null, null, null, null, null, null, null, null);
+        final User reporter = userDao.createUser("report-reporter@test.com", "pass", "Reporter",
+            false, true, null, null, null, null, null, null, null, null);
+        final User otherReporter = userDao.createUser("report-other@test.com", "pass", "Other Reporter",
+            false, true, null, null, null, null, null, null, null, null);
 
-    private long insertUser(final String suffix, final String username) {
-        jdbcTemplate.update(
-            "INSERT INTO users (email, password, username, mod) VALUES (?, 'pass', ?, false)",
-            suffix + "@test.com",
-            username
-        );
-        return jdbcTemplate.queryForObject("CALL IDENTITY()", Long.class);
-    }
+        ownerId = owner.getId();
+        reporterId = reporter.getId();
+        otherReporterId = otherReporter.getId();
 
-    private long insertProduct(final long userId, final String title, final String artist) {
-        jdbcTemplate.update(
-            "INSERT INTO products (user_id, title, artist, description, sleeve_condition, record_condition, published, price) "
-                + "VALUES (?, ?, ?, 'Description', 8, 9, CURRENT_DATE, 1000)",
-            userId,
-            title,
-            artist
+        final Product product = productDao.createProduct(
+            ownerId, "Reported Album", "Reported Artist", "Label", "CAT", "Argentina",
+            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
         );
-        return jdbcTemplate.queryForObject("CALL IDENTITY()", Long.class);
+        final Product otherProduct = productDao.createProduct(
+            ownerId, "Other Reported Album", "Other Artist", "Label", "CAT2", "Argentina",
+            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+        );
+
+        productId = product.getId();
+        otherProductId = otherProduct.getId();
+        em.flush();
     }
 
     @Test
-    public void createPersistsReportAndExistsByProductAndReporterFindsIt() {
+    public void createPersistsReportAndExistsFindsIt() {
         final Report report = reportDao.create(productId, ownerId, reporterId);
+        em.flush();
 
         Assertions.assertNotNull(report.getReportId());
         Assertions.assertEquals(productId, report.getProductId());
         Assertions.assertEquals(ownerId, report.getOwnerUserId());
         Assertions.assertEquals(reporterId, report.getReporterUserId());
-        Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "reports"));
+
         Assertions.assertTrue(reportDao.existsByProductAndReporter(productId, reporterId));
         Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, otherReporterId));
     }
@@ -86,6 +94,7 @@ public class ReportJdbcDaoTest {
         reportDao.create(productId, ownerId, reporterId);
         reportDao.create(productId, ownerId, otherReporterId);
         reportDao.create(otherProductId, ownerId, reporterId);
+        em.flush();
 
         final List<ReportedProduct> reportedProducts = reportDao.findAllGroupedByProduct(1, 10).getResults();
 
@@ -104,12 +113,13 @@ public class ReportJdbcDaoTest {
         reportDao.create(productId, ownerId, reporterId);
         reportDao.create(productId, ownerId, otherReporterId);
         reportDao.create(otherProductId, ownerId, reporterId);
+        em.flush();
 
         reportDao.deleteByProductId(productId);
+        em.flush();
 
         Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, reporterId));
         Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, otherReporterId));
         Assertions.assertTrue(reportDao.existsByProductAndReporter(otherProductId, reporterId));
-        Assertions.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, "reports"));
     }
 }

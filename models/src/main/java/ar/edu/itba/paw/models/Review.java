@@ -2,16 +2,49 @@ package ar.edu.itba.paw.models;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Id;
+import javax.persistence.Column;
+import javax.persistence.Transient;
+
+@Entity
+@Table(name = "reviews")
 public class Review {
 
-    private final Long reviewId;
-    private final Long purchaseId;
-    private final Long sellerId;
-    private final Long buyerId;
-    private final int score;
-    private final String text;
-    private final LocalDateTime createdAt;
-    private final String buyerUsername;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reviews_review_id_seq")
+    @SequenceGenerator(sequenceName = "reviews_review_id_seq", name = "reviews_review_id_seq", allocationSize = 1)
+    @Column(name = "review_id")
+    private Long reviewId;
+
+    @Column(name = "purchase_id", nullable = false, unique = true)
+    private Long purchaseId;
+
+    @Column(name = "seller_id", nullable = false)
+    private Long sellerId;
+
+    @Column(name = "buyer_id", nullable = false)
+    private Long buyerId;
+
+    @Column(nullable = false)
+    private int score;
+
+    @Column(name = "review")
+    private String text;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Transient
+    private String buyerUsername;
+
+    Review() {
+        // Just for Hibernate, we love you!
+    }
 
     public Review(
         final Long reviewId,
@@ -31,6 +64,22 @@ public class Review {
         this.text = text;
         this.createdAt = createdAt;
         this.buyerUsername = buyerUsername;
+    }
+
+    public Review(
+        final Long purchaseId,
+        final Long sellerId,
+        final Long buyerId,
+        final int score,
+        final String text,
+        final LocalDateTime createdAt
+    ) {
+        this.purchaseId = purchaseId;
+        this.sellerId = sellerId;
+        this.buyerId = buyerId;
+        this.score = score;
+        this.text = text;
+        this.createdAt = createdAt;
     }
 
     public Long getReviewId() {
@@ -63,5 +112,9 @@ public class Review {
 
     public String getBuyerUsername() {
         return buyerUsername;
+    }
+
+    public void setBuyerUsername(String buyerUsername) {
+        this.buyerUsername = buyerUsername;
     }
 }

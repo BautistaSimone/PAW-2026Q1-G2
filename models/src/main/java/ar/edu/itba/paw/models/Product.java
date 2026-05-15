@@ -26,7 +26,7 @@ public class Product {
     @Column(name = "product_id")
     private Long productId;
 
-    @Column(name = "user_id", nullable = false, unique = true)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
     private String title;
     private String artist;
@@ -60,6 +60,9 @@ public class Product {
     private BigDecimal recordCondition;
     private LocalDate published;
     private BigDecimal price;
+
+    @Column(name = "state", length = 32, nullable = false)
+    private String state = ProductState.ACTIVE.getPersistenceValue();
 
     Product() {
         // Just for Hibernate, we love you!
@@ -195,51 +198,59 @@ public class Product {
         return published;
     }
 
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     public void setUserId(Long userId) {
-        userId = userId;
+        this.userId = userId;
     }
 
     public void setTitle(String title) {
-        title = title;
+        this.title = title;
     }
 
     public void setArtist(String artist) {
-        artist = artist;
+        this.artist = artist;
     }
 
-    public void setRecordLabel(String record) {
-        recordLabel = record;
+    public void setRecordLabel(String recordLabel) {
+        this.recordLabel = recordLabel;
     }
 
-    public void setCatalogNumber(String catalog) {
-        catalogNumber = catalog;
+    public void setCatalogNumber(String catalogNumber) {
+        this.catalogNumber = catalogNumber;
     }
 
     public void setEditionCountry(String editionCountry) {
-        editionCountry = editionCountry;
+        this.editionCountry = editionCountry;
     }
 
     public void setCategories(List<Category> categories) {
-        categories = categories;
+        this.categories = categories;
     }
 
-    public void setSleeveCondition(BigDecimal sleeve) {
-        sleeveCondition = sleeve;
+    public void setSleeveCondition(BigDecimal sleeveCondition) {
+        this.sleeveCondition = sleeveCondition;
     }
 
-    public void setRecordCondition(BigDecimal record) {
-        recordCondition = record;
+    public void setRecordCondition(BigDecimal recordCondition) {
+        this.recordCondition = recordCondition;
     }
 
     public void setPrice(BigDecimal price) {
-        price = price;
+        this.price = price;
     }
 
     public void setDescription(String description) {
-        description = description;
+        this.description = description;
     }
 
     public void setPublished(LocalDate published) {
-        published = published;
+        this.published = published;
     }
 }

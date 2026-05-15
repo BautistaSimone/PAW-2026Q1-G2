@@ -3,12 +3,17 @@ package ar.edu.itba.paw.models;
 import java.time.Instant;
 
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Column;
 
 @MappedSuperclass
 abstract class Token {
  
     protected String token;
+
+    @Column(name = "user_id", nullable = false)
     protected Long userId;
+
+    @Column(name = "expiration_date", nullable = false)
     protected Instant expirationDate;
 
     Token() {

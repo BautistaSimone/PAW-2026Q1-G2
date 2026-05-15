@@ -8,12 +8,12 @@ Vinyland is a multi-module Java/Spring web application designed as an e-commerce
 - **`service-contracts`**: Interfaces for the business logic layer.
 - **`services`**: Implementations of the service interfaces.
 - **`persistence-contracts`**: Interfaces for the data access layer.
-- **`persistence`**: JDBC-based implementations of the repository interfaces.
+- **`persistence`**: Hibernate/JPA-based implementations of the repository interfaces.
 - **`webapp`**: Presentation layer containing Spring MVC controllers, JSPs, and application configuration.
 
 ## Tech Stack
 - **Language**: Java 21
-- **Framework**: Spring 5.3.33 (WebMVC, JDBC, Context)
+- **Framework**: Spring 5.3.33 (WebMVC, ORM/JPA, Context)
 - **Database**: PostgreSQL 42.2.5 (Local), HSQLDB (Testing)
 - **Template Engine**: JSP (JavaServer Pages)
 - **Frontend**: Bootstrap 5, CSS, Vanilla JS
@@ -53,8 +53,8 @@ mvn test
 - **Interface-driven**: Services and DAOs should always have a corresponding interface in the `-contracts` modules.
 
 ### Database
-- The database schema is defined in `persistence/src/main/resources/schema.sql`.
-- `WebConfig.java` uses `DataSourceInitializer` to automatically populate the schema on application startup.
+- The database schema is defined in `persistence/src/main/resources/schema.sql` (DDL + seed data). Hibernate also manages the schema via `hbm2ddl.auto=update`.
+- `WebConfig.java` uses `DataSourceInitializer` to execute `schema.sql` on startup (the `CREATE TABLE IF NOT EXISTS` statements are safe alongside Hibernate's auto-update).
 - Local PostgreSQL credentials (default):
   - **Host**: `localhost`
   - **Database**: `paw`
@@ -69,6 +69,7 @@ mvn test
 ### Coding Style
 - Ensure proper use of Spring annotations (`@Controller`, `@Service`, `@Repository`, `@Autowired`).
 - Use domain entities from the `models` module for transferring data between layers.
+- All persistence DAOs use JPA `EntityManager` with `@PersistenceContext`. Use JPQL (entity field names, not SQL column names) for queries.
 
 ### Maven & Dependency Management
 - **Centralized Versioning**: All dependency versions MUST be defined in the root `pom.xml` within the `<properties>` section.
@@ -103,7 +104,8 @@ When generating new code, always strictly adhere to the following rules to ensur
 - Tokens or non-password secrets should be compared using `MessageDigest.isEqual(...)` in the service layer if used for authorization rules. Ensure constant-time comparisons when validating unpredictable input buffers.
 
 ### 6. SQL Injection Prevention
-- All user-submitted text evaluated within `LIKE` wildcard searches (e.g., `CONCAT('%', ?, '%')`) must be escaped upstream before parameterization to prevent wildcards like `%` and `_` from being exploited.
+- All user-submitted text evaluated within `LIKE` wildcard searches must be escaped upstream before parameterization to prevent wildcards like `%` and `_` from being exploited.
+- Use JPQL named parameters (`:paramName`) instead of positional parameters or string concatenation.
 
 ## Internationalization (i18n)
 
