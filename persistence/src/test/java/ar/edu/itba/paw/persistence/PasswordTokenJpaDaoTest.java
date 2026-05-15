@@ -78,8 +78,12 @@ public class PasswordTokenJpaDaoTest {
 
     @Test
     public void testCreatePasswordToken() {
+        // Arrange
+
+        // Act
         final PasswordToken token = passwordTokenDao.createToken(userId, tkn, expirationDate);
 
+        // Assert
         Assertions.assertNotNull(token);
         Assertions.assertEquals(expirationDate, token.getExpirationDate());
         Assertions.assertEquals(tkn, token.getToken());
@@ -94,10 +98,13 @@ public class PasswordTokenJpaDaoTest {
 
     @Test
     public void testFindByUserId() {
+        // Arrange
         passwordTokenDao.createToken(userId, tkn, expirationDate);
 
+        // Act
         Optional<PasswordToken> result = passwordTokenDao.findByUserId(userId);
 
+        // Assert
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(expirationDate, result.get().getExpirationDate());
         Assertions.assertEquals(tkn, result.get().getToken());
@@ -105,10 +112,13 @@ public class PasswordTokenJpaDaoTest {
 
     @Test
     public void testFindByToken() {
+        // Arrange
         passwordTokenDao.createToken(userId, tkn, expirationDate);
 
+        // Act
         Optional<PasswordToken> result = passwordTokenDao.findByToken(tkn);
 
+        // Assert
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(expirationDate, result.get().getExpirationDate());
         Assertions.assertEquals(userId, result.get().getUserId());

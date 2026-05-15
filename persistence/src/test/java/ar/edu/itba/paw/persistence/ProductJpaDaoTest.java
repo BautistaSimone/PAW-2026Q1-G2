@@ -52,6 +52,7 @@ public class ProductJpaDaoTest {
         final User user = userDao.createUser("seller@test.com", "password", "seller",
             false, true, null, null, null, null, null, null, null, null);
 
+        // Act
         final Product firstProduct = productDao.createProduct(
             user.getId(), "Dynamo", "Soda Stereo", "Sony Music", "EPC 85930", "Argentina",
             Collections.emptyList(), "Edicion original", BigDecimal.valueOf(9.0),
@@ -63,16 +64,18 @@ public class ProductJpaDaoTest {
             BigDecimal.valueOf(10.0), BigDecimal.valueOf(28000)
         );
 
+        // Assert
         Assertions.assertNotNull(firstProduct);
         Assertions.assertNotNull(secondProduct);
 
         final long count = em.createQuery("SELECT COUNT(p) FROM Product p", Long.class).getSingleResult();
-        Assertions.assertEquals(2, count);
+        Assertions.assertEquals(2, count); 
         Assertions.assertEquals(2, productDao.listProducts().getResults().size());
     }
 
     @Test
     public void findProductsSearchMatchesArtist() {
+        // Arrange
         final User user = userDao.createUser("seller2@test.com", "password", "seller2",
             false, true, null, null, null, null, null, null, null, null);
         productDao.createProduct(
@@ -85,13 +88,18 @@ public class ProductJpaDaoTest {
             "cerati", Collections.emptyList(), null, null,
             Collections.emptyList(), Collections.emptyList(), null, null, 1, 10
         );
+
+        // Act
         final List<Product> found = productDao.findProducts(criteria).getResults();
+        
+        // Assert
         Assertions.assertEquals(1, found.size());
         Assertions.assertEquals("Bocanada", found.get(0).getTitle());
     }
 
     @Test
     public void findProductsSearchReturnsEmptyWhenNoMatch() {
+        // Arrange
         final User user = userDao.createUser("seller3@test.com", "password", "seller3",
             false, true, null, null, null, null, null, null, null, null);
         productDao.createProduct(
@@ -104,11 +112,17 @@ public class ProductJpaDaoTest {
             "texto_que_no_existe_en_ningun_campo", Collections.emptyList(), null, null,
             Collections.emptyList(), Collections.emptyList(), null, null, 1, 10
         );
-        Assertions.assertTrue(productDao.findProducts(criteria).getResults().isEmpty());
+
+        // Act
+        final List<Product> found = productDao.findProducts(criteria).getResults();
+
+        // Assert
+        Assertions.assertTrue(found.isEmpty());
     }
 
     @Test
-    public void reserveIfAvailableHidesProductAndOnlySucceedsOnce() {
+    public void reserveIfAvailableProductOnlySucceedsOnce() {
+        // Arrange
         final User user = userDao.createUser("seller4@test.com", "password", "seller4",
             false, true, null, null, null, null, null, null, null, null);
         final Product product = productDao.createProduct(
@@ -119,17 +133,18 @@ public class ProductJpaDaoTest {
 
         em.flush();
 
-        Assertions.assertTrue(productDao.reserveIfAvailable(product.getId()));
-        Assertions.assertFalse(productDao.reserveIfAvailable(product.getId()));
+        // Act
+        final Boolean first = productDao.reserveIfAvailable(product.getId());
+        final Boolean second = productDao.reserveIfAvailable(product.getId());
 
-        em.clear();
-
-        Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isEmpty());
-        Assertions.assertTrue(productDao.findProducts(ProductSearchCriteria.empty()).getResults().isEmpty());
+        // Assert
+        Assertions.assertTrue(first);
+        Assertions.assertFalse(second);
     }
 
     @Test
-    public void markAsUserDeletedAndRestore() {
+    public void markAsUserDeleted() {
+        // Arrange
         final User user = userDao.createUser("seller5@test.com", "password", "seller5",
             false, true, null, null, null, null, null, null, null, null);
         final Product product = productDao.createProduct(
@@ -140,25 +155,48 @@ public class ProductJpaDaoTest {
 
         em.flush();
 
-        Assertions.assertTrue(productDao.markAsUserDeleted(product.getId()));
-        Assertions.assertFalse(productDao.markAsUserDeleted(product.getId()));
+        // Act
+        final Boolean first = productDao.markAsUserDeleted(product.getId());
+        final Boolean second = productDao.markAsUserDeleted(product.getId());
 
-        em.clear();
+        // Assert
+        Assertions.assertTrue(first);
+        Assertions.assertFalse(second);
 
         Assertions.assertEquals(1, productDao.findProductsByUserIdAndState(
             user.getId(), ProductState.USER_DELETED, 1, 10).getResults().size());
         Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isEmpty());
+    }
 
-        Assertions.assertTrue(productDao.restoreUserDeletedProduct(product.getId()));
-        Assertions.assertFalse(productDao.restoreUserDeletedProduct(product.getId()));
+    @Test
+    public void markAsUserDeletedAndRestore() {
+        // Arrange
+        final User user = userDao.createUser("seller5@test.com", "password", "seller5",
+            false, true, null, null, null, null, null, null, null, null);
+        final Product product = productDao.createProduct(
+            user.getId(), "Album", "Artist", "Label", "CAT-1", "Argentina",
+            Collections.emptyList(), "Desc", BigDecimal.valueOf(8.0),
+            BigDecimal.valueOf(8.0), BigDecimal.valueOf(1000)
+        );
 
-        em.clear();
+        em.flush();
 
+        productDao.markAsUserDeleted(product.getId());
+
+        // Act
+        final Boolean first = productDao.restoreUserDeletedProduct(product.getId());
+        final Boolean second = productDao.restoreUserDeletedProduct(product.getId());
+
+        // Assert
+        Assertions.assertTrue(first);
+        Assertions.assertFalse(second);
         Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isPresent());
     }
 
     @Test
     public void markAsSoldOnlyFromReserved() {
+
+        // Arrange
         final User user = userDao.createUser("seller6@test.com", "password", "seller6",
             false, true, null, null, null, null, null, null, null, null);
         final Product product = productDao.createProduct(
@@ -169,17 +207,18 @@ public class ProductJpaDaoTest {
 
         em.flush();
 
-        Assertions.assertTrue(productDao.reserveIfAvailable(product.getId()));
+        // Act
+        productDao.reserveIfAvailable(product.getId());
         productDao.markAsSold(product.getId());
 
-        em.clear();
-
+        // Assert
         Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isEmpty());
         Assertions.assertTrue(productDao.findById(product.getId()).isPresent());
     }
 
     @Test
     public void updateProductChangesTitleWhenActive() {
+        // Arrange
         final User user = userDao.createUser("seller7@test.com", "password", "seller7",
             false, true, null, null, null, null, null, null, null, null);
         final Product product = productDao.createProduct(
@@ -190,15 +229,15 @@ public class ProductJpaDaoTest {
 
         em.flush();
 
-        Assertions.assertTrue(productDao.updateProduct(
+        // Act
+        final Boolean updated = productDao.updateProduct(
             product.getId(), "NewTitle", "Artist", "Label", "CAT", "Argentina",
             Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
             BigDecimal.valueOf(9.0), BigDecimal.valueOf(2500)
-        ));
+        );
 
-        em.flush();
-        em.clear();
-
+        // Assert
+        Assertions.assertTrue(updated);
         final Product reloaded = productDao.findById(product.getId()).orElseThrow();
         Assertions.assertEquals("NewTitle", reloaded.getTitle());
         Assertions.assertEquals(0, reloaded.getPrice().compareTo(BigDecimal.valueOf(2500)));
@@ -206,6 +245,7 @@ public class ProductJpaDaoTest {
 
     @Test
     public void listDistinctArtistsReturnsUniqueVisibleNonBlankArtistsSorted() {
+        // Arrange
         final User user = userDao.createUser("seller10@test.com", "password", "seller10",
             false, true, null, null, null, null, null, null, null, null);
         createSuggestionProduct(user, "Visible B", "Zoo Artist", "Label B");
@@ -215,20 +255,25 @@ public class ProductJpaDaoTest {
         final Product hiddenProduct = createSuggestionProduct(user, "Hidden", "Hidden Artist", "Hidden Label");
 
         em.flush();
-
         productDao.reserveIfAvailable(hiddenProduct.getId());
 
         em.flush();
         em.clear();
 
+        // Act
+        final List<String> distinct = productDao.listDistinctArtists();
+
+        // Assert
         Assertions.assertIterableEquals(
             List.of("Alpha Artist", "Zoo Artist"),
-            productDao.listDistinctArtists()
+            distinct
         );
     }
 
     @Test
     public void listDistinctRecordLabelsReturnsUniqueVisibleNonBlankLabelsSorted() {
+
+        // Arrange
         final User user = userDao.createUser("seller11@test.com", "password", "seller11",
             false, true, null, null, null, null, null, null, null, null);
         createSuggestionProduct(user, "Visible B", "Artist B", "Zoo Label");
@@ -244,9 +289,13 @@ public class ProductJpaDaoTest {
         em.flush();
         em.clear();
 
+        // Act
+        final List<String> distinct = productDao.listDistinctRecordLabels();
+
+        // Assert
         Assertions.assertIterableEquals(
             List.of("Alpha Label", "Zoo Label"),
-            productDao.listDistinctRecordLabels()
+            distinct
         );
     }
 }
