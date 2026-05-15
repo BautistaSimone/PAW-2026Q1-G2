@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -203,28 +204,23 @@ public class ProductJpaDao implements ProductDao {
         final int safePageSize = pageSize < 1 ? 12 : pageSize;
         final String stateVal = state.getPersistenceValue();
 
-        final TypedQuery<Long> countQuery = em.createQuery(
-            "SELECT COUNT(p) FROM Product p WHERE p.userId = :userId AND p.state = :state", Long.class
-        );
-        countQuery.setParameter("userId", userId);
-        countQuery.setParameter("state", stateVal);
-        final long totalCount = countQuery.getSingleResult();
+        // Paginate with 1 + 1 queries
+        @SuppressWarnings("unchecked")
+        List<Number> ids = em.createNativeQuery("SELECT product_id FROM products WHERE user_id = :userId AND state = :state")
+            .setParameter("userId", userId)
+            .setParameter("state", stateVal)
+            .setFirstResult((safePage-1) * safePageSize)
+            .setMaxResults(safePageSize)
+            .getResultList();
 
-        if (totalCount == 0) {
+        if (ids.isEmpty()) {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
         }
 
-        final TypedQuery<Product> selectQuery = em.createQuery(
-            "SELECT p FROM Product p WHERE p.userId = :userId AND p.state = :state ORDER BY "
-                + orderByJpql(ProductSortOrder.NEWEST),
-            Product.class
-        );
-        selectQuery.setParameter("userId", userId);
-        selectQuery.setParameter("state", stateVal);
-        selectQuery.setMaxResults(safePageSize);
-        selectQuery.setFirstResult((safePage - 1) * safePageSize);
+        final TypedQuery<Product> selectQuery = em.createQuery("FROM Product WHERE productId IN :ids", Product.class)
+            .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
 
-        return new PaginatedResult<>(selectQuery.getResultList(), safePage, safePageSize, totalCount);
+        return new PaginatedResult<>(selectQuery.getResultList(), safePage, safePageSize, ids.size());
     }
 
     @Override

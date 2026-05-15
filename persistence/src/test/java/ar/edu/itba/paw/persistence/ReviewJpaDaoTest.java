@@ -125,16 +125,23 @@ public class ReviewJpaDaoTest {
         reviewDao.create(purchaseId, sellerId, buyerId, 4, "Good");
         em.flush();
 
+        // Act
         final SellerRatingSummary summary = reviewDao.summaryForSeller(sellerId);
 
+        // Assert
         Assertions.assertEquals(1, summary.getCount());
         Assertions.assertEquals(4.0, summary.getAvgScore(), 0.01);
     }
 
     @Test
     public void testSummaryForSellerWithNoReviews() {
+
+        // Arrange
+
+        // Act
         final SellerRatingSummary summary = reviewDao.summaryForSeller(sellerId);
 
+        // Assert
         Assertions.assertEquals(0, summary.getCount());
         Assertions.assertEquals(0.0, summary.getAvgScore(), 0.01);
     }
