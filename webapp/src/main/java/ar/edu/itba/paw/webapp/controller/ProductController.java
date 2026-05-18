@@ -412,9 +412,17 @@ public class ProductController {
         mav.addObject("product", product);
         mav.addObject("productDetailBackUrl", resolveProductDetailBackUrl(request, id));
 
-        final boolean isOwnProduct = authUser != null
-            && product.getUserId().equals(authUser.getUser().getId());
-        mav.addObject("isOwnProduct", isOwnProduct);
+        if (authUser != null) {
+            final boolean isOwnProduct = product.getUserId().equals(authUser.getUser().getId());
+            final boolean isWishlisted = userService.isProductInWishlist(authUser.getUser().getId(), product.getId());
+
+            mav.addObject("isOwnProduct", isOwnProduct);
+            mav.addObject("isWishlisted", isWishlisted);
+
+        } else {
+            mav.addObject("isOwnProduct", false);
+            mav.addObject("isWishlisted", false);
+        }
 
         final List<ar.edu.itba.paw.models.Image> productImages = imageService.findAllByProductId(product.getId());
         if (!productImages.isEmpty()) {

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -391,4 +392,22 @@ public class UserController {
         }
         return new ModelAndView("redirect:/profile?tab=trash&trashPage=" + page);
     }
+
+    @RequestMapping(value = "/add-wishlist-product", method = RequestMethod.POST)
+    public ModelAndView addWishlistProduct(
+            @AuthenticationPrincipal final PawAuthUser authUser,
+            @RequestParam("productId") final Long productId,
+            HttpServletRequest request) {
+
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        userService.addWishlistProduct(authUser.getUser().getId(), productId);
+
+        String referer = request.getHeader("Referer");
+
+        return new ModelAndView("redirect:" + referer);
+    }
+
 }

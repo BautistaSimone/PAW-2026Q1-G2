@@ -78,7 +78,6 @@ public class UserJpaDaoTest {
         Assertions.assertEquals(1L, count);
     }
 
-
     @Test
     public void testAddWishlistProduct() {
         // Arrange
@@ -127,4 +126,42 @@ public class UserJpaDaoTest {
         Assertions.assertEquals(2L, count.longValue());
     }
 
+    @Test
+    public void testIsProductInWishlist() {
+        // Arrange
+        final String email = "[EMAIL_ADDRESS]";
+        final String password = "[PASSWORD]";
+        final String username = "[USERNAME]";
+        final Boolean mod = false;
+        final Boolean enabled = false;
+
+        final User user = userDao.createUser(
+                email,
+                password,
+                username,
+                mod,
+                enabled,
+                "Juan",
+                "Perez",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        final Product product = productDao.createProduct(
+            user.getId(), "Album", "Artist", "Label", "CAT", "Argentina",
+            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+        );
+        
+        userDao.addWishlistProduct(user.getId(), product);
+
+        // Act
+        final Boolean isWishlisted = userDao.isProductInWishlist(user.getId(), product.getId());
+
+        // Assert
+        Assertions.assertTrue(isWishlisted);
+    }
 }

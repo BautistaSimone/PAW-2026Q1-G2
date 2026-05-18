@@ -28,6 +28,7 @@
     </c:otherwise>
 </c:choose>
     <div class="product-image-placeholder product-card-div-3" >
+    
         <c:choose>
             <c:when test="${not empty imageUrl}">
                 <img

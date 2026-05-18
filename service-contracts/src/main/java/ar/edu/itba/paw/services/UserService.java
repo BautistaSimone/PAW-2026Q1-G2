@@ -45,5 +45,8 @@ public interface UserService {
 
 	void ban(final Long id);
 
-	void addWishlistProduct(final Long id, Product product);
+	void addWishlistProduct(final Long user_id, final Long product_id);
+
+	Boolean isProductInWishlist(final Long userId, final Long productId);
+
 }

@@ -117,4 +117,20 @@ public class UserJpaDao implements UserDao {
         // Set it, hibernate will take care of it
         user.getWishlistProducts().add(product);
     }
+
+    @Override
+	public Boolean isProductInWishlist(final Long userId, final Long productId) {
+        final TypedQuery<Long> query = em.createQuery(
+            "SELECT COUNT(p) " +
+            "FROM User u JOIN u.wishlistProducts p " +
+            "WHERE u.id = :userId " +
+            "AND p.id = :productId",
+            Long.class
+        );
+
+        query.setParameter("userId", userId);
+        query.setParameter("productId", productId);
+
+        return query.getSingleResult() > 0;
+    }
 }

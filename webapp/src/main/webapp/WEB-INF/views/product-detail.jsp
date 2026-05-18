@@ -190,20 +190,64 @@
                                                     </div>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <div class="d-grid">
+                                                    <div class="d-grid gap-3">
+                                                        <!-- Purchase -->
                                                         <c:url var="purchasePostUrl" value='/purchases' />
                                                         <form:form modelAttribute="purchaseCreateForm"
-                                                            action="${purchasePostUrl}" method="POST" cssClass="w-100" data-single-submit="true">
-                                                            <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
-                                                            <input type="hidden" name="productId" value="<c:out value='${product.id}'/>" />
-                                                            <button type="submit" class="btn w-100 product-detail-button-17"
-                                                                
-                                                                onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 12px 28px rgba(231, 111, 81, 0.5)'; this.style.background='var(--color-accent-hover)';"
-                                                                onmouseout="this.style.transform='none'; this.style.boxShadow='0 8px 24px rgba(231, 111, 81, 0.4)'; this.style.background='var(--color-accent)';">
-                                                                <i class="bi bi-cart-fill product-detail-i-16" aria-hidden="true"
-                                                                    ></i> <spring:message code="ProductDetail.purchase.button" />
+                                                            action="${purchasePostUrl}"
+                                                            method="POST"
+                                                            cssClass="w-100"
+                                                            data-single-submit="true">
+
+                                                            <input type="hidden"
+                                                                name="${_csrf.parameterName}"
+                                                                value="${_csrf.token}" />
+
+                                                            <input type="hidden"
+                                                                name="productId"
+                                                                value="<c:out value='${product.id}'/>'" />
+
+                                                            <button type="submit"
+                                                                    class="btn w-100 product-detail-button-17">
+
+                                                                <i class="bi bi-cart-fill product-detail-i-16"
+                                                                aria-hidden="true"></i>
+
+                                                                <spring:message code="ProductDetail.purchase.button" />
                                                             </button>
                                                         </form:form>
+
+                                                        <!-- Wishlist -->
+                                                        <c:url var="wishlistUrl" value='/add-wishlist-product' />
+
+                                                        <form:form action="${wishlistUrl}"
+                                                                method="POST"
+                                                                cssClass="w-100">
+
+                                                            <input type="hidden"
+                                                                name="${_csrf.parameterName}"
+                                                                value="${_csrf.token}" />
+
+                                                            <input type="hidden"
+                                                                name="productId"
+                                                                value="<c:out value='${product.id}'/>" />
+
+                                                            <button type="submit"
+                                                                    class="btn w-100 product-detail-button-18">
+
+                                                                <i class="bi ${isWishlisted ? 'bi-heart-fill' : 'bi-heart'}"></i>
+
+                                                                <c:choose>
+                                                                    <c:when test="${isWishlisted}">
+                                                                        Remove from wishlist
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        Add to wishlist
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </button>
+                                                        </form:form>
+
                                                     </div>
                                                     <sec:authorize access="isAuthenticated()">
                                                         <div class="d-grid mt-3">
