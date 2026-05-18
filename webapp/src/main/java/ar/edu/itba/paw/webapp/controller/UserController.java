@@ -53,6 +53,7 @@ public class UserController {
     private static final int PROFILE_PUBLICATIONS_PAGE_SIZE = 12;
     private static final int PROFILE_OTHER_PAGE_SIZE = 3;
     private static final int PROFILE_TRASH_PAGE_SIZE = 12;
+    private static final int PROFILE_FOLLOW_PAGE_SIZE = 12;
 
     private final UserService userService;
     private final ProductService productService;
@@ -302,6 +303,13 @@ public class UserController {
         mv.addObject("userProducts", productsPage.getResults());
         mv.addObject("productImageUrls", productImageUrls);
 
+        mv.addObject("followerCount", userService.countFollowers(profileUser.getId()));
+        mv.addObject("followingCount", userService.countFollowing(profileUser.getId()));
+
+        if (!isOwnProfile && authUser != null) {
+            mv.addObject("isFollowing", userService.isFollowing(authUser.getUser().getId(), profileUser.getId()));
+        }
+
         PaginatedResult<ar.edu.itba.paw.models.Review> reviewsPage = reviewService.findBySellerId(profileUser.getId(),
                 page, PROFILE_OTHER_PAGE_SIZE);
         mv.addObject("receivedReviewsPage", reviewsPage);
@@ -358,6 +366,27 @@ public class UserController {
             mv.addObject("deletedProducts", deletedPage.getResults());
             mv.addObject("deletedProductImageUrls", deletedProductImageUrls);
         }
+
+        final PaginatedResult<User> followersPage = userService.getFollowers(profileUser.getId(), page, PROFILE_FOLLOW_PAGE_SIZE);
+        mv.addObject("followersPage", followersPage);
+        mv.addObject("followers", followersPage.getResults());
+
+        final PaginatedResult<User> followingPage = userService.getFollowing(profileUser.getId(), page, PROFILE_FOLLOW_PAGE_SIZE);
+        mv.addObject("followingPage", followingPage);
+        mv.addObject("followingUsers", followingPage.getResults());
+
+        if (authUser != null) {
+            final Map<Long, Boolean> followStatusMap = new HashMap<>();
+            for (User u : followersPage.getResults()) {
+                followStatusMap.put(u.getId(), userService.isFollowing(authUser.getUser().getId(), u.getId()));
+            }
+            for (User u : followingPage.getResults()) {
+                if (!followStatusMap.containsKey(u.getId())) {
+                    followStatusMap.put(u.getId(), userService.isFollowing(authUser.getUser().getId(), u.getId()));
+                }
+            }
+            mv.addObject("followStatusMap", followStatusMap);
+        }
     }
 
     @RequestMapping(value = "/profile/admin/hide-product", method = RequestMethod.POST)
@@ -408,6 +437,34 @@ public class UserController {
         String referer = request.getHeader("Referer");
 
         return new ModelAndView("redirect:" + referer);
+    }
+
+    @RequestMapping(value = "/profile/follow", method = RequestMethod.POST)
+    public ModelAndView toggleFollow(
+            @AuthenticationPrincipal final PawAuthUser authUser,
+            @RequestParam("userId") final Long targetUserId,
+            HttpServletRequest request) {
+
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        final Long currentUserId = authUser.getUser().getId();
+        if (currentUserId.equals(targetUserId)) {
+            return new ModelAndView("redirect:/profile");
+        }
+
+        if (userService.isFollowing(currentUserId, targetUserId)) {
+            userService.unfollow(currentUserId, targetUserId);
+        } else {
+            userService.follow(currentUserId, targetUserId);
+        }
+
+        final String referer = request.getHeader("Referer");
+        if (referer != null && !referer.isEmpty()) {
+            return new ModelAndView("redirect:" + referer);
+        }
+        return new ModelAndView("redirect:/profile?userId=" + targetUserId);
     }
 
 }

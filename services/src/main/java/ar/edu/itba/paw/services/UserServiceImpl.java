@@ -2,9 +2,9 @@ package ar.edu.itba.paw.services;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
@@ -180,5 +181,68 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Boolean isProductInWishlist(final Long userId, final Long productId) {
         return userDao.isProductInWishlist(userId, productId);
+    }
+
+    @Override
+    @Transactional
+    public void follow(final Long followerId, final Long followedId) {
+        if (followerId.equals(followedId)) {
+            throw new IllegalArgumentException("Cannot follow yourself");
+        }
+        userDao.follow(followerId, followedId);
+    }
+
+    @Override
+    @Transactional
+    public void unfollow(final Long followerId, final Long followedId) {
+        userDao.unfollow(followerId, followedId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isFollowing(final Long followerId, final Long followedId) {
+        return userDao.isFollowing(followerId, followedId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countFollowers(final Long userId) {
+        return userDao.countFollowers(userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countFollowing(final Long userId) {
+        return userDao.countFollowing(userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedResult<User> getFollowers(final Long userId, final int page, final int pageSize) {
+        return userDao.getFollowers(userId, page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedResult<User> getFollowing(final Long userId, final int page, final int pageSize) {
+        return userDao.getFollowing(userId, page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> getFollowedUserIds(final Long userId) {
+        return userDao.getFollowedUserIds(userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedResult<User> searchUsers(final String query, final int page, final int pageSize) {
+        return userDao.searchUsers(query, page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> getMostFollowedUsers(final int limit) {
+        return userDao.getMostFollowedUsers(limit);
     }
 }

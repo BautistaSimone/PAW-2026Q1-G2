@@ -36,6 +36,18 @@
             </div>
 
             <div class="header-right">
+                <nav class="header-nav-links">
+                    <a href="<c:url value='/search-users'/>" class="header-nav-link" aria-label="<spring:message code='Header.searchUsers.ariaLabel' />">
+                        <i class="bi bi-people" aria-hidden="true"></i>
+                        <span><spring:message code="Header.searchUsers" /></span>
+                    </a>
+                    <sec:authorize access="isAuthenticated()">
+                        <a href="<c:url value='/for-you'/>" class="header-nav-link" aria-label="<spring:message code='Header.forYou.ariaLabel' />">
+                            <i class="bi bi-heart" aria-hidden="true"></i>
+                            <span><spring:message code="Header.forYou" /></span>
+                        </a>
+                    </sec:authorize>
+                </nav>
 
                 <sec:authorize access="isAuthenticated()">
                     <a href="<c:url value='/profile'/>" class="profile-btn" aria-label="<spring:message code='Header.profile.ariaLabel' />">

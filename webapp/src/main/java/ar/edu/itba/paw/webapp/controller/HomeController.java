@@ -22,6 +22,7 @@ import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.SellerRatingSummary;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
@@ -158,6 +159,122 @@ public class HomeController {
 		mav.addObject("selectedSort", sortOrder.name());
 		mav.addObject("activeSearchText", hasActiveSearch ? trimmedSearch : null);
 		mav.addObject("noProductsMatchFilters", productsPage.getResults().isEmpty() && hasActiveFilters);
+		return mav;
+	}
+
+	@RequestMapping(value = "/for-you", method = RequestMethod.GET)
+	public ModelAndView forYou(
+			@AuthenticationPrincipal PawAuthUser authUser,
+			@RequestParam(value = "page", defaultValue = "1") final int page) {
+
+		if (authUser == null) {
+			return new ModelAndView("redirect:/login");
+		}
+
+		if (page < 1) {
+			throw new IllegalArgumentException("Invalid page");
+		}
+
+		final List<Long> followedIds = userService.getFollowedUserIds(authUser.getUser().getId());
+
+		final ModelAndView mav = new ModelAndView("forYou");
+
+		if (followedIds.isEmpty()) {
+			mav.addObject("hasFollowing", false);
+			return mav;
+		}
+
+		mav.addObject("hasFollowing", true);
+
+		final ProductSearchCriteria criteria = new ProductSearchCriteria(
+				null,
+				java.util.Collections.emptyList(),
+				null,
+				null,
+				java.util.Collections.emptyList(),
+				java.util.Collections.emptyList(),
+				ProductSortOrder.NEWEST,
+				null,
+				followedIds,
+				page,
+				12
+		);
+
+		final PaginatedResult<Product> productsPage = productService.listProducts(criteria);
+
+		final Map<Long, String> productImageUrls = new HashMap<>();
+		for (Product product : productsPage.getResults()) {
+			if (imageService.existsByProductId(product.getId())) {
+				productImageUrls.put(product.getId(), "/images/product/" + product.getId());
+			}
+		}
+
+		final Set<Long> distinctSellerIds = new HashSet<>();
+		for (Product product : productsPage.getResults()) {
+			distinctSellerIds.add(product.getUserId());
+		}
+		final Map<Long, SellerRatingSummary> sellerRatingByUserId = new HashMap<>();
+		for (Long sellerId : distinctSellerIds) {
+			sellerRatingByUserId.put(sellerId, reviewService.summaryForSeller(sellerId));
+		}
+
+		mav.addObject("productsPage", productsPage);
+		mav.addObject("products", productsPage.getResults());
+		mav.addObject("productImageUrls", productImageUrls);
+		mav.addObject("sellerRatingByUserId", sellerRatingByUserId);
+		return mav;
+	}
+
+	@RequestMapping(value = "/search-users", method = RequestMethod.GET)
+	public ModelAndView searchUsers(
+			@AuthenticationPrincipal PawAuthUser authUser,
+			@RequestParam(value = "q", required = false) final String query,
+			@RequestParam(value = "page", defaultValue = "1") final int page) {
+
+		if (page < 1) {
+			throw new IllegalArgumentException("Invalid page");
+		}
+
+		final ModelAndView mav = new ModelAndView("searchUsers");
+
+		final boolean hasQuery = query != null && !query.trim().isEmpty();
+		mav.addObject("searchQuery", hasQuery ? query.trim() : "");
+
+		if (hasQuery) {
+			final PaginatedResult<User> usersPage = userService.searchUsers(query.trim(), page, 12);
+			mav.addObject("usersPage", usersPage);
+			mav.addObject("users", usersPage.getResults());
+			mav.addObject("showingSearchResults", true);
+		} else {
+			final List<User> topUsers = userService.getMostFollowedUsers(12);
+			mav.addObject("users", topUsers);
+			mav.addObject("showingSearchResults", false);
+		}
+
+		if (authUser != null) {
+			final List<User> displayedUsers = (List<User>) mav.getModel().get("users");
+			final Map<Long, Boolean> followStatusMap = new HashMap<>();
+			final Map<Long, Long> userFollowerCounts = new HashMap<>();
+			if (displayedUsers != null) {
+				for (User u : displayedUsers) {
+					followStatusMap.put(u.getId(), userService.isFollowing(authUser.getUser().getId(), u.getId()));
+					userFollowerCounts.put(u.getId(), userService.countFollowers(u.getId()));
+				}
+			}
+			mav.addObject("followStatusMap", followStatusMap);
+			mav.addObject("userFollowerCounts", userFollowerCounts);
+			mav.addObject("currentUserId", authUser.getUser().getId());
+		} else {
+			final List<User> displayedUsers = (List<User>) mav.getModel().get("users");
+			final Map<Long, Long> userFollowerCounts = new HashMap<>();
+			if (displayedUsers != null) {
+				for (User u : displayedUsers) {
+					userFollowerCounts.put(u.getId(), userService.countFollowers(u.getId()));
+				}
+			}
+			mav.addObject("userFollowerCounts", userFollowerCounts);
+		}
+
 		return mav;
 	}
 }

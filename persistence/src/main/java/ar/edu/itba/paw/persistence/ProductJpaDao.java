@@ -168,6 +168,12 @@ public class ProductJpaDao implements ProductDao {
             paramValues.add(criteria.getUserId());
         }
 
+        if (!criteria.getUserIds().isEmpty()) {
+            whereJpql.append(" AND p.userId IN :userIds");
+            paramNames.add("userIds");
+            paramValues.add(criteria.getUserIds());
+        }
+
         final TypedQuery<Long> countQuery = em.createQuery(
             "SELECT COUNT(p) FROM Product p " + whereJpql, Long.class
         );

@@ -124,6 +124,16 @@ CREATE TABLE IF NOT EXISTS reports (
 	FOREIGN KEY(reporter_user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS user_follows (
+	follower_id INTEGER NOT NULL,
+	followed_id INTEGER NOT NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (follower_id, followed_id),
+	FOREIGN KEY (follower_id) REFERENCES users(user_id) ON DELETE CASCADE,
+	FOREIGN KEY (followed_id) REFERENCES users(user_id) ON DELETE CASCADE,
+	CHECK (follower_id <> followed_id)
+);
+
 -- Seed default categories (genres) using more compatible EXISTS check instead of ON CONFLICT
 INSERT INTO categories (name) SELECT 'Rock'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Rock');
 INSERT INTO categories (name) SELECT 'Pop'         WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Pop');

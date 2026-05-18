@@ -3484,3 +3484,298 @@ input[type="password"]::-ms-clear {
     .error-code { font-size: 3.5rem; }
     .error-message { font-size: 1.2rem; }
 }
+
+/* ========================
+   Social Features
+   ======================== */
+
+/* Header nav links */
+.header-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.header-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--radius);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: color var(--transition), background var(--transition);
+    white-space: nowrap;
+}
+
+.header-nav-link:hover,
+.header-nav-link:focus {
+    color: var(--color-accent);
+    background: var(--color-bg-card);
+}
+
+/* Follow button */
+.btn-follow {
+    min-width: 140px;
+    font-weight: 600;
+}
+
+.btn-follow-sm {
+    font-size: 0.82rem;
+    padding: 0.3rem 0.75rem;
+    font-weight: 600;
+}
+
+/* Profile follow stats */
+.profile-follow-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.92rem;
+}
+
+.profile-follow-stat-link {
+    color: var(--color-text-main);
+    text-decoration: none;
+    transition: color var(--transition);
+}
+
+.profile-follow-stat-link:hover,
+.profile-follow-stat-link:focus {
+    color: var(--color-accent);
+}
+
+.profile-follow-stat-link strong {
+    font-weight: 700;
+}
+
+.profile-follow-sep {
+    color: var(--color-text-muted);
+}
+
+/* User card row (followers/following tabs) */
+.user-card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    transition: box-shadow var(--transition);
+}
+
+.user-card-row:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.user-card-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    text-decoration: none;
+    color: inherit;
+    flex: 1;
+    min-width: 0;
+}
+
+.user-card-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.user-card-info {
+    min-width: 0;
+}
+
+.user-card-username {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text-main);
+}
+
+.user-card-name {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+/* Search Users page */
+.search-users-header {
+    margin-bottom: 2rem;
+}
+
+.search-users-heading {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-users-form {
+    max-width: 500px;
+}
+
+.search-users-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.search-users-input {
+    flex: 1;
+}
+
+.search-users-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-text-muted);
+}
+
+.search-users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 0.75rem;
+}
+
+.search-user-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.15rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    transition: box-shadow var(--transition);
+}
+
+.search-user-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.search-user-card-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    text-decoration: none;
+    color: inherit;
+    flex: 1;
+    min-width: 0;
+}
+
+.search-user-card-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.search-user-card-info {
+    min-width: 0;
+}
+
+.search-user-card-username {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-text-main);
+}
+
+.search-user-card-name {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.search-user-card-followers {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.15rem;
+}
+
+.search-user-card-action {
+    flex-shrink: 0;
+    margin-left: 0.75rem;
+}
+
+.search-users-empty-icon {
+    font-size: 3rem;
+    color: var(--color-text-muted);
+}
+
+.search-users-empty-text {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+}
+
+/* For You page */
+.foryou-header {
+    margin-bottom: 1.5rem;
+}
+
+.foryou-heading {
+    font-size: 1.6rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.foryou-subheading {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+.foryou-empty-icon {
+    font-size: 3rem;
+    color: var(--color-text-muted);
+}
+
+.foryou-empty-text {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+}
+
+/* Responsive: header nav links */
+@media (max-width: 768px) {
+    .header-nav-links {
+        gap: 0;
+    }
+    .header-nav-link span {
+        display: none;
+    }
+    .header-nav-link {
+        padding: 0.45rem 0.55rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-users-grid {
+        grid-template-columns: 1fr;
+    }
+}

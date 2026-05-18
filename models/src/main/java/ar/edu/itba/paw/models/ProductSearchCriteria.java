@@ -17,6 +17,7 @@ public final class ProductSearchCriteria {
         Collections.emptyList(),
         null,
         null,
+        Collections.emptyList(),
         1,
         12
     );
@@ -29,6 +30,7 @@ public final class ProductSearchCriteria {
     private final List<ConditionBucket> conditionBuckets;
     private final ProductSortOrder sortOrder;
     private final Long userId;
+    private final List<Long> userIds;
     private final int page;
     private final int pageSize;
 
@@ -41,6 +43,23 @@ public final class ProductSearchCriteria {
         final List<ConditionBucket> conditionBuckets,
         final ProductSortOrder sortOrder,
         final Long userId,
+        final int page,
+        final int pageSize
+    ) {
+        this(searchText, categoryIds, minPrice, maxPrice, recordLabels,
+             conditionBuckets, sortOrder, userId, Collections.emptyList(), page, pageSize);
+    }
+
+    public ProductSearchCriteria(
+        final String searchText,
+        final List<Long> categoryIds,
+        final BigDecimal minPrice,
+        final BigDecimal maxPrice,
+        final List<String> recordLabels,
+        final List<ConditionBucket> conditionBuckets,
+        final ProductSortOrder sortOrder,
+        final Long userId,
+        final List<Long> userIds,
         final int page,
         final int pageSize
     ) {
@@ -59,6 +78,7 @@ public final class ProductSearchCriteria {
         this.conditionBuckets = conditionBuckets == null ? Collections.emptyList() : List.copyOf(conditionBuckets);
         this.sortOrder = sortOrder == null ? ProductSortOrder.NEWEST : sortOrder;
         this.userId = userId;
+        this.userIds = userIds == null ? Collections.emptyList() : List.copyOf(userIds);
         this.page = page < 1 ? 1 : page;
         this.pageSize = pageSize < 1 ? 12 : pageSize;
     }
@@ -97,6 +117,10 @@ public final class ProductSearchCriteria {
 
     public Long getUserId() {
         return userId;
+    }
+
+    public List<Long> getUserIds() {
+        return userIds;
     }
 
     public int getPage() {

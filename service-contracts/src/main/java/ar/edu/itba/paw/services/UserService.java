@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.services;
 
+import java.util.List;
 import java.util.Optional;
 
+import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.User;
 
@@ -49,4 +51,14 @@ public interface UserService {
 
 	Boolean isProductInWishlist(final Long userId, final Long productId);
 
+	void follow(final Long followerId, final Long followedId);
+	void unfollow(final Long followerId, final Long followedId);
+	boolean isFollowing(final Long followerId, final Long followedId);
+	long countFollowers(final Long userId);
+	long countFollowing(final Long userId);
+	PaginatedResult<User> getFollowers(final Long userId, final int page, final int pageSize);
+	PaginatedResult<User> getFollowing(final Long userId, final int page, final int pageSize);
+	List<Long> getFollowedUserIds(final Long userId);
+	PaginatedResult<User> searchUsers(final String query, final int page, final int pageSize);
+	List<User> getMostFollowedUsers(final int limit);
 }
