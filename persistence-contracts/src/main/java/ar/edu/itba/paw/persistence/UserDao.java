@@ -1,8 +1,10 @@
 package ar.edu.itba.paw.persistence;
 
 import java.util.Optional;
+import java.util.Set;
 
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.Product;
 
 public interface UserDao {
 
@@ -38,6 +40,7 @@ public interface UserDao {
     Optional<User> findById(final Long id);
 
 	void enable(final Long id);
-
 	void ban(final Long id);
+
+	void addWishlistProduct(final Long id, Product product);
 }

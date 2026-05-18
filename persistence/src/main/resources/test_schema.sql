@@ -16,6 +16,14 @@ CREATE TABLE IF NOT EXISTS users (
 	banned BOOLEAN NOT NULL DEFAULT false
 );
 
+CREATE TABLE IF NOT EXISTS user_wishlist_products (
+	product_id INTEGER NOT NULL,
+	user_id INTEGER NOT NULL,
+	PRIMARY KEY(product_id, user_id),
+	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
+	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
 CREATE TABLE IF NOT EXISTS password_tokens (
 	token_id SERIAL PRIMARY KEY,
 	user_id INTEGER NOT NULL,

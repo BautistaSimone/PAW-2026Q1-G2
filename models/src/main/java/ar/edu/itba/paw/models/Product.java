@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "products")
@@ -66,6 +67,7 @@ public class Product {
 
     Product() {
         // Just for Hibernate, we love you!
+        categories = new ArrayList<>();
     }
 
     public Product(

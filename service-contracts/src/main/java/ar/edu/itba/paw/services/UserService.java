@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import java.util.Optional;
 
+import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.User;
 
 public interface UserService {
@@ -44,4 +45,5 @@ public interface UserService {
 
 	void ban(final Long id);
 
+	void addWishlistProduct(final Long id, Product product);
 }

@@ -13,11 +13,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 
 import ar.edu.itba.paw.persistence.UserDao;
-import ar.edu.itba.paw.models.User;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -167,4 +167,8 @@ public class UserServiceImpl implements UserService {
         userDao.ban(id);
     }
 
+    @Override
+	public void addWishlistProduct(final Long id, Product product) {
+        userDao.addWishlistProduct(id, product);
+    }
 }

@@ -3,12 +3,15 @@ package ar.edu.itba.paw.persistence;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.persistence.EntityNotFoundException;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Repository;
 
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.Product;
 
 @Repository
 public class UserJpaDao implements UserDao {
@@ -104,5 +107,14 @@ public class UserJpaDao implements UserDao {
     public void ban(final Long id) {
         final User user = em.find(User.class, id);
         user.setBanned(true);
+    }
+
+    @Override
+    public void addWishlistProduct(final Long id, Product product) {
+        User user = findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("User not found"));;
+
+        // Set it, hibernate will take care of it
+        user.getWishlistProducts().add(product);
     }
 }
