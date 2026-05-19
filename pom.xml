@@ -38,6 +38,7 @@
     <jetty-maven-plugin.version>9.4.58.v20250814</jetty-maven-plugin.version>
     <org.hibernate.version>5.6.15.Final</org.hibernate.version>
     <org.hibernate.jpa.version>1.0.0.Final</org.hibernate.jpa.version>
+    <jackson.version>2.21.3</jackson.version>
   </properties>
 
   <dependencyManagement>
@@ -67,6 +68,12 @@
         <artifactId>spring-test</artifactId>
         <version>${spring.version}</version>
         <scope>test</scope> 
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
       </dependency>
 
       <dependency>

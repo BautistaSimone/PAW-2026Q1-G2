@@ -28,6 +28,8 @@ public class ProductJpaDao implements ProductDao {
     @PersistenceContext
     private EntityManager em;
 
+    private static final int MIN_SUGGESTION_QUERY_LENGTH = 2;
+
     private static String normalizeRecordLabel(final String recordLabel) {
         return recordLabel == null ? "" : recordLabel.trim();
     }
@@ -36,6 +38,13 @@ public class ProductJpaDao implements ProductDao {
         return raw.replace("\\", "\\\\")
             .replace("%", "\\%")
             .replace("_", "\\_");
+    }
+
+    private static String normalizeSuggestionQuery(final String raw) {
+        if (raw == null) {
+            return "";
+        }
+        return raw.trim().toLowerCase();
     }
 
     private static void appendConditionBucketJpql(final StringBuilder jpql, final ConditionBucket bucket) {
@@ -247,6 +256,60 @@ public class ProductJpaDao implements ProductDao {
             "ORDER BY TRIM(p.recordLabel) ASC", String.class
         ).setParameter("state", ProductState.ACTIVE.getPersistenceValue())
         .getResultList();
+    }
+
+    @Override
+    public List<String> suggestArtists(final String query, final int limit) {
+        return suggestDistinctField("artist", query, limit);
+    }
+
+    @Override
+    public List<String> suggestRecordLabels(final String query, final int limit) {
+        return suggestDistinctField("recordLabel", query, limit);
+    }
+
+    private List<String> suggestDistinctField(final String fieldName, final String rawQuery, final int limit) {
+        final String query = normalizeSuggestionQuery(rawQuery);
+        if (query.length() < MIN_SUGGESTION_QUERY_LENGTH || limit < 1) {
+            return Collections.emptyList();
+        }
+
+        final String trimmedField = "TRIM(p." + fieldName + ")";
+        final String normalizedField = "LOWER(" + trimmedField + ")";
+        final String escapedQuery = escapeForLike(query);
+
+        final TypedQuery<Object[]> suggestionsQuery = em.createQuery(
+            "SELECT DISTINCT " +
+            trimmedField + " AS suggestion, " +
+            "CASE WHEN " + normalizedField + " = :query THEN 0 ELSE 1 END AS exactRank, " +
+            "CASE WHEN " + normalizedField + " LIKE :prefix ESCAPE '\\' THEN 0 ELSE 1 END AS prefixRank, " +
+            "LOCATE(:query, " + normalizedField + ") AS matchPosition, " +
+            "LENGTH(" + trimmedField + ") AS suggestionLength, " +
+            normalizedField + " AS normalizedSuggestion " +
+            "FROM Product p " +
+            "WHERE p." + fieldName + " IS NOT NULL " +
+            "AND p.state = :state " +
+            "AND " + trimmedField + " <> '' " +
+            "AND " + normalizedField + " LIKE :needle ESCAPE '\\' " +
+            "ORDER BY " +
+            "exactRank ASC, " +
+            "prefixRank ASC, " +
+            "matchPosition ASC, " +
+            "suggestionLength ASC, " +
+            "normalizedSuggestion ASC",
+            Object[].class
+        );
+
+        return suggestionsQuery
+            .setParameter("state", ProductState.ACTIVE.getPersistenceValue())
+            .setParameter("query", query)
+            .setParameter("needle", "%" + escapedQuery + "%")
+            .setParameter("prefix", escapedQuery + "%")
+            .setMaxResults(limit)
+            .getResultList()
+            .stream()
+            .map(row -> (String) row[0])
+            .collect(Collectors.toList());
     }
 
     @Override

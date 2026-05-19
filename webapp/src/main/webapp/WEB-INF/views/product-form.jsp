@@ -48,6 +48,8 @@
                 </c:choose>
                 <form:form modelAttribute="productForm" action="${postUrl}" method="post" enctype="multipart/form-data" cssClass="sell-form" novalidate="novalidate">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <c:url var="artistAutocompleteUrl" value="/products/autocomplete/artists" />
+                    <c:url var="recordLabelAutocompleteUrl" value="/products/autocomplete/record-labels" />
                     <div class="row g-4">
                         <div class="col-md-6">
                             <label for="title" class="form-label"><spring:message code="ProductForm.albumTitle.label" /> <span class="text-danger">*</span></label>
@@ -59,15 +61,10 @@
                             <label for="artist" class="form-label"><spring:message code="ProductForm.artist.label" /> <span class="text-danger">*</span></label>
                             <div class="vinyland-autocomplete-field">
                                 <form:input path="artist" cssClass="form-control vinyland-autocomplete-input" required="required" autocomplete="off"
-                                            data-autocomplete-source="artist-suggestions-source" data-autocomplete-list="artist-autocomplete-list"
+                                            data-autocomplete-url="${artistAutocompleteUrl}" data-autocomplete-list="artist-autocomplete-list"
                                             role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="artist-autocomplete-list" />
                                 <div class="vinyland-autocomplete-menu" id="artist-autocomplete-list" role="listbox" hidden></div>
                             </div>
-                            <select id="artist-suggestions-source" class="vinyland-autocomplete-source" hidden="hidden" aria-hidden="true" tabindex="-1">
-                                <c:forEach items="${artistSuggestions}" var="artistSuggestion">
-                                    <option value="<c:out value='${artistSuggestion}' />"><c:out value="${artistSuggestion}" /></option>
-                                </c:forEach>
-                            </select>
                             <form:errors path="artist" cssClass="text-danger" element="div" />
                         </div>
 
@@ -78,7 +75,7 @@
                                 <div class="vinyland-autocomplete-field vinyland-autocomplete-field-group">
                                     <form:input path="recordLabel" cssClass="form-control vinyland-autocomplete-input"
                                            placeholder="${labelPlaceholder}" required="required" autocomplete="off"
-                                           data-autocomplete-source="record-label-suggestions-source" data-autocomplete-list="record-label-autocomplete-list"
+                                           data-autocomplete-url="${recordLabelAutocompleteUrl}" data-autocomplete-list="record-label-autocomplete-list"
                                            role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="record-label-autocomplete-list" />
                                     <div class="vinyland-autocomplete-menu" id="record-label-autocomplete-list" role="listbox" hidden></div>
                                 </div>
@@ -87,11 +84,6 @@
                                 <form:input path="catalogNumber" cssClass="form-control"
                                        placeholder="${catalogPlaceholder}" required="required" />
                             </div>
-                            <select id="record-label-suggestions-source" class="vinyland-autocomplete-source" hidden="hidden" aria-hidden="true" tabindex="-1">
-                                <c:forEach items="${recordLabelSuggestions}" var="recordLabelSuggestion">
-                                    <option value="<c:out value='${recordLabelSuggestion}' />"><c:out value="${recordLabelSuggestion}" /></option>
-                                </c:forEach>
-                            </select>
                             <form:errors path="recordLabel" cssClass="text-danger" element="div" />
                             <form:errors path="catalogNumber" cssClass="text-danger" element="div" />
                         </div>

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -57,6 +58,10 @@ import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
 @Controller
 public class ProductController {
 
+    private static final int AUTOCOMPLETE_LIMIT = 7;
+    private static final int AUTOCOMPLETE_MIN_QUERY_LENGTH = 2;
+    private static final int PRODUCT_FORM_TEXT_MAX_LENGTH = 100;
+
     private final ProductService productService;
     private final CategoryService categoryService;
     private final ImageService imageService;
@@ -88,6 +93,34 @@ public class ProductController {
     @ModelAttribute("categories")
     public List<Category> categories() {
         return categoryService.findAll();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/products/autocomplete/artists", method = RequestMethod.GET, produces = "application/json")
+    public List<String> artistAutocomplete(@RequestParam(value = "q", required = false) final String query) {
+        final String normalizedQuery = normalizeAutocompleteQuery(query);
+        if (normalizedQuery.length() < AUTOCOMPLETE_MIN_QUERY_LENGTH) {
+            return List.of();
+        }
+        return productService.suggestArtists(normalizedQuery, AUTOCOMPLETE_LIMIT);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/products/autocomplete/record-labels", method = RequestMethod.GET, produces = "application/json")
+    public List<String> recordLabelAutocomplete(@RequestParam(value = "q", required = false) final String query) {
+        final String normalizedQuery = normalizeAutocompleteQuery(query);
+        if (normalizedQuery.length() < AUTOCOMPLETE_MIN_QUERY_LENGTH) {
+            return List.of();
+        }
+        return productService.suggestRecordLabels(normalizedQuery, AUTOCOMPLETE_LIMIT);
+    }
+
+    private static String normalizeAutocompleteQuery(final String rawQuery) {
+        final String trimmed = rawQuery == null ? "" : rawQuery.trim();
+        if (trimmed.length() <= PRODUCT_FORM_TEXT_MAX_LENGTH) {
+            return trimmed;
+        }
+        return trimmed.substring(0, PRODUCT_FORM_TEXT_MAX_LENGTH);
     }
 
     @RequestMapping(value = "/products/new", method = RequestMethod.GET)
@@ -394,7 +427,6 @@ public class ProductController {
                 .collect(Collectors.toList());
             mav.addObject("existingProductImageIds", ids);
         }
-        attachProductFormSuggestions(mav);
         return mav;
     }
 
@@ -590,15 +622,9 @@ public class ProductController {
         return Optional.empty();
     }
 
-    private void attachProductFormSuggestions(final ModelAndView mav) {
-        mav.addObject("artistSuggestions", productService.listDistinctArtists());
-        mav.addObject("recordLabelSuggestions", productService.listDistinctRecordLabels());
-    }
-
     private ModelAndView productFormView() {
         final ModelAndView mav = new ModelAndView("product-form");
         mav.addObject("isEditing", Boolean.FALSE);
-        attachProductFormSuggestions(mav);
         return mav;
     }
 }

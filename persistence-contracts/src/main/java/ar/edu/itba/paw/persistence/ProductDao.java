@@ -40,6 +40,10 @@ public interface ProductDao {
 
     List<String> listDistinctRecordLabels();
 
+    List<String> suggestArtists(final String query, final int limit);
+
+    List<String> suggestRecordLabels(final String query, final int limit);
+
     Optional<Product> findById(final Long id);
 
     Optional<Product> findByIdIfAvailable(final Long id);

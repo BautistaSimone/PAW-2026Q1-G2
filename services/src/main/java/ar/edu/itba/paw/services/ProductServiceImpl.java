@@ -242,6 +242,18 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<String> suggestArtists(final String query, final int limit) {
+        return productDao.suggestArtists(query, limit);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> suggestRecordLabels(final String query, final int limit) {
+        return productDao.suggestRecordLabels(query, limit);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<Product> findById(final Long id) {
         return productDao.findById(id);
     }

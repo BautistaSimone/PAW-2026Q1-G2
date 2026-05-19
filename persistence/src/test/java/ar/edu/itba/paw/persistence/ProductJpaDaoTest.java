@@ -298,4 +298,94 @@ public class ProductJpaDaoTest {
             distinct
         );
     }
+
+    @Test
+    public void suggestArtistsReturnsRankedLimitedUniqueVisibleMatches() {
+        // Arrange
+        final User user = userDao.createUser("seller12@test.com", "password", "seller12",
+            false, true, null, null, null, null, null, null, null, null);
+        createSuggestionProduct(user, "Exact", " Son ", "Label A");
+        createSuggestionProduct(user, "Prefix 1", "Sons", "Label B");
+        createSuggestionProduct(user, "Prefix 2", "Sony", "Label C");
+        createSuggestionProduct(user, "Prefix 3", "Sonic", "Label D");
+        createSuggestionProduct(user, "Prefix 4", "Sonata", "Label E");
+        createSuggestionProduct(user, "Prefix 5", "Sonic Youth", "Label F");
+        createSuggestionProduct(user, "Contains 1", "The Sonics", "Label G");
+        createSuggestionProduct(user, "Contains 2", "Awesome Son", "Label H");
+        createSuggestionProduct(user, "Duplicate", "Sonic", "Label I");
+        createSuggestionProduct(user, "Blank", "   ", "Label J");
+        createSuggestionProduct(user, "No Match", "Cerati", "Label K");
+        final Product hiddenProduct = createSuggestionProduct(user, "Hidden", "Son Hidden", "Hidden Label");
+
+        em.flush();
+        productDao.reserveIfAvailable(hiddenProduct.getId());
+        em.flush();
+        em.clear();
+
+        // Act
+        final List<String> suggestions = productDao.suggestArtists("son", 7);
+
+        // Assert
+        Assertions.assertIterableEquals(
+            List.of("Son", "Sons", "Sony", "Sonic", "Sonata", "Sonic Youth", "The Sonics"),
+            suggestions
+        );
+    }
+
+    @Test
+    public void suggestRecordLabelsReturnsRankedLimitedUniqueVisibleMatches() {
+        // Arrange
+        final User user = userDao.createUser("seller13@test.com", "password", "seller13",
+            false, true, null, null, null, null, null, null, null, null);
+        createSuggestionProduct(user, "Exact", "Artist A", " Cap ");
+        createSuggestionProduct(user, "Prefix 1", "Artist B", "Cape");
+        createSuggestionProduct(user, "Prefix 2", "Artist C", "Caps");
+        createSuggestionProduct(user, "Prefix 3", "Artist D", "Capitol");
+        createSuggestionProduct(user, "Prefix 4", "Artist E", "Capital Records");
+        createSuggestionProduct(user, "Contains 1", "Artist F", "Discap");
+        createSuggestionProduct(user, "Contains 2", "Artist G", "Blue Cap");
+        createSuggestionProduct(user, "Contains 3", "Artist H", "Late Cap");
+        createSuggestionProduct(user, "Duplicate", "Artist I", "Capitol");
+        createSuggestionProduct(user, "Blank", "Artist J", "   ");
+        createSuggestionProduct(user, "No Match", "Artist K", "Ariola");
+        final Product hiddenProduct = createSuggestionProduct(user, "Hidden", "Artist L", "Cap Hidden");
+
+        em.flush();
+        productDao.reserveIfAvailable(hiddenProduct.getId());
+        em.flush();
+        em.clear();
+
+        // Act
+        final List<String> suggestions = productDao.suggestRecordLabels("cap", 7);
+
+        // Assert
+        Assertions.assertIterableEquals(
+            List.of("Cap", "Cape", "Caps", "Capitol", "Capital Records", "Discap", "Blue Cap"),
+            suggestions
+        );
+    }
+
+    @Test
+    public void suggestionsEscapeWildcardsAndIgnoreShortQueries() {
+        // Arrange
+        final User user = userDao.createUser("seller14@test.com", "password", "seller14",
+            false, true, null, null, null, null, null, null, null, null);
+        createSuggestionProduct(user, "Literal Wildcards", "100%_Artist", "100%_Records");
+        createSuggestionProduct(user, "Wildcard Lookalike", "100XAartist", "100XRecords");
+
+        em.flush();
+        em.clear();
+
+        // Act & Assert
+        Assertions.assertIterableEquals(
+            List.of("100%_Artist"),
+            productDao.suggestArtists("%_", 7)
+        );
+        Assertions.assertIterableEquals(
+            List.of("100%_Records"),
+            productDao.suggestRecordLabels("%_", 7)
+        );
+        Assertions.assertTrue(productDao.suggestArtists("s", 7).isEmpty());
+        Assertions.assertTrue(productDao.suggestRecordLabels("r", 7).isEmpty());
+    }
 }
