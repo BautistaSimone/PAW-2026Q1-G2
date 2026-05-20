@@ -210,6 +210,7 @@ public class UserController {
         if (isOwnProfile && !model.containsAttribute("userProfileForm")) {
             mv.addObject("userProfileForm", UserProfileForm.fromUser(profileUser));
         }
+        
         return mv;
     }
 

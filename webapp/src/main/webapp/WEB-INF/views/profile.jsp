@@ -7,6 +7,7 @@
                         <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
                             <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
                                 <c:set var="activeMyData" value="${isOwnProfile and param.tab eq 'mydata'}" />
+                                <c:set var="activeWishlistProducts" value="${isOwnProfile and param.tab eq 'wishlist'}" />
                                 <c:set var="activePurchases" value="${isOwnProfile and param.tab eq 'purchases'}" />
                                 <c:set var="activeSales" value="${isOwnProfile and param.tab eq 'sales'}" />
                                 <c:set var="activeReviews" value="${param.tab eq 'reviews'}" />
@@ -18,6 +19,7 @@
                                     value="${isOwnProfile and isAdmin and param.tab eq 'reports'}" />
                                 <c:set var="activePublications"
                                     value="${not activeMyData and not activePurchases and not activeSales and not activeReviews and not activeTrash and not activeReports and not activeFollowers and not activeFollowing}" />
+
 
                                 <spring:message code="Profile.title" var="profileTitle" />
                                 <ui:layout title="${profileTitle}">
@@ -215,6 +217,9 @@
                                                 </div>
                                             </c:if>
 
+                                            <c:url var="profileTabWishlistUrl" value="/profile">
+                                                <c:param name="tab" value="wishlist" />
+                                            </c:url>
                                             <c:url var="profileTabPublicationsUrl" value="/profile">
                                                 <c:if test="${not empty param.userId}">
                                                     <c:param name="userId" value="${param.userId}" />
@@ -266,6 +271,17 @@
                                                         <spring:message code="Profile.tabs.publications" />
                                                     </a>
                                                 </li>
+                                                <c:if test="${isOwnProfile}">
+                                                    <li class="nav-item" role="presentation">
+                                                        <a class="nav-link<c:if test='${activeWishlist}'> active</c:if>"
+                                                            id="wishlist-tab" href="<c:out value='${profileTabWishlistUrl}'/>"
+                                                            role="tab" aria-controls="wishlist"
+                                                            aria-selected="${activeWishlist}" style="font-weight: 600;">
+                                                            <i class="bi bi-heart-fill" aria-hidden="true"></i>
+                                                            <spring:message code="Profile.tabs.wishlist" />
+                                                        </a>
+                                                    </li>
+                                                </c:if>
                                                 <c:if test="${isOwnProfile}">
                                                     <li class="nav-item" role="presentation">
                                                         <a class="nav-link<c:if test='${activeMyData}'> active</c:if>"
@@ -418,6 +434,52 @@
                                                     </c:choose>
                                                 </div>
 
+                                                <!-- Tab: Wishlist -->
+                                                <div class="tab-pane fade<c:if test='${activeWishlistProducts}'> show active</c:if>"
+                                                    id="wishlist" role="tabpanel"
+                                                    aria-labelledby="wishlists-tab">
+                                                    <c:choose>
+                                                        <c:when test="${not empty wishlistProducts}">
+                                                            <div class="profile-wishlist-stack">
+                                                                <div class="products-grid profile-wishlist-grid">
+                                                                    <c:forEach items="${wishlistProducts}" var="product">
+                                                                        <div class="products-grid-item">
+                                                                            <c:url value="/products/${product.id}"
+                                                                                var="productUrl" />
+                                                                            <ui:productCard title="${product.title}"
+                                                                                artist="${product.artist}"
+                                                                                price="${product.price}"
+                                                                                installments="${product.installmentPrice}"
+                                                                                imageUrl="${wishlistProductImageUrls[product.id]}"
+                                                                                categories="${product.categories}"
+                                                                                sellerRating="${sellerRating}"
+                                                                                href="${productUrl}" />
+                                                                        </div>
+                                                                    </c:forEach>
+                                                                </div>
+                                                                <ui:pagination result="${wishlistProductsPage}" />
+                                                            </div>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <div class="empty-products-state">
+                                                                <i class="bi bi-vinyl profile-i-4"></i>
+                                                                <p class="profile-p-5">
+                                                                    <c:choose>
+                                                                        <c:when test="${isOwnProfile}">
+                                                                            <spring:message
+                                                                                code="Profile.publications.empty.own" />
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <spring:message
+                                                                                code="Profile.publications.empty.other" />
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </p>
+                                                            </div>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                                
                                                 <!-- Tab: Mis datos (solo perfil propio) -->
                                                 <c:if test="${isOwnProfile}">
                                                     <div class="tab-pane fade<c:if test='${activeMyData}'> show active</c:if>"
