@@ -3,6 +3,10 @@ package ar.edu.itba.paw.persistence;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Predicate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -117,95 +121,110 @@ public class ProductJpaDao implements ProductDao {
 
     @Override
     public PaginatedResult<Product> findProducts(final ProductSearchCriteria criteria) {
-        final StringBuilder whereJpql = new StringBuilder("WHERE p.state = :state");
-        final List<String> paramNames = new ArrayList<>();
-        final List<Object> paramValues = new ArrayList<>();
-        paramNames.add("state");
-        paramValues.add(ProductState.ACTIVE.getPersistenceValue());
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Product> query = cb.createQuery(Product.class);
+        Root<Product> root = query.from(Product.class);
 
-        if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
-            final String likeNeedle = "%" + escapeForLike(criteria.getSearchText().trim()).toLowerCase() + "%";
-            whereJpql.append(" AND (");
-            whereJpql.append("LOWER(p.title) LIKE :searchText ESCAPE '\\' OR ");
-            whereJpql.append("LOWER(p.artist) LIKE :searchText ESCAPE '\\' OR ");
-            whereJpql.append("LOWER(p.description) LIKE :searchText ESCAPE '\\'");
-            whereJpql.append(")");
-            paramNames.add("searchText");
-            paramValues.add(likeNeedle);
-        }
+        List<Predicate> conditions = new ArrayList<>();
 
-        if (!criteria.getCategoryIds().isEmpty()) {
-            whereJpql.append(" AND EXISTS (SELECT 1 FROM Product p2 JOIN p2.categories c WHERE p2 = p AND c.id IN :categoryIds)");
-            paramNames.add("categoryIds");
-            paramValues.add(criteria.getCategoryIds());
-        }
+        // Product must be active
+        conditions.add(cb.equal(root.get("state"), ProductState.ACTIVE.getPersistenceValue()));
 
         if (criteria.getMinPrice() != null) {
-            whereJpql.append(" AND p.price >= :minPrice");
-            paramNames.add("minPrice");
-            paramValues.add(criteria.getMinPrice());
+            conditions.add(cb.greaterThan(root.get("price"), criteria.getMaxPrice()));
         }
 
         if (criteria.getMaxPrice() != null) {
-            whereJpql.append(" AND p.price <= :maxPrice");
-            paramNames.add("maxPrice");
-            paramValues.add(criteria.getMaxPrice());
+            conditions.add(cb.lessThan(root.get("price"), criteria.getMinPrice()));
         }
 
-        if (!criteria.getRecordLabels().isEmpty()) {
-            whereJpql.append(" AND p.recordLabel IN :recordLabels");
-            paramNames.add("recordLabels");
-            paramValues.add(criteria.getRecordLabels());
-        }
+        // if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
+        //     final String likeNeedle = "%" + escapeForLike(criteria.getSearchText().trim()).toLowerCase() + "%";
+        //     whereJpql.append(" AND (");
+        //     whereJpql.append("LOWER(p.title) LIKE :searchText ESCAPE '\\' OR ");
+        //     whereJpql.append("LOWER(p.artist) LIKE :searchText ESCAPE '\\' OR ");
+        //     whereJpql.append("LOWER(p.description) LIKE :searchText ESCAPE '\\'");
+        //     whereJpql.append(")");
+        //     paramNames.add("searchText");
+        //     paramValues.add(likeNeedle);
+        // }
 
-        if (!criteria.getConditionBuckets().isEmpty()) {
-            whereJpql.append(" AND (");
-            boolean first = true;
-            for (ConditionBucket bucket : criteria.getConditionBuckets()) {
-                if (!first) {
-                    whereJpql.append(" OR ");
-                }
-                first = false;
-                appendConditionBucketJpql(whereJpql, bucket);
-            }
-            whereJpql.append(")");
-        }
+        // if (!criteria.getCategoryIds().isEmpty()) {
+        //     whereJpql.append(" AND EXISTS (SELECT 1 FROM Product p2 JOIN p2.categories c WHERE p2 = p AND c.id IN :categoryIds)");
+        //     paramNames.add("categoryIds");
+        //     paramValues.add(criteria.getCategoryIds());
+        // }
 
-        if (criteria.getUserId() != null) {
-            whereJpql.append(" AND p.userId = :userId");
-            paramNames.add("userId");
-            paramValues.add(criteria.getUserId());
-        }
+        // if (!criteria.getRecordLabels().isEmpty()) {
+        //     whereJpql.append(" AND p.recordLabel IN :recordLabels");
+        //     paramNames.add("recordLabels");
+        //     paramValues.add(criteria.getRecordLabels());
+        // }
 
-        if (!criteria.getUserIds().isEmpty()) {
-            whereJpql.append(" AND p.userId IN :userIds");
-            paramNames.add("userIds");
-            paramValues.add(criteria.getUserIds());
-        }
+        // if (!criteria.getConditionBuckets().isEmpty()) {
+        //     whereJpql.append(" AND (");
+        //     boolean first = true;
+        //     for (ConditionBucket bucket : criteria.getConditionBuckets()) {
+        //         if (!first) {
+        //             whereJpql.append(" OR ");
+        //         }
+        //         first = false;
+        //         appendConditionBucketJpql(whereJpql, bucket);
+        //     }
+        //     whereJpql.append(")");
+        // }
 
-        final TypedQuery<Long> countQuery = em.createQuery(
-            "SELECT COUNT(p) FROM Product p " + whereJpql, Long.class
-        );
-        for (int i = 0; i < paramNames.size(); i++) {
-            countQuery.setParameter(paramNames.get(i), paramValues.get(i));
-        }
-        final long totalCount = countQuery.getSingleResult();
+        // if (criteria.getUserId() != null) {
+        //     whereJpql.append(" AND p.userId = :userId");
+        //     paramNames.add("userId");
+        //     paramValues.add(criteria.getUserId());
+        // }
 
-        if (totalCount == 0) {
-            return new PaginatedResult<>(Collections.emptyList(), criteria.getPage(), criteria.getPageSize(), 0);
-        }
+        // if (!criteria.getUserIds().isEmpty()) {
+        //     whereJpql.append(" AND p.userId IN :userIds");
+        //     paramNames.add("userIds");
+        //     paramValues.add(criteria.getUserIds());
+        // }
 
-        final TypedQuery<Product> selectQuery = em.createQuery(
-            "SELECT p FROM Product p " + whereJpql + " ORDER BY " + orderByJpql(criteria.getSortOrder()),
-            Product.class
-        );
-        for (int i = 0; i < paramNames.size(); i++) {
-            selectQuery.setParameter(paramNames.get(i), paramValues.get(i));
-        }
-        selectQuery.setMaxResults(criteria.getPageSize());
-        selectQuery.setFirstResult((criteria.getPage() - 1) * criteria.getPageSize());
+        // final TypedQuery<Long> countQuery = em.createQuery(
+        //     "SELECT COUNT(p) FROM Product p " + whereJpql, Long.class
+        // );
+        // for (int i = 0; i < paramNames.size(); i++) {
+        //     countQuery.setParameter(paramNames.get(i), paramValues.get(i));
+        // }
+        // final long totalCount = countQuery.getSingleResult();
 
-        return new PaginatedResult<>(selectQuery.getResultList(), criteria.getPage(), criteria.getPageSize(), totalCount);
+        // if (totalCount == 0) {
+        //     return new PaginatedResult<>(Collections.emptyList(), criteria.getPage(), criteria.getPageSize(), 0);
+        // }
+
+        // final TypedQuery<Product> selectQuery = em.createQuery(
+        //     "SELECT p FROM Product p " + whereJpql + " ORDER BY " + orderByJpql(criteria.getSortOrder()),
+        //     Product.class
+        // );
+        // for (int i = 0; i < paramNames.size(); i++) {
+        //     selectQuery.setParameter(paramNames.get(i), paramValues.get(i));
+        // }
+        // selectQuery.setMaxResults(criteria.getPageSize());
+        // selectQuery.setFirstResult((criteria.getPage() - 1) * criteria.getPageSize());
+
+        // Fetches the count of all Products as per given criteria
+        query.where(cb.and(conditions.toArray(new Predicate[0])));
+
+        // This query fetches the Products as per the Page Limit
+        List<Product> result = em.createQuery(query)
+            .setFirstResult((criteria.getPage() - 1) * criteria.getPageSize())
+            .setMaxResults(criteria.getPageSize())
+            .getResultList();
+        
+        // Create Count Query
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Product> productRootCount = countQuery.from(Product.class);
+        countQuery.select(cb.count(productRootCount)).where(cb.and(conditions.toArray(new Predicate[conditions.size()])));
+
+        Long count = em.createQuery(countQuery).getSingleResult();
+
+        return new PaginatedResult<>(result, criteria.getPage(), criteria.getPageSize(), count);
     }
 
     @Override

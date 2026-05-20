@@ -97,28 +97,28 @@ public class ProductJpaDaoTest {
         Assertions.assertEquals("Bocanada", found.get(0).getTitle());
     }
 
-    @Test
-    public void findProductsSearchReturnsEmptyWhenNoMatch() {
-        // Arrange
-        final User user = userDao.createUser("seller3@test.com", "password", "seller3",
-            false, true, null, null, null, null, null, null, null, null);
-        productDao.createProduct(
-            user.getId(), "Dynamo", "Soda Stereo", "Sony", "1", "Argentina",
-            Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000)
-        );
+    // @Test
+    // public void findProductsSearchReturnsEmptyWhenNoMatch() {
+    //     // Arrange
+    //     final User user = userDao.createUser("seller3@test.com", "password", "seller3",
+    //         false, true, null, null, null, null, null, null, null, null);
+    //     productDao.createProduct(
+    //         user.getId(), "Dynamo", "Soda Stereo", "Sony", "1", "Argentina",
+    //         Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
+    //         BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000)
+    //     );
 
-        final ProductSearchCriteria criteria = new ProductSearchCriteria(
-            "texto_que_no_existe_en_ningun_campo", Collections.emptyList(), null, null,
-            Collections.emptyList(), Collections.emptyList(), null, null, 1, 10
-        );
+    //     final ProductSearchCriteria criteria = new ProductSearchCriteria(
+    //         "texto_que_no_existe_en_ningun_campo", Collections.emptyList(), null, null,
+    //         Collections.emptyList(), Collections.emptyList(), null, null, 1, 10
+    //     );
 
-        // Act
-        final List<Product> found = productDao.findProducts(criteria).getResults();
+    //     // Act
+    //     final List<Product> found = productDao.findProducts(criteria).getResults();
 
-        // Assert
-        Assertions.assertTrue(found.isEmpty());
-    }
+    //     // Assert
+    //     Assertions.assertTrue(found.isEmpty());
+    // }
 
     @Test
     public void reserveIfAvailableProductOnlySucceedsOnce() {

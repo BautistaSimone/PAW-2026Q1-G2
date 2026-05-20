@@ -151,13 +151,26 @@ public class UserJpaDao implements UserDao {
     @Override
     public List<Product> getWishlistProducts(final Long userId, final int limit) {
         final int safeLimit = Math.max(limit, 1);
-        return em.createQuery(
-                "SELECT p FROM User u JOIN u.wishlistProducts p "
-                        + "WHERE u.id = :userId ORDER BY p.published DESC",
-                Product.class)
+
+        // Paginate with 1 + 1 queries
+        @SuppressWarnings("unchecked")
+        List<Number> ids = em.createNativeQuery("SELECT product_id FROM user_wishlist_products WHERE user_id = :userId")
             .setParameter("userId", userId)
+            .setFirstResult(0)
             .setMaxResults(safeLimit)
             .getResultList();
+            
+        if (ids.isEmpty()) {
+           // return new PaginatedResult<>(Collections.emptyList(), 0, safeLimit, 0);
+           return Collections.emptyList();
+        }
+
+        final TypedQuery<Product> selectQuery = em.createQuery("FROM Product WHERE productId IN :ids", Product.class)
+            .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
+
+        // FIXME: Allow page number to be specified
+        //return new PaginatedResult<>(selectQuery.getResultList(), 0, safePageSize, ids.size());
+        return selectQuery.getResultList();
     }
 
     @Override
