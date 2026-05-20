@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Id;
 import javax.persistence.Column;
+import javax.persistence.PrePersist;
 
 @Entity
 @Table(name = "reports")
@@ -56,6 +57,13 @@ public class Report {
         this.productId = productId;
         this.ownerUserId = ownerUserId;
         this.reporterUserId = reporterUserId;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
     }
 
     public Long getReportId() {

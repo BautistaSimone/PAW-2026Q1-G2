@@ -39,6 +39,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import java.util.Locale;
 
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
+import ar.edu.itba.paw.webapp.interceptor.BannedUserInterceptor;
 import ar.edu.itba.paw.webapp.interceptor.VerificationInterceptor;
 
 @EnableWebMvc // Use all the defaults from webmvc
@@ -56,6 +57,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${db.password}")
     private String dbPassword;
+
+    @Autowired
+    private BannedUserInterceptor bannedUserInterceptor;
 
     @Autowired
     private VerificationInterceptor verificationInterceptor;
@@ -172,6 +176,15 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(bannedUserInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns(
+                    "/banned",
+                    "/login",
+                    "/register",
+                    "/logout",
+                    "/assets/**"
+                );
         registry.addInterceptor(verificationInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(

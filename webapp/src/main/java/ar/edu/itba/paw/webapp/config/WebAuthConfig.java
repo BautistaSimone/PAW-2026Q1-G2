@@ -40,7 +40,7 @@ public class WebAuthConfig{
             .and()
             .authorizeHttpRequests()
                 .requestMatchers("/login", "/register").anonymous()
-                .requestMatchers("/", "/changePassword", "/resetPassword", "/verificationStatus", "/search-users").permitAll()
+                .requestMatchers("/", "/changePassword", "/resetPassword", "/verificationStatus", "/search-users", "/banned").permitAll()
                 .requestMatchers("/verifyEmail", "/notVerified", "/for-you").authenticated()
                 // Role based routes — more specific first
                 .requestMatchers("/profile/admin/**").hasRole("ADMIN")
