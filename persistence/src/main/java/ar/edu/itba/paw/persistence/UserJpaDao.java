@@ -140,6 +140,29 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
+    public List<Product> getWishlistProducts(final Long userId, final int limit) {
+        final int safeLimit = Math.max(limit, 1);
+        return em.createQuery(
+                "SELECT p FROM User u JOIN u.wishlistProducts p "
+                        + "WHERE u.id = :userId ORDER BY p.published DESC",
+                Product.class)
+            .setParameter("userId", userId)
+            .setMaxResults(safeLimit)
+            .getResultList();
+    }
+
+    @Override
+    public List<Long> getWishlistCategoryIds(final Long userId) {
+        final List<Long> ids = em.createQuery(
+                "SELECT DISTINCT c.id FROM User u JOIN u.wishlistProducts p "
+                        + "JOIN p.categories c WHERE u.id = :userId",
+                Long.class)
+            .setParameter("userId", userId)
+            .getResultList();
+        return ids != null ? ids : Collections.emptyList();
+    }
+
+    @Override
     public void follow(final Long followerId, final Long followedId) {
         em.createNativeQuery("INSERT INTO user_follows (follower_id, followed_id) VALUES (:fid, :lid) ON CONFLICT DO NOTHING")
             .setParameter("fid", followerId)

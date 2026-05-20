@@ -184,6 +184,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Product> getWishlistProducts(final Long userId, final int limit) {
+        return userDao.getWishlistProducts(userId, limit);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> getWishlistCategoryIds(final Long userId) {
+        return userDao.getWishlistCategoryIds(userId);
+    }
+
+    @Override
     @Transactional
     public void follow(final Long followerId, final Long followedId) {
         if (followerId.equals(followedId)) {

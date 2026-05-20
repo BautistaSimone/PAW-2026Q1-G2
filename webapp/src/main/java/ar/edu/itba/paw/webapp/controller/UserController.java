@@ -54,6 +54,7 @@ public class UserController {
     private static final int PROFILE_OTHER_PAGE_SIZE = 3;
     private static final int PROFILE_TRASH_PAGE_SIZE = 12;
     private static final int PROFILE_FOLLOW_PAGE_SIZE = 12;
+    private static final int PROFILE_WISHLIST_LIMIT = 9;
 
     private final UserService userService;
     private final ProductService productService;
@@ -302,6 +303,17 @@ public class UserController {
         mv.addObject("userProductsPage", productsPage);
         mv.addObject("userProducts", productsPage.getResults());
         mv.addObject("productImageUrls", productImageUrls);
+
+        final List<Product> wishlistProducts = userService.getWishlistProducts(profileUser.getId(), PROFILE_WISHLIST_LIMIT);
+        final Map<Long, String> wishlistProductImageUrls = new HashMap<>();
+        for (Product product : wishlistProducts) {
+            if (imageService.existsByProductId(product.getId())) {
+                wishlistProductImageUrls.put(product.getId(), "/images/product/" + product.getId());
+            }
+        }
+
+        mv.addObject("wishlistProducts", wishlistProducts);
+        mv.addObject("wishlistProductImageUrls", wishlistProductImageUrls);
 
         mv.addObject("followerCount", userService.countFollowers(profileUser.getId()));
         mv.addObject("followingCount", userService.countFollowing(profileUser.getId()));

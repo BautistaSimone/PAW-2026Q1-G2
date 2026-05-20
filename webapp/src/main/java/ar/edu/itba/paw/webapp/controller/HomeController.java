@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -174,53 +175,108 @@ public class HomeController {
 			throw new IllegalArgumentException("Invalid page");
 		}
 
-		final List<Long> followedIds = userService.getFollowedUserIds(authUser.getUser().getId());
+		final Long currentUserId = authUser.getUser().getId();
+		final List<Long> followedIds = userService.getFollowedUserIds(currentUserId);
 
 		final ModelAndView mav = new ModelAndView("forYou");
+		mav.addObject("hasFollowing", !followedIds.isEmpty());
+		mav.addObject("currentUserId", currentUserId);
 
-		if (followedIds.isEmpty()) {
-			mav.addObject("hasFollowing", false);
-			return mav;
-		}
-
-		mav.addObject("hasFollowing", true);
-
-		final ProductSearchCriteria criteria = new ProductSearchCriteria(
-				null,
-				java.util.Collections.emptyList(),
-				null,
-				null,
-				java.util.Collections.emptyList(),
-				java.util.Collections.emptyList(),
-				ProductSortOrder.NEWEST,
-				null,
-				followedIds,
-				page,
-				12
-		);
-
-		final PaginatedResult<Product> productsPage = productService.listProducts(criteria);
-
+		PaginatedResult<Product> productsPage = new PaginatedResult<>(Collections.emptyList(), page, 12, 0);
 		final Map<Long, String> productImageUrls = new HashMap<>();
-		for (Product product : productsPage.getResults()) {
-			if (imageService.existsByProductId(product.getId())) {
-				productImageUrls.put(product.getId(), "/images/product/" + product.getId());
-			}
-		}
-
-		final Set<Long> distinctSellerIds = new HashSet<>();
-		for (Product product : productsPage.getResults()) {
-			distinctSellerIds.add(product.getUserId());
-		}
 		final Map<Long, SellerRatingSummary> sellerRatingByUserId = new HashMap<>();
-		for (Long sellerId : distinctSellerIds) {
-			sellerRatingByUserId.put(sellerId, reviewService.summaryForSeller(sellerId));
+		if (!followedIds.isEmpty()) {
+			final ProductSearchCriteria criteria = new ProductSearchCriteria(
+					null,
+					Collections.emptyList(),
+					null,
+					null,
+					Collections.emptyList(),
+					Collections.emptyList(),
+					ProductSortOrder.NEWEST,
+					null,
+					followedIds,
+					page,
+					12
+			);
+
+			productsPage = productService.listProducts(criteria);
+
+			for (Product product : productsPage.getResults()) {
+				if (imageService.existsByProductId(product.getId())) {
+					productImageUrls.put(product.getId(), "/images/product/" + product.getId());
+				}
+			}
+
+			final Set<Long> distinctSellerIds = new HashSet<>();
+			for (Product product : productsPage.getResults()) {
+				distinctSellerIds.add(product.getUserId());
+			}
+			for (Long sellerId : distinctSellerIds) {
+				sellerRatingByUserId.put(sellerId, reviewService.summaryForSeller(sellerId));
+			}
 		}
 
 		mav.addObject("productsPage", productsPage);
 		mav.addObject("products", productsPage.getResults());
 		mav.addObject("productImageUrls", productImageUrls);
 		mav.addObject("sellerRatingByUserId", sellerRatingByUserId);
+
+		final List<Long> wishlistCategoryIds = userService.getWishlistCategoryIds(currentUserId);
+		final List<Product> wishlistProducts;
+		final Map<Long, String> wishlistProductImageUrls = new HashMap<>();
+		final Map<Long, SellerRatingSummary> wishlistSellerRatingByUserId = new HashMap<>();
+		if (wishlistCategoryIds.isEmpty()) {
+			wishlistProducts = Collections.emptyList();
+		} else {
+			final ProductSearchCriteria wishlistCriteria = new ProductSearchCriteria(
+					null,
+					wishlistCategoryIds,
+					null,
+					null,
+					Collections.emptyList(),
+					Collections.emptyList(),
+					ProductSortOrder.NEWEST,
+					null,
+					1,
+					12
+			);
+
+			final PaginatedResult<Product> wishlistPage = productService.listProducts(wishlistCriteria);
+			wishlistProducts = wishlistPage.getResults();
+
+			for (Product product : wishlistProducts) {
+				if (imageService.existsByProductId(product.getId())) {
+					wishlistProductImageUrls.put(product.getId(), "/images/product/" + product.getId());
+				}
+			}
+
+			final Set<Long> distinctWishlistSellers = new HashSet<>();
+			for (Product product : wishlistProducts) {
+				distinctWishlistSellers.add(product.getUserId());
+			}
+			for (Long sellerId : distinctWishlistSellers) {
+				wishlistSellerRatingByUserId.put(sellerId, reviewService.summaryForSeller(sellerId));
+			}
+		}
+
+		mav.addObject("hasWishlist", !wishlistCategoryIds.isEmpty());
+		mav.addObject("wishlistProducts", wishlistProducts);
+		mav.addObject("wishlistProductImageUrls", wishlistProductImageUrls);
+		mav.addObject("wishlistSellerRatingByUserId", wishlistSellerRatingByUserId);
+
+		final List<User> suggestedUsers = userService.getMostFollowedUsers(12);
+		final Map<Long, Long> suggestedFollowerCounts = new HashMap<>();
+		final Map<Long, Boolean> suggestedFollowStatusMap = new HashMap<>();
+		for (User u : suggestedUsers) {
+			suggestedFollowerCounts.put(u.getId(), userService.countFollowers(u.getId()));
+			if (!u.getId().equals(currentUserId)) {
+				suggestedFollowStatusMap.put(u.getId(), userService.isFollowing(currentUserId, u.getId()));
+			}
+		}
+		mav.addObject("suggestedUsers", suggestedUsers);
+		mav.addObject("suggestedFollowerCounts", suggestedFollowerCounts);
+		mav.addObject("suggestedFollowStatusMap", suggestedFollowStatusMap);
 		return mav;
 	}
 

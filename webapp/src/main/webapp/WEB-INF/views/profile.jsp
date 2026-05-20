@@ -26,103 +26,113 @@
 
                                     <div class="profile-page">
                                         <div class="container py-4">
-                                            <div class="profile-user-card d-flex justify-content-between">
-                                                <div class="d-flex justify-content-between profile-data">
-                                                    <div class="profile-avatar">
+                                            <div class="profile-hero">
+                                                <div class="profile-hero-main">
+                                                    <div class="profile-avatar-lg">
                                                         <c:out value="${fn:substring(user.username, 0, 1)}" />
                                                     </div>
-                                                    <div class="profile-user-info">
-                                                        <h1>
-                                                            <c:out value="${user.username}" />
-                                                        </h1>
-                                                        <c:if
-                                                            test="${not empty user.firstName or not empty user.lastName}">
-                                                            <p class="profile-p-1">
-                                                                <c:out value="${user.firstName}" />
-                                                                <c:out value="${user.lastName}" />
-                                                            </p>
-                                                        </c:if>
-                                                        <c:if test="${isOwnProfile}">
-                                                            <h2>
-                                                                <c:out value="${user.email}" />
-                                                            </h2>
-                                                        </c:if>
-                                                        <c:if test="${sellerRating.count > 0}">
-                                                            <div class="profile-rating-row"
-                                                                aria-label="<spring:message code='Profile.rating.ariaLabel' />">
-                                                                <span class="profile-rating-stars" aria-hidden="true">
-                                                                    <c:forEach begin="1" end="5" var="i">
-                                                                        <c:choose>
-                                                                            <c:when
-                                                                                test="${i <= sellerRating.avgScore}"><i
-                                                                                    class="bi bi-star-fill"></i>
-                                                                            </c:when>
-                                                                            <c:when
-                                                                                test="${i - 0.5 <= sellerRating.avgScore}">
-                                                                                <i class="bi bi-star-half"></i></c:when>
-                                                                            <c:otherwise><i class="bi bi-star"></i>
-                                                                            </c:otherwise>
-                                                                        </c:choose>
-                                                                    </c:forEach>
+                                                    <div class="profile-hero-info">
+                                                        <div class="profile-hero-header">
+                                                            <h1 class="profile-username">
+                                                                <c:out value="${user.username}" />
+                                                            </h1>
+                                                            <c:if
+                                                                test="${not empty user.firstName or not empty user.lastName}">
+                                                                <div class="profile-fullname">
+                                                                    <c:out value="${user.firstName}" />
+                                                                    <c:out value="${user.lastName}" />
+                                                                </div>
+                                                            </c:if>
+                                                        </div>
+                                                        <div class="profile-bio">
+                                                            <c:if test="${sellerRating.count > 0}">
+                                                                <div class="profile-rating-row"
+                                                                    aria-label="<spring:message code='Profile.rating.ariaLabel' />">
+                                                                    <span class="profile-rating-stars"
+                                                                        aria-hidden="true">
+                                                                        <c:forEach begin="1" end="5" var="i">
+                                                                            <c:choose>
+                                                                                <c:when
+                                                                                    test="${i <= sellerRating.avgScore}">
+                                                                                    <i class="bi bi-star-fill"></i>
+                                                                                </c:when>
+                                                                                <c:when
+                                                                                    test="${i - 0.5 <= sellerRating.avgScore}">
+                                                                                    <i class="bi bi-star-half"></i>
+                                                                                </c:when>
+                                                                                <c:otherwise><i class="bi bi-star"></i>
+                                                                                </c:otherwise>
+                                                                            </c:choose>
+                                                                        </c:forEach>
+                                                                    </span>
+                                                                    <span class="profile-rating-caption">
+                                                                        <c:out value="${sellerRating.formattedAvg}" /> (
+                                                                        <c:out value="${sellerRating.count}" />
+                                                                        <spring:message
+                                                                            code="${sellerRating.count == 1 ? 'Profile.rating.reviews.singular' : 'Profile.rating.reviews.plural'}" />
+                                                                        )
+                                                                    </span>
+                                                                </div>
+                                                            </c:if>
+                                                            <c:if test="${not empty user.location}">
+                                                                <div class="profile-location">
+                                                                    <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                                                                    <c:out value="${user.location}" />
+                                                                </div>
+                                                            </c:if>
+                                                        </div>
+                                                        <div class="profile-stats">
+                                                            <div class="profile-stat">
+                                                                <span class="profile-stat-value">
+                                                                    <c:out value="${userProductsPage.totalCount}" />
                                                                 </span>
-                                                                <span class="profile-rating-caption">
-                                                                    <c:out value="${sellerRating.formattedAvg}" /> (
-                                                                    <c:out value="${sellerRating.count}" />
-                                                                    <spring:message
-                                                                        code="${sellerRating.count == 1 ? 'Profile.rating.reviews.singular' : 'Profile.rating.reviews.plural'}" />
-                                                                    )
+                                                                <span class="profile-stat-label">
+                                                                    <spring:message code="Profile.tabs.publications" />
                                                                 </span>
                                                             </div>
-                                                        </c:if>
-                                                        <div class="profile-follow-stats">
-                                                            <c:url var="followersTabUrl" value="/profile">
-                                                                <c:param name="tab" value="followers" />
-                                                                <c:if test="${not empty param.userId}">
-                                                                    <c:param name="userId" value="${param.userId}" />
-                                                                </c:if>
-                                                            </c:url>
-                                                            <c:url var="followingTabUrl" value="/profile">
-                                                                <c:param name="tab" value="following" />
-                                                                <c:if test="${not empty param.userId}">
-                                                                    <c:param name="userId" value="${param.userId}" />
-                                                                </c:if>
-                                                            </c:url>
-                                                            <a href="<c:out value='${followersTabUrl}'/>" class="profile-follow-stat-link">
-                                                                <strong><c:out value="${followerCount}" /></strong>
-                                                                <spring:message code="Profile.followers" />
-                                                            </a>
-                                                            <span class="profile-follow-sep">&middot;</span>
-                                                            <a href="<c:out value='${followingTabUrl}'/>" class="profile-follow-stat-link">
-                                                                <strong><c:out value="${followingCount}" /></strong>
-                                                                <spring:message code="Profile.following" />
-                                                            </a>
+                                                            <button type="button" class="profile-stat profile-stat-btn"
+                                                                data-bs-toggle="modal" data-bs-target="#followersModal">
+                                                                <span class="profile-stat-value">
+                                                                    <c:out value="${followerCount}" />
+                                                                </span>
+                                                                <span class="profile-stat-label">
+                                                                    <spring:message code="Profile.followers" />
+                                                                </span>
+                                                            </button>
+                                                            <button type="button" class="profile-stat profile-stat-btn"
+                                                                data-bs-toggle="modal" data-bs-target="#followingModal">
+                                                                <span class="profile-stat-value">
+                                                                    <c:out value="${followingCount}" />
+                                                                </span>
+                                                                <span class="profile-stat-label">
+                                                                    <spring:message code="Profile.following" />
+                                                                </span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
-
-                                                <c:choose>
-                                                    <c:when test="${isOwnProfile}">
-                                                        <div>
+                                                <div class="profile-hero-actions">
+                                                    <c:choose>
+                                                        <c:when test="${isOwnProfile}">
                                                             <a href="<c:url value='/resetPassword'/>"
                                                                 class="btn btn-retro btn-retro-secondary" role="button">
                                                                 <spring:message code="Profile.changePassword" />
                                                             </a>
-                                                            <form action="<c:url value='/logout' />" method="post"
-                                                                style="margin-top: 1rem;">
+                                                            <form action="<c:url value='/logout' />" method="post">
                                                                 <input type="hidden" name="${_csrf.parameterName}"
                                                                     value="${_csrf.token}" />
                                                                 <button type="submit"
                                                                     class="btn btn-retro btn-retro-secondary">
-                                                                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                                                                    <i class="bi bi-box-arrow-right"
+                                                                        aria-hidden="true"></i>
                                                                     <spring:message code="Profile.logout" />
                                                                 </button>
                                                             </form>
-                                                        </div>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <sec:authorize access="isAuthenticated()">
-                                                            <div>
-                                                                <form action="<c:url value='/profile/follow' />" method="post">
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <sec:authorize access="isAuthenticated()">
+                                                                <form action="<c:url value='/profile/follow' />"
+                                                                    method="post">
                                                                     <input type="hidden" name="${_csrf.parameterName}"
                                                                         value="${_csrf.token}" />
                                                                     <input type="hidden" name="userId"
@@ -131,23 +141,26 @@
                                                                         <c:when test="${isFollowing}">
                                                                             <button type="submit"
                                                                                 class="btn btn-retro btn-retro-secondary btn-follow">
-                                                                                <i class="bi bi-person-dash" aria-hidden="true"></i>
-                                                                                <spring:message code="Profile.unfollow" />
+                                                                                <i class="bi bi-person-dash"
+                                                                                    aria-hidden="true"></i>
+                                                                                <spring:message
+                                                                                    code="Profile.unfollow" />
                                                                             </button>
                                                                         </c:when>
                                                                         <c:otherwise>
                                                                             <button type="submit"
                                                                                 class="btn btn-retro btn-retro-primary btn-follow">
-                                                                                <i class="bi bi-person-plus" aria-hidden="true"></i>
+                                                                                <i class="bi bi-person-plus"
+                                                                                    aria-hidden="true"></i>
                                                                                 <spring:message code="Profile.follow" />
                                                                             </button>
                                                                         </c:otherwise>
                                                                     </c:choose>
                                                                 </form>
-                                                            </div>
-                                                        </sec:authorize>
-                                                    </c:otherwise>
-                                                </c:choose>
+                                                            </sec:authorize>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
                                             </div>
 
                                             <c:if test="${isOwnProfile}">
@@ -293,24 +306,6 @@
                                                         <spring:message code="Profile.tabs.reviews" />
                                                     </a>
                                                 </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <a class="nav-link<c:if test='${activeFollowers}'> active</c:if>"
-                                                        id="followers-tab" href="<c:out value='${profileTabFollowersUrl}'/>"
-                                                        role="tab" aria-controls="followers"
-                                                        aria-selected="${activeFollowers}" style="font-weight: 600;">
-                                                        <i class="bi bi-people" aria-hidden="true"></i>
-                                                        <spring:message code="Profile.tabs.followers" />
-                                                    </a>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <a class="nav-link<c:if test='${activeFollowing}'> active</c:if>"
-                                                        id="following-tab" href="<c:out value='${profileTabFollowingUrl}'/>"
-                                                        role="tab" aria-controls="following"
-                                                        aria-selected="${activeFollowing}" style="font-weight: 600;">
-                                                        <i class="bi bi-person-check" aria-hidden="true"></i>
-                                                        <spring:message code="Profile.tabs.following" />
-                                                    </a>
-                                                </li>
                                                 <c:if test="${isOwnProfile}">
                                                     <li class="nav-item" role="presentation">
                                                         <a class="nav-link<c:if test='${activeTrash}'> active</c:if>"
@@ -434,7 +429,8 @@
                                                             <c:url var="profileUpdateUrl" value="/profile/update" />
                                                             <form:form modelAttribute="userProfileForm"
                                                                 action="${profileUpdateUrl}" method="post"
-                                                                cssClass="user-profile-form" id="profileForm" novalidate="true">
+                                                                cssClass="user-profile-form" id="profileForm"
+                                                                novalidate="true">
                                                                 <input type="hidden" name="${_csrf.parameterName}"
                                                                     value="${_csrf.token}" />
                                                                 <div class="row g-2">
@@ -546,87 +542,96 @@
                                                 <c:if test="${isOwnProfile}">
                                                     <div class="tab-pane fade<c:if test='${activePurchases}'> show active</c:if>"
                                                         id="purchases" role="tabpanel" aria-labelledby="purchases-tab">
-                                                        <div class="products-layout-grid" style="align-items: start; margin-top: 1rem;">
+                                                        <div class="products-layout-grid"
+                                                            style="align-items: start; margin-top: 1rem;">
                                                             <aside class="products-filters-column">
                                                                 <ui:purchaseFiltersBar activeTab="purchases" />
                                                             </aside>
-                                                            <section class="products-content-column" style="width: 100%;">
+                                                            <section class="products-content-column"
+                                                                style="width: 100%;">
                                                                 <c:choose>
                                                                     <c:when test="${not empty purchases}">
                                                                         <div class="d-flex flex-column gap-3">
-                                                                    <c:forEach items="${purchases}" var="purchase">
-                                                                        <c:set var="pProduct"
-                                                                            value="${purchaseProducts[purchase.purchaseId]}" />
-                                                                        <div class="profile-div-8">
-                                                                            <c:if test="${pProduct != null}">
-                                                                                <img src="<c:url value='/images/product/${pProduct.id}'/>"
-                                                                                    alt=""
-                                                                                    style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover;"
-                                                                                    onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\' viewBox=\'0 0 60 60\'%3E%3Crect width=\'60\' height=\'60\' fill=\'%23e9e4dc\'/%3E%3Ctext x=\'30\' y=\'38\' text-anchor=\'middle\' font-size=\'22\' fill=\'%23b0a898\'%3E♪%3C/text%3E%3C/svg%3E';" />
-                                                                            </c:if>
-                                                                            <div class="profile-div-9">
-                                                                                <c:if test="${pProduct != null}">
-                                                                                    <div class="profile-div-10">
-                                                                                        <c:out
-                                                                                            value="${pProduct.title}" />
+                                                                            <c:forEach items="${purchases}"
+                                                                                var="purchase">
+                                                                                <c:set var="pProduct"
+                                                                                    value="${purchaseProducts[purchase.purchaseId]}" />
+                                                                                <div class="profile-div-8">
+                                                                                    <c:if test="${pProduct != null}">
+                                                                                        <img src="<c:url value='/images/product/${pProduct.id}'/>"
+                                                                                            alt=""
+                                                                                            style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover;"
+                                                                                            onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\' viewBox=\'0 0 60 60\'%3E%3Crect width=\'60\' height=\'60\' fill=\'%23e9e4dc\'/%3E%3Ctext x=\'30\' y=\'38\' text-anchor=\'middle\' font-size=\'22\' fill=\'%23b0a898\'%3E♪%3C/text%3E%3C/svg%3E';" />
+                                                                                    </c:if>
+                                                                                    <div class="profile-div-9">
+                                                                                        <c:if
+                                                                                            test="${pProduct != null}">
+                                                                                            <div class="profile-div-10">
+                                                                                                <c:out
+                                                                                                    value="${pProduct.title}" />
+                                                                                            </div>
+                                                                                            <div class="profile-div-11">
+                                                                                                <c:out
+                                                                                                    value="${pProduct.artist}" />
+                                                                                                ·
+                                                                                                <ui:price
+                                                                                                    value="${pProduct.price}" />
+                                                                                            </div>
+                                                                                        </c:if>
+                                                                                        <div class="profile-div-12">
+                                                                                            <c:out
+                                                                                                value="${purchase.date}" />
+                                                                                            ·
+                                                                                            <span
+                                                                                                class="profile-span-13">
+                                                                                                <spring:message
+                                                                                                    code="PurchaseStatus.${purchase.status}" />
+                                                                                            </span>
+                                                                                        </div>
                                                                                     </div>
-                                                                                    <div class="profile-div-11">
-                                                                                        <c:out
-                                                                                            value="${pProduct.artist}" />
-                                                                                        ·
-                                                                                        <ui:price
-                                                                                            value="${pProduct.price}" />
+                                                                                    <div class="profile-div-14">
+                                                                                        <a href="<c:url value='/purchases/${purchase.purchaseId}'/>"
+                                                                                            class="btn btn-retro btn-retro-secondary"
+                                                                                            style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                                                                                            <i class="bi bi-eye"
+                                                                                                aria-hidden="true"></i>
+                                                                                            <spring:message
+                                                                                                code="Profile.reports.view" />
+                                                                                        </a>
+                                                                                        <c:if
+                                                                                            test="${purchase.status eq 'DELIVERED' and not purchaseHasReview[purchase.purchaseId]}">
+                                                                                            <a href="<c:url value='/purchases/${purchase.purchaseId}/review'/>"
+                                                                                                class="btn btn-retro btn-retro-primary"
+                                                                                                style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                                                                                                <i class="bi bi-star"
+                                                                                                    aria-hidden="true"></i>
+                                                                                                <spring:message
+                                                                                                    code="PurchasePanel.buyer.delivered.review" />
+                                                                                            </a>
+                                                                                        </c:if>
                                                                                     </div>
-                                                                                </c:if>
-                                                                                <div class="profile-div-12">
-                                                                                    <c:out value="${purchase.date}" /> ·
-                                                                                    <span class="profile-span-13">
-                                                                                        <spring:message code="PurchaseStatus.${purchase.status}" />
-                                                                                    </span>
                                                                                 </div>
-                                                                            </div>
-                                                                            <div class="profile-div-14">
-                                                                                <a href="<c:url value='/purchases/${purchase.purchaseId}'/>"
-                                                                                    class="btn btn-retro btn-retro-secondary"
-                                                                                    style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
-                                                                                    <i class="bi bi-eye"
-                                                                                        aria-hidden="true"></i>
-                                                                                    <spring:message
-                                                                                        code="Profile.reports.view" />
-                                                                                </a>
-                                                                                <c:if
-                                                                                    test="${purchase.status eq 'DELIVERED' and not purchaseHasReview[purchase.purchaseId]}">
-                                                                                    <a href="<c:url value='/purchases/${purchase.purchaseId}/review'/>"
-                                                                                        class="btn btn-retro btn-retro-primary"
-                                                                                        style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
-                                                                                        <i class="bi bi-star"
-                                                                                            aria-hidden="true"></i>
-                                                                                        <spring:message
-                                                                                            code="PurchasePanel.buyer.delivered.review" />
-                                                                                    </a>
-                                                                                </c:if>
-                                                                            </div>
+                                                                            </c:forEach>
                                                                         </div>
-                                                                    </c:forEach>
-                                                                </div>
-                                                                <ui:pagination result="${purchasesPage}" />
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <div class="empty-products-state">
-                                                                    <i class="bi bi-bag profile-i-4"></i>
-                                                                    <p class="profile-p-5">
-                                                                        <spring:message
-                                                                            code="Profile.purchases.empty" />
-                                                                    </p>
-                                                                    <a href="<c:url value='/'/>"
-                                                                        class="btn btn-retro btn-retro-primary"
-                                                                        style="justify-self: center;">
-                                                                        <i class="bi bi-search" aria-hidden="true"></i>
-                                                                        <spring:message
-                                                                            code="Profile.purchases.explore" />
-                                                                    </a>
-                                                                </div>
-                                                            </c:otherwise>
+                                                                        <ui:pagination result="${purchasesPage}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <div class="empty-products-state">
+                                                                            <i class="bi bi-bag profile-i-4"></i>
+                                                                            <p class="profile-p-5">
+                                                                                <spring:message
+                                                                                    code="Profile.purchases.empty" />
+                                                                            </p>
+                                                                            <a href="<c:url value='/'/>"
+                                                                                class="btn btn-retro btn-retro-primary"
+                                                                                style="justify-self: center;">
+                                                                                <i class="bi bi-search"
+                                                                                    aria-hidden="true"></i>
+                                                                                <spring:message
+                                                                                    code="Profile.purchases.explore" />
+                                                                            </a>
+                                                                        </div>
+                                                                    </c:otherwise>
                                                                 </c:choose>
                                                             </section>
                                                         </div>
@@ -637,75 +642,84 @@
                                                 <c:if test="${isOwnProfile}">
                                                     <div class="tab-pane fade<c:if test='${activeSales}'> show active</c:if>"
                                                         id="sales" role="tabpanel" aria-labelledby="sales-tab">
-                                                        <div class="products-layout-grid" style="align-items: start; margin-top: 1rem;">
+                                                        <div class="products-layout-grid"
+                                                            style="align-items: start; margin-top: 1rem;">
                                                             <aside class="products-filters-column">
                                                                 <ui:purchaseFiltersBar activeTab="sales" />
                                                             </aside>
-                                                            <section class="products-content-column" style="width: 100%;">
+                                                            <section class="products-content-column"
+                                                                style="width: 100%;">
                                                                 <c:choose>
                                                                     <c:when test="${not empty sales}">
                                                                         <div class="d-flex flex-column gap-3">
-                                                                    <c:forEach items="${sales}" var="sale">
-                                                                        <c:set var="sProduct"
-                                                                            value="${saleProducts[sale.purchaseId]}" />
-                                                                        <div class="profile-div-8">
-                                                                            <c:if test="${sProduct != null}">
-                                                                                <img src="<c:url value='/images/product/${sProduct.id}'/>"
-                                                                                    alt=""
-                                                                                    style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover;"
-                                                                                    onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\' viewBox=\'0 0 60 60\'%3E%3Crect width=\'60\' height=\'60\' fill=\'%23e9e4dc\'/%3E%3Ctext x=\'30\' y=\'38\' text-anchor=\'middle\' font-size=\'22\' fill=\'%23b0a898\'%3E♪%3C/text%3E%3C/svg%3E';" />
-                                                                            </c:if>
-                                                                            <div class="profile-div-9">
-                                                                                <c:if test="${sProduct != null}">
-                                                                                    <div class="profile-div-10">
-                                                                                        <c:out
-                                                                                            value="${sProduct.title}" />
+                                                                            <c:forEach items="${sales}" var="sale">
+                                                                                <c:set var="sProduct"
+                                                                                    value="${saleProducts[sale.purchaseId]}" />
+                                                                                <div class="profile-div-8">
+                                                                                    <c:if test="${sProduct != null}">
+                                                                                        <img src="<c:url value='/images/product/${sProduct.id}'/>"
+                                                                                            alt=""
+                                                                                            style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover;"
+                                                                                            onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\' viewBox=\'0 0 60 60\'%3E%3Crect width=\'60\' height=\'60\' fill=\'%23e9e4dc\'/%3E%3Ctext x=\'30\' y=\'38\' text-anchor=\'middle\' font-size=\'22\' fill=\'%23b0a898\'%3E♪%3C/text%3E%3C/svg%3E';" />
+                                                                                    </c:if>
+                                                                                    <div class="profile-div-9">
+                                                                                        <c:if
+                                                                                            test="${sProduct != null}">
+                                                                                            <div class="profile-div-10">
+                                                                                                <c:out
+                                                                                                    value="${sProduct.title}" />
+                                                                                            </div>
+                                                                                            <div class="profile-div-11">
+                                                                                                <c:out
+                                                                                                    value="${sProduct.artist}" />
+                                                                                                ·
+                                                                                                <ui:price
+                                                                                                    value="${sProduct.price}" />
+                                                                                            </div>
+                                                                                        </c:if>
+                                                                                        <div class="profile-div-12">
+                                                                                            <c:out
+                                                                                                value="${sale.date}" />
+                                                                                            ·
+                                                                                            <span
+                                                                                                class="profile-span-13">
+                                                                                                <spring:message
+                                                                                                    code="PurchaseStatus.${sale.status}" />
+                                                                                            </span>
+                                                                                        </div>
                                                                                     </div>
-                                                                                    <div class="profile-div-11">
-                                                                                        <c:out
-                                                                                            value="${sProduct.artist}" />
-                                                                                        ·
-                                                                                        <ui:price
-                                                                                            value="${sProduct.price}" />
+                                                                                    <div class="profile-div-14">
+                                                                                        <a href="<c:url value='/purchases/${sale.purchaseId}'/>"
+                                                                                            class="btn btn-retro btn-retro-secondary"
+                                                                                            style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                                                                                            <i class="bi bi-eye"
+                                                                                                aria-hidden="true"></i>
+                                                                                            <spring:message
+                                                                                                code="Profile.reports.view" />
+                                                                                        </a>
                                                                                     </div>
-                                                                                </c:if>
-                                                                                <div class="profile-div-12">
-                                                                                    <c:out value="${sale.date}" /> ·
-                                                                                    <span class="profile-span-13">
-                                                                                        <spring:message code="PurchaseStatus.${sale.status}" />
-                                                                                    </span>
                                                                                 </div>
-                                                                            </div>
-                                                                            <div class="profile-div-14">
-                                                                                <a href="<c:url value='/purchases/${sale.purchaseId}'/>"
-                                                                                    class="btn btn-retro btn-retro-secondary"
-                                                                                    style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
-                                                                                    <i class="bi bi-eye"
-                                                                                        aria-hidden="true"></i>
-                                                                                    <spring:message
-                                                                                        code="Profile.reports.view" />
-                                                                                </a>
-                                                                            </div>
+                                                                            </c:forEach>
                                                                         </div>
-                                                                    </c:forEach>
-                                                                </div>
-                                                                <ui:pagination result="${salesPage}" />
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <div class="empty-products-state">
-                                                                    <i class="bi bi-shop profile-i-4"></i>
-                                                                    <p class="profile-p-5">
-                                                                        <spring:message code="Profile.sales.empty" />
-                                                                    </p>
-                                                                    <a href="<c:url value='/products/new'/>"
-                                                                        class="btn btn-retro btn-retro-primary"
-                                                                        style="justify-self: center;">
-                                                                        <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                                                                        <spring:message
-                                                                            code="Profile.sales.publishVinyl" />
-                                                                    </a>
-                                                                </div>
-                                                            </c:otherwise>
+                                                                        <ui:pagination result="${salesPage}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <div class="empty-products-state">
+                                                                            <i class="bi bi-shop profile-i-4"></i>
+                                                                            <p class="profile-p-5">
+                                                                                <spring:message
+                                                                                    code="Profile.sales.empty" />
+                                                                            </p>
+                                                                            <a href="<c:url value='/products/new'/>"
+                                                                                class="btn btn-retro btn-retro-primary"
+                                                                                style="justify-self: center;">
+                                                                                <i class="bi bi-plus-lg"
+                                                                                    aria-hidden="true"></i>
+                                                                                <spring:message
+                                                                                    code="Profile.sales.publishVinyl" />
+                                                                            </a>
+                                                                        </div>
+                                                                    </c:otherwise>
                                                                 </c:choose>
                                                             </section>
                                                         </div>
@@ -774,126 +788,205 @@
                                                     </c:choose>
                                                 </div>
 
-                                                <!-- Tab: Seguidores -->
-                                                <div class="tab-pane fade<c:if test='${activeFollowers}'> show active</c:if>"
-                                                    id="followers" role="tabpanel" aria-labelledby="followers-tab">
-                                                    <c:choose>
-                                                        <c:when test="${not empty followers}">
-                                                            <div class="d-flex flex-column gap-3">
-                                                                <c:forEach items="${followers}" var="followerUser">
-                                                                    <div class="user-card-row">
-                                                                        <a href="<c:url value='/profile?userId=${followerUser.id}'/>" class="user-card-link">
-                                                                            <div class="user-card-avatar">
-                                                                                <c:out value="${fn:substring(followerUser.username, 0, 1)}" />
-                                                                            </div>
-                                                                            <div class="user-card-info">
-                                                                                <div class="user-card-username">
-                                                                                    <c:out value="${followerUser.username}" />
+                                                <div class="modal fade profile-modal" id="followersModal" tabindex="-1"
+                                                    aria-labelledby="followersModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="followersModalLabel">
+                                                                    <spring:message code="Profile.tabs.followers" />
+                                                                </h5>
+                                                                <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <c:choose>
+                                                                    <c:when test="${not empty followers}">
+                                                                        <div class="d-flex flex-column gap-3">
+                                                                            <c:forEach items="${followers}"
+                                                                                var="followerUser">
+                                                                                <div class="user-card-row">
+                                                                                    <a href="<c:url value='/profile?userId=${followerUser.id}'/>"
+                                                                                        class="user-card-link">
+                                                                                        <div class="user-card-avatar">
+                                                                                            <c:out
+                                                                                                value="${fn:substring(followerUser.username, 0, 1)}" />
+                                                                                        </div>
+                                                                                        <div class="user-card-info">
+                                                                                            <div
+                                                                                                class="user-card-username">
+                                                                                                <c:out
+                                                                                                    value="${followerUser.username}" />
+                                                                                            </div>
+                                                                                            <c:if
+                                                                                                test="${not empty followerUser.firstName or not empty followerUser.lastName}">
+                                                                                                <div
+                                                                                                    class="user-card-name">
+                                                                                                    <c:out
+                                                                                                        value="${followerUser.firstName}" />
+                                                                                                    <c:out
+                                                                                                        value="${followerUser.lastName}" />
+                                                                                                </div>
+                                                                                            </c:if>
+                                                                                        </div>
+                                                                                    </a>
+                                                                                    <sec:authorize
+                                                                                        access="isAuthenticated()">
+                                                                                        <sec:authentication
+                                                                                            property="principal.user.id"
+                                                                                            var="currentUserId" />
+                                                                                        <c:if
+                                                                                            test="${followerUser.id != currentUserId}">
+                                                                                            <form
+                                                                                                action="<c:url value='/profile/follow' />"
+                                                                                                method="post">
+                                                                                                <input type="hidden"
+                                                                                                    name="${_csrf.parameterName}"
+                                                                                                    value="${_csrf.token}" />
+                                                                                                <input type="hidden"
+                                                                                                    name="userId"
+                                                                                                    value="${followerUser.id}" />
+                                                                                                <c:choose>
+                                                                                                    <c:when
+                                                                                                        test="${followStatusMap[followerUser.id]}">
+                                                                                                        <button
+                                                                                                            type="submit"
+                                                                                                            class="btn btn-retro btn-retro-secondary btn-follow-sm">
+                                                                                                            <spring:message
+                                                                                                                code="Profile.unfollow" />
+                                                                                                        </button>
+                                                                                                    </c:when>
+                                                                                                    <c:otherwise>
+                                                                                                        <button
+                                                                                                            type="submit"
+                                                                                                            class="btn btn-retro btn-retro-primary btn-follow-sm">
+                                                                                                            <spring:message
+                                                                                                                code="Profile.follow" />
+                                                                                                        </button>
+                                                                                                    </c:otherwise>
+                                                                                                </c:choose>
+                                                                                            </form>
+                                                                                        </c:if>
+                                                                                    </sec:authorize>
                                                                                 </div>
-                                                                                <c:if test="${not empty followerUser.firstName or not empty followerUser.lastName}">
-                                                                                    <div class="user-card-name">
-                                                                                        <c:out value="${followerUser.firstName}" />
-                                                                                        <c:out value="${followerUser.lastName}" />
-                                                                                    </div>
-                                                                                </c:if>
-                                                                            </div>
-                                                                        </a>
-                                                                        <sec:authorize access="isAuthenticated()">
-                                                                            <sec:authentication property="principal.user.id" var="currentUserId" />
-                                                                            <c:if test="${followerUser.id != currentUserId}">
-                                                                                <form action="<c:url value='/profile/follow' />" method="post">
-                                                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                                                                    <input type="hidden" name="userId" value="${followerUser.id}" />
-                                                                                    <c:choose>
-                                                                                        <c:when test="${followStatusMap[followerUser.id]}">
-                                                                                            <button type="submit" class="btn btn-retro btn-retro-secondary btn-follow-sm">
-                                                                                                <spring:message code="Profile.unfollow" />
-                                                                                            </button>
-                                                                                        </c:when>
-                                                                                        <c:otherwise>
-                                                                                            <button type="submit" class="btn btn-retro btn-retro-primary btn-follow-sm">
-                                                                                                <spring:message code="Profile.follow" />
-                                                                                            </button>
-                                                                                        </c:otherwise>
-                                                                                    </c:choose>
-                                                                                </form>
-                                                                            </c:if>
-                                                                        </sec:authorize>
-                                                                    </div>
-                                                                </c:forEach>
+                                                                            </c:forEach>
+                                                                        </div>
+                                                                        <ui:pagination result="${followersPage}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <div class="empty-products-state">
+                                                                            <i class="bi bi-people profile-i-4"></i>
+                                                                            <p class="profile-p-5">
+                                                                                <spring:message
+                                                                                    code="Profile.followers.empty" />
+                                                                            </p>
+                                                                        </div>
+                                                                    </c:otherwise>
+                                                                </c:choose>
                                                             </div>
-                                                            <ui:pagination result="${followersPage}" />
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <div class="empty-products-state">
-                                                                <i class="bi bi-people profile-i-4"></i>
-                                                                <p class="profile-p-5">
-                                                                    <spring:message code="Profile.followers.empty" />
-                                                                </p>
-                                                            </div>
-                                                        </c:otherwise>
-                                                    </c:choose>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
-                                                <!-- Tab: Siguiendo -->
-                                                <div class="tab-pane fade<c:if test='${activeFollowing}'> show active</c:if>"
-                                                    id="following" role="tabpanel" aria-labelledby="following-tab">
-                                                    <c:choose>
-                                                        <c:when test="${not empty followingUsers}">
-                                                            <div class="d-flex flex-column gap-3">
-                                                                <c:forEach items="${followingUsers}" var="followedUser">
-                                                                    <div class="user-card-row">
-                                                                        <a href="<c:url value='/profile?userId=${followedUser.id}'/>" class="user-card-link">
-                                                                            <div class="user-card-avatar">
-                                                                                <c:out value="${fn:substring(followedUser.username, 0, 1)}" />
-                                                                            </div>
-                                                                            <div class="user-card-info">
-                                                                                <div class="user-card-username">
-                                                                                    <c:out value="${followedUser.username}" />
+                                                <div class="modal fade profile-modal" id="followingModal" tabindex="-1"
+                                                    aria-labelledby="followingModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="followingModalLabel">
+                                                                    <spring:message code="Profile.tabs.following" />
+                                                                </h5>
+                                                                <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <c:choose>
+                                                                    <c:when test="${not empty followingUsers}">
+                                                                        <div class="d-flex flex-column gap-3">
+                                                                            <c:forEach items="${followingUsers}"
+                                                                                var="followedUser">
+                                                                                <div class="user-card-row">
+                                                                                    <a href="<c:url value='/profile?userId=${followedUser.id}'/>"
+                                                                                        class="user-card-link">
+                                                                                        <div class="user-card-avatar">
+                                                                                            <c:out
+                                                                                                value="${fn:substring(followedUser.username, 0, 1)}" />
+                                                                                        </div>
+                                                                                        <div class="user-card-info">
+                                                                                            <div
+                                                                                                class="user-card-username">
+                                                                                                <c:out
+                                                                                                    value="${followedUser.username}" />
+                                                                                            </div>
+                                                                                            <c:if
+                                                                                                test="${not empty followedUser.firstName or not empty followedUser.lastName}">
+                                                                                                <div
+                                                                                                    class="user-card-name">
+                                                                                                    <c:out
+                                                                                                        value="${followedUser.firstName}" />
+                                                                                                    <c:out
+                                                                                                        value="${followedUser.lastName}" />
+                                                                                                </div>
+                                                                                            </c:if>
+                                                                                        </div>
+                                                                                    </a>
+                                                                                    <sec:authorize
+                                                                                        access="isAuthenticated()">
+                                                                                        <sec:authentication
+                                                                                            property="principal.user.id"
+                                                                                            var="currentUserId" />
+                                                                                        <c:if
+                                                                                            test="${followedUser.id != currentUserId}">
+                                                                                            <form
+                                                                                                action="<c:url value='/profile/follow' />"
+                                                                                                method="post">
+                                                                                                <input type="hidden"
+                                                                                                    name="${_csrf.parameterName}"
+                                                                                                    value="${_csrf.token}" />
+                                                                                                <input type="hidden"
+                                                                                                    name="userId"
+                                                                                                    value="${followedUser.id}" />
+                                                                                                <c:choose>
+                                                                                                    <c:when
+                                                                                                        test="${followStatusMap[followedUser.id]}">
+                                                                                                        <button
+                                                                                                            type="submit"
+                                                                                                            class="btn btn-retro btn-retro-secondary btn-follow-sm">
+                                                                                                            <spring:message
+                                                                                                                code="Profile.unfollow" />
+                                                                                                        </button>
+                                                                                                    </c:when>
+                                                                                                    <c:otherwise>
+                                                                                                        <button
+                                                                                                            type="submit"
+                                                                                                            class="btn btn-retro btn-retro-primary btn-follow-sm">
+                                                                                                            <spring:message
+                                                                                                                code="Profile.follow" />
+                                                                                                        </button>
+                                                                                                    </c:otherwise>
+                                                                                                </c:choose>
+                                                                                            </form>
+                                                                                        </c:if>
+                                                                                    </sec:authorize>
                                                                                 </div>
-                                                                                <c:if test="${not empty followedUser.firstName or not empty followedUser.lastName}">
-                                                                                    <div class="user-card-name">
-                                                                                        <c:out value="${followedUser.firstName}" />
-                                                                                        <c:out value="${followedUser.lastName}" />
-                                                                                    </div>
-                                                                                </c:if>
-                                                                            </div>
-                                                                        </a>
-                                                                        <sec:authorize access="isAuthenticated()">
-                                                                            <sec:authentication property="principal.user.id" var="currentUserId" />
-                                                                            <c:if test="${followedUser.id != currentUserId}">
-                                                                                <form action="<c:url value='/profile/follow' />" method="post">
-                                                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                                                                    <input type="hidden" name="userId" value="${followedUser.id}" />
-                                                                                    <c:choose>
-                                                                                        <c:when test="${followStatusMap[followedUser.id]}">
-                                                                                            <button type="submit" class="btn btn-retro btn-retro-secondary btn-follow-sm">
-                                                                                                <spring:message code="Profile.unfollow" />
-                                                                                            </button>
-                                                                                        </c:when>
-                                                                                        <c:otherwise>
-                                                                                            <button type="submit" class="btn btn-retro btn-retro-primary btn-follow-sm">
-                                                                                                <spring:message code="Profile.follow" />
-                                                                                            </button>
-                                                                                        </c:otherwise>
-                                                                                    </c:choose>
-                                                                                </form>
-                                                                            </c:if>
-                                                                        </sec:authorize>
-                                                                    </div>
-                                                                </c:forEach>
+                                                                            </c:forEach>
+                                                                        </div>
+                                                                        <ui:pagination result="${followingPage}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <div class="empty-products-state">
+                                                                            <i
+                                                                                class="bi bi-person-check profile-i-4"></i>
+                                                                            <p class="profile-p-5">
+                                                                                <spring:message
+                                                                                    code="Profile.following.empty" />
+                                                                            </p>
+                                                                        </div>
+                                                                    </c:otherwise>
+                                                                </c:choose>
                                                             </div>
-                                                            <ui:pagination result="${followingPage}" />
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <div class="empty-products-state">
-                                                                <i class="bi bi-person-check profile-i-4"></i>
-                                                                <p class="profile-p-5">
-                                                                    <spring:message code="Profile.following.empty" />
-                                                                </p>
-                                                            </div>
-                                                        </c:otherwise>
-                                                    </c:choose>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
                                                 <!-- Tab: Papelera (solo perfil propio) -->
@@ -1039,20 +1132,24 @@
                                                                                     code="Profile.reports.hide"
                                                                                     var="hideText" />
                                                                                 <button type="button"
-                                                                                        data-bs-toggle="modal" data-bs-target="#hideModal-${rp.productId}"
-                                                                                        class="btn btn-retro btn-retro-danger-outline"
-                                                                                        style="font-size: 0.78rem; padding: 0.35rem 0.7rem;"
-                                                                                        title="${hideText}">
-                                                                                        <i class="bi bi-x-circle"
-                                                                                            aria-hidden="true"></i>
-                                                                                        <c:out value="${hideText}" />
+                                                                                    data-bs-toggle="modal"
+                                                                                    data-bs-target="#hideModal-${rp.productId}"
+                                                                                    class="btn btn-retro btn-retro-danger-outline"
+                                                                                    style="font-size: 0.78rem; padding: 0.35rem 0.7rem;"
+                                                                                    title="${hideText}">
+                                                                                    <i class="bi bi-x-circle"
+                                                                                        aria-hidden="true"></i>
+                                                                                    <c:out value="${hideText}" />
                                                                                 </button>
 
-                                                                                <spring:message code="Profile.reports.hideConfirm" var="hideConfirmText" />
-                                                                                <spring:message code="Global.cancel" var="cancelText" />
-                                                                                <ui:confirmFormModal 
-                                                                                    id="hideModal-${rp.productId}" 
-                                                                                    title="${hideText}" 
+                                                                                <spring:message
+                                                                                    code="Profile.reports.hideConfirm"
+                                                                                    var="hideConfirmText" />
+                                                                                <spring:message code="Global.cancel"
+                                                                                    var="cancelText" />
+                                                                                <ui:confirmFormModal
+                                                                                    id="hideModal-${rp.productId}"
+                                                                                    title="${hideText}"
                                                                                     message="${hideConfirmText}"
                                                                                     confirmBtnText="${hideText}"
                                                                                     cancelBtnText="${cancelText}"
@@ -1080,19 +1177,22 @@
                                                                                     code="Profile.reports.ban"
                                                                                     var="banText" />
                                                                                 <button type="button"
-                                                                                        data-bs-toggle="modal" data-bs-target="#banModal-${rp.productId}"
-                                                                                        class="btn btn-retro btn-retro-danger"
-                                                                                        style="font-size: 0.78rem; padding: 0.35rem 0.7rem;"
-                                                                                        title="${banText}">
-                                                                                        <i class="bi bi-person-x"
-                                                                                            aria-hidden="true"></i>
-                                                                                        <c:out value="${banText}" />
+                                                                                    data-bs-toggle="modal"
+                                                                                    data-bs-target="#banModal-${rp.productId}"
+                                                                                    class="btn btn-retro btn-retro-danger"
+                                                                                    style="font-size: 0.78rem; padding: 0.35rem 0.7rem;"
+                                                                                    title="${banText}">
+                                                                                    <i class="bi bi-person-x"
+                                                                                        aria-hidden="true"></i>
+                                                                                    <c:out value="${banText}" />
                                                                                 </button>
 
-                                                                                <spring:message code="Profile.reports.banConfirm" var="banConfirmText" />
-                                                                                <ui:confirmFormModal 
-                                                                                    id="banModal-${rp.productId}" 
-                                                                                    title="${banText}" 
+                                                                                <spring:message
+                                                                                    code="Profile.reports.banConfirm"
+                                                                                    var="banConfirmText" />
+                                                                                <ui:confirmFormModal
+                                                                                    id="banModal-${rp.productId}"
+                                                                                    title="${banText}"
                                                                                     message="${banConfirmText}"
                                                                                     confirmBtnText="${banText}"
                                                                                     cancelBtnText="${cancelText}"
