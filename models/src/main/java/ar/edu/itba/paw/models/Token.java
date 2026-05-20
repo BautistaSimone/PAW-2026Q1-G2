@@ -2,19 +2,32 @@ package ar.edu.itba.paw.models;
 
 import java.time.Instant;
 
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Id;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 abstract class Token {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tokens_token_id_seq")
+    @SequenceGenerator(sequenceName = "tokens_token_id_seq", name = "tokens_token_id_seq", allocationSize = 1)
+    @Column(name = "token_id")
+    private Long tokenId;
  
-    protected String token;
+    private String token;
 
     @Column(name = "user_id", nullable = false)
-    protected Long userId;
+    private Long userId;
 
     @Column(name = "expiration_date", nullable = false)
-    protected Instant expirationDate;
+    private Instant expirationDate;
 
     Token() {
 
@@ -39,4 +52,7 @@ abstract class Token {
         return expirationDate;
     }
 
+    public Long getTokenId() {
+        return tokenId;
+    }
 }

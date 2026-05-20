@@ -30,7 +30,6 @@ public class PasswordTokenServiceImplTest {
     public void testAcceptPasswordTokenWhenNotExpired() {
         PasswordToken token = new PasswordToken(
             1L,
-            1L,
             "token",
             Instant.now().plus(Duration.ofMinutes(EXPIRATION))
         );
@@ -45,7 +44,6 @@ public class PasswordTokenServiceImplTest {
     @Test
     public void testRejectPasswordTokenWhenExpired() {
         PasswordToken token = new PasswordToken(
-            1L,
             1L,
             "token",
             Instant.now().minus(Duration.ofMinutes(1))

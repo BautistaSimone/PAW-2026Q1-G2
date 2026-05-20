@@ -30,7 +30,6 @@ public class VerificationTokenServiceImplTest {
     public void testAcceptVerificationTokenWhenNotExpired() {
         VerificationToken token = new VerificationToken(
             1L,
-            1L,
             "token",
             Instant.now().plus(Duration.ofMinutes(EXPIRATION))
         );
@@ -45,7 +44,6 @@ public class VerificationTokenServiceImplTest {
     @Test
     public void testRejectVerificationTokenWhenExpired() {
         VerificationToken token = new VerificationToken(
-            1L,
             1L,
             "token",
             Instant.now().minus(Duration.ofMinutes(1))
