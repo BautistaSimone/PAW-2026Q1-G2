@@ -149,7 +149,6 @@ public class HomeController {
 		mav.addObject("productImageUrls", productImageUrls);
 		mav.addObject("sellerRatingByUserId", sellerRatingByUserId);
 		mav.addObject("categories", categoryService.findAll());
-		mav.addObject("recordLabelsFilter", productService.listDistinctRecordLabels());
 		mav.addObject("selectedCategoryIds", selectedCategoryIds);
 		mav.addObject("selectedLabels", selectedLabels);
 		mav.addObject("selectedEstados", selectedEstados);

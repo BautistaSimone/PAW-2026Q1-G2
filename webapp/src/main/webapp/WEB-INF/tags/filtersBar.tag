@@ -3,6 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <spring:message code="Global.currency.symbol" var="currencySymbol"/>
+<c:url var="recordLabelAutocompleteUrl" value="/products/autocomplete/record-labels" />
 <form class="filters-bar" method="get" action="<c:url value="/"/>" novalidate>
     <input type="hidden" name="sort" value="<c:out value="${selectedSort}" />" />
     <c:if test="${not empty activeSearchText}">
@@ -82,36 +83,28 @@
             <i class="bi bi-chevron-up filter-section-chevron" aria-hidden="true"></i>
         </summary>
         <div class="filter-options">
-            <c:choose>
-                <c:when test="${not empty recordLabelsFilter or not empty selectedLabels}">
-                    <div class="record-label-filter" data-initial-limit="10">
-                        <spring:message code="Filters.labels.search.placeholder" var="labelSearchPlaceholder" />
-                        <input id="recordLabelSearch" type="text" class="record-label-search-input"
-                               placeholder="<c:out value='${labelSearchPlaceholder}' />" autocomplete="off" />
-                        <div class="record-label-selected" hidden>
-                            <p class="record-label-group-title"><spring:message code="Filters.labels.selected" /></p>
-                            <div class="record-label-selected-options"></div>
-                        </div>
-                        <div class="record-label-results"></div>
-                        <p class="record-label-no-results filter-empty-hint mb-0" hidden>
-                            <spring:message code="Filters.labels.noResults" />
-                        </p>
-                    </div>
-                    <select id="recordLabelFilterSource" class="record-label-filter-source" hidden="hidden" aria-hidden="true" tabindex="-1">
-                        <c:forEach items="${recordLabelsFilter}" var="lbl">
-                            <option value="<c:out value='${lbl}' />" data-selected="${selectedLabels.contains(lbl) ? 'true' : 'false'}"><c:out value="${lbl}" /></option>
-                        </c:forEach>
-                        <c:forEach items="${selectedLabels}" var="selectedLabel">
-                            <c:if test="${not recordLabelsFilter.contains(selectedLabel)}">
-                                <option value="<c:out value='${selectedLabel}' />" data-selected="true"><c:out value="${selectedLabel}" /></option>
-                            </c:if>
-                        </c:forEach>
-                    </select>
-                </c:when>
-                <c:otherwise>
-                    <p class="filter-empty-hint mb-0"><spring:message code="Filters.labels.empty" /></p>
-                </c:otherwise>
-            </c:choose>
+            <div class="record-label-filter"
+                 data-autocomplete-url="<c:out value='${recordLabelAutocompleteUrl}' />"
+                 data-min-query-length="2"
+                 data-max-results="7"
+                 data-debounce-ms="250">
+                <spring:message code="Filters.labels.search.placeholder" var="labelSearchPlaceholder" />
+                <input id="recordLabelSearch" type="text" class="record-label-search-input"
+                       placeholder="<c:out value='${labelSearchPlaceholder}' />" autocomplete="off" />
+                <div class="record-label-selected" hidden>
+                    <p class="record-label-group-title"><spring:message code="Filters.labels.selected" /></p>
+                    <div class="record-label-selected-options"></div>
+                </div>
+                <div class="record-label-results"></div>
+                <p class="record-label-no-results filter-empty-hint mb-0" hidden>
+                    <spring:message code="Filters.labels.noResults" />
+                </p>
+            </div>
+            <select id="recordLabelFilterSource" class="record-label-filter-source" hidden="hidden" aria-hidden="true" tabindex="-1">
+                <c:forEach items="${selectedLabels}" var="selectedLabel">
+                    <option value="<c:out value='${selectedLabel}' />" data-selected="true"><c:out value="${selectedLabel}" /></option>
+                </c:forEach>
+            </select>
         </div>
     </details>
 
@@ -172,6 +165,16 @@
         return (value || '').trim().toLowerCase();
     }
 
+    function parsePositiveInt(value, fallback) {
+        var parsed = parseInt(value, 10);
+        return parsed > 0 ? parsed : fallback;
+    }
+
+    function buildAutocompleteUrl(endpoint, query) {
+        var separator = endpoint.indexOf('?') === -1 ? '?' : '&';
+        return endpoint + separator + 'q=' + encodeURIComponent(query);
+    }
+
     function initRecordLabelFilter() {
         var labelFilter = form.querySelector('.record-label-filter');
         var source = document.getElementById('recordLabelFilterSource');
@@ -179,30 +182,81 @@
             return;
         }
 
+        var endpoint = labelFilter.getAttribute('data-autocomplete-url');
         var searchInput = document.getElementById('recordLabelSearch');
         var selectedBlock = labelFilter.querySelector('.record-label-selected');
         var selectedOptions = labelFilter.querySelector('.record-label-selected-options');
         var resultsOptions = labelFilter.querySelector('.record-label-results');
         var noResults = labelFilter.querySelector('.record-label-no-results');
-        var initialLimit = parseInt(labelFilter.getAttribute('data-initial-limit'), 10) || 10;
+        var minQueryLength = parsePositiveInt(labelFilter.getAttribute('data-min-query-length'), 2);
+        var maxResults = parsePositiveInt(labelFilter.getAttribute('data-max-results'), 7);
+        var debounceMs = parsePositiveInt(labelFilter.getAttribute('data-debounce-ms'), 250);
         var labelsByKey = Object.create(null);
         var labels = [];
         var selectedKeys = Object.create(null);
+        var suggestions = [];
+        var debounceTimer = null;
+        var requestCounter = 0;
+        var activeController = null;
+        var completedQuery = '';
+        var isLoading = false;
 
-        Array.prototype.slice.call(source.options).forEach(function (option) {
-            var value = option.value;
-            var key = normalizeLabel(value);
-            if (!key || labelsByKey[key]) {
-                if (key && labelsByKey[key] && option.getAttribute('data-selected') === 'true') {
-                    selectedKeys[key] = true;
-                }
-                return;
+        function currentSearchTerm() {
+            return searchInput ? (searchInput.value || '').trim() : '';
+        }
+
+        function addLabel(value) {
+            var name = (value || '').trim();
+            var key = normalizeLabel(name);
+            if (!key) {
+                return null;
+            }
+            if (!labelsByKey[key]) {
+                labelsByKey[key] = { key: key, name: name };
+                labels.push(labelsByKey[key]);
+            }
+            return labelsByKey[key];
+        }
+
+        function sanitizeSuggestions(values) {
+            var seen = Object.create(null);
+            var result = [];
+
+            if (!Array.isArray(values)) {
+                return result;
             }
 
-            labelsByKey[key] = { key: key, name: value };
-            labels.push(labelsByKey[key]);
-            if (option.getAttribute('data-selected') === 'true') {
-                selectedKeys[key] = true;
+            values.some(function (value) {
+                if (typeof value !== 'string') {
+                    return false;
+                }
+                var label = addLabel(value);
+                if (!label || Object.prototype.hasOwnProperty.call(seen, label.key)) {
+                    return false;
+                }
+                seen[label.key] = true;
+                result.push(label);
+                return result.length >= maxResults;
+            });
+
+            return result;
+        }
+
+        function clearPendingRequest() {
+            if (debounceTimer) {
+                window.clearTimeout(debounceTimer);
+                debounceTimer = null;
+            }
+            if (activeController) {
+                activeController.abort();
+                activeController = null;
+            }
+        }
+
+        Array.prototype.slice.call(source.options).forEach(function (option) {
+            var label = addLabel(option.value);
+            if (label && option.getAttribute('data-selected') === 'true') {
+                selectedKeys[label.key] = true;
             }
         });
 
@@ -212,18 +266,9 @@
             });
         }
 
-        function filteredLabelObjects() {
-            var searchTerm = normalizeLabel(searchInput ? searchInput.value : '');
-            var availableLabels = labels.filter(function (label) {
+        function visibleSuggestionObjects() {
+            return suggestions.filter(function (label) {
                 return !selectedKeys[label.key];
-            });
-
-            if (!searchTerm) {
-                return availableLabels.slice(0, initialLimit);
-            }
-
-            return availableLabels.filter(function (label) {
-                return normalizeLabel(label.name).indexOf(searchTerm) !== -1;
             });
         }
 
@@ -259,8 +304,12 @@
 
         function renderLabels() {
             var selected = selectedLabelObjects();
-            var visible = filteredLabelObjects();
-            var hasSearch = !!normalizeLabel(searchInput ? searchInput.value : '');
+            var visible = visibleSuggestionObjects();
+            var normalizedSearch = normalizeLabel(currentSearchTerm());
+            var shouldShowNoResults = normalizedSearch.length >= minQueryLength &&
+                !isLoading &&
+                completedQuery === normalizedSearch &&
+                visible.length === 0;
 
             selectedOptions.textContent = '';
             resultsOptions.textContent = '';
@@ -273,11 +322,78 @@
             });
 
             selectedBlock.hidden = selected.length === 0;
-            noResults.hidden = !hasSearch || visible.length > 0;
+            noResults.hidden = !shouldShowNoResults;
+        }
+
+        function requestSuggestions(delay) {
+            var query = currentSearchTerm();
+            var normalizedQuery = normalizeLabel(query);
+            requestCounter += 1;
+            clearPendingRequest();
+
+            if (!endpoint || typeof window.fetch !== 'function' || normalizedQuery.length < minQueryLength) {
+                suggestions = [];
+                completedQuery = '';
+                isLoading = false;
+                renderLabels();
+                return;
+            }
+
+            isLoading = true;
+            completedQuery = '';
+            suggestions = [];
+            renderLabels();
+
+            var requestId = requestCounter;
+            debounceTimer = window.setTimeout(function () {
+                var options = {
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                };
+
+                if (typeof window.AbortController === 'function') {
+                    activeController = new AbortController();
+                    options.signal = activeController.signal;
+                }
+
+                window.fetch(buildAutocompleteUrl(endpoint, query), options)
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('Record label autocomplete request failed');
+                        }
+                        return response.json();
+                    })
+                    .then(function (values) {
+                        if (requestId !== requestCounter) {
+                            return;
+                        }
+                        activeController = null;
+                        isLoading = false;
+                        completedQuery = normalizedQuery;
+                        suggestions = sanitizeSuggestions(values);
+                        renderLabels();
+                    })
+                    .catch(function (error) {
+                        if (error && error.name === 'AbortError') {
+                            return;
+                        }
+                        if (requestId === requestCounter) {
+                            activeController = null;
+                            isLoading = false;
+                            completedQuery = '';
+                            suggestions = [];
+                            renderLabels();
+                        }
+                    });
+            }, delay);
         }
 
         if (searchInput) {
-            searchInput.addEventListener('input', renderLabels);
+            searchInput.addEventListener('input', function () {
+                requestSuggestions(debounceMs);
+            });
             searchInput.addEventListener('keydown', function (ev) {
                 if (ev.key === 'Enter') {
                     ev.preventDefault();
