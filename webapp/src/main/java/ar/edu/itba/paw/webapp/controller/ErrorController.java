@@ -18,4 +18,9 @@ public class ErrorController {
         mav.addObject("errorDescription", "Si creés que es un error, intentá iniciar sesión con otra cuenta.");
         return mav;
     }
+
+    @RequestMapping("/banned")
+    public ModelAndView banned() {
+        return new ModelAndView("banned");
+    }
 }
