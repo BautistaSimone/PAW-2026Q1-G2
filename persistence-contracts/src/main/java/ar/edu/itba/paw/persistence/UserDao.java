@@ -44,6 +44,7 @@ public interface UserDao {
 	void enable(final Long id);
 	void ban(final Long id);
 
+        void removeWishlistProduct(final Long id, Product product);
 	void addWishlistProduct(final Long id, Product product);
 	Boolean isProductInWishlist(final Long userId, final Long productId);
         List<Product> getWishlistProducts(final Long userId, final int limit);

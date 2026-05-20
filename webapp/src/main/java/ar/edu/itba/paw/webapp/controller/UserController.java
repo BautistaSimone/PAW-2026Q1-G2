@@ -435,7 +435,7 @@ public class UserController {
         return new ModelAndView("redirect:/profile?tab=trash&trashPage=" + page);
     }
 
-    @RequestMapping(value = "/add-wishlist-product", method = RequestMethod.POST)
+    @RequestMapping(value = "/toggle-wishlist-product", method = RequestMethod.POST)
     public ModelAndView addWishlistProduct(
             @AuthenticationPrincipal final PawAuthUser authUser,
             @RequestParam("productId") final Long productId,
@@ -445,7 +445,7 @@ public class UserController {
             return new ModelAndView("redirect:/login");
         }
 
-        userService.addWishlistProduct(authUser.getUser().getId(), productId);
+        userService.toggleWishlistProduct(authUser.getUser().getId(), productId);
 
         String referer = request.getHeader("Referer");
 

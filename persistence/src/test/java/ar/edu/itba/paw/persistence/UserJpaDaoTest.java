@@ -127,6 +127,56 @@ public class UserJpaDaoTest {
     }
 
     @Test
+    public void testRemoveWishlistProduct() {
+        // Arrange
+        final String email = "[EMAIL_ADDRESS]";
+        final String password = "[PASSWORD]";
+        final String username = "[USERNAME]";
+        final Boolean mod = false;
+        final Boolean enabled = false;
+
+        final User user = userDao.createUser(
+                email,
+                password,
+                username,
+                mod,
+                enabled,
+                "Juan",
+                "Perez",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        final Product product = productDao.createProduct(
+            user.getId(), "Album", "Artist", "Label", "CAT", "Argentina",
+            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+        );
+        final Product otherProduct = productDao.createProduct(
+            user.getId(), "Other Album", "Other Artist", "Label", "CAT2", "Argentina",
+            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+        );
+
+        userDao.addWishlistProduct(user.getId(), product);
+        userDao.addWishlistProduct(user.getId(), otherProduct);
+
+        // Act
+        userDao.removeWishlistProduct(user.getId(), product);
+
+        // Assert
+        Number count = (Number) em.createNativeQuery(
+            "SELECT COUNT(*) FROM user_wishlist_products wp WHERE wp.user_id = :userId")
+            .setParameter("userId", user.getId())
+            .getSingleResult();
+
+        Assertions.assertEquals(1L, count.longValue());
+    }
+
+    @Test
     public void testIsProductInWishlist() {
         // Arrange
         final String email = "[EMAIL_ADDRESS]";

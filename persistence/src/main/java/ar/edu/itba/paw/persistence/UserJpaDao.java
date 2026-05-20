@@ -124,6 +124,15 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
+    public void removeWishlistProduct(final Long id, Product product) {
+        User user = findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("User not found"));;
+
+        // Set it, hibernate will take care of it
+        user.getWishlistProducts().remove(product);
+    }
+
+    @Override
 	public Boolean isProductInWishlist(final Long userId, final Long productId) {
         final TypedQuery<Long> query = em.createQuery(
             "SELECT COUNT(p) " +

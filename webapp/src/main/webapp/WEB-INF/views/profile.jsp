@@ -18,7 +18,7 @@
                                 <c:set var="activeReports"
                                     value="${isOwnProfile and isAdmin and param.tab eq 'reports'}" />
                                 <c:set var="activePublications"
-                                    value="${not activeMyData and not activePurchases and not activeSales and not activeReviews and not activeTrash and not activeReports and not activeFollowers and not activeFollowing}" />
+                                    value="${not activeWishlistProducts and not activeMyData and not activePurchases and not activeSales and not activeReviews and not activeTrash and not activeReports and not activeFollowers and not activeFollowing}" />
 
 
                                 <spring:message code="Profile.title" var="profileTitle" />
@@ -273,10 +273,10 @@
                                                 </li>
                                                 <c:if test="${isOwnProfile}">
                                                     <li class="nav-item" role="presentation">
-                                                        <a class="nav-link<c:if test='${activeWishlist}'> active</c:if>"
+                                                        <a class="nav-link<c:if test='${activeWishlistProducts}'> active</c:if>"
                                                             id="wishlist-tab" href="<c:out value='${profileTabWishlistUrl}'/>"
                                                             role="tab" aria-controls="wishlist"
-                                                            aria-selected="${activeWishlist}" style="font-weight: 600;">
+                                                            aria-selected="${activeWishlistProducts}" style="font-weight: 600;">
                                                             <i class="bi bi-heart-fill" aria-hidden="true"></i>
                                                             <spring:message code="Profile.tabs.wishlist" />
                                                         </a>
@@ -435,50 +435,45 @@
                                                 </div>
 
                                                 <!-- Tab: Wishlist -->
-                                                <div class="tab-pane fade<c:if test='${activeWishlistProducts}'> show active</c:if>"
-                                                    id="wishlist" role="tabpanel"
-                                                    aria-labelledby="wishlists-tab">
-                                                    <c:choose>
-                                                        <c:when test="${not empty wishlistProducts}">
-                                                            <div class="profile-wishlist-stack">
-                                                                <div class="products-grid profile-wishlist-grid">
-                                                                    <c:forEach items="${wishlistProducts}" var="product">
-                                                                        <div class="products-grid-item">
-                                                                            <c:url value="/products/${product.id}"
-                                                                                var="productUrl" />
-                                                                            <ui:productCard title="${product.title}"
-                                                                                artist="${product.artist}"
-                                                                                price="${product.price}"
-                                                                                installments="${product.installmentPrice}"
-                                                                                imageUrl="${wishlistProductImageUrls[product.id]}"
-                                                                                categories="${product.categories}"
-                                                                                sellerRating="${sellerRating}"
-                                                                                href="${productUrl}" />
-                                                                        </div>
-                                                                    </c:forEach>
+
+                                                <c:if test="${isOwnProfile}">
+                                                    <div class="tab-pane fade<c:if test='${activeWishlistProducts}'> show active</c:if>"
+                                                        id="wishlist" role="tabpanel"
+                                                        aria-labelledby="wishlists-tab">
+                                                        <c:choose>
+                                                            <c:when test="${not empty wishlistProducts}">
+                                                                <div class="profile-wishlist-stack">
+                                                                    <div class="products-grid profile-wishlist-grid">
+                                                                        <c:forEach items="${wishlistProducts}" var="product">
+                                                                            <div class="products-grid-item">
+                                                                                <c:url value="/products/${product.id}"
+                                                                                    var="productUrl" />
+                                                                                <ui:productCard title="${product.title}"
+                                                                                    artist="${product.artist}"
+                                                                                    price="${product.price}"
+                                                                                    installments="${product.installmentPrice}"
+                                                                                    imageUrl="${wishlistProductImageUrls[product.id]}"
+                                                                                    categories="${product.categories}"
+                                                                                    sellerRating="${sellerRating}"
+                                                                                    href="${productUrl}" />
+                                                                            </div>
+                                                                        </c:forEach>
+                                                                    </div>
+                                                                    <ui:pagination result="${wishlistProductsPage}" />
                                                                 </div>
-                                                                <ui:pagination result="${wishlistProductsPage}" />
-                                                            </div>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <div class="empty-products-state">
-                                                                <i class="bi bi-vinyl profile-i-4"></i>
-                                                                <p class="profile-p-5">
-                                                                    <c:choose>
-                                                                        <c:when test="${isOwnProfile}">
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <div class="empty-products-state">
+                                                                    <i class="bi bi-vinyl profile-i-4"></i>
+                                                                    <p class="profile-p-5">
                                                                             <spring:message
-                                                                                code="Profile.publications.empty.own" />
-                                                                        </c:when>
-                                                                        <c:otherwise>
-                                                                            <spring:message
-                                                                                code="Profile.publications.empty.other" />
-                                                                        </c:otherwise>
-                                                                    </c:choose>
-                                                                </p>
-                                                            </div>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </div>
+                                                                                code="Profile.wishlist.empty.own" />
+                                                                    </p>
+                                                                </div>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </div>
+                                                </c:if>
                                                 
                                                 <!-- Tab: Mis datos (solo perfil propio) -->
                                                 <c:if test="${isOwnProfile}">

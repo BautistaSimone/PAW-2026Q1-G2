@@ -218,7 +218,7 @@
                                                         </form:form>
 
                                                         <!-- Wishlist -->
-                                                        <c:url var="wishlistUrl" value='/add-wishlist-product' />
+                                                        <c:url var="wishlistUrl" value='/toggle-wishlist-product' />
 
                                                         <form:form action="${wishlistUrl}"
                                                                 method="POST"

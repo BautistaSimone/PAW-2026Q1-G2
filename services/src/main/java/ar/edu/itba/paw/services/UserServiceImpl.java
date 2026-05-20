@@ -168,13 +168,18 @@ public class UserServiceImpl implements UserService {
         userDao.ban(id);
     }
 
-    @Override
+	@Override
     @Transactional
-	public void addWishlistProduct(final Long user_id, final Long product_id) {
-        Product product = productService.findById(product_id)
+	public void toggleWishlistProduct(final Long userId, final Long productId) {
+        Product product = productService.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
 
-        userDao.addWishlistProduct(user_id, product);
+        if (this.isProductInWishlist(userId, productId)) {
+            userDao.removeWishlistProduct(userId, product);
+        } else {
+            userDao.addWishlistProduct(userId, product);
+        }
+
     }
 
     @Override
