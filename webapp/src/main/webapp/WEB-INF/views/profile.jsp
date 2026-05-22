@@ -479,7 +479,10 @@
                                                 <c:if test="${isOwnProfile}">
                                                     <div class="tab-pane fade<c:if test='${activeMyData}'> show active</c:if>"
                                                         id="mydata" role="tabpanel" aria-labelledby="mydata-tab">
+                                                <div class="row g-4">
+                                                    <div class="col-md-6">
                                                         <div class="profile-div-6">
+                                                            <h4 class="mb-3"><spring:message code="Profile.myData.title" text="Mis Datos" /></h4>
                                                             <p class="profile-p-7">
                                                                 <spring:message code="Profile.myData.help" />
                                                             </p>
@@ -593,6 +596,35 @@
                                                             </form:form>
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <div class="profile-div-6">
+                                                            <h4 class="mb-3"><spring:message code="Profile.favoriteGenres.title" text="Mis géneros favoritos" /></h4>
+                                                            <p class="profile-p-7">
+                                                                <spring:message code="Profile.favoriteGenres.help" text="Selecciona los géneros que más te gustan para mejorar tus recomendaciones." />
+                                                            </p>
+                                                            <c:url var="profileUpdateGenresUrl" value="/profile/update-genres" />
+                                                            <form action="${profileUpdateGenresUrl}" method="post" id="genresForm">
+                                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                                <div class="mb-4 d-flex flex-column gap-2" style="max-height: 400px; overflow-y: auto;">
+                                                                    <c:forEach items="${allCategories}" var="category">
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input form-check-input-retro" type="checkbox" name="favoriteCategories" value="${category.id}" id="favCat_${category.id}" 
+                                                                                <c:if test="${fn:contains(userFavoriteCategoryIds, category.id)}">checked</c:if>
+                                                                            >
+                                                                            <label class="form-check-label" for="favCat_${category.id}">
+                                                                                <c:out value="${category.name}" />
+                                                                            </label>
+                                                                        </div>
+                                                                    </c:forEach>
+                                                                </div>
+                                                                <button type="submit" class="btn btn-retro btn-retro-primary">
+                                                                    <i class="bi bi-save" aria-hidden="true"></i>
+                                                                    <spring:message code="Profile.myData.save" />
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 </c:if>
 
                                                 <!-- Tab: Mis compras (only own profile) -->

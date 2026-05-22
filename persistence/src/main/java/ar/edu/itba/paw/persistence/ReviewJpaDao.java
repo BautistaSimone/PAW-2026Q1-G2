@@ -7,7 +7,9 @@ import javax.persistence.TypedQuery;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -63,8 +65,21 @@ public class ReviewJpaDao implements ReviewDao {
         .setFirstResult((page - 1) * pageSize)
         .getResultList();
 
-        for (Review review : reviews) {
-            populateBuyerUsername(review);
+        if (!reviews.isEmpty()) {
+            final List<Long> buyerIds = reviews.stream()
+                .map(Review::getBuyerId)
+                .distinct()
+                .collect(Collectors.toList());
+            
+            final Map<Long, String> usernames = em.createQuery("SELECT u.id, u.username FROM User u WHERE u.id IN :ids", Object[].class)
+                .setParameter("ids", buyerIds)
+                .getResultList()
+                .stream()
+                .collect(Collectors.toMap(res -> (Long) res[0], res -> (String) res[1]));
+
+            for (Review review : reviews) {
+                review.setBuyerUsername(usernames.get(review.getBuyerId()));
+            }
         }
 
         return new PaginatedResult<>(reviews, page, pageSize, totalCount);

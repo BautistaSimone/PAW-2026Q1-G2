@@ -23,56 +23,15 @@ import ar.edu.itba.paw.models.ConditionBucket;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
-import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.ProductState;
 
 @Repository
 public class ProductJpaDao implements ProductDao {
 
-    @PersistenceContext
-    private EntityManager em;
-
     private static final int MIN_SUGGESTION_QUERY_LENGTH = 2;
 
-    private static String normalizeRecordLabel(final String recordLabel) {
-        return recordLabel == null ? "" : recordLabel.trim();
-    }
-
-    private static String escapeForLike(final String raw) {
-        return raw.replace("\\", "\\\\")
-            .replace("%", "\\%")
-            .replace("_", "\\_");
-    }
-
-    private static String normalizeSuggestionQuery(final String raw) {
-        if (raw == null) {
-            return "";
-        }
-        return raw.trim().toLowerCase();
-    }
-
-    private static void appendConditionBucketJpql(final StringBuilder jpql, final ConditionBucket bucket) {
-        final String avg = "(p.sleeveCondition + p.recordCondition) / 2.0";
-        switch (bucket) {
-            case EXCELENTE -> jpql.append(avg).append(" >= 9");
-            case MUY_BUENO -> jpql.append(avg).append(" >= 8 AND ").append(avg).append(" < 9");
-            case BUENO -> jpql.append(avg).append(" >= 7 AND ").append(avg).append(" < 8");
-            case REGULAR -> jpql.append(avg).append(" < 7");
-        }
-    }
-
-    private static String orderByJpql(final ProductSortOrder sortOrder) {
-        return switch (sortOrder) {
-            case NEWEST -> "p.published DESC, p.productId DESC";
-            case OLDEST -> "p.published ASC, p.productId ASC";
-            case PRICE_ASC -> "p.price ASC";
-            case PRICE_DESC -> "p.price DESC";
-            case NAME_ASC -> "LOWER(p.title) ASC";
-            case NAME_DESC -> "LOWER(p.title) DESC";
-            case CONDITION_DESC -> "(p.sleeveCondition + p.recordCondition) / 2.0 DESC";
-            case CONDITION_ASC -> "(p.sleeveCondition + p.recordCondition) / 2.0 ASC";
-        };
-    }
+    @PersistenceContext
+    private EntityManager em;
 
     @Override
     public Optional<Product> findById(final Long id) {
@@ -131,100 +90,219 @@ public class ProductJpaDao implements ProductDao {
         conditions.add(cb.equal(root.get("state"), ProductState.ACTIVE.getPersistenceValue()));
 
         if (criteria.getMinPrice() != null) {
-            conditions.add(cb.greaterThan(root.get("price"), criteria.getMaxPrice()));
+            conditions.add(cb.ge(root.get("price"), criteria.getMinPrice()));
         }
 
         if (criteria.getMaxPrice() != null) {
-            conditions.add(cb.lessThan(root.get("price"), criteria.getMinPrice()));
+            conditions.add(cb.le(root.get("price"), criteria.getMaxPrice()));
         }
 
-        // if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
-        //     final String likeNeedle = "%" + escapeForLike(criteria.getSearchText().trim()).toLowerCase() + "%";
-        //     whereJpql.append(" AND (");
-        //     whereJpql.append("LOWER(p.title) LIKE :searchText ESCAPE '\\' OR ");
-        //     whereJpql.append("LOWER(p.artist) LIKE :searchText ESCAPE '\\' OR ");
-        //     whereJpql.append("LOWER(p.description) LIKE :searchText ESCAPE '\\'");
-        //     whereJpql.append(")");
-        //     paramNames.add("searchText");
-        //     paramValues.add(likeNeedle);
-        // }
+        if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
+            final String raw = criteria.getSearchText().trim().toLowerCase();
+            final boolean needsEscape = raw.contains("%") || raw.contains("_") || raw.contains("\\");
+            final String needle = "%" + (needsEscape ? escapeForLike(raw) : raw) + "%";
+            javax.persistence.criteria.Expression<String> pattern = cb.literal(needle);
+            Predicate p1 = needsEscape
+                ? cb.like(cb.lower(root.get("title")), pattern, '\\')
+                : cb.like(cb.lower(root.get("title")), pattern);
+            Predicate p2 = needsEscape
+                ? cb.like(cb.lower(root.get("artist")), pattern, '\\')
+                : cb.like(cb.lower(root.get("artist")), pattern);
+            Predicate p3 = needsEscape
+                ? cb.like(cb.lower(root.get("description")), pattern, '\\')
+                : cb.like(cb.lower(root.get("description")), pattern);
+            conditions.add(cb.or(p1, p2, p3));
+        }
 
-        // if (!criteria.getCategoryIds().isEmpty()) {
-        //     whereJpql.append(" AND EXISTS (SELECT 1 FROM Product p2 JOIN p2.categories c WHERE p2 = p AND c.id IN :categoryIds)");
-        //     paramNames.add("categoryIds");
-        //     paramValues.add(criteria.getCategoryIds());
-        // }
+        if (!criteria.getCategoryIds().isEmpty()) {
+            javax.persistence.criteria.Join<Product, Category> categoriesJoin = root.join("categories");
+            conditions.add(categoriesJoin.get("id").in(criteria.getCategoryIds()));
+        }
 
-        // if (!criteria.getRecordLabels().isEmpty()) {
-        //     whereJpql.append(" AND p.recordLabel IN :recordLabels");
-        //     paramNames.add("recordLabels");
-        //     paramValues.add(criteria.getRecordLabels());
-        // }
+        if (!criteria.getRecordLabels().isEmpty()) {
+            conditions.add(root.get("recordLabel").in(criteria.getRecordLabels()));
+        }
 
-        // if (!criteria.getConditionBuckets().isEmpty()) {
-        //     whereJpql.append(" AND (");
-        //     boolean first = true;
-        //     for (ConditionBucket bucket : criteria.getConditionBuckets()) {
-        //         if (!first) {
-        //             whereJpql.append(" OR ");
-        //         }
-        //         first = false;
-        //         appendConditionBucketJpql(whereJpql, bucket);
-        //     }
-        //     whereJpql.append(")");
-        // }
+        if (!criteria.getConditionBuckets().isEmpty()) {
+            List<Predicate> bucketPredicates = new ArrayList<>();
+            javax.persistence.criteria.Expression<Number> avgCond = cb.quot(cb.sum(root.get("sleeveCondition"), root.get("recordCondition")), 2.0);
+            
+            for (ConditionBucket bucket : criteria.getConditionBuckets()) {
+                switch (bucket) {
+                    case EXCELENTE -> bucketPredicates.add(cb.ge(avgCond, 9.0));
+                    case MUY_BUENO -> bucketPredicates.add(cb.and(cb.ge(avgCond, 8.0), cb.lt(avgCond, 9.0)));
+                    case BUENO -> bucketPredicates.add(cb.and(cb.ge(avgCond, 7.0), cb.lt(avgCond, 8.0)));
+                    case REGULAR -> bucketPredicates.add(cb.lt(avgCond, 7.0));
+                }
+            }
+            conditions.add(cb.or(bucketPredicates.toArray(new Predicate[0])));
+        }
 
-        // if (criteria.getUserId() != null) {
-        //     whereJpql.append(" AND p.userId = :userId");
-        //     paramNames.add("userId");
-        //     paramValues.add(criteria.getUserId());
-        // }
+        if (criteria.getUserId() != null) {
+            conditions.add(cb.equal(root.get("userId"), criteria.getUserId()));
+        }
 
-        // if (!criteria.getUserIds().isEmpty()) {
-        //     whereJpql.append(" AND p.userId IN :userIds");
-        //     paramNames.add("userIds");
-        //     paramValues.add(criteria.getUserIds());
-        // }
-
-        // final TypedQuery<Long> countQuery = em.createQuery(
-        //     "SELECT COUNT(p) FROM Product p " + whereJpql, Long.class
-        // );
-        // for (int i = 0; i < paramNames.size(); i++) {
-        //     countQuery.setParameter(paramNames.get(i), paramValues.get(i));
-        // }
-        // final long totalCount = countQuery.getSingleResult();
-
-        // if (totalCount == 0) {
-        //     return new PaginatedResult<>(Collections.emptyList(), criteria.getPage(), criteria.getPageSize(), 0);
-        // }
-
-        // final TypedQuery<Product> selectQuery = em.createQuery(
-        //     "SELECT p FROM Product p " + whereJpql + " ORDER BY " + orderByJpql(criteria.getSortOrder()),
-        //     Product.class
-        // );
-        // for (int i = 0; i < paramNames.size(); i++) {
-        //     selectQuery.setParameter(paramNames.get(i), paramValues.get(i));
-        // }
-        // selectQuery.setMaxResults(criteria.getPageSize());
-        // selectQuery.setFirstResult((criteria.getPage() - 1) * criteria.getPageSize());
+        if (!criteria.getUserIds().isEmpty()) {
+            conditions.add(root.get("userId").in(criteria.getUserIds()));
+        }
 
         // Fetches the count of all Products as per given criteria
-        query.where(cb.and(conditions.toArray(new Predicate[0])));
+        Predicate[] predicates = conditions.toArray(new Predicate[0]);
+        
+        // Create Count Query
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Product> productRootCount = countQuery.from(Product.class);
+        
+        // We need to recreate the joins for the count query if they exist
+        List<Predicate> countConditions = new ArrayList<>();
+        countConditions.add(cb.equal(productRootCount.get("state"), ProductState.ACTIVE.getPersistenceValue()));
+        if (criteria.getMinPrice() != null) countConditions.add(cb.ge(productRootCount.get("price"), criteria.getMinPrice()));
+        if (criteria.getMaxPrice() != null) countConditions.add(cb.le(productRootCount.get("price"), criteria.getMaxPrice()));
+        if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
+            final String raw = criteria.getSearchText().trim().toLowerCase();
+            final boolean needsEscape = raw.contains("%") || raw.contains("_") || raw.contains("\\");
+            final String needle = "%" + (needsEscape ? escapeForLike(raw) : raw) + "%";
+            javax.persistence.criteria.Expression<String> pattern = cb.literal(needle);
+            Predicate p1 = needsEscape
+                ? cb.like(cb.lower(productRootCount.get("title")), pattern, '\\')
+                : cb.like(cb.lower(productRootCount.get("title")), pattern);
+            Predicate p2 = needsEscape
+                ? cb.like(cb.lower(productRootCount.get("artist")), pattern, '\\')
+                : cb.like(cb.lower(productRootCount.get("artist")), pattern);
+            Predicate p3 = needsEscape
+                ? cb.like(cb.lower(productRootCount.get("description")), pattern, '\\')
+                : cb.like(cb.lower(productRootCount.get("description")), pattern);
+            countConditions.add(cb.or(p1, p2, p3));
+        }
+        if (!criteria.getCategoryIds().isEmpty()) {
+            javax.persistence.criteria.Join<Product, Category> countCategoriesJoin = productRootCount.join("categories");
+            countConditions.add(countCategoriesJoin.get("id").in(criteria.getCategoryIds()));
+        }
+        if (!criteria.getRecordLabels().isEmpty()) countConditions.add(productRootCount.get("recordLabel").in(criteria.getRecordLabels()));
+        if (!criteria.getConditionBuckets().isEmpty()) {
+            List<Predicate> bucketPredicates = new ArrayList<>();
+            javax.persistence.criteria.Expression<Number> avgCond = cb.quot(cb.sum(productRootCount.get("sleeveCondition"), productRootCount.get("recordCondition")), 2.0);
+            for (ConditionBucket bucket : criteria.getConditionBuckets()) {
+                switch (bucket) {
+                    case EXCELENTE -> bucketPredicates.add(cb.ge(avgCond, 9.0));
+                    case MUY_BUENO -> bucketPredicates.add(cb.and(cb.ge(avgCond, 8.0), cb.lt(avgCond, 9.0)));
+                    case BUENO -> bucketPredicates.add(cb.and(cb.ge(avgCond, 7.0), cb.lt(avgCond, 8.0)));
+                    case REGULAR -> bucketPredicates.add(cb.lt(avgCond, 7.0));
+                }
+            }
+            countConditions.add(cb.or(bucketPredicates.toArray(new Predicate[0])));
+        }
+        if (criteria.getUserId() != null) countConditions.add(cb.equal(productRootCount.get("userId"), criteria.getUserId()));
+        if (!criteria.getUserIds().isEmpty()) countConditions.add(productRootCount.get("userId").in(criteria.getUserIds()));
+
+        countQuery.select(cb.countDistinct(productRootCount)).where(cb.and(countConditions.toArray(new Predicate[0])));
+        Long count = em.createQuery(countQuery).getSingleResult();
+
+        if (count == 0) {
+            return new PaginatedResult<>(Collections.emptyList(), criteria.getPage(), criteria.getPageSize(), 0);
+        }
+
+        query.select(root).distinct(true).where(cb.and(predicates));
+
+        List<javax.persistence.criteria.Order> orders = new ArrayList<>();
+        switch(criteria.getSortOrder()) {
+            case NEWEST -> {
+                orders.add(cb.desc(root.get("published"))); 
+                orders.add(cb.desc(root.get("productId")));
+            }
+            case OLDEST -> {
+                orders.add(cb.asc(root.get("published"))); 
+                orders.add(cb.asc(root.get("productId")));
+            }
+            case PRICE_ASC -> orders.add(cb.asc(root.get("price")));
+            case PRICE_DESC -> orders.add(cb.desc(root.get("price")));
+            case NAME_ASC -> orders.add(cb.asc(cb.lower(root.get("title"))));
+            case NAME_DESC -> orders.add(cb.desc(cb.lower(root.get("title"))));
+            case CONDITION_DESC -> orders.add(cb.desc(cb.quot(cb.sum(root.get("sleeveCondition"), root.get("recordCondition")), 2.0)));
+            case CONDITION_ASC -> orders.add(cb.asc(cb.quot(cb.sum(root.get("sleeveCondition"), root.get("recordCondition")), 2.0)));
+        }
+        query.orderBy(orders);
 
         // This query fetches the Products as per the Page Limit
         List<Product> result = em.createQuery(query)
             .setFirstResult((criteria.getPage() - 1) * criteria.getPageSize())
             .setMaxResults(criteria.getPageSize())
             .getResultList();
-        
-        // Create Count Query
-        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-        Root<Product> productRootCount = countQuery.from(Product.class);
-        countQuery.select(cb.count(productRootCount)).where(cb.and(conditions.toArray(new Predicate[conditions.size()])));
-
-        Long count = em.createQuery(countQuery).getSingleResult();
 
         return new PaginatedResult<>(result, criteria.getPage(), criteria.getPageSize(), count);
+    }
+
+    @Override
+    public List<Product> getRecommendedProducts(final Long userId, final int limit, final Long productIdToExclude) {
+        if (userId == null || limit < 1) {
+            return Collections.emptyList();
+        }
+
+        final String baseSql = "WITH fav_cats AS (" +
+            " SELECT category_id FROM user_favorite_categories WHERE user_id = :userId" +
+            "), wishlist_cats AS (" +
+            " SELECT DISTINCT pc.category_id" +
+            " FROM user_wishlist_products uwp" +
+            " JOIN products_categories pc ON pc.product_id = uwp.product_id" +
+            " WHERE uwp.user_id = :userId" +
+            "), purchase_cats AS (" +
+            " SELECT DISTINCT pc.category_id" +
+            " FROM purchases pu" +
+            " JOIN products_categories pc ON pc.product_id = pu.product_id" +
+            " WHERE pu.buyer_user_id = :userId" +
+            "), fav_match AS (" +
+            " SELECT pc.product_id, COUNT(DISTINCT pc.category_id) AS match_count" +
+            " FROM products_categories pc" +
+            " JOIN fav_cats fc ON fc.category_id = pc.category_id" +
+            " GROUP BY pc.product_id" +
+            "), wishlist_match AS (" +
+            " SELECT pc.product_id, COUNT(DISTINCT pc.category_id) AS match_count" +
+            " FROM products_categories pc" +
+            " JOIN wishlist_cats wc ON wc.category_id = pc.category_id" +
+            " GROUP BY pc.product_id" +
+            "), purchase_match AS (" +
+            " SELECT pc.product_id, COUNT(DISTINCT pc.category_id) AS match_count" +
+            " FROM products_categories pc" +
+            " JOIN purchase_cats pcats ON pcats.category_id = pc.category_id" +
+            " GROUP BY pc.product_id" +
+            ")" +
+            " SELECT p.*" +
+            " FROM products p" +
+            " LEFT JOIN fav_match fm ON fm.product_id = p.product_id" +
+            " LEFT JOIN wishlist_match wm ON wm.product_id = p.product_id" +
+            " LEFT JOIN purchase_match pm ON pm.product_id = p.product_id" +
+            " WHERE p.state = :state" +
+            " AND p.user_id <> :userId";
+
+        final String sql = productIdToExclude == null
+            ? baseSql +
+                " ORDER BY" +
+                " COALESCE(fm.match_count, 0) DESC," +
+                " COALESCE(wm.match_count, 0) DESC," +
+                " COALESCE(pm.match_count, 0) DESC," +
+                " p.published DESC, p.product_id DESC"
+            : baseSql +
+                " AND p.product_id <> :excludeId" +
+                " ORDER BY" +
+                " COALESCE(fm.match_count, 0) DESC," +
+                " COALESCE(wm.match_count, 0) DESC," +
+                " COALESCE(pm.match_count, 0) DESC," +
+                " p.published DESC, p.product_id DESC";
+
+        final javax.persistence.Query query = em.createNativeQuery(sql, Product.class)
+            .setParameter("userId", userId)
+            .setParameter("state", ProductState.ACTIVE.getPersistenceValue());
+
+        if (productIdToExclude != null) {
+            query.setParameter("excludeId", productIdToExclude);
+        }
+
+        @SuppressWarnings("unchecked")
+        final List<Product> results = query
+            .setMaxResults(limit)
+            .getResultList();
+
+        return results;
     }
 
     @Override
@@ -421,5 +499,32 @@ public class ProductJpaDao implements ProductDao {
             .setParameter("productId", id)
             .setParameter("currentState", ProductState.USER_DELETED.getPersistenceValue())
             .executeUpdate() >= 1;
+    }
+
+    private static String normalizeRecordLabel(final String raw) {
+        if (raw == null) {
+            return "";
+        }
+        final String trimmed = raw.trim();
+        return trimmed.isEmpty() ? "" : trimmed;
+    }
+
+    private static String normalizeSuggestionQuery(final String raw) {
+        return raw == null ? "" : raw.trim().toLowerCase();
+    }
+
+    private static String escapeForLike(final String raw) {
+        if (raw == null || raw.isEmpty()) {
+            return "";
+        }
+        final StringBuilder escaped = new StringBuilder(raw.length());
+        for (int i = 0; i < raw.length(); i++) {
+            final char ch = raw.charAt(i);
+            if (ch == '\\' || ch == '%' || ch == '_') {
+                escaped.append('\\');
+            }
+            escaped.append(ch);
+        }
+        return escaped.toString();
     }
 }

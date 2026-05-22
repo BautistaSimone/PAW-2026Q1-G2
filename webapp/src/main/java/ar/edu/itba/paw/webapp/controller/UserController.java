@@ -34,6 +34,7 @@ import ar.edu.itba.paw.services.PurchaseService;
 import ar.edu.itba.paw.services.VerificationTokenService;
 import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.services.ReportService;
+import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.webapp.form.RegisterForm;
 import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
@@ -63,6 +64,7 @@ public class UserController {
     private final ReviewService reviewService;
     private final ReportService reportService;
     private final VerificationTokenService verificationTokenService;
+    private final CategoryService categoryService;
 
     @Autowired
     public UserController(
@@ -72,7 +74,8 @@ public class UserController {
             final PurchaseService purchaseService,
             final ReviewService reviewService,
             final ReportService reportService,
-            final VerificationTokenService verificationTokenService) {
+            final VerificationTokenService verificationTokenService,
+            final CategoryService categoryService) {
 
         this.userService = userService;
         this.productService = productService;
@@ -81,6 +84,7 @@ public class UserController {
         this.reviewService = reviewService;
         this.reportService = reportService;
         this.verificationTokenService = verificationTokenService;
+        this.categoryService = categoryService;
     }
 
     @RequestMapping(value = "/login")
@@ -252,6 +256,22 @@ public class UserController {
         return new ModelAndView("redirect:/profile?tab=mydata&updated=1");
     }
 
+    @RequestMapping(value = "/profile/update-genres", method = RequestMethod.POST)
+    public ModelAndView updateGenres(
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @RequestParam(value = "favoriteCategories", required = false) final List<Long> categoryIds) {
+        if (authUser == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        final User profileUser = userService.findById(authUser.getUser().getId())
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        userService.updateFavoriteCategories(profileUser.getId(), categoryIds != null ? categoryIds : Collections.emptyList());
+
+        return new ModelAndView("redirect:/profile?tab=mydata&updated=1");
+    }
+
     private static void refreshAuthenticationPrincipal(final PawAuthUser current, final User refreshedUser) {
         final Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
         final PawAuthUser newPrincipal = new PawAuthUser(
@@ -304,6 +324,13 @@ public class UserController {
         mv.addObject("userProductsPage", productsPage);
         mv.addObject("userProducts", productsPage.getResults());
         mv.addObject("productImageUrls", productImageUrls);
+
+        if (isOwnProfile) {
+            mv.addObject("allCategories", categoryService.findAll());
+            mv.addObject("userFavoriteCategoryIds", profileUser.getFavoriteCategories().stream()
+                .map(ar.edu.itba.paw.models.Category::getId)
+                .collect(java.util.stream.Collectors.toList()));
+        }
 
         final List<Product> wishlistProducts = userService.getWishlistProducts(profileUser.getId(), PROFILE_WISHLIST_LIMIT);
         final Map<Long, String> wishlistProductImageUrls = new HashMap<>();

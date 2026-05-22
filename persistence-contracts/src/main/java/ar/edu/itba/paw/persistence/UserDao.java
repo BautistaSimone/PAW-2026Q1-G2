@@ -37,6 +37,8 @@ public interface UserDao {
             final String cbuCvu);
 
     void updatePassword(final Long userId, final String encodedPassword);
+
+    void updateFavoriteCategories(final Long userId, final List<Long> categoryIds);
     Optional<User> findByEmail(final String email);
 
     Optional<User> findById(final Long id);

@@ -13,6 +13,7 @@ import javax.persistence.Column;
 import javax.persistence.JoinTable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "users")
@@ -57,6 +58,7 @@ public class User {
     @Column(name = "cbu_cvu", length = 22)
     private String cbuCvu;
 
+    @BatchSize(size = 20)
     @ManyToMany
     @JoinTable(
         name = "user_wishlist_products", 
@@ -64,6 +66,15 @@ public class User {
         inverseJoinColumns = { @JoinColumn(name = "product_id") }
     )
     private Set<Product> wishlistProducts = new HashSet<>();
+
+    @BatchSize(size = 20)
+    @ManyToMany
+    @JoinTable(
+        name = "user_favorite_categories",
+        joinColumns = { @JoinColumn(name = "user_id") },
+        inverseJoinColumns = { @JoinColumn(name = "category_id") }
+    )
+    private Set<Category> favoriteCategories = new HashSet<>();
 
     User() {
         // Just for Hibernate, we love you!
@@ -261,6 +272,10 @@ public class User {
         return wishlistProducts;
     }
 
+    public Set<Category> getFavoriteCategories() {
+        return favoriteCategories;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -307,6 +322,10 @@ public class User {
 
     public void setWishlistProducts(Set<Product> wishlistProducts) {
         this.wishlistProducts = wishlistProducts;
+    }
+
+    public void setFavoriteCategories(Set<Category> favoriteCategories) {
+        this.favoriteCategories = favoriteCategories;
     }
 
     @Override

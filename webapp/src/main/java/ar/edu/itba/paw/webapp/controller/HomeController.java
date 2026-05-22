@@ -222,29 +222,10 @@ public class HomeController {
 		mav.addObject("productImageUrls", productImageUrls);
 		mav.addObject("sellerRatingByUserId", sellerRatingByUserId);
 
-		final List<Long> wishlistCategoryIds = userService.getWishlistCategoryIds(currentUserId);
-		final List<Product> wishlistProducts;
+		final List<Product> wishlistProducts = productService.getRecommendedProducts(currentUserId, 12, null);
 		final Map<Long, String> wishlistProductImageUrls = new HashMap<>();
 		final Map<Long, SellerRatingSummary> wishlistSellerRatingByUserId = new HashMap<>();
-		if (wishlistCategoryIds.isEmpty()) {
-			wishlistProducts = Collections.emptyList();
-		} else {
-			final ProductSearchCriteria wishlistCriteria = new ProductSearchCriteria(
-					null,
-					wishlistCategoryIds,
-					null,
-					null,
-					Collections.emptyList(),
-					Collections.emptyList(),
-					ProductSortOrder.NEWEST,
-					null,
-					1,
-					12
-			);
-
-			final PaginatedResult<Product> wishlistPage = productService.listProducts(wishlistCriteria);
-			wishlistProducts = wishlistPage.getResults();
-
+		if (!wishlistProducts.isEmpty()) {
 			for (Product product : wishlistProducts) {
 				if (imageService.existsByProductId(product.getId())) {
 					wishlistProductImageUrls.put(product.getId(), "/images/product/" + product.getId());
@@ -259,24 +240,10 @@ public class HomeController {
 				wishlistSellerRatingByUserId.put(sellerId, reviewService.summaryForSeller(sellerId));
 			}
 		}
-
-		mav.addObject("hasWishlist", !wishlistCategoryIds.isEmpty());
 		mav.addObject("wishlistProducts", wishlistProducts);
 		mav.addObject("wishlistProductImageUrls", wishlistProductImageUrls);
 		mav.addObject("wishlistSellerRatingByUserId", wishlistSellerRatingByUserId);
 
-		final List<User> suggestedUsers = userService.getMostFollowedUsers(12);
-		final Map<Long, Long> suggestedFollowerCounts = new HashMap<>();
-		final Map<Long, Boolean> suggestedFollowStatusMap = new HashMap<>();
-		for (User u : suggestedUsers) {
-			suggestedFollowerCounts.put(u.getId(), userService.countFollowers(u.getId()));
-			if (!u.getId().equals(currentUserId)) {
-				suggestedFollowStatusMap.put(u.getId(), userService.isFollowing(currentUserId, u.getId()));
-			}
-		}
-		mav.addObject("suggestedUsers", suggestedUsers);
-		mav.addObject("suggestedFollowerCounts", suggestedFollowerCounts);
-		mav.addObject("suggestedFollowStatusMap", suggestedFollowStatusMap);
 		return mav;
 	}
 

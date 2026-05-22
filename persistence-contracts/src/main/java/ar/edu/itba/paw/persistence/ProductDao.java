@@ -29,6 +29,8 @@ public interface ProductDao {
 
     PaginatedResult<Product> findProducts(ProductSearchCriteria criteria);
 
+    List<Product> getRecommendedProducts(final Long userId, final int limit, final Long productIdToExclude);
+
     PaginatedResult<Product> findProductsByUserIdAndState(
         final Long userId,
         final ProductState state,

@@ -110,6 +110,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    public void updateFavoriteCategories(final Long userId, final List<Long> categoryIds) {
+        userDao.updateFavoriteCategories(userId, categoryIds);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<User> findByEmail(final String email) {
         return userDao.findByEmail(email);

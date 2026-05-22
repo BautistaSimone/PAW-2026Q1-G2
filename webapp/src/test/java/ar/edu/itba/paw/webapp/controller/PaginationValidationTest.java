@@ -17,7 +17,7 @@ class PaginationValidationTest {
 
     @Test
     void profileRejectsNegativePage() {
-        final UserController controller = new UserController(null, null, null, null, null, null, null);
+        final UserController controller = new UserController(null, null, null, null, null, null, null, null);
 
         assertThrows(IllegalArgumentException.class, () ->
             controller.profile(null, null, -1, 1, null, null)
@@ -26,7 +26,7 @@ class PaginationValidationTest {
 
     @Test
     void profileRejectsNegativeTrashPage() {
-        final UserController controller = new UserController(null, null, null, null, null, null, null);
+        final UserController controller = new UserController(null, null, null, null, null, null, null, null);
 
         assertThrows(IllegalArgumentException.class, () ->
             controller.profile(null, null, 1, -1, null, null)
@@ -35,7 +35,7 @@ class PaginationValidationTest {
 
     @Test
     void trashRejectsNegativePage() {
-        final UserController controller = new UserController(null, null, null, null, null, null, null);
+        final UserController controller = new UserController(null, null, null, null, null, null, null, null);
 
         assertThrows(IllegalArgumentException.class, () ->
             controller.trash(null, -1)

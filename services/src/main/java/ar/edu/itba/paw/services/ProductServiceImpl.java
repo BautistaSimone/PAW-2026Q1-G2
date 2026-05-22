@@ -224,6 +224,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Product> getRecommendedProducts(final Long userId, final int limit, final Long productIdToExclude) {
+        return productDao.getRecommendedProducts(userId, limit, productIdToExclude);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public PaginatedResult<Product> listUserDeletedProducts(final Long userId, final int page, final int pageSize) {
         return productDao.findProductsByUserIdAndState(userId, ProductState.USER_DELETED, page, pageSize);
     }

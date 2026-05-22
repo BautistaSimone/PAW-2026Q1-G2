@@ -16,14 +16,6 @@ CREATE TABLE IF NOT EXISTS users (
 	banned BOOLEAN NOT NULL DEFAULT false
 );
 
-CREATE TABLE IF NOT EXISTS user_wishlist_products (
-	product_id INTEGER NOT NULL,
-	user_id INTEGER NOT NULL,
-	PRIMARY KEY(product_id, user_id),
-	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
-	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION
-);
-
 CREATE TABLE IF NOT EXISTS password_tokens (
 	token_id SERIAL PRIMARY KEY,
 	user_id INTEGER NOT NULL,
@@ -56,6 +48,15 @@ CREATE TABLE IF NOT EXISTS products (
 	state VARCHAR(32) NOT NULL DEFAULT 'ACTIVE',
 	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS user_wishlist_products (
+	product_id INTEGER NOT NULL,
+	user_id INTEGER NOT NULL,
+	PRIMARY KEY(product_id, user_id),
+	FOREIGN KEY(user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
+	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
 
 CREATE TABLE IF NOT EXISTS images (
 	image_id SERIAL PRIMARY KEY,
@@ -134,6 +135,14 @@ CREATE TABLE IF NOT EXISTS user_follows (
 	CHECK (follower_id <> followed_id)
 );
 
+CREATE TABLE IF NOT EXISTS user_favorite_categories (
+	user_id INTEGER NOT NULL,
+	category_id INTEGER NOT NULL,
+	PRIMARY KEY (user_id, category_id),
+	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+	FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
+);
+
 -- Seed default categories (genres) using more compatible EXISTS check instead of ON CONFLICT
 INSERT INTO categories (name) SELECT 'Rock'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Rock');
 INSERT INTO categories (name) SELECT 'Pop'         WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Pop');
@@ -152,6 +161,3 @@ INSERT INTO categories (name) SELECT 'Soul'        WHERE NOT EXISTS (SELECT 1 FR
 INSERT INTO categories (name) SELECT 'Funk'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Funk');
 INSERT INTO categories (name) SELECT 'Tango'       WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Tango');
 INSERT INTO categories (name) SELECT 'Cumbia'      WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Cumbia');
-
-
-

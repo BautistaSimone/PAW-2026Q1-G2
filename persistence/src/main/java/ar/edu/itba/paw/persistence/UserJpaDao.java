@@ -96,6 +96,23 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
+    public void updateFavoriteCategories(final Long userId, final List<Long> categoryIds) {
+        final User user = em.find(User.class, userId);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found");
+        }
+        user.getFavoriteCategories().clear();
+        if (categoryIds != null) {
+            for (Long cid : categoryIds) {
+                ar.edu.itba.paw.models.Category c = em.find(ar.edu.itba.paw.models.Category.class, cid);
+                if (c != null) {
+                    user.getFavoriteCategories().add(c);
+                }
+            }
+        }
+    }
+
+    @Override
     public Optional<User> findByEmail(String email) {
         final TypedQuery<User> query = em.createQuery("FROM User WHERE email = :email", User.class);
         query.setParameter("email", email);
