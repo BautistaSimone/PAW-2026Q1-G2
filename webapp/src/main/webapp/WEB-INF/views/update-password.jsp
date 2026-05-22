@@ -93,7 +93,7 @@
 
                     <div class="auth-card-footer">
                         <a href="<c:url value='/login'/>" class="btn btn-retro btn-retro-outline w-100">
-                            <i class="bi bi-arrow-left" aria-hidden="true"></i> <spring:message code="UpdatePassword.backToLogin" />
+                            <i class="bi bi-arrow-left" aria-hidden="true"></i> <spring:message code="UpdatePassword.back" />
                         </a>
                     </div>
                 </div>

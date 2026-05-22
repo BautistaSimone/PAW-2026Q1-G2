@@ -116,7 +116,7 @@
                                                 <div class="profile-hero-actions">
                                                     <c:choose>
                                                         <c:when test="${isOwnProfile}">
-                                                            <a href="<c:url value='/resetPassword'/>"
+                                                            <a href="<c:url value='/changePassword'/>"
                                                                 class="btn btn-retro btn-retro-secondary" role="button">
                                                                 <spring:message code="Profile.changePassword" />
                                                             </a>

@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import javax.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,6 +38,7 @@ import ar.edu.itba.paw.services.PasswordTokenService;
 import ar.edu.itba.paw.webapp.form.UpdatePasswordForm;
 import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
+import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.PasswordToken;
 
@@ -113,17 +115,21 @@ public class PasswordController {
             return mv;
         }
 
-        if (!passwordTokenService.isValidPasswordResetToken(form.getToken())) {
+        // If the user is logged in, there is no need for a token
+        if (authUser != null) {
+            userService.updatePassword(authUser.getUser().getId(), form.getNewPassword());
+        } else if (passwordTokenService.isValidPasswordResetToken(form.getToken())) {
+
+            final Optional<PasswordToken> passTokenOpt = passwordTokenService.findByToken(form.getToken());
+
+            // We already know it exists
+            final PasswordToken passToken = passTokenOpt.get();
+
+            userService.updatePassword(passToken.getUserId(), form.getNewPassword());
+        } else {
             ModelAndView mv = new ModelAndView("redirect:/login");
             return mv;
         }
-
-        final Optional<PasswordToken> passTokenOpt = passwordTokenService.findByToken(form.getToken());
-
-        // We already know it exists
-        final PasswordToken passToken = passTokenOpt.get();
-
-        userService.updatePassword(passToken.getUserId(), form.getNewPassword());
 
         // Reset the form on success
         form = new UpdatePasswordForm(); 
@@ -143,11 +149,14 @@ public class PasswordController {
 
     @RequestMapping(value = "/changePassword")
     public ModelAndView showChangePasswordPage(
-        @ModelAttribute UpdatePasswordForm form) {
+        @AuthenticationPrincipal PawAuthUser authUser,
+        @ModelAttribute UpdatePasswordForm form,
+        final HttpServletRequest request) {
 
         ModelAndView mv = new ModelAndView();
+        mv.addObject("productDetailBackUrl", Util.resolveBackUrl(request));
 
-        if(!passwordTokenService.isValidPasswordResetToken(form.getToken())) {
+        if(authUser == null && !passwordTokenService.isValidPasswordResetToken(form.getToken())) {
             
             mv.setViewName("redirect:/login");
             return mv;

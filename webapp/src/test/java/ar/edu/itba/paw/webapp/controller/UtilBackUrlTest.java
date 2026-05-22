@@ -5,13 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-class ProductControllerBackUrlTest {
+import ar.edu.itba.paw.webapp.Util;
+
+class UtilBackUrlTest {
 
     @Test
     void usesInternalRefererIncludingQueryString() {
         final MockHttpServletRequest request = requestFrom("http://localhost:8000/profile?tab=reports&reportsPage=2");
 
-        assertEquals("/profile?tab=reports&reportsPage=2", ProductController.resolveProductDetailBackUrl(request, 12L));
+        assertEquals("/profile?tab=reports&reportsPage=2", Util.resolveBackUrl(request));
     }
 
     @Test
@@ -19,35 +21,28 @@ class ProductControllerBackUrlTest {
         final MockHttpServletRequest request = requestFrom("http://localhost:8000/products/new");
         request.setParameter("created", "1");
 
-        assertEquals("/", ProductController.resolveProductDetailBackUrl(request, 12L));
+        assertEquals("/", Util.resolveBackUrl(request));
     }
 
     @Test
     void fallsBackWhenRefererIsMissing() {
         final MockHttpServletRequest request = requestFrom(null);
 
-        assertEquals("/", ProductController.resolveProductDetailBackUrl(request, 12L));
+        assertEquals("/", Util.resolveBackUrl(request));
     }
 
     @Test
     void fallsBackWhenRefererIsExternal() {
         final MockHttpServletRequest request = requestFrom("https://example.com/profile");
 
-        assertEquals("/", ProductController.resolveProductDetailBackUrl(request, 12L));
+        assertEquals("/", Util.resolveBackUrl(request));
     }
 
     @Test
     void fallsBackWhenRefererIsSchemeRelativeExternal() {
         final MockHttpServletRequest request = requestFrom("//example.com/profile");
 
-        assertEquals("/", ProductController.resolveProductDetailBackUrl(request, 12L));
-    }
-
-    @Test
-    void fallsBackWhenRefererIsCurrentProductDetail() {
-        final MockHttpServletRequest request = requestFrom("http://localhost:8000/products/12?reported=1");
-
-        assertEquals("/", ProductController.resolveProductDetailBackUrl(request, 12L));
+        assertEquals("/", Util.resolveBackUrl(request));
     }
 
     @Test
@@ -55,7 +50,7 @@ class ProductControllerBackUrlTest {
         final MockHttpServletRequest request = requestFrom("http://localhost:8000/app/profile?userId=4");
         request.setContextPath("/app");
 
-        assertEquals("/profile?userId=4", ProductController.resolveProductDetailBackUrl(request, 12L));
+        assertEquals("/profile?userId=4", Util.resolveBackUrl(request));
     }
 
     private static MockHttpServletRequest requestFrom(final String referer) {

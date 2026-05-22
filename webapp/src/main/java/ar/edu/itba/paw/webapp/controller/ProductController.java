@@ -2,7 +2,6 @@ package ar.edu.itba.paw.webapp.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +37,7 @@ import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.Review;
 import ar.edu.itba.paw.models.SellerRatingSummary;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.webapp.form.ProductForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.product.ProductImageLayoutParser;
@@ -442,7 +442,11 @@ public class ProductController {
 
         final ModelAndView mav = new ModelAndView("product-detail");
         mav.addObject("product", product);
-        mav.addObject("productDetailBackUrl", resolveProductDetailBackUrl(request, id));
+
+        String backUrl = Util.resolveBackUrl(request);
+        if (!isSameProductDetailPath(backUrl, id)) {
+            mav.addObject("productDetailBackUrl", backUrl);
+        }
 
         if (authUser != null) {
             final boolean isOwnProduct = product.getUserId().equals(authUser.getUser().getId());
@@ -500,72 +504,6 @@ public class ProductController {
         mav.addObject("sellerRatings", sellerRatings);
 
         return mav;
-    }
-
-    static String resolveProductDetailBackUrl(final HttpServletRequest request, final Long productId) {
-        final String fallbackUrl = "/";
-        if ("1".equals(request.getParameter("created"))) {
-            return fallbackUrl;
-        }
-
-        final String referer = request.getHeader("Referer");
-        if (referer == null || referer.isBlank()) {
-            return fallbackUrl;
-        }
-
-        try {
-            final URI refererUri = URI.create(referer);
-            if ((refererUri.isAbsolute() || refererUri.getHost() != null)
-                && !isSameOrigin(refererUri, request)) {
-                return fallbackUrl;
-            }
-
-            final String backPath = internalPathFromReferer(refererUri.getRawPath(), request.getContextPath());
-            if (backPath == null || isSameProductDetailPath(backPath, productId)) {
-                return fallbackUrl;
-            }
-
-            final String query = refererUri.getRawQuery();
-            return query == null || query.isBlank() ? backPath : backPath + "?" + query;
-        } catch (IllegalArgumentException e) {
-            return fallbackUrl;
-        }
-    }
-
-    private static boolean isSameOrigin(final URI refererUri, final HttpServletRequest request) {
-        final String refererHost = refererUri.getHost();
-        if (refererHost == null || !refererHost.equalsIgnoreCase(request.getServerName())) {
-            return false;
-        }
-        if (refererUri.getScheme() != null && !refererUri.getScheme().equalsIgnoreCase(request.getScheme())) {
-            return false;
-        }
-        return effectivePort(refererUri.getScheme(), refererUri.getPort())
-            == effectivePort(request.getScheme(), request.getServerPort());
-    }
-
-    private static int effectivePort(final String scheme, final int port) {
-        if (port > 0) {
-            return port;
-        }
-        if ("https".equalsIgnoreCase(scheme)) {
-            return 443;
-        }
-        return 80;
-    }
-
-    private static String internalPathFromReferer(final String rawPath, final String contextPath) {
-        String path = rawPath == null || rawPath.isBlank() ? "/" : rawPath;
-        if (contextPath != null && !contextPath.isBlank()) {
-            if (path.equals(contextPath)) {
-                return "/";
-            }
-            if (!path.startsWith(contextPath + "/")) {
-                return null;
-            }
-            path = path.substring(contextPath.length());
-        }
-        return path.startsWith("/") ? path : "/" + path;
     }
 
     private static boolean isSameProductDetailPath(final String path, final Long productId) {
