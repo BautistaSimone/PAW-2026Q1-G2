@@ -13,7 +13,7 @@ import javax.persistence.Column;
 import javax.persistence.JoinTable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import org.hibernate.annotations.BatchSize;
+//import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "users")
@@ -58,7 +58,7 @@ public class User {
     @Column(name = "cbu_cvu", length = 22)
     private String cbuCvu;
 
-    @BatchSize(size = 20)
+    //@BatchSize(size = 20)
     @ManyToMany
     @JoinTable(
         name = "user_wishlist_products", 
@@ -67,7 +67,7 @@ public class User {
     )
     private Set<Product> wishlistProducts = new HashSet<>();
 
-    @BatchSize(size = 20)
+    //@BatchSize(size = 20)
     @ManyToMany
     @JoinTable(
         name = "user_favorite_categories",

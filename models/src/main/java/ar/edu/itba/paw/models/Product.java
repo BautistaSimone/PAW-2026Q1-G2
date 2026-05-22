@@ -10,7 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Id;
 import javax.persistence.Column;
 import javax.persistence.ManyToMany;
-import org.hibernate.annotations.BatchSize;
+//import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -43,7 +43,7 @@ public class Product {
     private String editionCountry;
 
     // TODO: Check how it behaves with deletion
-    @BatchSize(size = 20)
+    //@BatchSize(size = 20)
     @ManyToMany
     @JoinTable(
         name = "products_categories", 

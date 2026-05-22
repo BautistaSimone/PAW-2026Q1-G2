@@ -8,7 +8,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.ManyToMany;
 import javax.persistence.Id;
 import javax.persistence.Column;
-import org.hibernate.annotations.BatchSize;
+//import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class Category {
     @Column(length = 255, nullable = false)
     private String name;
 
-    @BatchSize(size = 20)
+    //@BatchSize(size = 20)
     @ManyToMany(mappedBy = "categories")
     List<Product> products;
 
