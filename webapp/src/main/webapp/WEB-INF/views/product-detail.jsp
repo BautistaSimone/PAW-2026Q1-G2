@@ -239,10 +239,12 @@
 
                                                                 <c:choose>
                                                                     <c:when test="${isWishlisted}">
-                                                                        Remove from wishlist
+                                                                        <spring:message
+                                                                            code="Wishlist.remove" />
                                                                     </c:when>
                                                                     <c:otherwise>
-                                                                        Add to wishlist
+                                                                        <spring:message
+                                                                            code="Wishlist.add" />
                                                                     </c:otherwise>
                                                                 </c:choose>
                                                             </button>

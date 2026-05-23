@@ -2134,6 +2134,19 @@ details.filter-section:not([open]) .filter-section-chevron {
   box-shadow: 0 0 0 3px rgba(231, 111, 81, 0.1);
 }
 
+.btn-accent-secondary {
+  background: var(--color-text-muted);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.7rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+  width: 100%;
+}
+
 .btn-accent {
   background: var(--color-accent);
   color: #fff;

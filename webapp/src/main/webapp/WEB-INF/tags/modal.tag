@@ -5,6 +5,8 @@
 <%@ attribute name="primaryBtn" required="false" %>
 <%@ attribute name="secondaryBtn" required="false" %>
 <%@ attribute name="cssClass" required="false" %>
+<%@ attribute name="primaryBtnId" required="false" %>
+<%@ attribute name="primaryBtnOnClick" required="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
@@ -15,6 +17,10 @@
 <c:set var="modalCssClass" value="${not empty cssClass ? cssClass : ''}" />
 <c:set var="primary" value="${not empty primaryBtn ? primaryBtn : defaultPrimary}" />
 <c:set var="secondary" value="${secondaryBtn}" />
+<c:set var="primaryBtnId"
+       value="${not empty primaryBtnId ? primaryBtnId : ''}" />
+<c:set var="primaryBtnOnClick"
+       value="${not empty primaryBtnOnClick ? primaryBtnOnClick : ''}" />
 
 <div class="modal fade <c:out value='${modalCssClass}' />" id="<c:out value='${id}' />" tabindex="-1" aria-labelledby="<c:out value='${id}' />Label" aria-hidden="true">
     <div class="modal-dialog">
@@ -29,10 +35,18 @@
             <div class="modal-footer">
 
                 <c:if test="${secondaryBtn ne null}">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><c:out value="${secondary}"/></button>
+                    <button type="button" class="btn-accent-secondary" data-bs-dismiss="modal"><c:out value="${secondary}"/></button>
                 </c:if>
-                
-                <button type="button" class="btn-accent" data-bs-dismiss="modal"><c:out value="${primary}"/></button>
+
+                <button type="button"
+                    id="<c:out value='${primaryBtnId}' />"
+                    class="btn-accent"
+                    data-bs-dismiss="modal"
+                    onclick="<c:out value='${primaryBtnOnClick}' />">
+
+                    <c:out value="${primary}"/>
+
+                </button>
             </div>
         </div>
     </div>
