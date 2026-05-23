@@ -529,152 +529,153 @@
                 <c:if test="${isOwnProfile}">
                     <div class="tab-pane fade<c:if test='${activeMyData}'> show active</c:if>"
                         id="mydata" role="tabpanel" aria-labelledby="mydata-tab">
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <div class="profile-div-6">
-                            <h4 class="mb-3"><spring:message code="Profile.myData.title" text="Mis Datos" /></h4>
-                            <p class="profile-p-7">
-                                <spring:message code="Profile.myData.help" />
-                            </p>
-                            <c:url var="profileUpdateUrl" value="/profile/update" />
-                            <form:form modelAttribute="userProfileForm"
-                                action="${profileUpdateUrl}" method="post"
-                                cssClass="user-profile-form" id="profileForm"
-                                novalidate="true">
-                                <input type="hidden" name="${_csrf.parameterName}"
-                                    value="${_csrf.token}" />
-                                <div class="row g-2">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="pfFirstName">
-                                            <spring:message
-                                                code="Profile.myData.firstName" /> <span
-                                                class="text-danger">*</span>
-                                        </label>
-                                        <form:input path="firstName" id="pfFirstName"
-                                            cssClass="form-control"
-                                            autocomplete="given-name" />
-                                        <form:errors path="firstName"
-                                            cssClass="text-danger small d-block" />
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="pfLastName">
-                                            <spring:message
-                                                code="Profile.myData.lastName" /> <span
-                                                class="text-danger">*</span>
-                                        </label>
-                                        <form:input path="lastName" id="pfLastName"
-                                            cssClass="form-control"
-                                            autocomplete="family-name" />
-                                        <form:errors path="lastName"
-                                            cssClass="text-danger small d-block" />
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label" for="pfStreet">
-                                        <spring:message code="Profile.myData.street" />
-                                    </label>
-                                    <spring:message code="Common.optional"
-                                        var="optionalPlaceholder" />
-                                    <form:input path="streetName" id="pfStreet"
-                                        cssClass="form-control"
-                                        placeholder="${optionalPlaceholder}" />
-                                    <form:errors path="streetName"
-                                        cssClass="text-danger small d-block" />
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label" for="pfStreetNum">
-                                        <spring:message code="Profile.myData.number" />
-                                    </label>
-                                    <form:input type="number" path="streetNumber"
-                                        id="pfStreetNum" cssClass="form-control"
-                                        placeholder="${optionalPlaceholder}" min="1" />
-                                    <form:errors path="streetNumber"
-                                        cssClass="text-danger small d-block" />
-                                </div>
-                                <div class="row g-2">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="pfNeighborhood">
-                                            <spring:message
-                                                code="Profile.myData.neighborhood" />
-                                        </label>
-                                        <form:input path="neighborhood"
-                                            id="pfNeighborhood" cssClass="form-control"
-                                            placeholder="${optionalPlaceholder}" />
-                                        <form:errors path="neighborhood"
-                                            cssClass="text-danger small d-block" />
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="pfProvince">
-                                            <spring:message
-                                                code="Profile.myData.province" />
-                                        </label>
-                                        <form:input path="province" id="pfProvince"
-                                            cssClass="form-control"
-                                            placeholder="${optionalPlaceholder}" />
-                                        <form:errors path="province"
-                                            cssClass="text-danger small d-block" />
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label" for="pfExtra">
-                                        <spring:message
-                                            code="Profile.myData.extraInfo" />
-                                    </label>
-                                    <form:input path="extraAddressInfo" id="pfExtra"
-                                        cssClass="form-control"
-                                        placeholder="${optionalPlaceholder}" />
-                                    <form:errors path="extraAddressInfo"
-                                        cssClass="text-danger small d-block" />
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label" for="pfCbu">
-                                        <spring:message code="Profile.myData.cbuCvu" />
-                                    </label>
-                                    <form:input path="cbuCvu" id="pfCbu"
-                                        cssClass="form-control"
-                                        placeholder="${optionalPlaceholder}"
-                                        inputmode="numeric" maxlength="22" />
-                                    <form:errors path="cbuCvu"
-                                        cssClass="text-danger small d-block" />
-                                </div>
-                                <button type="submit"
-                                    class="btn btn-retro btn-retro-primary"
-                                    id="profileSaveBtn" disabled="true">
-                                    <i class="bi bi-save" aria-hidden="true"></i>
-                                    <spring:message code="Profile.myData.save" />
-                                </button>
-                            </form:form>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="profile-div-6">
-                            <h4 class="mb-3"><spring:message code="Profile.favoriteGenres.title" text="Mis géneros favoritos" /></h4>
-                            <p class="profile-p-7">
-                                <spring:message code="Profile.favoriteGenres.help" text="Selecciona los géneros que más te gustan para mejorar tus recomendaciones." />
-                            </p>
-                            <c:url var="profileUpdateGenresUrl" value="/profile/update-genres" />
-                            <form action="${profileUpdateGenresUrl}" method="post" id="genresForm">
-                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                <div class="mb-4 d-flex flex-column gap-2" style="max-height: 400px; overflow-y: auto;">
-                                    <c:forEach items="${allCategories}" var="category">
-                                        <div class="form-check">
-                                            <input class="form-check-input form-check-input-retro" type="checkbox" name="favoriteCategories" value="${category.id}" id="favCat_${category.id}" 
-                                                <c:if test="${fn:contains(userFavoriteCategoryIds, category.id)}">checked</c:if>
-                                            >
-                                            <label class="form-check-label" for="favCat_${category.id}">
-                                                <c:out value="${category.name}" />
-                                            </label>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="profile-div-6">
+                                    <h4 class="mb-3"><spring:message code="Profile.myData.title" text="Mis Datos" /></h4>
+                                    <p class="profile-p-7">
+                                        <spring:message code="Profile.myData.help" />
+                                    </p>
+                                    <c:url var="profileUpdateUrl" value="/profile/update" />
+                                    <form:form modelAttribute="userProfileForm"
+                                        action="${profileUpdateUrl}" method="post"
+                                        cssClass="user-profile-form" id="profileForm"
+                                        novalidate="true">
+                                        <input type="hidden" name="${_csrf.parameterName}"
+                                            value="${_csrf.token}" />
+                                        <div class="row g-2">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" for="pfFirstName">
+                                                    <spring:message
+                                                        code="Profile.myData.firstName" /> <span
+                                                        class="text-danger">*</span>
+                                                </label>
+                                                <form:input path="firstName" id="pfFirstName"
+                                                    cssClass="form-control"
+                                                    autocomplete="given-name" />
+                                                <form:errors path="firstName"
+                                                    cssClass="text-danger small d-block" />
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" for="pfLastName">
+                                                    <spring:message
+                                                        code="Profile.myData.lastName" /> <span
+                                                        class="text-danger">*</span>
+                                                </label>
+                                                <form:input path="lastName" id="pfLastName"
+                                                    cssClass="form-control"
+                                                    autocomplete="family-name" />
+                                                <form:errors path="lastName"
+                                                    cssClass="text-danger small d-block" />
+                                            </div>
                                         </div>
-                                    </c:forEach>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="pfStreet">
+                                                <spring:message code="Profile.myData.street" />
+                                            </label>
+                                            <spring:message code="Common.optional"
+                                                var="optionalPlaceholder" />
+                                            <form:input path="streetName" id="pfStreet"
+                                                cssClass="form-control"
+                                                placeholder="${optionalPlaceholder}" />
+                                            <form:errors path="streetName"
+                                                cssClass="text-danger small d-block" />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="pfStreetNum">
+                                                <spring:message code="Profile.myData.number" />
+                                            </label>
+                                            <form:input type="number" path="streetNumber"
+                                                id="pfStreetNum" cssClass="form-control"
+                                                placeholder="${optionalPlaceholder}" min="1" />
+                                            <form:errors path="streetNumber"
+                                                cssClass="text-danger small d-block" />
+                                        </div>
+                                        <div class="row g-2">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" for="pfNeighborhood">
+                                                    <spring:message
+                                                        code="Profile.myData.neighborhood" />
+                                                </label>
+                                                <form:input path="neighborhood"
+                                                    id="pfNeighborhood" cssClass="form-control"
+                                                    placeholder="${optionalPlaceholder}" />
+                                                <form:errors path="neighborhood"
+                                                    cssClass="text-danger small d-block" />
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label" for="pfProvince">
+                                                    <spring:message
+                                                        code="Profile.myData.province" />
+                                                </label>
+                                                <form:input path="province" id="pfProvince"
+                                                    cssClass="form-control"
+                                                    placeholder="${optionalPlaceholder}" />
+                                                <form:errors path="province"
+                                                    cssClass="text-danger small d-block" />
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="pfExtra">
+                                                <spring:message
+                                                    code="Profile.myData.extraInfo" />
+                                            </label>
+                                            <form:input path="extraAddressInfo" id="pfExtra"
+                                                cssClass="form-control"
+                                                placeholder="${optionalPlaceholder}" />
+                                            <form:errors path="extraAddressInfo"
+                                                cssClass="text-danger small d-block" />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="pfCbu">
+                                                <spring:message code="Profile.myData.cbuCvu" />
+                                            </label>
+                                            <form:input path="cbuCvu" id="pfCbu"
+                                                cssClass="form-control"
+                                                placeholder="${optionalPlaceholder}"
+                                                inputmode="numeric" maxlength="22" />
+                                            <form:errors path="cbuCvu"
+                                                cssClass="text-danger small d-block" />
+                                        </div>
+                                        <button type="submit"
+                                            class="btn btn-retro btn-retro-primary"
+                                            id="profileSaveBtn" disabled="true">
+                                            <i class="bi bi-save" aria-hidden="true"></i>
+                                            <spring:message code="Profile.myData.save" />
+                                        </button>
+                                    </form:form>
                                 </div>
-                                <button type="submit" class="btn btn-retro btn-retro-primary">
-                                    <i class="bi bi-save" aria-hidden="true"></i>
-                                    <spring:message code="Profile.myData.save" />
-                                </button>
-                            </form>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="profile-div-6">
+                                    <h4 class="mb-3"><spring:message code="Profile.favoriteGenres.title" text="Mis géneros favoritos" /></h4>
+                                    <p class="profile-p-7">
+                                        <spring:message code="Profile.favoriteGenres.help" text="Selecciona los géneros que más te gustan para mejorar tus recomendaciones." />
+                                    </p>
+                                    <c:url var="profileUpdateGenresUrl" value="/profile/update-genres" />
+                                    <form action="${profileUpdateGenresUrl}" method="post" id="genresForm">
+                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                        <div class="mb-4 d-flex flex-column gap-2" style="max-height: 400px; overflow-y: auto;">
+                                            <c:forEach items="${allCategories}" var="category">
+                                                <div class="form-check">
+                                                    <input class="form-check-input form-check-input-retro" type="checkbox" name="favoriteCategories" value="${category.id}" id="favCat_${category.id}" 
+                                                        <c:if test="${fn:contains(userFavoriteCategoryIds, category.id)}">checked</c:if>
+                                                    >
+                                                    <label class="form-check-label" for="favCat_${category.id}">
+                                                        <c:out value="${category.name}" />
+                                                    </label>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                        <button type="submit" class="btn btn-retro btn-retro-primary">
+                                            <i class="bi bi-save" aria-hidden="true"></i>
+                                            <spring:message code="Profile.myData.save" />
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
                 </c:if>
 
                 <!-- Tab: Mis compras (only own profile) -->
@@ -1127,7 +1128,7 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Tab: Papelera (solo perfil propio) -->
                 <c:if test="${isOwnProfile}">
                     <div class="tab-pane fade<c:if test='${activeTrash}'> show active</c:if>"
@@ -1153,11 +1154,9 @@
                         </h2>
                         <c:choose>
                             <c:when test="${not empty deletedProducts}">
-                                <div
-                                    class="profile-publications-stack deleted-products-stack">
+                                <div class="profile-publications-stack deleted-products-stack">
                                     <div class="products-grid profile-listings-grid">
-                                        <c:forEach items="${deletedProducts}"
-                                            var="product">
+                                        <c:forEach items="${deletedProducts}" var="product">
                                             <div class="products-grid-item">
                                                 <ui:productCard title="${product.title}"
                                                     artist="${product.artist}"
@@ -1167,15 +1166,18 @@
                                                     categories="${product.categories}"
                                                     sellerRating="${sellerRating}"
                                                     href="#" linkDisabled="true" />
+
                                                 <c:url var="restoreProductUrl"
                                                     value="/products/${product.id}/restore" />
+
                                                 <spring:message
                                                     code="Trash.restore.confirm"
                                                     var="confirmRestore" />
+                                                    
                                                 <form action="${restoreProductUrl}"
                                                     method="post"
                                                     class="mt-2 flex-shrink-0"
-                                                    onsubmit="return confirm('${confirmRestore}');">
+                                                    onsubmit="return showConfirmationModal(event);">
                                                     <input type="hidden"
                                                         name="${_csrf.parameterName}"
                                                         value="${_csrf.token}" />

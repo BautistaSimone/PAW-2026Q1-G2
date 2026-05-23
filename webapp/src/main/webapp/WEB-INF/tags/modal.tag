@@ -1,6 +1,6 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ attribute name="title" required="true" %>
-<%@ attribute name="text" required="true" %>
+<%@ attribute name="text" required="false" %>
 <%@ attribute name="id" required="true" %>
 <%@ attribute name="primaryBtn" required="false" %>
 <%@ attribute name="secondaryBtn" required="false" %>
@@ -16,6 +16,7 @@
 <spring:message code="Modal.button.close.ariaLabel" var="closeLabel" />
 <c:set var="modalCssClass" value="${not empty cssClass ? cssClass : ''}" />
 <c:set var="primary" value="${not empty primaryBtn ? primaryBtn : defaultPrimary}" />
+<c:set var="modalText" value="${not empty text ? text : ''}" />
 <c:set var="secondary" value="${secondaryBtn}" />
 <c:set var="primaryBtnId"
        value="${not empty primaryBtnId ? primaryBtnId : ''}" />
@@ -30,7 +31,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<c:out value='${closeLabel}' />"></button>
             </div>
             <div class="modal-body">
-                <c:out value="${text}"/>
+                <c:out value="${modalText}"/>
             </div>
             <div class="modal-footer">
 

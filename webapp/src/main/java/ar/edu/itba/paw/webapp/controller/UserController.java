@@ -402,6 +402,9 @@ public class UserController {
                     deletedProductImageUrls.put(product.getId(), "/images/product/" + product.getId());
                 }
             }
+
+            LOGGER.atDebug().addArgument(deletedPage.getResults()).log("Found the following deleted products: {}");
+
             mv.addObject("deletedProductsPage", deletedPage);
             mv.addObject("deletedProducts", deletedPage.getResults());
             mv.addObject("deletedProductImageUrls", deletedProductImageUrls);
