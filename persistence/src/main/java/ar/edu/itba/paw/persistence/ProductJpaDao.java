@@ -306,6 +306,107 @@ public class ProductJpaDao implements ProductDao {
     }
 
     @Override
+    public PaginatedResult<Product> getRecommendedProductsPage(
+        final Long userId,
+        final int page,
+        final int pageSize,
+        final Long productIdToExclude
+    ) {
+        final int safePage = page < 1 ? 1 : page;
+        final int safePageSize = pageSize < 1 ? 12 : pageSize;
+
+        if (userId == null) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
+        }
+
+        final String baseSql = "WITH fav_cats AS (" +
+            " SELECT category_id FROM user_favorite_categories WHERE user_id = :userId" +
+            "), wishlist_cats AS (" +
+            " SELECT DISTINCT pc.category_id" +
+            " FROM user_wishlist_products uwp" +
+            " JOIN products_categories pc ON pc.product_id = uwp.product_id" +
+            " WHERE uwp.user_id = :userId" +
+            "), purchase_cats AS (" +
+            " SELECT DISTINCT pc.category_id" +
+            " FROM purchases pu" +
+            " JOIN products_categories pc ON pc.product_id = pu.product_id" +
+            " WHERE pu.buyer_user_id = :userId" +
+            "), fav_match AS (" +
+            " SELECT pc.product_id, COUNT(DISTINCT pc.category_id) AS match_count" +
+            " FROM products_categories pc" +
+            " JOIN fav_cats fc ON fc.category_id = pc.category_id" +
+            " GROUP BY pc.product_id" +
+            "), wishlist_match AS (" +
+            " SELECT pc.product_id, COUNT(DISTINCT pc.category_id) AS match_count" +
+            " FROM products_categories pc" +
+            " JOIN wishlist_cats wc ON wc.category_id = pc.category_id" +
+            " GROUP BY pc.product_id" +
+            "), purchase_match AS (" +
+            " SELECT pc.product_id, COUNT(DISTINCT pc.category_id) AS match_count" +
+            " FROM products_categories pc" +
+            " JOIN purchase_cats pcats ON pcats.category_id = pc.category_id" +
+            " GROUP BY pc.product_id" +
+            ")";
+
+        final String whereSql = productIdToExclude == null
+            ? " WHERE p.state = :state AND p.user_id <> :userId"
+            : " WHERE p.state = :state AND p.user_id <> :userId AND p.product_id <> :excludeId";
+
+        final String orderSql = " ORDER BY" +
+            " COALESCE(fm.match_count, 0) DESC," +
+            " COALESCE(wm.match_count, 0) DESC," +
+            " COALESCE(pm.match_count, 0) DESC," +
+            " p.published DESC, p.product_id DESC";
+
+        final String countSql = baseSql +
+            " SELECT COUNT(*)" +
+            " FROM products p" +
+            " LEFT JOIN fav_match fm ON fm.product_id = p.product_id" +
+            " LEFT JOIN wishlist_match wm ON wm.product_id = p.product_id" +
+            " LEFT JOIN purchase_match pm ON pm.product_id = p.product_id" +
+            whereSql;
+
+        final javax.persistence.Query countQuery = em.createNativeQuery(countSql)
+            .setParameter("userId", userId)
+            .setParameter("state", ProductState.ACTIVE.getPersistenceValue());
+
+        if (productIdToExclude != null) {
+            countQuery.setParameter("excludeId", productIdToExclude);
+        }
+
+        final Number countResult = (Number) countQuery.getSingleResult();
+        final int total = countResult == null ? 0 : countResult.intValue();
+        if (total == 0) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
+        }
+
+        final String selectSql = baseSql +
+            " SELECT p.*" +
+            " FROM products p" +
+            " LEFT JOIN fav_match fm ON fm.product_id = p.product_id" +
+            " LEFT JOIN wishlist_match wm ON wm.product_id = p.product_id" +
+            " LEFT JOIN purchase_match pm ON pm.product_id = p.product_id" +
+            whereSql +
+            orderSql;
+
+        final javax.persistence.Query query = em.createNativeQuery(selectSql, Product.class)
+            .setParameter("userId", userId)
+            .setParameter("state", ProductState.ACTIVE.getPersistenceValue());
+
+        if (productIdToExclude != null) {
+            query.setParameter("excludeId", productIdToExclude);
+        }
+
+        @SuppressWarnings("unchecked")
+        final List<Product> results = query
+            .setFirstResult((safePage - 1) * safePageSize)
+            .setMaxResults(safePageSize)
+            .getResultList();
+
+        return new PaginatedResult<>(results, safePage, safePageSize, total);
+    }
+
+    @Override
     public PaginatedResult<Product> findProductsByUserIdAndState(
         final Long userId,
         final ProductState state,
