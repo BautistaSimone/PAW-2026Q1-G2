@@ -542,7 +542,7 @@
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="profile-div-6">
-                                    <h4 class="mb-3"><spring:message code="Profile.myData.title" text="Mis Datos" /></h4>
+                                    <h4 class="mb-3"><spring:message code="Profile.tabs.myData" text="Mis Datos" /></h4>
                                     <p class="profile-p-7">
                                         <spring:message code="Profile.myData.help" />
                                     </p>
@@ -658,7 +658,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="profile-div-6">
-                                    <h4 class="mb-3"><spring:message code="Profile.favoriteGenres.title" text="Mis géneros favoritos" /></h4>
+                                    <h4 class="mb-3"><spring:message code="Profile.tabs.favoriteGenres" text="Mis géneros favoritos" /></h4>
                                     <p class="profile-p-7">
                                         <spring:message code="Profile.favoriteGenres.help" text="Selecciona los géneros que más te gustan para mejorar tus recomendaciones." />
                                     </p>
