@@ -205,7 +205,7 @@
 
                                                             <input type="hidden"
                                                                 name="productId"
-                                                                value="<c:out value='${product.id}'/>'" />
+                                                                value="<c:out value='${product.id}'/>" />
 
                                                             <button type="submit"
                                                                     class="btn w-100 product-detail-button-17">
