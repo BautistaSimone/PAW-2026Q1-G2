@@ -2798,20 +2798,23 @@ details.filter-section:not([open]) .filter-section-chevron {
   padding: 1.5rem 0 4rem;
 }
 
-.profile-page .profile-listings-grid .product-card,
-.deleted-products-stack .profile-listings-grid .product-card {
-  height: auto;
-}
-
-/* Deleted listings grid: card + restore button; avoid row-stretch overlap with pagination */
-.deleted-products-stack .products-grid-item {
+.profile-page .profile-listings-grid .products-grid-item,
+.profile-page .profile-wishlist-grid .products-grid-item {
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
-.deleted-products-stack .products-grid-item .product-card {
-  flex: 0 0 auto;
+.profile-page .profile-listings-grid .product-card,
+.profile-page .profile-wishlist-grid .product-card {
+  flex: 1 1 auto;
+  height: auto;
+}
+
+.profile-page .profile-listings-grid .products-grid-item > .btn,
+.profile-page .profile-listings-grid .products-grid-item > form,
+.profile-page .profile-wishlist-grid .products-grid-item > form {
+  flex-shrink: 0;
 }
 
 .profile-publications-stack {
