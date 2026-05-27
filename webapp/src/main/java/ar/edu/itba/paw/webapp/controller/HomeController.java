@@ -120,7 +120,8 @@ public class HomeController {
 				|| (categoryIds != null && !categoryIds.isEmpty())
 				|| criteria.getMinPrice() != null
 				|| criteria.getMaxPrice() != null
-				|| (recordLabels != null && !recordLabels.isEmpty());
+				|| (recordLabels != null && !recordLabels.isEmpty())
+				|| (estadoParams != null && !estadoParams.isEmpty());
 
 		final ProductSortOrder sortOrder = ProductSortOrder.parse(sortParam).orElse(ProductSortOrder.NEWEST);
 
@@ -158,6 +159,7 @@ public class HomeController {
 		mav.addObject("sortOptions", ProductSortOrder.values());
 		mav.addObject("selectedSort", sortOrder.name());
 		mav.addObject("activeSearchText", hasActiveSearch ? trimmedSearch : null);
+		mav.addObject("hasActiveFilters", hasActiveFilters);
 		mav.addObject("noProductsMatchFilters", productsPage.getResults().isEmpty() && hasActiveFilters);
 		return mav;
 	}
