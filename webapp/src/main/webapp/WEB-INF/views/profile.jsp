@@ -518,11 +518,12 @@
                         <c:otherwise>
                             <div class="empty-products-state">
                                 <i class="bi bi-vinyl profile-i-4"></i>
-                                <p class="profile-p-5">
                                     <c:choose>
                                         <c:when test="${isOwnProfile}">
-                                            <spring:message
-                                                code="Profile.wishlist.empty.own" />
+                                            <p class="profile-p-5">
+                                                <spring:message
+                                                    code="Profile.wishlist.empty.own" />
+                                            </p>
                                             <a href="<c:url value='/'/>"
                                                 class="btn btn-retro btn-retro-primary"
                                                 style="justify-self: center;">
@@ -532,11 +533,13 @@
                                             </a>
                                         </c:when>    
                                         <c:otherwise>
-                                            <spring:message
-                                                code="Profile.wishlist.empty.other" />
+
+                                            <p class="profile-p-5">
+                                                <spring:message
+                                                    code="Profile.wishlist.empty.other" />
+                                            </p>
                                         </c:otherwise>
                                     </c:choose>
-                                </p>
                             </div>
                         </c:otherwise>
                     </c:choose>
