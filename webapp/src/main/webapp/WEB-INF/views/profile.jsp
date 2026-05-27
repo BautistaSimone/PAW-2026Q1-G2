@@ -523,6 +523,13 @@
                                         <c:when test="${isOwnProfile}">
                                             <spring:message
                                                 code="Profile.wishlist.empty.own" />
+                                            <a href="<c:url value='/'/>"
+                                                class="btn btn-retro btn-retro-primary"
+                                                style="justify-self: center;">
+                                                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                                                <spring:message
+                                                    code="Profile.wishlist.empty.checkProducts" />
+                                            </a>
                                         </c:when>    
                                         <c:otherwise>
                                             <spring:message
