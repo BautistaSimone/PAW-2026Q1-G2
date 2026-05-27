@@ -40,6 +40,13 @@ public interface ProductService {
 
     List<Product> getRecommendedProducts(final Long userId, final int limit, final Long productIdToExclude);
 
+    PaginatedResult<Product> getRecommendedProductsPage(
+        final Long userId,
+        final int page,
+        final int pageSize,
+        final Long productIdToExclude
+    );
+
     List<Product> listProductsNotByUser(final Long userId);
     List<Product> listProductsByUserExcept(final Long userId, final Long productId);
     List<Product> listProductsByArtistExcept(final String artist, final Long productId);
