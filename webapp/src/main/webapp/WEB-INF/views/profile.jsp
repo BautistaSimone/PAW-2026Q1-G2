@@ -518,18 +518,28 @@
                         <c:otherwise>
                             <div class="empty-products-state">
                                 <i class="bi bi-vinyl profile-i-4"></i>
-                                <p class="profile-p-5">
                                     <c:choose>
                                         <c:when test="${isOwnProfile}">
-                                            <spring:message
-                                                code="Profile.wishlist.empty.own" />
+                                            <p class="profile-p-5">
+                                                <spring:message
+                                                    code="Profile.wishlist.empty.own" />
+                                            </p>
+                                            <a href="<c:url value='/'/>"
+                                                class="btn btn-retro btn-retro-primary"
+                                                style="justify-self: center;">
+                                                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                                                <spring:message
+                                                    code="Profile.wishlist.empty.checkProducts" />
+                                            </a>
                                         </c:when>    
                                         <c:otherwise>
-                                            <spring:message
-                                                code="Profile.wishlist.empty.other" />
+
+                                            <p class="profile-p-5">
+                                                <spring:message
+                                                    code="Profile.wishlist.empty.other" />
+                                            </p>
                                         </c:otherwise>
                                     </c:choose>
-                                </p>
                             </div>
                         </c:otherwise>
                     </c:choose>
@@ -542,7 +552,7 @@
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="profile-div-6">
-                                    <h4 class="mb-3"><spring:message code="Profile.myData.title" text="Mis Datos" /></h4>
+                                    <h4 class="mb-3"><spring:message code="Profile.tabs.myData" text="Mis Datos" /></h4>
                                     <p class="profile-p-7">
                                         <spring:message code="Profile.myData.help" />
                                     </p>
@@ -658,7 +668,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="profile-div-6">
-                                    <h4 class="mb-3"><spring:message code="Profile.favoriteGenres.title" text="Mis géneros favoritos" /></h4>
+                                    <h4 class="mb-3"><spring:message code="Profile.tabs.favoriteGenres" text="Mis géneros favoritos" /></h4>
                                     <p class="profile-p-7">
                                         <spring:message code="Profile.favoriteGenres.help" text="Selecciona los géneros que más te gustan para mejorar tus recomendaciones." />
                                     </p>

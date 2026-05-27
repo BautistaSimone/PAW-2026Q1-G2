@@ -120,7 +120,8 @@ public class HomeController {
 				|| (categoryIds != null && !categoryIds.isEmpty())
 				|| criteria.getMinPrice() != null
 				|| criteria.getMaxPrice() != null
-				|| (recordLabels != null && !recordLabels.isEmpty());
+				|| (recordLabels != null && !recordLabels.isEmpty())
+				|| (estadoParams != null && !estadoParams.isEmpty());
 
 		final ProductSortOrder sortOrder = ProductSortOrder.parse(sortParam).orElse(ProductSortOrder.NEWEST);
 
@@ -158,6 +159,7 @@ public class HomeController {
 		mav.addObject("sortOptions", ProductSortOrder.values());
 		mav.addObject("selectedSort", sortOrder.name());
 		mav.addObject("activeSearchText", hasActiveSearch ? trimmedSearch : null);
+		mav.addObject("hasActiveFilters", hasActiveFilters);
 		mav.addObject("noProductsMatchFilters", productsPage.getResults().isEmpty() && hasActiveFilters);
 		return mav;
 	}
@@ -165,13 +167,14 @@ public class HomeController {
 	@RequestMapping(value = "/for-you", method = RequestMethod.GET)
 	public ModelAndView forYou(
 			@AuthenticationPrincipal PawAuthUser authUser,
-			@RequestParam(value = "page", defaultValue = "1") final int page) {
+			@RequestParam(value = "page", defaultValue = "1") final int page,
+			@RequestParam(value = "wishlistPage", defaultValue = "1") final int wishlistPage) {
 
 		if (authUser == null) {
 			return new ModelAndView("redirect:/login");
 		}
 
-		if (page < 1) {
+		if (page < 1 || wishlistPage < 1) {
 			throw new IllegalArgumentException("Invalid page");
 		}
 
@@ -222,25 +225,27 @@ public class HomeController {
 		mav.addObject("productImageUrls", productImageUrls);
 		mav.addObject("sellerRatingByUserId", sellerRatingByUserId);
 
-		final List<Product> wishlistProducts = productService.getRecommendedProducts(currentUserId, 12, null);
+		final PaginatedResult<Product> wishlistProductsPage =
+				productService.getRecommendedProductsPage(currentUserId, wishlistPage, 12, null);
 		final Map<Long, String> wishlistProductImageUrls = new HashMap<>();
 		final Map<Long, SellerRatingSummary> wishlistSellerRatingByUserId = new HashMap<>();
-		if (!wishlistProducts.isEmpty()) {
-			for (Product product : wishlistProducts) {
+		if (!wishlistProductsPage.getResults().isEmpty()) {
+			for (Product product : wishlistProductsPage.getResults()) {
 				if (imageService.existsByProductId(product.getId())) {
 					wishlistProductImageUrls.put(product.getId(), "/images/product/" + product.getId());
 				}
 			}
 
 			final Set<Long> distinctWishlistSellers = new HashSet<>();
-			for (Product product : wishlistProducts) {
+			for (Product product : wishlistProductsPage.getResults()) {
 				distinctWishlistSellers.add(product.getUserId());
 			}
 			for (Long sellerId : distinctWishlistSellers) {
 				wishlistSellerRatingByUserId.put(sellerId, reviewService.summaryForSeller(sellerId));
 			}
 		}
-		mav.addObject("wishlistProducts", wishlistProducts);
+		mav.addObject("wishlistProductsPage", wishlistProductsPage);
+		mav.addObject("wishlistProducts", wishlistProductsPage.getResults());
 		mav.addObject("wishlistProductImageUrls", wishlistProductImageUrls);
 		mav.addObject("wishlistSellerRatingByUserId", wishlistSellerRatingByUserId);
 
