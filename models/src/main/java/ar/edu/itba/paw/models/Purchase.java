@@ -138,8 +138,12 @@ public class Purchase {
     }
 
     public void setStatus(PurchaseStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("Purchase status is required");
+        }
         this.status = status;
         this.confirmed = (status == PurchaseStatus.DELIVERED);
+        encodePaymentMethod();
     }
 
     public String getBuyerToken() {

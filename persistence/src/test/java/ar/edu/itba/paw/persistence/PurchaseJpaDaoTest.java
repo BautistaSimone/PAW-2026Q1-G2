@@ -145,6 +145,27 @@ public class PurchaseJpaDaoTest {
     }
 
     @Test
+    public void testUpdateStatusFromPendingToPaidIsPersisted() {
+        // Arrange
+        final Purchase purchase = purchaseDao.createPurchase(
+            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token"
+        );
+        em.flush();
+
+        // Act
+        purchaseDao.updateStatus(purchase.getPurchaseId(), PurchaseStatus.PAID);
+        em.flush();
+        em.clear();
+
+        // Assert
+        final Purchase reloaded = purchaseDao.findById(purchase.getPurchaseId()).orElseThrow();
+        Assertions.assertEquals(PurchaseStatus.PAID, reloaded.getStatus());
+        Assertions.assertEquals("buyer-token", reloaded.getBuyerToken());
+        Assertions.assertEquals("seller-token", reloaded.getSellerToken());
+        Assertions.assertFalse(reloaded.getConfirmed());
+    }
+
+    @Test
     public void testFindByBuyerIdFiltersPurchases() {
 
         // Arrange
