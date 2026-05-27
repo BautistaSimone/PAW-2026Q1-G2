@@ -418,6 +418,16 @@
                                     </c:forEach>
                                 </div>
                                 <ui:pagination result="${userProductsPage}" />
+                                <c:if test="${isOwnProfile}">
+                                    <div class="d-flex justify-content-center mt-3">
+                                        <a href="<c:url value='/products/new'/>"
+                                            class="btn btn-retro btn-retro-primary">
+                                            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                                            <spring:message
+                                                code="Profile.publications.publishVinyl" />
+                                        </a>
+                                    </div>
+                                </c:if>
                             </div>
                         </c:when>
                         <c:otherwise>

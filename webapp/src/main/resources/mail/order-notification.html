@@ -136,6 +136,11 @@
                         <p th:utext="#{email.order.next.pending(${amount})}"></p>
                         </div>
 
+                        <div th:if="${purchaseStatusKey == 'PENDING' and !recipientIsBuyer}">
+                        <p th:text="#{email.order.next.title}"></p>
+                        <p th:text="#{email.order.next.requested}"></p>
+                        </div>
+
                         <div th:if="${purchaseStatusKey == 'PAID' and !recipientIsBuyer}">
                         <p th:text="#{email.order.next.title}"></p>
                         <p th:text="#{email.order.next.paid}"></p>

@@ -93,6 +93,16 @@ public class PurchaseServiceImpl implements PurchaseService {
                     buyer,
                     seller,
                     PurchaseStatus.PENDING);
+            emailService.sendSellerEmail(
+                    seller.getEmail(),
+                    purchase,
+                    product,
+                    messageSource.getMessage("Email.purchase.seller.requested.title", null, locale),
+                    messageSource.getMessage("Email.purchase.seller.requested.msg",
+                            new Object[] { buyer.getUsername() }, locale),
+                    buyer,
+                    seller,
+                    PurchaseStatus.PENDING);
         });
 
         return purchase;

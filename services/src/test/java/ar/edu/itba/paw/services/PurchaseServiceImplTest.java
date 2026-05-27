@@ -121,10 +121,50 @@ public class PurchaseServiceImplTest {
             Mockito.anyString(),
             Mockito.anyString()
         )).thenReturn(purchase);
+        Mockito.when(messageSource.getMessage(
+            Mockito.eq("Email.purchase.buyer.confirmed.title"),
+            Mockito.<Object[]>isNull(),
+            Mockito.any()
+        )).thenReturn("buyer title");
+        Mockito.when(messageSource.getMessage(
+            Mockito.eq("Email.purchase.buyer.confirmed.msg"),
+            Mockito.<Object[]>isNull(),
+            Mockito.any()
+        )).thenReturn("buyer message");
+        Mockito.when(messageSource.getMessage(
+            Mockito.eq("Email.purchase.seller.requested.title"),
+            Mockito.<Object[]>isNull(),
+            Mockito.any()
+        )).thenReturn("seller title");
+        Mockito.when(messageSource.getMessage(
+            Mockito.eq("Email.purchase.seller.requested.msg"),
+            Mockito.any(Object[].class),
+            Mockito.any()
+        )).thenReturn("seller message");
 
         final Purchase result = purchaseService.createPurchase(PRODUCT_ID, BUYER_ID);
 
         Assertions.assertSame(purchase, result);
+        Mockito.verify(emailService).sendBuyerEmail(
+            Mockito.eq("buyer@test.com"),
+            Mockito.same(purchase),
+            Mockito.same(product),
+            Mockito.eq("buyer title"),
+            Mockito.eq("buyer message"),
+            Mockito.same(buyer),
+            Mockito.same(seller),
+            Mockito.eq(PurchaseStatus.PENDING)
+        );
+        Mockito.verify(emailService).sendSellerEmail(
+            Mockito.eq("seller@test.com"),
+            Mockito.same(purchase),
+            Mockito.same(product),
+            Mockito.eq("seller title"),
+            Mockito.eq("seller message"),
+            Mockito.same(buyer),
+            Mockito.same(seller),
+            Mockito.eq(PurchaseStatus.PENDING)
+        );
     }
 
     @Test
