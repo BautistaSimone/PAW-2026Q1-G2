@@ -3,7 +3,6 @@
 **/application.properties
 .m2/
 jetty.out.log
-AGENTS.md
 
 jetty.clean.err.log
 
