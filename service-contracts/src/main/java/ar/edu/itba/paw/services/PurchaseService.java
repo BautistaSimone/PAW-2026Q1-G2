@@ -12,7 +12,16 @@ public interface PurchaseService {
 
     Optional<Purchase> findById(Long purchaseId);
 
-    Purchase updateStatus(Long purchaseId, Long userId, PurchaseStatus newStatus);
+    Purchase updateStatus(
+        Long purchaseId,
+        Long userId,
+        PurchaseStatus newStatus,
+        byte[] paymentProof,
+        String paymentProofContentType,
+        String paymentProofFileName
+    );
+
+    int cancelExpiredPurchases();
 
     PaginatedResult<Purchase> findByBuyerId(Long buyerId, List<PurchaseStatus> statuses, int page, int pageSize);
 

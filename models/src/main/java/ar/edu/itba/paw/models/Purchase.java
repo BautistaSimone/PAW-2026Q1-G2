@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.models;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -9,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Id;
 import javax.persistence.Column;
+import javax.persistence.Lob;
 import javax.persistence.Transient;
 import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
@@ -41,6 +43,19 @@ public class Purchase {
 
     @Column(nullable = false)
     private Boolean confirmed;
+
+    @Column(name = "reserved_until")
+    private LocalDateTime reservedUntil;
+
+    @Lob
+    @Column(name = "payment_proof")
+    private byte[] paymentProof;
+
+    @Column(name = "payment_proof_content_type")
+    private String paymentProofContentType;
+
+    @Column(name = "payment_proof_file_name")
+    private String paymentProofFileName;
 
     @Transient
     private PurchaseStatus status;
@@ -156,5 +171,31 @@ public class Purchase {
 
     public Boolean getConfirmed() {
         return confirmed;
+    }
+
+    public LocalDateTime getReservedUntil() {
+        return reservedUntil;
+    }
+
+    public void setReservedUntil(final LocalDateTime reservedUntil) {
+        this.reservedUntil = reservedUntil;
+    }
+
+    public byte[] getPaymentProof() {
+        return paymentProof;
+    }
+
+    public String getPaymentProofContentType() {
+        return paymentProofContentType;
+    }
+
+    public String getPaymentProofFileName() {
+        return paymentProofFileName;
+    }
+
+    public void setPaymentProof(final byte[] paymentProof, final String contentType, final String fileName) {
+        this.paymentProof = paymentProof;
+        this.paymentProofContentType = contentType;
+        this.paymentProofFileName = fileName;
     }
 }

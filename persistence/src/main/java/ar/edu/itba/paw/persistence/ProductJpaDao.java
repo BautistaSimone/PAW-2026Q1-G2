@@ -531,6 +531,16 @@ public class ProductJpaDao implements ProductDao {
     }
 
     @Override
+    public boolean releaseReservation(final Long id) {
+        return em.createQuery(
+            "UPDATE Product SET state = :newState WHERE productId = :productId AND state = :currentState")
+            .setParameter("newState", ProductState.ACTIVE.getPersistenceValue())
+            .setParameter("productId", id)
+            .setParameter("currentState", ProductState.RESERVED.getPersistenceValue())
+            .executeUpdate() >= 1;
+    }
+
+    @Override
     public void markAsSold(final Long id) {
         em.createQuery(
             "UPDATE Product SET state = :newState WHERE productId = :productId AND state = :currentState")

@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 import org.springframework.context.MessageSource;
@@ -119,7 +120,8 @@ public class PurchaseServiceImplTest {
             Mockito.eq(SELLER_ID),
             Mockito.eq(PurchaseStatus.PENDING),
             Mockito.anyString(),
-            Mockito.anyString()
+            Mockito.anyString(),
+            Mockito.any(LocalDateTime.class)
         )).thenReturn(purchase);
         Mockito.when(messageSource.getMessage(
             Mockito.eq("Email.purchase.buyer.confirmed.title"),

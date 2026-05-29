@@ -4,7 +4,8 @@ public enum PurchaseStatus {
     PENDING("Pendiente de pago"),
     PAID("Pagado"),
     SHIPPED("Enviado"),
-    DELIVERED("Entregado");
+    DELIVERED("Entregado"),
+    CANCELLED("Cancelado");
 
     private final String description;
 

@@ -59,6 +59,8 @@ public interface ProductDao {
 
     boolean reserveIfAvailable(final Long id);
 
+    boolean releaseReservation(final Long id);
+
     void markAsSold(final Long id);
 
     boolean markAsUserDeleted(final Long id);

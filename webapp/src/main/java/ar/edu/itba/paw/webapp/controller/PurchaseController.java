@@ -1,5 +1,8 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Product;
@@ -20,9 +26,12 @@ import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.PurchaseService;
 import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.services.UserService;
+import ar.edu.itba.paw.services.PurchaseExpiredException;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.form.PurchaseCreateForm;
 import ar.edu.itba.paw.webapp.form.PurchaseStatusForm;
+import ar.edu.itba.paw.webapp.validation.PaymentProofValidator;
+import ar.edu.itba.paw.webapp.validation.PaymentProofValidator.ValidatedPaymentProof;
 
 @Controller
 public class PurchaseController {
@@ -119,6 +128,20 @@ public class PurchaseController {
         mav.addObject("isBuyer", isBuyer);
         mav.addObject("isSeller", isSeller);
 
+        if (purchase.getStatus() == PurchaseStatus.PENDING && purchase.getReservedUntil() != null) {
+            long remainingSeconds = Duration.between(LocalDateTime.now(), purchase.getReservedUntil()).getSeconds();
+            if (remainingSeconds < 0) {
+                remainingSeconds = 0;
+            }
+            mav.addObject("remainingSeconds", remainingSeconds);
+        }
+
+        final boolean hasPaymentProof = purchase.getPaymentProof() != null
+                && purchase.getPaymentProof().length > 0
+                && purchase.getPaymentProofContentType() != null;
+        mav.addObject("hasPaymentProof", hasPaymentProof);
+        mav.addObject("paymentProofFileName", purchase.getPaymentProofFileName());
+
         if (isBuyer && purchase.getStatus() == PurchaseStatus.DELIVERED) {
             mav.addObject("hasReview", reviewService.findByPurchaseId(id).isPresent());
         }
@@ -148,7 +171,28 @@ public class PurchaseController {
             return getPurchase(authUser, id, form);
         }
 
-        Purchase updated = purchaseService.updateStatus(id, authUser.getUser().getId(), statusObj);
+        ValidatedPaymentProof proof = null;
+        if (statusObj == PurchaseStatus.PAID) {
+            try {
+                proof = PaymentProofValidator.validate(form.getProofFile());
+            } catch (PaymentProofValidator.InvalidPaymentProofException e) {
+                errors.rejectValue("proofFile", e.getMessageKey());
+                return getPurchase(authUser, id, form);
+            }
+        }
+        final Purchase updated;
+        try {
+            updated = purchaseService.updateStatus(
+                id,
+                authUser.getUser().getId(),
+                statusObj,
+                proof != null ? proof.getData() : null,
+                proof != null ? proof.getContentType() : null,
+                proof != null ? proof.getFileName() : null
+            );
+        } catch (PurchaseExpiredException e) {
+            return new ModelAndView("redirect:/purchases/" + id + "?expired=1");
+        }
 
         if (statusObj == PurchaseStatus.DELIVERED) {
             final boolean isBuyer = authUser.getUser().getId().equals(updated.getBuyerId());
@@ -158,5 +202,37 @@ public class PurchaseController {
         }
 
         return new ModelAndView("redirect:/purchases/" + id + "?updated=1");
+    }
+
+    @RequestMapping(value = "/purchases/{id:\\d+}/proof", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<byte[]> downloadPaymentProof(
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @PathVariable("id") final Long id) {
+        if (authUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        final Purchase purchase = purchaseService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+
+        final Long userId = authUser.getUser().getId();
+        if (!userId.equals(purchase.getSellerId())) {
+            return ResponseEntity.status(403).build();
+        }
+
+        if (purchase.getPaymentProof() == null || purchase.getPaymentProof().length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
+        final String safeFileName = PaymentProofValidator.safeFileName(purchase.getPaymentProofFileName());
+        return PaymentProofValidator.detectSafeContentType(purchase.getPaymentProof())
+            .map(contentType -> ResponseEntity.ok()
+                .header("X-Content-Type-Options", "nosniff")
+                .header("Content-Disposition", "attachment; filename=\"" + safeFileName + "\"")
+                .contentType(MediaType.parseMediaType(contentType))
+                .contentLength(purchase.getPaymentProof().length)
+                .body(purchase.getPaymentProof()))
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

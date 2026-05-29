@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -66,7 +67,7 @@ public class ReviewJpaDaoTest {
         );
 
         final Purchase purchase = purchaseDao.createPurchase(
-            product.getId(), buyerId, sellerId, PurchaseStatus.DELIVERED, "token1", "token2"
+            product.getId(), buyerId, sellerId, PurchaseStatus.DELIVERED, "token1", "token2", LocalDateTime.now()
         );
         purchaseId = purchase.getPurchaseId();
         em.flush();

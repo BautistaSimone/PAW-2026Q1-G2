@@ -87,6 +87,10 @@ CREATE TABLE IF NOT EXISTS purchases (
 	date DATE NOT NULL,
 	payment_method VARCHAR(255) NOT NULL,
 	confirmed BOOLEAN NOT NULL,
+	reserved_until TIMESTAMP,
+	payment_proof BYTEA,
+	payment_proof_content_type VARCHAR(255),
+	payment_proof_file_name VARCHAR(255),
 	FOREIGN KEY(product_id) REFERENCES products(product_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
 	FOREIGN KEY(buyer_user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
 	FOREIGN KEY(seller_user_id) REFERENCES users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION

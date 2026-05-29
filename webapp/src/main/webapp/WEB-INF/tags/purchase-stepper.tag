@@ -2,7 +2,23 @@
 <%@ attribute name="status" required="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<c:set var="stepIndex" value="${status eq 'PENDING' ? 0 : status eq 'PAID' ? 1 : status eq 'SHIPPED' ? 2 : 3}" />
+<c:choose>
+    <c:when test="${status eq 'CANCELLED'}">
+        <c:set var="stepIndex" value="-1" />
+    </c:when>
+    <c:when test="${status eq 'PENDING'}">
+        <c:set var="stepIndex" value="0" />
+    </c:when>
+    <c:when test="${status eq 'PAID'}">
+        <c:set var="stepIndex" value="1" />
+    </c:when>
+    <c:when test="${status eq 'SHIPPED'}">
+        <c:set var="stepIndex" value="2" />
+    </c:when>
+    <c:otherwise>
+        <c:set var="stepIndex" value="3" />
+    </c:otherwise>
+</c:choose>
 
 <div class="purchase-stepper" role="group" aria-label="<spring:message code='PurchaseStepper.ariaLabel'/>">
     <%-- Step 0: Pendiente --%>

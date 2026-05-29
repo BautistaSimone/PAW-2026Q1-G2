@@ -289,6 +289,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    public boolean releaseReservation(final Long id) {
+        return productDao.releaseReservation(id);
+    }
+
+    @Override
+    @Transactional
     public void markAsSold(final Long id) {
         productDao.markAsSold(id);
     }

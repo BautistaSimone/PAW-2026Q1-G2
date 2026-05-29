@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -44,6 +45,7 @@ import ar.edu.itba.paw.webapp.interceptor.VerificationInterceptor;
 
 @EnableWebMvc // Use all the defaults from webmvc
 @EnableTransactionManagement
+@EnableScheduling
 @ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.webapp.interceptor", "ar.edu.itba.paw.services", "ar.edu.itba.paw.persistence" })
 @Configuration
 @PropertySource("classpath:application.properties")

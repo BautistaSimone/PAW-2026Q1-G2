@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -88,7 +89,7 @@ public class PurchaseJpaDaoTest {
 
         // Act
         final Purchase purchase = purchaseDao.createPurchase(
-            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token"
+            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token", LocalDateTime.now()
         );
         em.flush();
         em.clear();
@@ -106,7 +107,7 @@ public class PurchaseJpaDaoTest {
     public void testFindsById() {
         // Arrange
         final Purchase purchase = purchaseDao.createPurchase(
-            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token"
+            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token", LocalDateTime.now()
         );
         em.flush();
         em.clear();
@@ -127,7 +128,7 @@ public class PurchaseJpaDaoTest {
     public void testUpdateStatusChangesStatusAndConfirmedFlag() {
         // Arrange
         final Purchase purchase = purchaseDao.createPurchase(
-            productId, buyerId, sellerId, PurchaseStatus.PAID, "buyer-token", "seller-token"
+            productId, buyerId, sellerId, PurchaseStatus.PAID, "buyer-token", "seller-token", LocalDateTime.now()
         );
         em.flush();
 
@@ -148,7 +149,7 @@ public class PurchaseJpaDaoTest {
     public void testUpdateStatusFromPendingToPaidIsPersisted() {
         // Arrange
         final Purchase purchase = purchaseDao.createPurchase(
-            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token"
+            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token", LocalDateTime.now()
         );
         em.flush();
 
@@ -172,9 +173,9 @@ public class PurchaseJpaDaoTest {
         final long secondProductId = createProduct(sellerId, "Second Purchase Album");
         final long otherBuyerProductId = createProduct(otherSellerId, "Other Buyer Album");
 
-        purchaseDao.createPurchase(productId, buyerId, sellerId, PurchaseStatus.PENDING, "b1", "s1");
-        purchaseDao.createPurchase(secondProductId, buyerId, sellerId, PurchaseStatus.PAID, "b2", "s2");
-        purchaseDao.createPurchase(otherBuyerProductId, otherBuyerId, otherSellerId, PurchaseStatus.PAID, "b3", "s3");
+        purchaseDao.createPurchase(productId, buyerId, sellerId, PurchaseStatus.PENDING, "b1", "s1", LocalDateTime.now());
+        purchaseDao.createPurchase(secondProductId, buyerId, sellerId, PurchaseStatus.PAID, "b2", "s2", LocalDateTime.now());
+        purchaseDao.createPurchase(otherBuyerProductId, otherBuyerId, otherSellerId, PurchaseStatus.PAID, "b3", "s3", LocalDateTime.now());
         em.flush();
 
         // Act
@@ -194,9 +195,9 @@ public class PurchaseJpaDaoTest {
         final long secondProductId = createProduct(sellerId, "Second Seller Album");
         final long otherSellerProductId = createProduct(otherSellerId, "Other Seller Album");
 
-        purchaseDao.createPurchase(productId, buyerId, sellerId, PurchaseStatus.PENDING, "b1", "s1");
-        purchaseDao.createPurchase(secondProductId, otherBuyerId, sellerId, PurchaseStatus.PAID, "b2", "s2");
-        purchaseDao.createPurchase(otherSellerProductId, buyerId, otherSellerId, PurchaseStatus.PAID, "b3", "s3");
+        purchaseDao.createPurchase(productId, buyerId, sellerId, PurchaseStatus.PENDING, "b1", "s1", LocalDateTime.now());
+        purchaseDao.createPurchase(secondProductId, otherBuyerId, sellerId, PurchaseStatus.PAID, "b2", "s2", LocalDateTime.now());
+        purchaseDao.createPurchase(otherSellerProductId, buyerId, otherSellerId, PurchaseStatus.PAID, "b3", "s3", LocalDateTime.now());
         em.flush();
 
         // Act

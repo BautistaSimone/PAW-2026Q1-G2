@@ -67,6 +67,8 @@ public interface ProductService {
 
     boolean reserveIfAvailable(final Long id);
 
+    boolean releaseReservation(final Long id);
+
     void markAsSold(final Long id);
 
     /**

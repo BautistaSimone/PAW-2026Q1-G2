@@ -5,6 +5,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,10 +25,12 @@ public class PurchaseJpaDao implements PurchaseDao {
 
     @Override
     public Purchase createPurchase(Long productId, Long buyerId, Long sellerId,
-                                   PurchaseStatus status, String buyerToken, String sellerToken) {
+                                   PurchaseStatus status, String buyerToken, String sellerToken,
+                                   LocalDateTime reservedUntil) {
         final Purchase purchase = new Purchase(
             productId, buyerId, sellerId, LocalDate.now(), status, buyerToken, sellerToken
         );
+        purchase.setReservedUntil(reservedUntil);
         em.persist(purchase);
         return purchase;
     }
@@ -126,5 +129,15 @@ public class PurchaseJpaDao implements PurchaseDao {
             throw new IllegalArgumentException("Purchase not found");
         }
         purchase.setStatus(status);
+    }
+
+    @Override
+    public List<Purchase> findExpiredPending(final LocalDateTime now) {
+        return em.createQuery(
+            "FROM Purchase p WHERE p.reservedUntil IS NOT NULL AND p.reservedUntil < :now AND p.paymentMethod LIKE :statusPattern",
+            Purchase.class)
+            .setParameter("now", now)
+            .setParameter("statusPattern", PurchaseStatus.PENDING.name() + "|%")
+            .getResultList();
     }
 }

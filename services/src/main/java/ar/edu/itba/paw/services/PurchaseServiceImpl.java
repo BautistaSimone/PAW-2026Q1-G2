@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,6 +24,8 @@ import ar.edu.itba.paw.persistence.PurchaseDao;
 
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
+
+    private static final long RESERVATION_MINUTES = 5L;
 
     private final PurchaseDao purchaseDao;
     private final ProductService productService;
@@ -74,10 +77,12 @@ public class PurchaseServiceImpl implements PurchaseService {
         final String buyerToken = UUID.randomUUID().toString();
         final String sellerToken = UUID.randomUUID().toString();
 
+        final LocalDateTime reservedUntil = LocalDateTime.now().plusMinutes(RESERVATION_MINUTES);
+
         final Purchase purchase;
         try {
             purchase = purchaseDao.createPurchase(productId, userId, seller.getId(), PurchaseStatus.PENDING, buyerToken,
-                    sellerToken);
+                    sellerToken, reservedUntil);
         } catch (DataIntegrityViolationException e) {
             throw new IllegalStateException("Product is no longer available", e);
         }
@@ -122,16 +127,32 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Optional<Purchase> findById(Long purchaseId) {
-        return purchaseDao.findById(purchaseId);
+        final Optional<Purchase> purchase = purchaseDao.findById(purchaseId);
+        purchase.ifPresent(value -> cancelIfExpired(value, LocalDateTime.now()));
+        return purchase;
     }
 
     @Override
     @Transactional
-    public Purchase updateStatus(Long purchaseId, Long userId, PurchaseStatus newStatus) {
+    public Purchase updateStatus(
+            Long purchaseId,
+            Long userId,
+            PurchaseStatus newStatus,
+            byte[] paymentProof,
+            String paymentProofContentType,
+            String paymentProofFileName) {
         final Purchase purchase = purchaseDao.findById(purchaseId)
                 .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+
+        if (purchase.getStatus() == PurchaseStatus.CANCELLED) {
+            throw new IllegalStateException("Purchase already cancelled");
+        }
+
+        if (cancelIfExpired(purchase, LocalDateTime.now())) {
+            throw new PurchaseExpiredException("Purchase reservation expired");
+        }
 
         final Product product = productService.findById(purchase.getProductId())
                 .orElseThrow(() -> new IllegalStateException("Product missing"));
@@ -151,6 +172,11 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         // State Machine Validations
         if (newStatus == PurchaseStatus.PAID && isBuyer && purchase.getStatus() == PurchaseStatus.PENDING) {
+            if (paymentProof == null || paymentProof.length == 0 || paymentProofContentType == null
+                    || paymentProofContentType.trim().isEmpty()) {
+                throw new IllegalArgumentException("Payment proof is required");
+            }
+            purchase.setPaymentProof(paymentProof, paymentProofContentType, paymentProofFileName);
             purchaseDao.updateStatus(purchaseId, newStatus);
             // Notify seller to confirm payment
             final Locale locale = LocaleContextHolder.getLocale();
@@ -185,6 +211,33 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         return purchaseDao.findById(purchaseId).get();
+    }
+
+    @Override
+    @Transactional
+    public int cancelExpiredPurchases() {
+        final LocalDateTime now = LocalDateTime.now();
+        final List<Purchase> expired = purchaseDao.findExpiredPending(now);
+        int cancelled = 0;
+        for (Purchase purchase : expired) {
+            if (cancelIfExpired(purchase, now)) {
+                cancelled++;
+            }
+        }
+        return cancelled;
+    }
+
+    private boolean cancelIfExpired(final Purchase purchase, final LocalDateTime now) {
+        if (purchase.getStatus() != PurchaseStatus.PENDING) {
+            return false;
+        }
+        final LocalDateTime reservedUntil = purchase.getReservedUntil();
+        if (reservedUntil == null || !reservedUntil.isBefore(now)) {
+            return false;
+        }
+        purchase.setStatus(PurchaseStatus.CANCELLED);
+        productService.releaseReservation(purchase.getProductId());
+        return true;
     }
 
     @Override

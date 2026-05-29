@@ -54,6 +54,12 @@
                                                     <spring:message code="PurchasePanel.alert.reviewed" />
                                                 </div>
                                             </c:if>
+                                            <c:if test="${param.expired eq '1'}">
+                                                <div class="alert-retro alert-retro-warning mb-3">
+                                                    <i class="bi bi-clock-history" aria-hidden="true"></i>
+                                                    <spring:message code="PurchasePanel.alert.expired" />
+                                                </div>
+                                            </c:if>
 
                                             <div class="purchase-card">
                                                 <div class="purchase-card-header">
@@ -164,6 +170,14 @@
                                                             </h5>
                                                             <c:choose>
                                                                 <c:when test="${purchase.status eq 'PENDING'}">
+                                                                    <c:if test="${remainingSeconds ne null}">
+                                                                        <div class="alert-retro alert-retro-warning purchase-panel-remaining"
+                                                                            data-remaining-seconds="<c:out value='${remainingSeconds}'/>">
+                                                                            <i class="bi bi-clock-history" aria-hidden="true"></i>
+                                                                            <spring:message code="PurchasePanel.pending.remaining" />
+                                                                            <strong data-remaining-value>--:--</strong>
+                                                                        </div>
+                                                                    </c:if>
                                                                     <div class="alert-retro alert-retro-info">
                                                                         <p class="mb-2"><i class="bi bi-info-circle"
                                                                                 aria-hidden="true"></i>
@@ -216,15 +230,34 @@
                                                                         value='/purchases/${purchase.purchaseId}/status' />
                                                                     <form:form modelAttribute="purchaseStatusForm"
                                                                         method="POST" action="${statusPostUrl}"
+                                                                        enctype="multipart/form-data"
                                                                         data-single-submit="true">
                                                                         <input type="hidden"
                                                                             name="${_csrf.parameterName}"
                                                                             value="${_csrf.token}" />
-
+                                                                        <div class="mb-3">
+                                                                            <label for="purchase-proof"
+                                                                                class="form-label">
+                                                                                <spring:message
+                                                                                    code="PurchasePanel.proof.label" />
+                                                                            </label>
+                                                                            <input id="purchase-proof" type="file"
+                                                                                name="proofFile" class="form-control"
+                                                                                accept="image/jpeg,image/png,image/webp,application/pdf"
+                                                                                required data-proof-input="true" />
+                                                                            <div class="form-text">
+                                                                                <spring:message
+                                                                                    code="PurchasePanel.proof.help" />
+                                                                            </div>
+                                                                            <form:errors path="proofFile"
+                                                                                cssClass="text-danger mt-2"
+                                                                                element="div" />
+                                                                        </div>
                                                                         <input type="hidden" name="newStatus"
                                                                             value="PAID" />
                                                                         <button type="submit"
-                                                                            class="btn btn-retro btn-retro-primary w-100 btn-lg">
+                                                                            class="btn btn-retro btn-retro-primary w-100 btn-lg"
+                                                                            data-proof-submit="true" disabled>
                                                                             <i class="bi bi-credit-card"
                                                                                 aria-hidden="true"></i>
                                                                             <spring:message
@@ -248,6 +281,13 @@
                                                                             (
                                                                             <c:out value="${orderSeller.username}" />)
                                                                         </c:if>.
+                                                                    </div>
+                                                                </c:when>
+                                                                <c:when test="${purchase.status eq 'CANCELLED'}">
+                                                                    <div class="alert-retro alert-retro-warning">
+                                                                        <i class="bi bi-x-circle" aria-hidden="true"></i>
+                                                                        <spring:message
+                                                                            code="PurchasePanel.buyer.cancelled" />
                                                                     </div>
                                                                 </c:when>
                                                                 <c:when test="${purchase.status eq 'SHIPPED'}">
@@ -321,8 +361,28 @@
                                                                 <i class="bi bi-shop" aria-hidden="true"></i>
                                                                 <spring:message code="PurchasePanel.seller.panel" />
                                                             </h5>
+                                                            <c:if test="${hasPaymentProof}">
+                                                                <a class="btn btn-retro btn-retro-outline w-100 btn-lg mb-2"
+                                                                    href="<c:url value='/purchases/${purchase.purchaseId}/proof'/>">
+                                                                    <i class="bi bi-download" aria-hidden="true"></i>
+                                                                    <spring:message
+                                                                        code="PurchasePanel.seller.proof.download" />
+                                                                </a>
+                                                                <p class="small text-muted mb-3">
+                                                                    <spring:message
+                                                                        code="PurchasePanel.seller.proof.help" />
+                                                                </p>
+                                                            </c:if>
                                                             <c:choose>
                                                                 <c:when test="${purchase.status eq 'PENDING'}">
+                                                                    <c:if test="${remainingSeconds ne null}">
+                                                                        <div class="alert-retro alert-retro-warning purchase-panel-remaining"
+                                                                            data-remaining-seconds="<c:out value='${remainingSeconds}'/>">
+                                                                            <i class="bi bi-clock-history" aria-hidden="true"></i>
+                                                                            <spring:message code="PurchasePanel.pending.remaining" />
+                                                                            <strong data-remaining-value>--:--</strong>
+                                                                        </div>
+                                                                    </c:if>
                                                                     <div class="purchase-card-inset">
                                                                         <p class="purchase-inset-title">
                                                                             <spring:message
@@ -439,6 +499,13 @@
                                                                             code="PurchasePanel.seller.delivered.success" />
                                                                     </div>
                                                                 </c:when>
+                                                                <c:when test="${purchase.status eq 'CANCELLED'}">
+                                                                    <div class="alert-retro alert-retro-warning">
+                                                                        <i class="bi bi-x-circle" aria-hidden="true"></i>
+                                                                        <spring:message
+                                                                            code="PurchasePanel.seller.cancelled" />
+                                                                    </div>
+                                                                </c:when>
                                                                 <c:when test="${purchase.status eq 'SHIPPED'}">
                                                                     <p class="purchase-panel-p-10">
                                                                         <spring:message
@@ -460,4 +527,48 @@
                                     </div>
                                 </div>
                             </div>
+                            <script>
+                                (function () {
+                                    var blocks = document.querySelectorAll("[data-remaining-seconds]");
+                                    function formatTime(totalSeconds) {
+                                        var seconds = Math.max(0, totalSeconds);
+                                        var minutes = Math.floor(seconds / 60);
+                                        var remainder = seconds % 60;
+                                        var padded = remainder < 10 ? "0" + remainder : String(remainder);
+                                        return minutes + ":" + padded;
+                                    }
+                                    blocks.forEach(function (block) {
+                                        var valueEl = block.querySelector("[data-remaining-value]");
+                                        var seconds = parseInt(block.getAttribute("data-remaining-seconds"), 10);
+                                        if (!valueEl || Number.isNaN(seconds)) {
+                                            return;
+                                        }
+                                        valueEl.textContent = formatTime(seconds);
+                                        if (seconds <= 0) {
+                                            return;
+                                        }
+                                        var timer = window.setInterval(function () {
+                                            seconds -= 1;
+                                            valueEl.textContent = formatTime(seconds);
+                                            if (seconds <= 0) {
+                                                window.clearInterval(timer);
+                                            }
+                                        }, 1000);
+                                    });
+
+                                    var proofInputs = document.querySelectorAll("[data-proof-input='true']");
+                                    proofInputs.forEach(function (input) {
+                                        var form = input.form;
+                                        var submitButton = form ? form.querySelector("[data-proof-submit='true']") : null;
+                                        if (!submitButton) {
+                                            return;
+                                        }
+                                        var syncState = function () {
+                                            submitButton.disabled = !input.files || input.files.length === 0;
+                                        };
+                                        input.addEventListener("change", syncState);
+                                        syncState();
+                                    });
+                                })();
+                            </script>
                         </ui:layout>
