@@ -50,7 +50,8 @@ public class ProductJpaDao implements ProductDao {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final BigDecimal price
+        final BigDecimal price,
+        final int stock
     ) {
         final LocalDate published = LocalDate.now();
 
@@ -66,7 +67,8 @@ public class ProductJpaDao implements ProductDao {
             sleeveCondition,
             recordCondition,
             published,
-            price
+            price,
+            stock
         );
 
         em.persist(product);
@@ -521,33 +523,26 @@ public class ProductJpaDao implements ProductDao {
     }
 
     @Override
-    public boolean reserveIfAvailable(final Long id) {
+    public boolean decrementStock(final Long id) {
         return em.createQuery(
-            "UPDATE Product SET state = :newState WHERE productId = :productId AND state = :currentState")
-            .setParameter("newState", ProductState.RESERVED.getPersistenceValue())
+            "UPDATE Product SET stock = stock - 1, " +
+            "state = CASE WHEN stock - 1 = 0 THEN :soldState ELSE state END " +
+            "WHERE productId = :productId AND state = :activeState AND stock > 0")
+            .setParameter("soldState", ProductState.SOLD.getPersistenceValue())
             .setParameter("productId", id)
-            .setParameter("currentState", ProductState.ACTIVE.getPersistenceValue())
+            .setParameter("activeState", ProductState.ACTIVE.getPersistenceValue())
             .executeUpdate() >= 1;
     }
 
     @Override
-    public boolean releaseReservation(final Long id) {
+    public boolean incrementStock(final Long id) {
         return em.createQuery(
-            "UPDATE Product SET state = :newState WHERE productId = :productId AND state = :currentState")
-            .setParameter("newState", ProductState.ACTIVE.getPersistenceValue())
+            "UPDATE Product SET stock = stock + 1, state = :activeState " +
+            "WHERE productId = :productId AND state IN (:activeState, :soldState)")
+            .setParameter("activeState", ProductState.ACTIVE.getPersistenceValue())
+            .setParameter("soldState", ProductState.SOLD.getPersistenceValue())
             .setParameter("productId", id)
-            .setParameter("currentState", ProductState.RESERVED.getPersistenceValue())
             .executeUpdate() >= 1;
-    }
-
-    @Override
-    public void markAsSold(final Long id) {
-        em.createQuery(
-            "UPDATE Product SET state = :newState WHERE productId = :productId AND state = :currentState")
-            .setParameter("newState", ProductState.SOLD.getPersistenceValue())
-            .setParameter("productId", id)
-            .setParameter("currentState", ProductState.RESERVED.getPersistenceValue())
-            .executeUpdate();
     }
 
     @Override
@@ -581,7 +576,8 @@ public class ProductJpaDao implements ProductDao {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final BigDecimal price
+        final BigDecimal price,
+        final int stock
     ) {
         final Product product = em.find(Product.class, productId);
         if (product == null) {
@@ -598,6 +594,7 @@ public class ProductJpaDao implements ProductDao {
         product.setSleeveCondition(sleeveCondition);
         product.setRecordCondition(recordCondition);
         product.setPrice(price);
+        product.setStock(stock);
 
         return true;
     }

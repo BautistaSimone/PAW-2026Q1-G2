@@ -41,7 +41,7 @@ public class ProductJpaDaoTest {
         return productDao.createProduct(
             user.getId(), title, artist, recordLabel, "CAT-001", "Argentina",
             Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000), 1
         );
     }
 
@@ -56,12 +56,12 @@ public class ProductJpaDaoTest {
         final Product firstProduct = productDao.createProduct(
             user.getId(), "Dynamo", "Soda Stereo", "Sony Music", "EPC 85930", "Argentina",
             Collections.emptyList(), "Edicion original", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(32000)
+            BigDecimal.valueOf(9.0), BigDecimal.valueOf(32000), 1
         );
         final Product secondProduct = productDao.createProduct(
             user.getId(), "Bocanada", "Gustavo Cerati", "Ariola", "74321 68523-2", "Argentina",
             Collections.emptyList(), "Reedicion 2024", BigDecimal.valueOf(10.0),
-            BigDecimal.valueOf(10.0), BigDecimal.valueOf(28000)
+            BigDecimal.valueOf(10.0), BigDecimal.valueOf(28000), 1
         );
 
         // Assert
@@ -81,7 +81,7 @@ public class ProductJpaDaoTest {
         productDao.createProduct(
             user.getId(), "Bocanada", "Gustavo Cerati", "Ariola", "74321", "Argentina",
             Collections.emptyList(), "Album solista", BigDecimal.valueOf(10.0),
-            BigDecimal.valueOf(10.0), BigDecimal.valueOf(28000)
+            BigDecimal.valueOf(10.0), BigDecimal.valueOf(28000), 1
         );
 
         final ProductSearchCriteria criteria = new ProductSearchCriteria(
@@ -121,21 +121,21 @@ public class ProductJpaDaoTest {
     // }
 
     @Test
-    public void reserveIfAvailableProductOnlySucceedsOnce() {
+    public void decrementStockOnlySucceedsWhenStockAvailable() {
         // Arrange
         final User user = userDao.createUser("seller4@test.com", "password", "seller4",
             false, true, null, null, null, null, null, null, null, null);
         final Product product = productDao.createProduct(
             user.getId(), "Artaud", "Pescado Rabioso", "Talent", "SE-515", "Argentina",
             Collections.emptyList(), "Original", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(45000)
+            BigDecimal.valueOf(9.0), BigDecimal.valueOf(45000), 1
         );
 
         em.flush();
 
         // Act
-        final Boolean first = productDao.reserveIfAvailable(product.getId());
-        final Boolean second = productDao.reserveIfAvailable(product.getId());
+        final Boolean first = productDao.decrementStock(product.getId());
+        final Boolean second = productDao.decrementStock(product.getId());
 
         // Assert
         Assertions.assertTrue(first);
@@ -150,7 +150,7 @@ public class ProductJpaDaoTest {
         final Product product = productDao.createProduct(
             user.getId(), "Album", "Artist", "Label", "CAT-1", "Argentina",
             Collections.emptyList(), "Desc", BigDecimal.valueOf(8.0),
-            BigDecimal.valueOf(8.0), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(8.0), BigDecimal.valueOf(1000), 1
         );
 
         em.flush();
@@ -176,7 +176,7 @@ public class ProductJpaDaoTest {
         final Product product = productDao.createProduct(
             user.getId(), "Album", "Artist", "Label", "CAT-1", "Argentina",
             Collections.emptyList(), "Desc", BigDecimal.valueOf(8.0),
-            BigDecimal.valueOf(8.0), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(8.0), BigDecimal.valueOf(1000), 1
         );
 
         em.flush();
@@ -194,7 +194,7 @@ public class ProductJpaDaoTest {
     }
 
     @Test
-    public void markAsSoldOnlyFromReserved() {
+    public void decrementStockSetsSoldAtZero() {
 
         // Arrange
         final User user = userDao.createUser("seller6@test.com", "password", "seller6",
@@ -202,14 +202,13 @@ public class ProductJpaDaoTest {
         final Product product = productDao.createProduct(
             user.getId(), "X", "Y", "L", "C", "Argentina",
             Collections.emptyList(), "D", BigDecimal.valueOf(7.0),
-            BigDecimal.valueOf(7.0), BigDecimal.valueOf(500)
+            BigDecimal.valueOf(7.0), BigDecimal.valueOf(500), 1
         );
 
         em.flush();
 
         // Act
-        productDao.reserveIfAvailable(product.getId());
-        productDao.markAsSold(product.getId());
+        productDao.decrementStock(product.getId());
 
         // Assert
         Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isEmpty());
@@ -224,7 +223,7 @@ public class ProductJpaDaoTest {
         final Product product = productDao.createProduct(
             user.getId(), "Old", "Artist", "Label", "CAT", "Argentina",
             Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(2000)
+            BigDecimal.valueOf(9.0), BigDecimal.valueOf(2000), 1
         );
 
         em.flush();
@@ -233,7 +232,7 @@ public class ProductJpaDaoTest {
         final Boolean updated = productDao.updateProduct(
             product.getId(), "NewTitle", "Artist", "Label", "CAT", "Argentina",
             Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(2500)
+            BigDecimal.valueOf(9.0), BigDecimal.valueOf(2500), 1
         );
 
         // Assert
@@ -255,7 +254,7 @@ public class ProductJpaDaoTest {
         final Product hiddenProduct = createSuggestionProduct(user, "Hidden", "Hidden Artist", "Hidden Label");
 
         em.flush();
-        productDao.reserveIfAvailable(hiddenProduct.getId());
+        productDao.markAsUserDeleted(hiddenProduct.getId());
 
         em.flush();
         em.clear();
@@ -284,7 +283,7 @@ public class ProductJpaDaoTest {
 
         em.flush();
 
-        productDao.reserveIfAvailable(hiddenProduct.getId());
+        productDao.markAsUserDeleted(hiddenProduct.getId());
 
         em.flush();
         em.clear();
@@ -318,7 +317,7 @@ public class ProductJpaDaoTest {
         final Product hiddenProduct = createSuggestionProduct(user, "Hidden", "Son Hidden", "Hidden Label");
 
         em.flush();
-        productDao.reserveIfAvailable(hiddenProduct.getId());
+        productDao.markAsUserDeleted(hiddenProduct.getId());
         em.flush();
         em.clear();
 
@@ -351,7 +350,7 @@ public class ProductJpaDaoTest {
         final Product hiddenProduct = createSuggestionProduct(user, "Hidden", "Artist L", "Cap Hidden");
 
         em.flush();
-        productDao.reserveIfAvailable(hiddenProduct.getId());
+        productDao.markAsUserDeleted(hiddenProduct.getId());
         em.flush();
         em.clear();
 

@@ -41,7 +41,7 @@ public class ReviewServiceImplTest {
         return new Product(10L, userId, "Title", "Artist", "", "", "",
             java.util.Collections.emptyList(), "desc",
             java.math.BigDecimal.ONE, java.math.BigDecimal.ONE,
-            LocalDate.now(), java.math.BigDecimal.TEN);
+            LocalDate.now(), java.math.BigDecimal.TEN, 1);
     }
 
     @Test

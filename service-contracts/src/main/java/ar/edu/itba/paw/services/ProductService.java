@@ -20,7 +20,8 @@ public interface ProductService {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final BigDecimal price
+        final BigDecimal price,
+        final int stock
     );
 
     ProductSearchCriteria getProductSearchCriteria(
@@ -65,11 +66,9 @@ public interface ProductService {
 
     Optional<Product> findByIdIfAvailable(final Long id);
 
-    boolean reserveIfAvailable(final Long id);
+    boolean decrementStock(final Long id);
 
-    boolean releaseReservation(final Long id);
-
-    void markAsSold(final Long id);
+    boolean incrementStock(final Long id);
 
     /**
      * Marks an {@code ACTIVE} listing as deleted by the owner (restorable).
@@ -92,7 +91,8 @@ public interface ProductService {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final BigDecimal price
+        final BigDecimal price,
+        final int stock
     );
 
     /**

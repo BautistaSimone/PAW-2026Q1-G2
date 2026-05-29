@@ -22,7 +22,8 @@ public interface ProductDao {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final BigDecimal price
+        final BigDecimal price,
+        final int stock
     );
 
     PaginatedResult<Product> listProducts();
@@ -57,11 +58,9 @@ public interface ProductDao {
 
     Optional<Product> findByIdIfAvailable(final Long id);
 
-    boolean reserveIfAvailable(final Long id);
+    boolean decrementStock(final Long id);
 
-    boolean releaseReservation(final Long id);
-
-    void markAsSold(final Long id);
+    boolean incrementStock(final Long id);
 
     boolean markAsUserDeleted(final Long id);
 
@@ -78,7 +77,8 @@ public interface ProductDao {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final BigDecimal price
+        final BigDecimal price,
+        final int stock
     );
 
     boolean restoreUserDeletedProduct(final Long id);

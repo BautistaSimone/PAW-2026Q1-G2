@@ -172,6 +172,23 @@
                                                     ><spring:message code="Global.currency.ars"/></span>
                                             </div>
 
+                                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                                                <c:choose>
+                                                    <c:when test="${product.stock == 1}">
+                                                        <span style="color: var(--color-accent); font-weight: 600; font-size: 0.9rem;">
+                                                            <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                                                            <spring:message code="ProductDetail.stock.last" />
+                                                        </span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span style="color: var(--color-text-muted); font-weight: 500; font-size: 0.9rem;">
+                                                            <i class="bi bi-box-seam" aria-hidden="true"></i>
+                                                            <c:out value="${product.stock}" /> <spring:message code="ProductDetail.stock" />
+                                                        </span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+
                                             <c:choose>
                                                 <c:when test="${isOwnProduct}">
                                                     <div class="alert-retro alert-retro-warning mb-0 product-detail-div-14" role="status" >

@@ -7,6 +7,7 @@ import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -61,6 +62,10 @@ public class ProductForm {
     private String description;
 
     private MultipartFile[] images;
+
+    @NotNull
+    @Min(1)
+    private Integer stock = 1;
 
     /** Comma-separated layout for edit: {@code e:123} = existing image id, {@code n} = next new upload. */
     private String imageLayout;
@@ -159,5 +164,13 @@ public class ProductForm {
 
     public void setImageLayout(final String imageLayout) {
         this.imageLayout = imageLayout;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 }

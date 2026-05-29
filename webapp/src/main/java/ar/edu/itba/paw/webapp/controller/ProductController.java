@@ -177,7 +177,8 @@ public class ProductController {
             form.getDescription(),
             form.getSleeveCondition(),
             form.getRecordCondition(),
-            form.getPrice()
+            form.getPrice(),
+            form.getStock()
         );
 
         for (ValidatedImage image : validatedImages) {
@@ -221,6 +222,7 @@ public class ProductController {
         form.setCategories(
             product.getCategories().stream().map(c -> c.getId()).collect(Collectors.toList())
         );
+        form.setStock(product.getStock());
 
         return editProductFormModelAndView(id);
     }
@@ -363,7 +365,8 @@ public class ProductController {
             form.getDescription(),
             form.getSleeveCondition(),
             form.getRecordCondition(),
-            form.getPrice()
+            form.getPrice(),
+            form.getStock()
         );
 
         if (replacementImages != null) {

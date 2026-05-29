@@ -63,7 +63,7 @@ public class ReviewJpaDaoTest {
         final Product product = productDao.createProduct(
             sellerId, "Test Album", "Test Artist", "Label", "CAT", "Argentina",
             Collections.emptyList(), "desc", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
         );
 
         final Purchase purchase = purchaseDao.createPurchase(

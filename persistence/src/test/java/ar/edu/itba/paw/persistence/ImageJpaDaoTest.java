@@ -56,7 +56,7 @@ public class ImageJpaDaoTest {
             "Edicion original",
             BigDecimal.valueOf(9.0),
             BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(32000)
+            BigDecimal.valueOf(32000), 1
         );
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
         final Image createdImage = imageDao.createImage(product.getId(), imageData, "image/jpeg");
@@ -87,7 +87,7 @@ public class ImageJpaDaoTest {
             "Edicion original",
             BigDecimal.valueOf(9.0),
             BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(32000)
+            BigDecimal.valueOf(32000), 1
         );
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
         final Image createdImage = imageDao.createImage(product.getId(), imageData, "image/jpeg");
@@ -117,7 +117,7 @@ public class ImageJpaDaoTest {
             "Edicion original",
             BigDecimal.valueOf(9.0),
             BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(32000)
+            BigDecimal.valueOf(32000), 1
         );
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
         final Image createdImage = imageDao.createImage(product.getId(), imageData, "image/jpeg");
@@ -146,7 +146,7 @@ public class ImageJpaDaoTest {
             "Edicion original",
             BigDecimal.valueOf(9.0),
             BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(32000)
+            BigDecimal.valueOf(32000), 1
         );
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
 

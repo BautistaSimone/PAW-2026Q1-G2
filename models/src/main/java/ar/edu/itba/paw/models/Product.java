@@ -64,6 +64,9 @@ public class Product {
     private LocalDate published;
     private BigDecimal price;
 
+    @Column(name = "stock", nullable = false)
+    private int stock = 1;
+
     @Column(name = "state", length = 32, nullable = false)
     private String state = ProductState.ACTIVE.getPersistenceValue();
 
@@ -85,7 +88,8 @@ public class Product {
         BigDecimal sleeveCondition,
         BigDecimal recordCondition,
         LocalDate published,
-        BigDecimal price
+        BigDecimal price,
+        int stock
     ) {
         this.productId = productId;
         this.userId = userId;
@@ -100,6 +104,7 @@ public class Product {
         this.recordCondition = recordCondition;
         this.published = published;
         this.price = price;
+        this.stock = stock;
     }
 
     public Product(
@@ -114,7 +119,8 @@ public class Product {
         BigDecimal sleeveCondition,
         BigDecimal recordCondition,
         LocalDate published,
-        BigDecimal price
+        BigDecimal price,
+        int stock
     ) {
         this.userId = userId;
         this.title = title;
@@ -128,6 +134,7 @@ public class Product {
         this.recordCondition = recordCondition;
         this.published = published;
         this.price = price;
+        this.stock = stock;
     }
 
     public Long getId() {
@@ -256,5 +263,13 @@ public class Product {
 
     public void setPublished(LocalDate published) {
         this.published = published;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 }

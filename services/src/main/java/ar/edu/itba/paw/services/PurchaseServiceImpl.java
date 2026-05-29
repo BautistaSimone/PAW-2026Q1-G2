@@ -70,7 +70,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         final User buyer = userService.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Buyer not found"));
 
-        if (!productService.reserveIfAvailable(productId)) {
+        if (!productService.decrementStock(productId)) {
             throw new IllegalStateException("Product is no longer available");
         }
 
@@ -205,7 +205,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                     PurchaseStatus.SHIPPED);
         } else if (newStatus == PurchaseStatus.DELIVERED && isBuyer && purchase.getStatus() == PurchaseStatus.SHIPPED) {
             purchaseDao.updateStatus(purchaseId, newStatus);
-            productService.markAsSold(purchase.getProductId());
+            // Stock was already decremented at purchase creation; no further action needed.
         } else {
             throw new IllegalStateException("Invalid state transition or unauthorized role.");
         }
@@ -236,7 +236,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             return false;
         }
         purchase.setStatus(PurchaseStatus.CANCELLED);
-        productService.releaseReservation(purchase.getProductId());
+        productService.incrementStock(purchase.getProductId());
         return true;
     }
 

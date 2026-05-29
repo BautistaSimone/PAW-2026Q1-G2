@@ -139,6 +139,14 @@
                             <form:errors path="price" cssClass="text-danger" element="div" />
                         </div>
 
+                        <div class="col-md-6">
+                            <label for="stock" class="form-label"><spring:message code="ProductForm.stock.label" /> <span class="text-danger">*</span></label>
+                            <form:input type="number" path="stock" min="1" step="1"
+                                   cssClass="form-control" required="required" id="stock" />
+                            <div class="form-text"><spring:message code="ProductForm.stock.help" /></div>
+                            <form:errors path="stock" cssClass="text-danger" element="div" />
+                        </div>
+
                         <div class="col-12">
                             <label for="images" class="form-label">
                                 <spring:message code="ProductForm.images.label" />

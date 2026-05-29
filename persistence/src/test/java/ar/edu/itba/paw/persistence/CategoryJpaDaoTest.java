@@ -78,7 +78,7 @@ public class CategoryJpaDaoTest {
         final Product product = productDao.createProduct(
             user.getId(), "Album", "Artist", "Label", "CAT-1", "Argentina",
             List.of(rock, ambient), "Desc", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000), 1
         );
 
         em.flush();
@@ -101,7 +101,7 @@ public class CategoryJpaDaoTest {
         final Product product = productDao.createProduct(
             user.getId(), "Album without categories", "Artist", "Label", "CAT-1", "Argentina",
             Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000), 1
         );
 
         em.flush();

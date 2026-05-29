@@ -66,7 +66,8 @@ public class PurchaseServiceImplTest {
             BigDecimal.valueOf(9),
             BigDecimal.valueOf(9),
             LocalDate.now(),
-            BigDecimal.valueOf(32000)
+            BigDecimal.valueOf(32000),
+            1
         );
     }
 
@@ -113,7 +114,7 @@ public class PurchaseServiceImplTest {
         Mockito.when(productService.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         Mockito.when(userService.findById(SELLER_ID)).thenReturn(Optional.of(seller));
         Mockito.when(userService.findById(BUYER_ID)).thenReturn(Optional.of(buyer));
-        Mockito.when(productService.reserveIfAvailable(PRODUCT_ID)).thenReturn(true);
+        Mockito.when(productService.decrementStock(PRODUCT_ID)).thenReturn(true);
         Mockito.when(purchaseDao.createPurchase(
             Mockito.eq(PRODUCT_ID),
             Mockito.eq(BUYER_ID),
@@ -210,7 +211,7 @@ public class PurchaseServiceImplTest {
         Mockito.when(productService.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         Mockito.when(userService.findById(SELLER_ID)).thenReturn(Optional.of(seller));
         Mockito.when(userService.findById(BUYER_ID)).thenReturn(Optional.of(buyer));
-        Mockito.when(productService.reserveIfAvailable(PRODUCT_ID)).thenReturn(false);
+        Mockito.when(productService.decrementStock(PRODUCT_ID)).thenReturn(false);
 
         Assertions.assertThrows(IllegalStateException.class, () ->
             purchaseService.createPurchase(PRODUCT_ID, BUYER_ID)

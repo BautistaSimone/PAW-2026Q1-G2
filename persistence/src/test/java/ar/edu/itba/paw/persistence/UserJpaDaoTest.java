@@ -105,12 +105,12 @@ public class UserJpaDaoTest {
         final Product product = productDao.createProduct(
             user.getId(), "Album", "Artist", "Label", "CAT", "Argentina",
             Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
         );
         final Product otherProduct = productDao.createProduct(
             user.getId(), "Other Album", "Other Artist", "Label", "CAT2", "Argentina",
             Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
         );
 
         // Act
@@ -153,12 +153,12 @@ public class UserJpaDaoTest {
         final Product product = productDao.createProduct(
             user.getId(), "Album", "Artist", "Label", "CAT", "Argentina",
             Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
         );
         final Product otherProduct = productDao.createProduct(
             user.getId(), "Other Album", "Other Artist", "Label", "CAT2", "Argentina",
             Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
         );
 
         userDao.addWishlistProduct(user.getId(), product);
@@ -203,7 +203,7 @@ public class UserJpaDaoTest {
         final Product product = productDao.createProduct(
             user.getId(), "Album", "Artist", "Label", "CAT", "Argentina",
             Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
         );
         
         userDao.addWishlistProduct(user.getId(), product);

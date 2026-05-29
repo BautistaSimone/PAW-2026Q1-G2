@@ -10,7 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Id;
 import javax.persistence.Column;
-import javax.persistence.Lob;
 import javax.persistence.Transient;
 import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
@@ -46,8 +45,7 @@ public class Purchase {
 
     @Column(name = "reserved_until")
     private LocalDateTime reservedUntil;
-
-    @Lob
+    //TODO: fijarse que el @Lob rompia todo aca, hacia error cuando se empezaba una purchase
     @Column(name = "payment_proof")
     private byte[] paymentProof;
 

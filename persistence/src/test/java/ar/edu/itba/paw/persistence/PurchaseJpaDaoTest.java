@@ -67,7 +67,7 @@ public class PurchaseJpaDaoTest {
         final Product product = productDao.createProduct(
             sellerId, "Purchase Album", "Artist", "Label", "CAT", "Argentina",
             Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
         );
         productId = product.getId();
         em.flush();
@@ -77,7 +77,7 @@ public class PurchaseJpaDaoTest {
         final Product p = productDao.createProduct(
             userId, title, "Artist", "Label", "CAT", "Argentina",
             Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
         );
         em.flush();
         return p.getId();

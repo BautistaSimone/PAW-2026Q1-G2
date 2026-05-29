@@ -63,12 +63,12 @@ public class ReportJpaDaoTest {
         final Product product = productDao.createProduct(
             ownerId, "Reported Album", "Reported Artist", "Label", "CAT", "Argentina",
             Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
         );
         final Product otherProduct = productDao.createProduct(
             ownerId, "Other Reported Album", "Other Artist", "Label", "CAT2", "Argentina",
             Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000)
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
         );
 
         productId = product.getId();

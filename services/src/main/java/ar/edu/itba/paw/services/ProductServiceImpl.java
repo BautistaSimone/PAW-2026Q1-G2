@@ -76,9 +76,13 @@ public class ProductServiceImpl implements ProductService {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final BigDecimal price
+        final BigDecimal price,
+        final int stock
     ) {
         validateProductFields(title, artist, description, sleeveCondition, recordCondition, price);
+        if (stock < 1) {
+            throw new IllegalArgumentException("Stock must be at least 1");
+        }
 
         List<Category> categories = new ArrayList<>(); 
 
@@ -94,7 +98,7 @@ public class ProductServiceImpl implements ProductService {
         return productDao.createProduct(
             userId, trimToNull(title), trimToNull(artist), toTitleCase(recordLabel),
             trimToNull(catalogNumber), trimToNull(editionCountry), categories, trimToNull(description),
-            sleeveCondition, recordCondition, price
+            sleeveCondition, recordCondition, price, stock
         );
     }
 
@@ -283,20 +287,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public boolean reserveIfAvailable(final Long id) {
-        return productDao.reserveIfAvailable(id);
+    public boolean decrementStock(final Long id) {
+        return productDao.decrementStock(id);
     }
 
     @Override
     @Transactional
-    public boolean releaseReservation(final Long id) {
-        return productDao.releaseReservation(id);
-    }
-
-    @Override
-    @Transactional
-    public void markAsSold(final Long id) {
-        productDao.markAsSold(id);
+    public boolean incrementStock(final Long id) {
+        return productDao.incrementStock(id);
     }
 
     @Override
@@ -330,7 +328,8 @@ public class ProductServiceImpl implements ProductService {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final BigDecimal price
+        final BigDecimal price,
+        final int stock
     ) {
         final Product product = productDao.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
@@ -338,6 +337,9 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Not the product owner");
         }
         validateProductFields(title, artist, description, sleeveCondition, recordCondition, price);
+        if (stock < 1) {
+            throw new IllegalArgumentException("Stock must be at least 1");
+        }
 
         List<Category> categories = new ArrayList<>(); 
 
@@ -362,7 +364,8 @@ public class ProductServiceImpl implements ProductService {
             trimToNull(description),
             sleeveCondition,
             recordCondition,
-            price
+            price,
+            stock
         );
         if (!ok) {
             throw new IllegalStateException("Product cannot be updated (not active or missing)");
