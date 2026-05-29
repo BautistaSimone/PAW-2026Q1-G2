@@ -8,12 +8,12 @@ Vinyland is a multi-module Java/Spring web application designed as an e-commerce
 - **`service-contracts`**: Interfaces for the business logic layer.
 - **`services`**: Implementations of the service interfaces.
 - **`persistence-contracts`**: Interfaces for the data access layer.
-- **`persistence`**: JDBC-based implementations of the repository interfaces.
+- **`persistence`**: Hibernate/JPA-based implementations of the repository interfaces.
 - **`webapp`**: Presentation layer containing Spring MVC controllers, JSPs, and application configuration.
 
 ## Tech Stack
 - **Language**: Java 21
-- **Framework**: Spring 5.3.33 (WebMVC, JDBC, Context)
+- **Framework**: Spring 5.3.33 (WebMVC, ORM/JPA, Context)
 - **Database**: PostgreSQL 42.2.5 (Local), HSQLDB (Testing)
 - **Template Engine**: JSP (JavaServer Pages)
 - **Frontend**: Bootstrap 5, CSS, Vanilla JS
@@ -53,8 +53,8 @@ mvn test
 - **Interface-driven**: Services and DAOs should always have a corresponding interface in the `-contracts` modules.
 
 ### Database
-- The database schema is defined in `persistence/src/main/resources/schema.sql`.
-- `WebConfig.java` uses `DataSourceInitializer` to automatically populate the schema on application startup.
+- The database schema is defined in `persistence/src/main/resources/schema.sql` (DDL + seed data). Hibernate also manages the schema via `hbm2ddl.auto=update`.
+- `WebConfig.java` uses `DataSourceInitializer` to execute `schema.sql` on startup (the `CREATE TABLE IF NOT EXISTS` statements are safe alongside Hibernate's auto-update).
 - Local PostgreSQL credentials (default):
   - **Host**: `localhost`
   - **Database**: `paw`
@@ -69,6 +69,7 @@ mvn test
 ### Coding Style
 - Ensure proper use of Spring annotations (`@Controller`, `@Service`, `@Repository`, `@Autowired`).
 - Use domain entities from the `models` module for transferring data between layers.
+- All persistence DAOs use JPA `EntityManager` with `@PersistenceContext`. Use JPQL (entity field names, not SQL column names) for queries.
 
 ### Maven & Dependency Management
 - **Centralized Versioning**: All dependency versions MUST be defined in the root `pom.xml` within the `<properties>` section.
@@ -103,7 +104,84 @@ When generating new code, always strictly adhere to the following rules to ensur
 - Tokens or non-password secrets should be compared using `MessageDigest.isEqual(...)` in the service layer if used for authorization rules. Ensure constant-time comparisons when validating unpredictable input buffers.
 
 ### 6. SQL Injection Prevention
-- All user-submitted text evaluated within `LIKE` wildcard searches (e.g., `CONCAT('%', ?, '%')`) must be escaped upstream before parameterization to prevent wildcards like `%` and `_` from being exploited.
+- All user-submitted text evaluated within `LIKE` wildcard searches must be escaped upstream before parameterization to prevent wildcards like `%` and `_` from being exploited.
+- Use JPQL named parameters (`:paramName`) instead of positional parameters or string concatenation.
 
+## Internationalization (i18n)
 
-## message_en.properties debe estar vacio
+The application uses **Spring MessageSource** for full internationalization. The default locale is **Spanish (es_AR)** and **English (en)** is also supported. Users can switch languages via the `?lang=` query parameter (e.g., `?lang=en`).
+
+### Configuration (WebConfig.java)
+- **`MessageSource`**: A `ReloadableResourceBundleMessageSource` bean loads message bundles from `classpath:messages` with UTF-8 encoding.
+- **`LocaleResolver`**: A `SessionLocaleResolver` stores the user's chosen locale in their session (default: `es_AR`).
+- **`LocaleChangeInterceptor`**: Registered in `addInterceptors()`, listens for the `lang` request parameter to switch locale dynamically.
+
+### Message Files
+- **`webapp/src/main/resources/messages.properties`** — Default (Spanish). This is the **primary** file.
+- **`webapp/src/main/resources/messages_en.properties`** — English translations.
+- When adding new user-facing text, **always add the key to BOTH files**.
+
+### Key Naming Convention
+Keys follow a hierarchical `PageName.element.property` pattern. Examples:
+```properties
+Login.subtitle=Inicia sesión para comprar y vender vinilos
+Login.email.label=Email
+Login.email.placeholder=tu@email.com
+Login.password.label=Contraseña
+Login.password.placeholder=Tu contraseña
+Login.password.show.ariaLabel=Mostrar contraseña
+Login.rememberMe.label=Recordarme
+ProductForm.albumTitle.label=Título del álbum
+Header.search.placeholder=Buscar vinilos, artistas, sellos...
+Footer.copyright=Copyright Vinyland - 2026. Todos los derechos reservados.
+```
+
+### Usage in JSPs and Tag Files
+Every JSP and tag file that uses i18n must declare the Spring taglib:
+```jsp
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+```
+
+#### Inline text replacement
+Replace hardcoded Spanish text with `<spring:message>`:
+```jsp
+<%-- WRONG: hardcoded text --%>
+<p>Inicia sesión para comprar y vender vinilos</p>
+
+<%-- CORRECT: internationalized --%>
+<p><spring:message code="Login.subtitle" /></p>
+```
+
+#### Attributes (placeholder, aria-label, title)
+For tag attributes that don't accept JSP tags inline, use a `var` to capture the message first:
+```jsp
+<%-- Store message in a variable --%>
+<spring:message code="Login.email.placeholder" var="emailPlaceholder" />
+
+<%-- Use the variable in the attribute --%>
+<form:input path="email" placeholder="${emailPlaceholder}" />
+```
+
+#### Parameterized messages
+Use `{0}`, `{1}`, etc. for dynamic values and `arguments` attribute:
+```properties
+PurchasePanel.order.id=Pedido #{0}
+```
+```jsp
+<spring:message code="PurchasePanel.order.id" arguments="${purchase.purchaseId}" />
+```
+
+#### Page titles
+Page titles must also be internationalized using a `var`:
+```jsp
+<spring:message code="ProductForm.title" var="pageTitle" />
+<ui:layout title="${pageTitle}">
+```
+
+### Critical Rules
+1. **NEVER hardcode user-facing text** in JSPs or tag files. Always use `<spring:message>` keys.
+2. **Always add keys to BOTH** `messages.properties` (Spanish) and `messages_en.properties` (English).
+3. **Keep key names consistent** with the `PageName.element.property` convention.
+4. **Aria-labels and accessibility text** must also be internationalized.
+5. **The `<c:out>` XSS rule still applies** — when printing dynamic model data, use `<c:out>`. The `<spring:message>` tag is only for static translatable text from the message bundles.
+6. **For every new user-facing text** (labels, buttons, alerts, placeholders, titles, `aria-label`s, etc.), add the corresponding message key to **both** `messages.properties` and `messages_en.properties` in the same change — do not defer internationalization.
