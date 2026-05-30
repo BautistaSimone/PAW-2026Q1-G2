@@ -2,6 +2,7 @@ package ar.edu.itba.paw.persistence;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import ar.edu.itba.paw.models.PaginatedResult;
@@ -44,6 +45,19 @@ public interface ProductDao {
         final ProductState state,
         final int page,
         final int pageSize
+    );
+
+    PaginatedResult<Product> findActiveProductsByUserId(
+        final Long userId,
+        final int page,
+        final int pageSize
+    );
+
+    Map<Long, Long> countActiveProductsByUserIds(final List<Long> userIds);
+
+    Map<Long, List<Product>> findLatestActiveProductsByUserIds(
+        final List<Long> userIds,
+        final int perUserLimit
     );
 
     List<String> listDistinctArtists();

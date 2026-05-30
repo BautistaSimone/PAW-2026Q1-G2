@@ -3,6 +3,8 @@ package ar.edu.itba.paw.persistence;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -386,5 +388,87 @@ public class ProductJpaDaoTest {
         );
         Assertions.assertTrue(productDao.suggestArtists("s", 7).isEmpty());
         Assertions.assertTrue(productDao.suggestRecordLabels("r", 7).isEmpty());
+    }
+
+    @Test
+    public void findActiveProductsByUserIdReturnsOnlyActiveProductsPaginatedAndSorted() {
+        // Arrange
+        final User user = userDao.createUser("active-seller@test.com", "password", "active_seller",
+            false, true, null, null, null, null, null, null, null, null);
+        final Product first = createSuggestionProduct(user, "First", "Artist", "Label");
+        final Product hidden = createSuggestionProduct(user, "Hidden", "Artist", "Label");
+        final Product latest = createSuggestionProduct(user, "Latest", "Artist", "Label");
+        productDao.markAsUserDeleted(hidden.getId());
+
+        em.flush();
+        em.clear();
+
+        // Act
+        final var firstPage = productDao.findActiveProductsByUserId(user.getId(), 1, 1);
+        final var secondPage = productDao.findActiveProductsByUserId(user.getId(), 2, 1);
+
+        // Assert
+        Assertions.assertEquals(2L, firstPage.getTotalCount());
+        Assertions.assertEquals(latest.getId(), firstPage.getResults().get(0).getId());
+        Assertions.assertEquals(first.getId(), secondPage.getResults().get(0).getId());
+    }
+
+    @Test
+    public void countActiveProductsByUserIdsReturnsZeroForMissingUsers() {
+        // Arrange
+        final User userA = userDao.createUser("count-a@test.com", "password", "count_a",
+            false, true, null, null, null, null, null, null, null, null);
+        final User userB = userDao.createUser("count-b@test.com", "password", "count_b",
+            false, true, null, null, null, null, null, null, null, null);
+        final User userC = userDao.createUser("count-c@test.com", "password", "count_c",
+            false, true, null, null, null, null, null, null, null, null);
+
+        createSuggestionProduct(userA, "A1", "Artist", "Label");
+        final Product hidden = createSuggestionProduct(userA, "A2", "Artist", "Label");
+        productDao.markAsUserDeleted(hidden.getId());
+        createSuggestionProduct(userB, "B1", "Artist", "Label");
+
+        em.flush();
+        em.clear();
+
+        // Act
+        final Map<Long, Long> counts = productDao.countActiveProductsByUserIds(List.of(userA.getId(), userB.getId(), userC.getId()));
+
+        // Assert
+        Assertions.assertEquals(1L, counts.get(userA.getId()));
+        Assertions.assertEquals(1L, counts.get(userB.getId()));
+        Assertions.assertEquals(0L, counts.get(userC.getId()));
+    }
+
+    @Test
+    public void findLatestActiveProductsByUserIdsLimitsEachUserAndSkipsHidden() {
+        // Arrange
+        final User userA = userDao.createUser("latest-a@test.com", "password", "latest_a",
+            false, true, null, null, null, null, null, null, null, null);
+        final User userB = userDao.createUser("latest-b@test.com", "password", "latest_b",
+            false, true, null, null, null, null, null, null, null, null);
+
+        final Product first = createSuggestionProduct(userA, "A1", "Artist", "Label");
+        final Product hidden = createSuggestionProduct(userA, "A2", "Artist", "Label");
+        final Product latest = createSuggestionProduct(userA, "A3", "Artist", "Label");
+        final Product onlyB = createSuggestionProduct(userB, "B1", "Artist", "Label");
+        productDao.markAsUserDeleted(hidden.getId());
+
+        em.flush();
+        em.clear();
+
+        // Act
+        final Map<Long, List<Product>> productsByUser = productDao.findLatestActiveProductsByUserIds(
+            List.of(userA.getId(), userB.getId()),
+            2
+        );
+        final List<Long> userAProductIds = productsByUser.get(userA.getId()).stream()
+            .map(Product::getId)
+            .collect(Collectors.toList());
+
+        // Assert
+        Assertions.assertIterableEquals(List.of(latest.getId(), first.getId()), userAProductIds);
+        Assertions.assertEquals(1, productsByUser.get(userB.getId()).size());
+        Assertions.assertEquals(onlyB.getId(), productsByUser.get(userB.getId()).get(0).getId());
     }
 }

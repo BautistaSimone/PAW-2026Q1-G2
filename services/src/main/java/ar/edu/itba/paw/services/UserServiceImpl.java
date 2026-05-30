@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -267,5 +268,29 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public List<User> getMostFollowedUsers(final int limit) {
         return userDao.getMostFollowedUsers(limit);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize) {
+        return userDao.getFeaturedActiveSellers(page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize) {
+        return userDao.searchActiveSellers(query, page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Long> countFollowersByUserIds(final List<Long> userIds) {
+        return userDao.countFollowersByUserIds(userIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Boolean> followingStatusByUserIds(final Long followerId, final List<Long> followedIds) {
+        return userDao.followingStatusByUserIds(followerId, followedIds);
     }
 }

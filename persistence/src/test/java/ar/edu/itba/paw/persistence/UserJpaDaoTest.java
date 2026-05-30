@@ -8,7 +8,10 @@ import javax.persistence.TypedQuery;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.math.BigDecimal;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.Test;
@@ -39,6 +42,49 @@ public class UserJpaDaoTest {
 
     @PersistenceContext
     private EntityManager em;
+
+    @BeforeEach
+    public void createFollowTable() {
+        em.createNativeQuery(
+                "CREATE TABLE IF NOT EXISTS user_follows (" +
+                "follower_id INTEGER NOT NULL, " +
+                "followed_id INTEGER NOT NULL, " +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, " +
+                "PRIMARY KEY (follower_id, followed_id))")
+            .executeUpdate();
+    }
+
+    private User createUser(final String username) {
+        return userDao.createUser(
+                username + "@test.com",
+                "password",
+                username,
+                false,
+                true,
+                "Juan",
+                "Perez",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+    }
+
+    private Product createProduct(final User user, final String title) {
+        return productDao.createProduct(
+            user.getId(), title, "Artist", "Label", "CAT-" + title, "Argentina",
+            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
+        );
+    }
+
+    private void follow(final User follower, final User followed) {
+        em.createNativeQuery("INSERT INTO user_follows (follower_id, followed_id) VALUES (:followerId, :followedId)")
+            .setParameter("followerId", follower.getId())
+            .setParameter("followedId", followed.getId())
+            .executeUpdate();
+    }
 
     @Test
     public void testCreateUserWhenUserDoesNotExist() {
@@ -213,5 +259,100 @@ public class UserJpaDaoTest {
 
         // Assert
         Assertions.assertTrue(isWishlisted);
+    }
+
+    @Test
+    public void getFeaturedActiveSellersExcludesHiddenAndOrdersByFollowersThenProducts() {
+        // Arrange
+        final User sellerA = createUser("seller_a");
+        final User sellerB = createUser("seller_b");
+        final User sellerC = createUser("seller_c");
+        final User bannedSeller = createUser("banned_seller");
+        final User noProducts = createUser("no_products");
+        final User hiddenOnly = createUser("hidden_only");
+        final User follower1 = createUser("follower_1");
+        final User follower2 = createUser("follower_2");
+        final User follower3 = createUser("follower_3");
+
+        createProduct(sellerA, "A1");
+        createProduct(sellerB, "B1");
+        createProduct(sellerB, "B2");
+        createProduct(sellerC, "C1");
+        createProduct(bannedSeller, "Banned1");
+        final Product hiddenProduct = createProduct(hiddenOnly, "Hidden1");
+        productDao.markAsUserDeleted(hiddenProduct.getId());
+        userDao.ban(bannedSeller.getId());
+
+        follow(follower1, sellerA);
+        follow(follower2, sellerA);
+        follow(follower1, sellerB);
+        follow(follower2, sellerB);
+        follow(follower1, sellerC);
+        follow(follower2, sellerC);
+        follow(follower3, sellerC);
+        follow(follower3, bannedSeller);
+
+        em.flush();
+        em.clear();
+
+        // Act
+        final List<Long> resultIds = userDao.getFeaturedActiveSellers(1, 10)
+            .getResults()
+            .stream()
+            .map(User::getId)
+            .collect(Collectors.toList());
+
+        // Assert
+        Assertions.assertIterableEquals(List.of(sellerC.getId(), sellerB.getId(), sellerA.getId()), resultIds);
+        Assertions.assertFalse(resultIds.contains(bannedSeller.getId()));
+        Assertions.assertFalse(resultIds.contains(noProducts.getId()));
+        Assertions.assertFalse(resultIds.contains(hiddenOnly.getId()));
+    }
+
+    @Test
+    public void searchActiveSellersEscapesLikeWildcards() {
+        // Arrange
+        final User literal = createUser("literal%_seller");
+        final User wildcardLookalike = createUser("literalXXseller");
+        createProduct(literal, "Literal");
+        createProduct(wildcardLookalike, "Wildcard");
+
+        em.flush();
+        em.clear();
+
+        // Act
+        final List<User> results = userDao.searchActiveSellers("%_", 1, 10).getResults();
+
+        // Assert
+        Assertions.assertEquals(1, results.size());
+        Assertions.assertEquals(literal.getId(), results.get(0).getId());
+    }
+
+    @Test
+    public void bulkFollowerCountsAndStatusesReturnDefaults() {
+        // Arrange
+        final User sellerA = createUser("bulk_seller_a");
+        final User sellerB = createUser("bulk_seller_b");
+        final User follower1 = createUser("bulk_follower_1");
+        final User follower2 = createUser("bulk_follower_2");
+
+        follow(follower1, sellerA);
+        follow(follower2, sellerA);
+        follow(follower1, sellerB);
+
+        em.flush();
+        em.clear();
+
+        // Act
+        final Map<Long, Long> counts = userDao.countFollowersByUserIds(List.of(sellerA.getId(), sellerB.getId(), follower2.getId()));
+        final Map<Long, Boolean> statuses = userDao.followingStatusByUserIds(follower1.getId(), List.of(sellerA.getId(), sellerB.getId(), follower2.getId()));
+
+        // Assert
+        Assertions.assertEquals(2L, counts.get(sellerA.getId()));
+        Assertions.assertEquals(1L, counts.get(sellerB.getId()));
+        Assertions.assertEquals(0L, counts.get(follower2.getId()));
+        Assertions.assertTrue(statuses.get(sellerA.getId()));
+        Assertions.assertTrue(statuses.get(sellerB.getId()));
+        Assertions.assertFalse(statuses.get(follower2.getId()));
     }
 }

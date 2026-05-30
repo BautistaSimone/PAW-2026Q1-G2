@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -62,4 +63,8 @@ public interface UserDao {
 	List<Long> getFollowedUserIds(final Long userId);
 	PaginatedResult<User> searchUsers(final String query, final int page, final int pageSize);
 	List<User> getMostFollowedUsers(final int limit);
+	PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize);
+	PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize);
+	Map<Long, Long> countFollowersByUserIds(final List<Long> userIds);
+	Map<Long, Boolean> followingStatusByUserIds(final Long followerId, final List<Long> followedIds);
 }

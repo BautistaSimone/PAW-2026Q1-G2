@@ -3,8 +3,10 @@ package ar.edu.itba.paw.services;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -247,6 +249,35 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public PaginatedResult<Product> listUserDeletedProducts(final Long userId, final int page, final int pageSize) {
         return productDao.findProductsByUserIdAndState(userId, ProductState.USER_DELETED, page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedResult<Product> listActiveProductsByUser(final Long userId, final int page, final int pageSize) {
+        if (userId == null) {
+            final int safePage = page < 1 ? 1 : page;
+            final int safePageSize = pageSize < 1 ? 12 : pageSize;
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
+        }
+        return productDao.findActiveProductsByUserId(userId, page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Long> countActiveProductsByUserIds(final List<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return productDao.countActiveProductsByUserIds(userIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, List<Product>> listLatestActiveProductsByUserIds(final List<Long> userIds, final int perUserLimit) {
+        if (userIds == null || userIds.isEmpty() || perUserLimit < 1) {
+            return Collections.emptyMap();
+        }
+        return productDao.findLatestActiveProductsByUserIds(userIds, perUserLimit);
     }
 
     @Override

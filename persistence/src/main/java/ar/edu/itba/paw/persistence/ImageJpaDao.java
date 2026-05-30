@@ -6,6 +6,8 @@ import javax.persistence.TypedQuery;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -51,6 +53,27 @@ public class ImageJpaDao implements ImageDao {
             "SELECT COUNT(i) FROM Image i WHERE i.productId = :productId", Long.class
         ).setParameter("productId", productId)
         .getSingleResult() > 0;
+    }
+
+    @Override
+    public Set<Long> findProductIdsWithImages(final List<Long> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            return Set.of();
+        }
+        final List<Long> distinctIds = productIds.stream()
+            .filter(id -> id != null)
+            .distinct()
+            .collect(Collectors.toList());
+        if (distinctIds.isEmpty()) {
+            return Set.of();
+        }
+        return em.createQuery(
+                "SELECT DISTINCT i.productId FROM Image i WHERE i.productId IN :productIds",
+                Long.class)
+            .setParameter("productIds", distinctIds)
+            .getResultList()
+            .stream()
+            .collect(Collectors.toSet());
     }
 
     @Override
