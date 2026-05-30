@@ -3,7 +3,7 @@
 
     var MIN_QUERY_LENGTH = 2;
     var MAX_RESULTS = 7;
-    var DEBOUNCE_MS = 250;
+    var DEBOUNCE_MS = 1000;
     var ACTIVE_CLASS = 'vinyland-autocomplete-option-active';
 
     function normalize(value) {
@@ -71,9 +71,22 @@
         var requestCounter = 0;
         var activeController = null;
         var suppressNextInputFetch = false;
+        var spinner = document.createElement('span');
+
+        spinner.className = 'vinyland-autocomplete-spinner';
+        spinner.setAttribute('aria-hidden', 'true');
+        spinner.hidden = true;
+        input.parentNode.appendChild(spinner);
+        input.setAttribute('aria-busy', 'false');
 
         function setExpanded(expanded) {
             input.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        }
+
+        function setLoading(loading) {
+            input.setAttribute('aria-busy', loading ? 'true' : 'false');
+            spinner.hidden = !loading;
+            input.parentNode.classList.toggle('vinyland-autocomplete-loading', loading);
         }
 
         function clearList() {
@@ -103,6 +116,7 @@
         function cancelAndCloseList() {
             requestCounter += 1;
             clearPendingRequest();
+            setLoading(false);
             closeList();
         }
 
@@ -195,11 +209,13 @@
                 return;
             }
 
+            requestCounter += 1;
+            var requestId = requestCounter;
             clearPendingRequest();
             closeList();
+            setLoading(true);
 
             debounceTimer = window.setTimeout(function () {
-                var requestId = ++requestCounter;
                 var options = {
                     headers: {
                         'Accept': 'application/json'
@@ -224,15 +240,21 @@
                             return;
                         }
                         activeController = null;
+                        setLoading(false);
                         matches = sanitizeSuggestions(values);
                         renderList();
                     })
                     .catch(function (error) {
                         if (error && error.name === 'AbortError') {
+                            if (requestId === requestCounter) {
+                                activeController = null;
+                                setLoading(false);
+                            }
                             return;
                         }
                         if (requestId === requestCounter) {
                             activeController = null;
+                            setLoading(false);
                             closeList();
                         }
                     });

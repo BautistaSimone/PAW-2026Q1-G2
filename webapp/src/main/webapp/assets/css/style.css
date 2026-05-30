@@ -1010,9 +1010,13 @@ details.filter-section:not([open]) .filter-section-chevron {
   gap: 0.45rem;
 }
 
+.record-label-search-field {
+  position: relative;
+}
+
 .record-label-search-input {
   width: 100%;
-  padding: 0.55rem 0.7rem;
+  padding: 0.55rem 2.2rem 0.55rem 0.7rem;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-size: 0.86rem;
@@ -1030,6 +1034,19 @@ details.filter-section:not([open]) .filter-section-chevron {
   background: #fff;
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgba(231, 111, 81, 0.12);
+}
+
+.record-label-search-spinner {
+  position: absolute;
+  top: calc(50% - 0.45rem);
+  right: 0.75rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid rgba(231, 111, 81, 0.18);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: vinyland-autocomplete-spin 0.7s linear infinite;
 }
 
 .record-label-selected {
@@ -2572,6 +2589,10 @@ details.filter-section:not([open]) .filter-section-chevron {
   position: relative;
 }
 
+.vinyland-autocomplete-input {
+  padding-right: 2.2rem;
+}
+
 .input-group > .vinyland-autocomplete-field {
   flex: 1 1 auto;
   width: 1%;
@@ -2593,6 +2614,20 @@ details.filter-section:not([open]) .filter-section-chevron {
 
 .vinyland-autocomplete-source {
   display: none !important;
+}
+
+.vinyland-autocomplete-spinner {
+  position: absolute;
+  top: calc(50% - 0.5rem);
+  right: 0.75rem;
+  z-index: 5;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(231, 111, 81, 0.18);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: vinyland-autocomplete-spin 0.7s linear infinite;
 }
 
 .vinyland-autocomplete-menu {
@@ -2634,6 +2669,12 @@ details.filter-section:not([open]) .filter-section-chevron {
 
 .vinyland-autocomplete-option:focus {
   outline: none;
+}
+
+@keyframes vinyland-autocomplete-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 575.98px) {

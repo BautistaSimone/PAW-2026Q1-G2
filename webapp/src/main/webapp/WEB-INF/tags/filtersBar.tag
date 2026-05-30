@@ -87,10 +87,13 @@
                  data-autocomplete-url="<c:out value='${recordLabelAutocompleteUrl}' />"
                  data-min-query-length="2"
                  data-max-results="7"
-                 data-debounce-ms="250">
+                 data-debounce-ms="1000">
                 <spring:message code="Filters.labels.search.placeholder" var="labelSearchPlaceholder" />
-                <input id="recordLabelSearch" type="text" class="record-label-search-input"
-                       placeholder="<c:out value='${labelSearchPlaceholder}' />" autocomplete="off" />
+                <div class="record-label-search-field">
+                    <input id="recordLabelSearch" type="text" class="record-label-search-input"
+                           placeholder="<c:out value='${labelSearchPlaceholder}' />" autocomplete="off" aria-busy="false" />
+                    <span class="record-label-search-spinner" aria-hidden="true" hidden></span>
+                </div>
                 <div class="record-label-selected" hidden>
                     <p class="record-label-group-title"><spring:message code="Filters.labels.selected" /></p>
                     <div class="record-label-selected-options"></div>
@@ -184,6 +187,7 @@
 
         var endpoint = labelFilter.getAttribute('data-autocomplete-url');
         var searchInput = document.getElementById('recordLabelSearch');
+        var searchSpinner = labelFilter.querySelector('.record-label-search-spinner');
         var selectedBlock = labelFilter.querySelector('.record-label-selected');
         var selectedOptions = labelFilter.querySelector('.record-label-selected-options');
         var resultsOptions = labelFilter.querySelector('.record-label-results');
@@ -203,6 +207,17 @@
 
         function currentSearchTerm() {
             return searchInput ? (searchInput.value || '').trim() : '';
+        }
+
+        function setLoading(loading) {
+            isLoading = loading;
+            if (searchInput) {
+                searchInput.setAttribute('aria-busy', loading ? 'true' : 'false');
+            }
+            if (searchSpinner) {
+                searchSpinner.hidden = !loading;
+            }
+            labelFilter.classList.toggle('record-label-filter-loading', loading);
         }
 
         function addLabel(value) {
@@ -334,12 +349,12 @@
             if (!endpoint || typeof window.fetch !== 'function' || normalizedQuery.length < minQueryLength) {
                 suggestions = [];
                 completedQuery = '';
-                isLoading = false;
+                setLoading(false);
                 renderLabels();
                 return;
             }
 
-            isLoading = true;
+            setLoading(true);
             completedQuery = '';
             suggestions = [];
             renderLabels();
@@ -370,18 +385,22 @@
                             return;
                         }
                         activeController = null;
-                        isLoading = false;
+                        setLoading(false);
                         completedQuery = normalizedQuery;
                         suggestions = sanitizeSuggestions(values);
                         renderLabels();
                     })
                     .catch(function (error) {
                         if (error && error.name === 'AbortError') {
+                            if (requestId === requestCounter) {
+                                activeController = null;
+                                setLoading(false);
+                            }
                             return;
                         }
                         if (requestId === requestCounter) {
                             activeController = null;
-                            isLoading = false;
+                            setLoading(false);
                             completedQuery = '';
                             suggestions = [];
                             renderLabels();
