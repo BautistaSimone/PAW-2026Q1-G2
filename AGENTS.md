@@ -71,6 +71,11 @@ mvn test
 - Use domain entities from the `models` module for transferring data between layers.
 - All persistence DAOs use JPA `EntityManager` with `@PersistenceContext`. Use JPQL (entity field names, not SQL column names) for queries.
 
+### Validation and Query Efficiency
+- Controller-level validation should be limited to binding flow (`@Valid` + `BindingResult`) and request orchestration. Validations that depend on a specific form/use case must be implemented as custom form validators, especially image upload checks on `MultipartFile` fields.
+- File/image upload rules (size, logical MIME type, required vs. optional image, dimensions when applicable) belong in reusable validators attached to the form, not as ad hoc controller conditionals.
+- Do not build maps or lists by looping through items and issuing one query per item (N+1 queries). Add DAO/service methods that batch-load the needed records with JPQL `IN` queries or equivalent bulk queries, then assemble the map/list in memory from the bulk result.
+
 ### Maven & Dependency Management
 - **Centralized Versioning**: All dependency versions MUST be defined in the root `pom.xml` within the `<properties>` section.
 - **Dependency Management**: The root `pom.xml` must use `<dependencyManagement>` to declare all project dependencies, including their versions and scopes.
@@ -89,6 +94,7 @@ When generating new code, always strictly adhere to the following rules to ensur
 - Ensure validation logic runs on uploaded `MultipartFile`.
 - Check file sizes strictly (e.g., limit to 5MB max).
 - Perform logical MIME type verification (e.g., `image/jpeg` or `image/png`), never trust extension names solely. 
+- For form submissions, implement upload validation as custom form validators instead of inline controller checks.
 - Reject unexpected payloads with `IllegalArgumentException`.
 
 ### 3. Business Logic Validation
@@ -109,7 +115,7 @@ When generating new code, always strictly adhere to the following rules to ensur
 
 ## Internationalization (i18n)
 
-The application uses **Spring MessageSource** for full internationalization. The default locale is **Spanish (es_AR)** and **English (en)** is also supported. Users can switch languages via the `?lang=` query parameter (e.g., `?lang=en`).
+The application uses **Spring MessageSource**. The default locale is **Spanish (es_AR)**, and the Spanish message bundle is the only maintained source of user-facing text. `messages_en.properties` is intentionally empty and must remain empty.
 
 ### Configuration (WebConfig.java)
 - **`MessageSource`**: A `ReloadableResourceBundleMessageSource` bean loads message bundles from `classpath:messages` with UTF-8 encoding.
@@ -118,8 +124,8 @@ The application uses **Spring MessageSource** for full internationalization. The
 
 ### Message Files
 - **`webapp/src/main/resources/messages.properties`** — Default (Spanish). This is the **primary** file.
-- **`webapp/src/main/resources/messages_en.properties`** — English translations.
-- When adding new user-facing text, **always add the key to BOTH files**.
+- **`webapp/src/main/resources/messages_en.properties`** — Must stay empty. Do not add English translations, duplicated Spanish keys, or placeholder keys.
+- When adding new user-facing text, add the key only to **`messages.properties`**.
 
 ### Key Naming Convention
 Keys follow a hierarchical `PageName.element.property` pattern. Examples:
@@ -180,8 +186,8 @@ Page titles must also be internationalized using a `var`:
 
 ### Critical Rules
 1. **NEVER hardcode user-facing text** in JSPs or tag files. Always use `<spring:message>` keys.
-2. **Always add keys to BOTH** `messages.properties` (Spanish) and `messages_en.properties` (English).
+2. **Always add keys to** `messages.properties` (Spanish) **only**. Keep `messages_en.properties` empty.
 3. **Keep key names consistent** with the `PageName.element.property` convention.
 4. **Aria-labels and accessibility text** must also be internationalized.
 5. **The `<c:out>` XSS rule still applies** — when printing dynamic model data, use `<c:out>`. The `<spring:message>` tag is only for static translatable text from the message bundles.
-6. **For every new user-facing text** (labels, buttons, alerts, placeholders, titles, `aria-label`s, etc.), add the corresponding message key to **both** `messages.properties` and `messages_en.properties` in the same change — do not defer internationalization.
+6. **For every new user-facing text** (labels, buttons, alerts, placeholders, titles, `aria-label`s, etc.), add the corresponding message key to **`messages.properties`** in the same change — do not defer internationalization and do not populate `messages_en.properties`.
