@@ -3,11 +3,13 @@ package ar.edu.itba.paw.persistence;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.persistence.Tuple;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -96,6 +98,26 @@ public class ReviewJpaDao implements ReviewDao {
         final double avgScore = ((Number) result[0]).doubleValue();
         final int count = ((Number) result[1]).intValue();
         return new SellerRatingSummary(avgScore, count);
+    }
+
+    @Override
+    public Map<Long, SellerRatingSummary> sellerRatingByUserId(final Set<Long> distinctSellerIds) {
+        final Map<Long, SellerRatingSummary> result = em.createQuery(
+            "SELECT r.sellerId AS id, COALESCE(AVG(r.score), 0.0) AS average, COUNT(r) AS count " 
+            + "FROM Review r WHERE r.sellerId IN :sellerIds GROUP BY r.sellerId",
+            Tuple.class
+        )
+        .setParameter("sellerIds", distinctSellerIds)
+        .getResultList()
+        .stream()
+        .collect(
+            Collectors.toMap(
+                tuple -> ((Number) tuple.get("id")).longValue(),
+                tuple -> new SellerRatingSummary(((Number) tuple.get("average")).doubleValue(), ((Number) tuple.get("count")).intValue())
+            )
+        );
+
+        return result;
     }
 
     private void populateBuyerUsername(Review review) {

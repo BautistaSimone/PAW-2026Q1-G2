@@ -4,6 +4,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,5 +78,11 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public SellerRatingSummary summaryForSeller(long sellerId) {
         return reviewDao.summaryForSeller(sellerId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, SellerRatingSummary> sellerRatingByUserId(final Set<Long> distinctSellerIds) {
+        return reviewDao.sellerRatingByUserId(distinctSellerIds);
     }
 }

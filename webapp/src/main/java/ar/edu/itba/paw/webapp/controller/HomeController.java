@@ -187,7 +187,7 @@ public class HomeController {
 
 		PaginatedResult<Product> productsPage = new PaginatedResult<>(Collections.emptyList(), page, 12, 0);
 		final Map<Long, String> productImageUrls = new HashMap<>();
-		final Map<Long, SellerRatingSummary> sellerRatingByUserId = new HashMap<>();
+		Map<Long, SellerRatingSummary> sellerRatingByUserId = new HashMap<>();
 		if (!followedIds.isEmpty()) {
 			final ProductSearchCriteria criteria = new ProductSearchCriteria(
 					null,
@@ -215,9 +215,8 @@ public class HomeController {
 			for (Product product : productsPage.getResults()) {
 				distinctSellerIds.add(product.getUserId());
 			}
-			for (Long sellerId : distinctSellerIds) {
-				sellerRatingByUserId.put(sellerId, reviewService.summaryForSeller(sellerId));
-			}
+
+			sellerRatingByUserId = reviewService.sellerRatingByUserId(distinctSellerIds);
 		}
 
 		mav.addObject("productsPage", productsPage);

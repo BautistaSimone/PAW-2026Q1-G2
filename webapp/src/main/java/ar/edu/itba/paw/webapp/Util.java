@@ -1,13 +1,40 @@
 package ar.edu.itba.paw.webapp;
 
 import java.net.URI;
+import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
+import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 
 public final class Util {
 
     private Util() {
         // Prevent instantiation
+    }
+    public static void refreshAuthenticationPrincipal(final PawAuthUser current, final User refreshedUser) {
+        final Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+        final PawAuthUser newPrincipal = new PawAuthUser(
+            refreshedUser.getEmail(),
+            refreshedUser.getPassword(),
+            current.isEnabled(),
+            current.isAccountNonExpired(),
+            current.isCredentialsNonExpired(),
+            current.isAccountNonLocked(),
+            new ArrayList<>(current.getAuthorities()),
+            refreshedUser
+        );
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                newPrincipal,
+                currentAuth != null ? currentAuth.getCredentials() : null,
+                newPrincipal.getAuthorities()));
     }
 
     public static String resolveBackUrl(final HttpServletRequest request) {

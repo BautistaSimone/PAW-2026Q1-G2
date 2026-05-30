@@ -39,6 +39,7 @@ import ar.edu.itba.paw.webapp.form.RegisterForm;
 import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
+import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
@@ -251,7 +252,7 @@ public class UserController {
 
         final User refreshed = userService.findById(profileUser.getId())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
-        refreshAuthenticationPrincipal(authUser, refreshed);
+        Util.refreshAuthenticationPrincipal(authUser, refreshed);
 
         return new ModelAndView("redirect:/profile?tab=mydata&updated=1");
     }
@@ -270,24 +271,6 @@ public class UserController {
         userService.updateFavoriteCategories(profileUser.getId(), categoryIds != null ? categoryIds : Collections.emptyList());
 
         return new ModelAndView("redirect:/profile?tab=mydata&updated=1");
-    }
-
-    private static void refreshAuthenticationPrincipal(final PawAuthUser current, final User refreshedUser) {
-        final Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
-        final PawAuthUser newPrincipal = new PawAuthUser(
-                refreshedUser.getEmail(),
-                refreshedUser.getPassword(),
-                current.isEnabled(),
-                current.isAccountNonExpired(),
-                current.isCredentialsNonExpired(),
-                current.isAccountNonLocked(),
-                new ArrayList<>(current.getAuthorities()),
-                refreshedUser);
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(
-                        newPrincipal,
-                        currentAuth != null ? currentAuth.getCredentials() : null,
-                        newPrincipal.getAuthorities()));
     }
 
     private void enrichProfileModel(

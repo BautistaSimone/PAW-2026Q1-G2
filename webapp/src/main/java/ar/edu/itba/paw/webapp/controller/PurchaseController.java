@@ -26,7 +26,6 @@ import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.PurchaseService;
 import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.services.UserService;
-import ar.edu.itba.paw.services.PurchaseExpiredException;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.form.PurchaseCreateForm;
 import ar.edu.itba.paw.webapp.form.PurchaseStatusForm;
@@ -190,7 +189,7 @@ public class PurchaseController {
                 proof != null ? proof.getContentType() : null,
                 proof != null ? proof.getFileName() : null
             );
-        } catch (PurchaseExpiredException e) {
+        } catch (IllegalStateException e) {
             return new ModelAndView("redirect:/purchases/" + id + "?expired=1");
         }
 

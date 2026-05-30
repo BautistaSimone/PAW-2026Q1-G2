@@ -2,6 +2,8 @@ package ar.edu.itba.paw.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
 
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Review;
@@ -12,4 +14,5 @@ public interface ReviewService {
     Optional<Review> findByPurchaseId(long purchaseId);
     PaginatedResult<Review> findBySellerId(long sellerId, int page, int pageSize);
     SellerRatingSummary summaryForSeller(long sellerId);
+    Map<Long, SellerRatingSummary> sellerRatingByUserId(final Set<Long> distinctSellerIds);
 }

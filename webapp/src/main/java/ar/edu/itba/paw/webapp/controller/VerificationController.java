@@ -33,14 +33,15 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Collection;
 
-import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.VerificationTokenService;
+import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
+import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
+import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.VerificationToken;
-import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
 
 @Controller
 public class VerificationController {
@@ -125,7 +126,7 @@ public class VerificationController {
         if (authUser != null) {
             final User refreshed = userService.findById(authUser.getUser().getId())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
-            refreshAuthenticationPrincipal(authUser, refreshed);
+            Util.refreshAuthenticationPrincipal(authUser, refreshed);
         }
 
         return mv;
@@ -134,24 +135,5 @@ public class VerificationController {
     @RequestMapping(value = "/verificationStatus")
     public ModelAndView verificationStatus() {
         return new ModelAndView("verification-status");
-    }
-
-    private static void refreshAuthenticationPrincipal(final PawAuthUser current, final User refreshedUser) {
-        final Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
-        final PawAuthUser newPrincipal = new PawAuthUser(
-            refreshedUser.getEmail(),
-            refreshedUser.getPassword(),
-            current.isEnabled(),
-            current.isAccountNonExpired(),
-            current.isCredentialsNonExpired(),
-            current.isAccountNonLocked(),
-            new ArrayList<>(current.getAuthorities()),
-            refreshedUser
-        );
-        SecurityContextHolder.getContext().setAuthentication(
-            new UsernamePasswordAuthenticationToken(
-                newPrincipal,
-                currentAuth != null ? currentAuth.getCredentials() : null,
-                newPrincipal.getAuthorities()));
     }
 }
