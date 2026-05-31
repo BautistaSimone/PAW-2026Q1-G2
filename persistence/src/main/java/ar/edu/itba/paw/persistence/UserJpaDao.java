@@ -368,37 +368,6 @@ public class UserJpaDao implements UserDao {
             .getResultList();
     }
 
-<<<<<<< HEAD
-    
-    @Override
-    public Map<Long, Boolean> getFollowStatusMap(Long userId, List<Long> userIds) {
-        final List<Object[]> result = em.createNativeQuery(
-                "SELECT followed_id, COUNT(*) AS count FROM user_follows " 
-                + "WHERE follower_id = :fid AND followed_id IN :lids GROUP BY followed_id")
-            .setParameter("fid", userId)
-            .setParameter("lids", userIds)
-            .getResultList();
-
-        return result.stream()
-            .collect(Collectors.toMap(
-                row -> ((Number) row[0]).longValue(),
-                row -> ((Number) row[1]).intValue() > 0
-            ));
-    }
-
-    @Override
-    public Map<Long, Long> getUserFollowerCounts(List<Long> userIds) {
-        final List<Object[]> result = em.createNativeQuery(
-                "SELECT followed_id, COUNT(*) as count FROM user_follows WHERE followed_id = :uids GROUP BY followed_id")
-            .setParameter("uids", userIds)
-            .getResultList();
-            
-        return  result.stream()
-            .collect(Collectors.toMap(
-                row -> ((Number) row[0]).longValue(),
-                row -> ((Number) row[1]).longValue()
-            ));
-=======
     @Override
     public PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize) {
         final int safePage = Math.max(page, 1);
@@ -568,6 +537,5 @@ public class UserJpaDao implements UserDao {
             .replace("\\", "\\\\")
             .replace("%", "\\%")
             .replace("_", "\\_");
->>>>>>> 21e8c0616424b57512c8e4f28423579dfb1fd2a5
     }
 }

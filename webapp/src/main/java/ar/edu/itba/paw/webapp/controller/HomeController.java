@@ -330,24 +330,8 @@ public class HomeController {
 		mav.addObject("productImageUrls", productImageUrls);
 
 		if (authUser != null) {
-<<<<<<< HEAD
-			final List<User> displayedUsers = (List<User>) mav.getModel().get("users");
-
-			Map<Long, Boolean> followStatusMap = new HashMap<>();
-			Map<Long, Long> userFollowerCounts = new HashMap<>();
-
-			if (displayedUsers != null) {
-				// Get the user ids
-				final List<Long> userIds = displayedUsers.stream().map(item -> {return item.getId();}).collect(Collectors.toList());
-
-				followStatusMap = userService.getFollowStatusMap(authUser.getUser().getId(), userIds);
-				userFollowerCounts = userService.getUserFollowerCounts(userIds);
-			}
-
-=======
 			final Map<Long, Boolean> followStatusMap =
 					userService.followingStatusByUserIds(authUser.getUser().getId(), displayedUserIds);
->>>>>>> 21e8c0616424b57512c8e4f28423579dfb1fd2a5
 			mav.addObject("followStatusMap", followStatusMap);
 			mav.addObject("currentUserId", authUser.getUser().getId());
 		}

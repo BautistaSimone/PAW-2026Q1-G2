@@ -271,21 +271,6 @@ public class UserServiceImpl implements UserService {
         return userDao.getMostFollowedUsers(limit);
     }
 
-<<<<<<< HEAD
-
-    @Override
-    @Transactional(readOnly = true)
-    public Map<Long, Boolean> getFollowStatusMap(Long userId, List<Long> userIds) {
-        return userDao.getFollowStatusMap(userId, userIds);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Map<Long, Long> getUserFollowerCounts(List<Long> userIds) {
-        return userDao.getUserFollowerCounts(userIds);
-    }
-    
-=======
     @Override
     @Transactional(readOnly = true)
     public PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize) {
@@ -309,5 +294,4 @@ public class UserServiceImpl implements UserService {
     public Map<Long, Boolean> followingStatusByUserIds(final Long followerId, final List<Long> followedIds) {
         return userDao.followingStatusByUserIds(followerId, followedIds);
     }
->>>>>>> 21e8c0616424b57512c8e4f28423579dfb1fd2a5
 }
