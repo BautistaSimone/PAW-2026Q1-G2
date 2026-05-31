@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +54,7 @@ public class ReportServiceImpl implements ReportService {
         User seller = userService.findById(reportedUserId)
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
 
-        emailService.sendProductReportEmail(product, reporter, seller);
+        emailService.sendProductReportEmail(product, reporter, seller, LocaleContextHolder.getLocale());
 
         return reportDao.create(productId, product.getUserId(), reporterUserId);
     }

@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.services;
 
+import java.util.Locale;
+
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.PurchaseStatus;
 import ar.edu.itba.paw.models.Product;
@@ -15,7 +17,8 @@ public interface EmailService {
             String message,
             User buyer,
             User seller,
-            PurchaseStatus currentStatus);
+            PurchaseStatus currentStatus,
+            Locale locale);
 
     void sendSellerEmail(
             String to,
@@ -25,12 +28,13 @@ public interface EmailService {
             String message,
             User buyer,
             User seller,
-            PurchaseStatus currentStatus);
+            PurchaseStatus currentStatus,
+            Locale locale);
 
-    void sendProductReportEmail(Product product, User reporter, final User seller);
+    void sendProductReportEmail(Product product, User reporter, final User seller, Locale locale);
     
-    void sendNewVinylDigestEmail(String to, String username, java.util.List<Product> products);
+    void sendNewVinylDigestEmail(String to, String username, java.util.List<Product> products, Locale locale);
 
-    void sendPasswordResetEmail(String to, String resetToken, String username);
-    void sendVerificationEmail(String to, String resetToken, String username);
+    void sendPasswordResetEmail(String to, String resetToken, String username, Locale locale);
+    void sendVerificationEmail(String to, String resetToken, String username, Locale locale);
 }

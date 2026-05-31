@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +72,8 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
             emailService.sendVerificationEmail(
                 user.getEmail(),
                 token,
-                user.getUsername()
+                user.getUsername(),
+                LocaleContextHolder.getLocale()
             )
         );
     }

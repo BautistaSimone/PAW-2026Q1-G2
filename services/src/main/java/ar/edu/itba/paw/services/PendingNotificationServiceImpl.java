@@ -1,18 +1,21 @@
 package ar.edu.itba.paw.services;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import ar.edu.itba.paw.models.PendingNotification;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.persistence.PendingNotificationDao;
 import ar.edu.itba.paw.persistence.ProductDao;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class PendingNotificationServiceImpl implements PendingNotificationService {
@@ -89,7 +92,8 @@ public class PendingNotificationServiceImpl implements PendingNotificationServic
                     emailService.sendNewVinylDigestEmail(
                             user.getEmail(),
                             user.getUsername(),
-                            products
+                            products,
+                            LocaleContextHolder.getLocale()
                     );
                     LOGGER.info("Sent digest email to user {} with {} products", userId, products.size());
                 } catch (Exception e) {

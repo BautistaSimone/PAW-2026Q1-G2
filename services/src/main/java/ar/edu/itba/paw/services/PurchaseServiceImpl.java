@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Locale;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -97,7 +99,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                     messageSource.getMessage("Email.purchase.buyer.confirmed.msg", null, locale),
                     buyer,
                     seller,
-                    PurchaseStatus.PENDING);
+                    PurchaseStatus.PENDING,
+                    LocaleContextHolder.getLocale());
             emailService.sendSellerEmail(
                     seller.getEmail(),
                     purchase,
@@ -107,7 +110,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                             new Object[] { buyer.getUsername() }, locale),
                     buyer,
                     seller,
-                    PurchaseStatus.PENDING);
+                    PurchaseStatus.PENDING,
+                    LocaleContextHolder.getLocale());
         });
 
         return purchase;
@@ -178,18 +182,19 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
             purchase.setPaymentProof(paymentProof, paymentProofContentType, paymentProofFileName);
             purchaseDao.updateStatus(purchaseId, newStatus);
+
             // Notify seller to confirm payment
-            final Locale locale = LocaleContextHolder.getLocale();
             emailService.sendSellerEmail(
                     seller.getEmail(),
                     purchase,
                     product,
-                    messageSource.getMessage("Email.purchase.seller.paid.title", null, locale),
+                    messageSource.getMessage("Email.purchase.seller.paid.title", null, LocaleContextHolder.getLocale()),
                     messageSource.getMessage("Email.purchase.seller.paid.msg", new Object[] { buyer.getUsername() },
-                            locale),
+                            LocaleContextHolder.getLocale()),
                     buyer,
                     seller,
-                    PurchaseStatus.PAID);
+                    PurchaseStatus.PAID, 
+                    LocaleContextHolder.getLocale());
         } else if (newStatus == PurchaseStatus.SHIPPED && isSeller && purchase.getStatus() == PurchaseStatus.PAID) {
             purchaseDao.updateStatus(purchaseId, newStatus);
             // Notify buyer
@@ -202,7 +207,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                     messageSource.getMessage("Email.purchase.buyer.shipped.msg", null, locale),
                     buyer,
                     seller,
-                    PurchaseStatus.SHIPPED);
+                    PurchaseStatus.SHIPPED,
+                    LocaleContextHolder.getLocale());
         } else if (newStatus == PurchaseStatus.DELIVERED && isBuyer && purchase.getStatus() == PurchaseStatus.SHIPPED) {
             purchaseDao.updateStatus(purchaseId, newStatus);
             // Stock was already decremented at purchase creation; no further action needed.

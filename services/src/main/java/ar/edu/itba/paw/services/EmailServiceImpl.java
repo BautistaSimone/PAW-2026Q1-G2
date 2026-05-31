@@ -71,9 +71,10 @@ public class EmailServiceImpl implements EmailService {
             final String message,
             final User buyer,
             final User seller,
-            final PurchaseStatus currentStatus) {
+            final PurchaseStatus currentStatus, 
+            Locale locale) {
         final String purchaseUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId());
-        sendOrderEmail(to, product, purchase, title, message, purchaseUrl, buyer, seller, true, currentStatus);
+        sendOrderEmail(to, product, purchase, title, message, purchaseUrl, buyer, seller, true, currentStatus, locale);
     }
 
     @Async
@@ -87,19 +88,18 @@ public class EmailServiceImpl implements EmailService {
             final String message,
             final User buyer,
             final User seller,
-            final PurchaseStatus currentStatus) {
+            final PurchaseStatus currentStatus, 
+            Locale locale) {
         final String purchaseUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId());
-        sendOrderEmail(to, product, purchase, title, message, purchaseUrl, buyer, seller, false, currentStatus);
+        sendOrderEmail(to, product, purchase, title, message, purchaseUrl, buyer, seller, false, currentStatus, locale);
     }
 
     @Async
     @Override
     @Transactional
-    public void sendProductReportEmail(final Product product, final User reporter, final User seller) {
+    public void sendProductReportEmail(final Product product, final User reporter, final User seller, Locale locale) {
 
-        final Locale locale = LocaleContextHolder.getLocale();
-
-        final Context ctx = new Context(LocaleContextHolder.getLocale());
+        final Context ctx = new Context(locale);
 
         ctx.setVariable("title",
                 messageSource.getMessage("email.report.heading", null, locale));
@@ -108,7 +108,7 @@ public class EmailServiceImpl implements EmailService {
                 messageSource.getMessage("email.report.message", null, locale));
         ctx.setVariable("productId", product.getId());
         ctx.setVariable("productName", product.getTitle() + " - " + product.getArtist());
-        ctx.setVariable("amount", formatAmount(product));
+        ctx.setVariable("amount", formatAmount(product, locale));
         ctx.setVariable("location", safeProductLocation(seller));
         ctx.setVariable("recordLabel", nullToEmpty(product.getRecordLabel()));
         ctx.setVariable("catalogNumber", nullToEmpty(product.getCatalogNumber()));
@@ -140,13 +140,11 @@ public class EmailServiceImpl implements EmailService {
     @Async
     @Override
     @Transactional
-    public void sendPasswordResetEmail(String to, String resetToken, String username) {
-
-        final Locale locale = LocaleContextHolder.getLocale();
+    public void sendPasswordResetEmail(String to, String resetToken, String username, Locale locale) {
 
         String resetUrl = buildAbsoluteUrl("/changePassword?token=" + resetToken);
 
-        final Context ctx = new Context(LocaleContextHolder.getLocale());
+        final Context ctx = new Context(locale);
         ctx.setVariable("title",
                 messageSource.getMessage("email.reset.heading", null, locale));
         ctx.setVariable("message",
@@ -176,13 +174,11 @@ public class EmailServiceImpl implements EmailService {
     @Async
     @Override
     @Transactional
-    public void sendVerificationEmail(String to, String resetToken, String username) {
-
-        final Locale locale = LocaleContextHolder.getLocale();
+    public void sendVerificationEmail(String to, String resetToken, String username, Locale locale) {
 
         String resetUrl = buildAbsoluteUrl("/verifyEmail?token=" + resetToken);
 
-        final Context ctx = new Context(LocaleContextHolder.getLocale());
+        final Context ctx = new Context(locale);
         ctx.setVariable("title",
                 messageSource.getMessage("email.verify.heading", null, locale));
         ctx.setVariable("message",
@@ -210,8 +206,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Transactional
-    public void sendNewVinylDigestEmail(final String to, final String username, final java.util.List<Product> products) {
-        final Locale locale = LocaleContextHolder.getLocale();
+    public void sendNewVinylDigestEmail(final String to, final String username, final java.util.List<Product> products, Locale locale) {
         final Context ctx = new Context(locale);
 
         ctx.setVariable("title",
@@ -241,7 +236,7 @@ public class EmailServiceImpl implements EmailService {
                 final java.util.Map<String, String> item = new java.util.LinkedHashMap<>();
                 item.put("name", p.getTitle());
                 item.put("artist", p.getArtist());
-                item.put("price", formatAmount(p));
+                item.put("price", formatAmount(p, locale));
                 item.put("url", buildProductUrl(p.getId()));
                 sellerProducts.add(item);
             } else {
@@ -281,11 +276,12 @@ public class EmailServiceImpl implements EmailService {
             final User buyer,
             final User seller,
             final boolean recipientIsBuyer,
-            final PurchaseStatus currentStatus) {
-        final Context ctx = new Context(LocaleContextHolder.getLocale());
+            final PurchaseStatus currentStatus,
+            Locale locale) {
+        final Context ctx = new Context(locale);
         ctx.setVariable("title", title);
         ctx.setVariable("message", message);
-        ctx.setVariable("amount", formatAmount(product));
+        ctx.setVariable("amount", formatAmount(product, locale));
         ctx.setVariable("productName", product.getTitle() + " - " + product.getArtist());
         ctx.setVariable("actionUrl", actionUrl);
         final String recipientName = recipientIsBuyer
@@ -295,7 +291,7 @@ public class EmailServiceImpl implements EmailService {
         ctx.setVariable("purchaseId", purchase.getPurchaseId());
         ctx.setVariable("currentStep", currentStatus.ordinal());
         ctx.setVariable("purchaseStatusKey", currentStatus.name());
-        final Locale locale = LocaleContextHolder.getLocale();
+        
         ctx.setVariable("purchaseStatusDescription", messageSource.getMessage("PurchaseStatus." + currentStatus.name(), null, locale));
         ctx.setVariable("formattedPurchaseDate", purchase.getDate() != null
                 ? purchase.getDate().format(PURCHASE_DATE_FMT)
@@ -362,12 +358,11 @@ public class EmailServiceImpl implements EmailService {
         return t.length() <= maxLen ? t : t.substring(0, maxLen).trim() + "…";
     }
 
-    private String formatAmount(final Product product) {
+    private String formatAmount(final Product product, Locale locale) {
         final NumberFormat priceFormat = NumberFormat.getNumberInstance(PRICE_LOCALE);
         priceFormat.setGroupingUsed(true);
         priceFormat.setMinimumFractionDigits(0);
         priceFormat.setMaximumFractionDigits(2);
-        final Locale locale = LocaleContextHolder.getLocale();
         final String currencySymbol = messageSource.getMessage("Global.currency.symbol", null, locale);
         return currencySymbol + priceFormat.format(product.getPrice());
     }

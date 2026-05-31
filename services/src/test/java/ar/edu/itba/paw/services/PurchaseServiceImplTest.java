@@ -5,8 +5,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Locale;
 import org.springframework.context.MessageSource;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -156,7 +158,8 @@ public class PurchaseServiceImplTest {
             Mockito.eq("buyer message"),
             Mockito.same(buyer),
             Mockito.same(seller),
-            Mockito.eq(PurchaseStatus.PENDING)
+            Mockito.eq(PurchaseStatus.PENDING),
+            Mockito.eq(LocaleContextHolder.getLocale())
         );
         Mockito.verify(emailService).sendSellerEmail(
             Mockito.eq("seller@test.com"),
@@ -166,7 +169,8 @@ public class PurchaseServiceImplTest {
             Mockito.eq("seller message"),
             Mockito.same(buyer),
             Mockito.same(seller),
-            Mockito.eq(PurchaseStatus.PENDING)
+            Mockito.eq(PurchaseStatus.PENDING),
+            Mockito.eq(LocaleContextHolder.getLocale())
         );
     }
 
