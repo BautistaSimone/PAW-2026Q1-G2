@@ -3,6 +3,7 @@
 **/application.properties
 .m2/
 jetty.out.log
+.idea/
 
 jetty.clean.err.log
 
