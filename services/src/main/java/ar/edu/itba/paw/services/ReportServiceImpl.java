@@ -12,9 +12,9 @@ import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Report;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.PaginatedResult;
-import ar.edu.itba.paw.models.ReportedProduct;
 import ar.edu.itba.paw.persistence.ReportDao;
 import ar.edu.itba.paw.persistence.ProductDao;
+import ar.edu.itba.paw.persistence.ReportedProductProjection;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -67,8 +67,20 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginatedResult<ReportedProduct> findAllGroupedByProduct(int page, int pageSize) {
-        return reportDao.findAllGroupedByProduct(page, pageSize);
+    public PaginatedResult<ReportedProductSummary> findAllGroupedByProduct(int page, int pageSize) {
+        final PaginatedResult<ReportedProductProjection> pageResult = reportDao.findAllGroupedByProduct(page, pageSize);
+        final List<ReportedProductSummary> summaries = pageResult.getResults().stream()
+            .map(report -> new ReportedProductSummary(
+                report.getProductId(),
+                report.getOwnerUserId(),
+                report.getReportCount(),
+                report.getProductTitle(),
+                report.getProductArtist(),
+                report.getOwnerUsername()
+            ))
+            .toList();
+
+        return new PaginatedResult<>(summaries, pageResult.getCurrentPage(), pageSize, pageResult.getTotalCount());
     }
 
     @Override

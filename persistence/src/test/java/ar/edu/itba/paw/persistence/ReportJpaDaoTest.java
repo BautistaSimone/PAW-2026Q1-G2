@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Report;
-import ar.edu.itba.paw.models.ReportedProduct;
 import ar.edu.itba.paw.models.User;
 
 @Rollback
@@ -118,11 +117,11 @@ public class ReportJpaDaoTest {
         em.flush();
 
         // Act
-        final List<ReportedProduct> reportedProducts = reportDao.findAllGroupedByProduct(1, 10).getResults();
+        final List<ReportedProductProjection> reportedProducts = reportDao.findAllGroupedByProduct(1, 10).getResults();
 
         // Assert
         Assertions.assertEquals(2, reportedProducts.size());
-        final ReportedProduct mostReported = reportedProducts.get(0);
+        final ReportedProductProjection mostReported = reportedProducts.get(0);
         Assertions.assertEquals(productId, mostReported.getProductId());
         Assertions.assertEquals(ownerId, mostReported.getOwnerUserId());
         Assertions.assertEquals(2, mostReported.getReportCount());

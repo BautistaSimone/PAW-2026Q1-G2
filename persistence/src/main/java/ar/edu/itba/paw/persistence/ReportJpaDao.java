@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Report;
-import ar.edu.itba.paw.models.ReportedProduct;
 
 @Repository
 public class ReportJpaDao implements ReportDao {
@@ -39,7 +38,7 @@ public class ReportJpaDao implements ReportDao {
     }
 
     @Override
-    public PaginatedResult<ReportedProduct> findAllGroupedByProduct(int page, int pageSize) {
+    public PaginatedResult<ReportedProductProjection> findAllGroupedByProduct(int page, int pageSize) {
         final int offset = (page - 1) * pageSize;
 
         final long totalDistinct = em.createQuery(
@@ -47,10 +46,8 @@ public class ReportJpaDao implements ReportDao {
         ).getSingleResult();
 
         final int total = (int) totalDistinct;
-        final int maxPage = (int) Math.ceil((double) total / pageSize);
-
         if (total == 0) {
-            return new PaginatedResult<>(Collections.emptyList(), page, maxPage, total);
+            return new PaginatedResult<>(Collections.emptyList(), page, pageSize, total);
         }
 
         @SuppressWarnings("unchecked")
@@ -65,8 +62,8 @@ public class ReportJpaDao implements ReportDao {
         .setFirstResult(offset)
         .getResultList();
 
-        final List<ReportedProduct> results = rows.stream().map(row ->
-            new ReportedProduct(
+        final List<ReportedProductProjection> results = rows.stream().map(row ->
+            new ReportedProductProjection(
                 ((Number) row[0]).longValue(),
                 ((Number) row[1]).longValue(),
                 ((Number) row[2]).intValue(),
@@ -76,7 +73,7 @@ public class ReportJpaDao implements ReportDao {
             )
         ).toList();
 
-        return new PaginatedResult<>(results, page, maxPage, total);
+        return new PaginatedResult<>(results, page, pageSize, total);
     }
 
     @Override

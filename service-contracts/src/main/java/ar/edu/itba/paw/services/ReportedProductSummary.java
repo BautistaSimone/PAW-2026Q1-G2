@@ -1,9 +1,9 @@
-package ar.edu.itba.paw.models;
+package ar.edu.itba.paw.services;
 
 /**
- * DTO that groups reports by product for the admin panel view.
+ * Business summary of a product grouped with its report count.
  */
-public class ReportedProduct {
+public class ReportedProductSummary {
 
     private final Long productId;
     private final Long ownerUserId;
@@ -12,7 +12,7 @@ public class ReportedProduct {
     private final String productArtist;
     private final String ownerUsername;
 
-    public ReportedProduct(
+    public ReportedProductSummary(
             final Long productId,
             final Long ownerUserId,
             final int reportCount,

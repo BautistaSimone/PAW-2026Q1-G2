@@ -52,6 +52,15 @@ mvn test
 - **Dependency Injection**: Managed by Spring's `@ComponentScan` and `@Bean` definitions in `ar.edu.itba.paw.webapp.config.WebConfig`.
 - **Interface-driven**: Services and DAOs should always have a corresponding interface in the `-contracts` modules.
 
+### DTOs, Projections, and JSON Boundaries
+- Keep the `models` module limited to domain entities, value objects, enums, and domain-level helper objects that are independent from any specific view, endpoint, or serialization format.
+- Do not place presentation DTOs, JSON response objects, controller-specific request/response shapes, or admin-panel/view-only structures in `models`.
+- Do not add Jackson or serialization annotations such as `@JsonIgnore`, `@JsonProperty`, `@JsonFormat`, `@JsonInclude`, or similar to classes in `models`. Formatting, field hiding, and JSON naming are presentation concerns.
+- JSON endpoint responses should use DTOs/response classes in the `webapp` layer, for example under a `dto`, `response`, or controller-local package/class when the shape is only used by that controller.
+- Persistence-only aggregate query results should live in `persistence-contracts` as projections, and service-facing aggregate results should live in `service-contracts` as business summaries when they must cross the service boundary.
+- Controllers should normally return objects through `@ResponseBody` or `ResponseEntity<?>` and let Spring/Jackson serialize them. Avoid manually using `ObjectMapper` in production controllers unless there is a specific, documented need.
+- The Jackson dependency, when needed for Spring MVC JSON conversion, belongs in `webapp` and root dependency management only. Do not add a Jackson dependency to `models`, `services`, `service-contracts`, `persistence`, or `persistence-contracts`.
+
 ### Database
 - The database schema is defined in `persistence/src/main/resources/schema.sql` (DDL + seed data). Hibernate also manages the schema via `hbm2ddl.auto=update`.
 - `WebConfig.java` uses `DataSourceInitializer` to execute `schema.sql` on startup (the `CREATE TABLE IF NOT EXISTS` statements are safe alongside Hibernate's auto-update).
