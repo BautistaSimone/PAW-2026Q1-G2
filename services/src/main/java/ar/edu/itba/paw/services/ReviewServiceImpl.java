@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -75,6 +76,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
+    public Set<Long> findReviewedPurchaseIds(final Set<Long> purchaseIds) {
+        if (purchaseIds == null || purchaseIds.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return reviewDao.findReviewedPurchaseIds(purchaseIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public PaginatedResult<Review> findBySellerId(long sellerId, int page, int pageSize) {
         return reviewDao.findBySellerId(sellerId, page, pageSize);
     }
@@ -88,6 +98,9 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional(readOnly = true)
     public Map<Long, SellerRatingSummary> sellerRatingByUserId(final Set<Long> distinctSellerIds) {
+        if (distinctSellerIds == null || distinctSellerIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return reviewDao.sellerRatingByUserId(distinctSellerIds);
     }
 }

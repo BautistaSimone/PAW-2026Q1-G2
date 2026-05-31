@@ -6,7 +6,13 @@
                     <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-                        <ui:layout title="Vinyland | ${product.title}">
+                        <spring:message code="ProductDetail.title" arguments="${product.title}" var="productDetailTitle" />
+                        <spring:message code="ProductDetail.images.placeholderText" var="productImagePlaceholderText" />
+                        <c:url var="productPlaceholderImageUrl" value="https://via.placeholder.com/600x600">
+                            <c:param name="text" value="${productImagePlaceholderText}" />
+                        </c:url>
+
+                        <ui:layout title="${productDetailTitle}">
 
                             <ui:header showHeaderActions="true" />
 
@@ -69,7 +75,7 @@
                                                     </c:when>
                                                     <c:otherwise>
                                                         <img id="productGalleryMain"
-                                                            src="https://via.placeholder.com/600x600?text=Sin+imagen"
+                                                            src="<c:out value='${productPlaceholderImageUrl}'/>"
                                                             alt="<c:out value='${product.artist}'/> — <c:out value='${product.title}'/>"
                                                             class="product-gallery-main-img"
                                                             style="border-radius: 12px;" />

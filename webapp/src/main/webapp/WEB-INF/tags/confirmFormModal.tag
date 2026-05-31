@@ -13,7 +13,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<c:set var="cancelText" value="${not empty cancelBtnText ? cancelBtnText : 'Cancelar'}" />
+<spring:message code="Global.cancel" var="defaultCancelText" />
+<c:set var="cancelText" value="${not empty cancelBtnText ? cancelBtnText : defaultCancelText}" />
 <c:set var="submitMethod" value="${not empty method ? method : 'post'}" />
 <c:set var="btnClass" value="${not empty confirmBtnClass ? confirmBtnClass : 'btn-retro-danger'}" />
 

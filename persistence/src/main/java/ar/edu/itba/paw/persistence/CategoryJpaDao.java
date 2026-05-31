@@ -31,6 +31,16 @@ public class CategoryJpaDao implements CategoryDao {
     }
 
     @Override
+    public List<Category> findByIds(final List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return em.createQuery("FROM Category WHERE id IN :ids", Category.class)
+            .setParameter("ids", ids)
+            .getResultList();
+    }
+
+    @Override
     public List<Category> findByProductId(final Long productId) {
         final Product product = em.find(Product.class, productId);
         if (product == null) {

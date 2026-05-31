@@ -3,8 +3,10 @@ package ar.edu.itba.paw.webapp.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
@@ -296,12 +298,7 @@ public class UserController {
 
         final PaginatedResult<Product> productsPage = productService.listProducts(criteria);
 
-        final Map<Long, String> productImageUrls = new HashMap<>();
-        for (Product product : productsPage.getResults()) {
-            if (imageService.existsByProductId(product.getId())) {
-                productImageUrls.put(product.getId(), "/images/product/" + product.getId());
-            }
-        }
+        final Map<Long, String> productImageUrls = productImageUrlsFor(productsPage.getResults());
 
         mv.addObject("user", profileUser);
         mv.addObject("isOwnProfile", isOwnProfile);
@@ -317,12 +314,7 @@ public class UserController {
         }
 
         final List<Product> wishlistProducts = userService.getWishlistProducts(profileUser.getId(), PROFILE_WISHLIST_LIMIT);
-        final Map<Long, String> wishlistProductImageUrls = new HashMap<>();
-        for (Product product : wishlistProducts) {
-            if (imageService.existsByProductId(product.getId())) {
-                wishlistProductImageUrls.put(product.getId(), "/images/product/" + product.getId());
-            }
-        }
+        final Map<Long, String> wishlistProductImageUrls = productImageUrlsFor(wishlistProducts);
 
         mv.addObject("wishlistProducts", wishlistProducts);
         mv.addObject("wishlistProductImageUrls", wishlistProductImageUrls);
@@ -344,13 +336,8 @@ public class UserController {
             final PaginatedResult<Purchase> purchasesPage = purchaseService.findByBuyerId(profileUser.getId(), statuses, page,
                     PROFILE_OTHER_PAGE_SIZE);
 
-            final Map<Long, Product> purchaseProducts = new HashMap<>();
-            final Map<Long, Boolean> purchaseHasReview = new HashMap<>();
-            for (Purchase p : purchasesPage.getResults()) {
-                productService.findById(p.getProductId())
-                        .ifPresent(prod -> purchaseProducts.put(p.getPurchaseId(), prod));
-                purchaseHasReview.put(p.getPurchaseId(), reviewService.findByPurchaseId(p.getPurchaseId()).isPresent());
-            }
+            final Map<Long, Product> purchaseProducts = productsByPurchaseId(purchasesPage.getResults());
+            final Map<Long, Boolean> purchaseHasReview = reviewStatusByPurchaseId(purchasesPage.getResults());
 
             mv.addObject("purchasesPage", purchasesPage);
             mv.addObject("purchases", purchasesPage.getResults());
@@ -360,10 +347,7 @@ public class UserController {
             final PaginatedResult<Purchase> salesPage = purchaseService.findBySellerId(profileUser.getId(), statuses, page,
                     PROFILE_OTHER_PAGE_SIZE);
 
-            final Map<Long, Product> saleProducts = new HashMap<>();
-            for (Purchase s : salesPage.getResults()) {
-                productService.findById(s.getProductId()).ifPresent(prod -> saleProducts.put(s.getPurchaseId(), prod));
-            }
+            final Map<Long, Product> saleProducts = productsByPurchaseId(salesPage.getResults());
 
             mv.addObject("salesPage", salesPage);
             mv.addObject("sales", salesPage.getResults());
@@ -380,12 +364,7 @@ public class UserController {
 
             final PaginatedResult<Product> deletedPage = productService.listUserDeletedProducts(profileUser.getId(),
                     trashPage, PROFILE_TRASH_PAGE_SIZE);
-            final Map<Long, String> deletedProductImageUrls = new HashMap<>();
-            for (Product product : deletedPage.getResults()) {
-                if (imageService.existsByProductId(product.getId())) {
-                    deletedProductImageUrls.put(product.getId(), "/images/product/" + product.getId());
-                }
-            }
+            final Map<Long, String> deletedProductImageUrls = productImageUrlsFor(deletedPage.getResults());
 
             LOGGER.atDebug().addArgument(deletedPage.getResults()).log("Found the following deleted products: {}");
 
@@ -403,17 +382,93 @@ public class UserController {
         mv.addObject("followingUsers", followingPage.getResults());
 
         if (authUser != null) {
-            final Map<Long, Boolean> followStatusMap = new HashMap<>();
-            for (User u : followersPage.getResults()) {
-                followStatusMap.put(u.getId(), userService.isFollowing(authUser.getUser().getId(), u.getId()));
+            mv.addObject("followStatusMap", followStatusMapFor(
+                    authUser.getUser().getId(),
+                    followersPage.getResults(),
+                    followingPage.getResults()));
+        }
+    }
+
+    private Map<Long, String> productImageUrlsFor(final List<Product> products) {
+        final Map<Long, String> productImageUrls = new HashMap<>();
+        if (products == null || products.isEmpty()) {
+            return productImageUrls;
+        }
+
+        final List<Long> productIds = new ArrayList<>();
+        for (Product product : products) {
+            productIds.add(product.getId());
+        }
+        final Set<Long> productIdsWithImages = imageService.findProductIdsWithImages(productIds);
+        for (Long productId : productIdsWithImages) {
+            productImageUrls.put(productId, "/images/product/" + productId);
+        }
+        return productImageUrls;
+    }
+
+    private Map<Long, Product> productsByPurchaseId(final List<Purchase> purchases) {
+        final Map<Long, Product> productsByPurchaseId = new HashMap<>();
+        if (purchases == null || purchases.isEmpty()) {
+            return productsByPurchaseId;
+        }
+
+        final Set<Long> productIds = new HashSet<>();
+        for (Purchase purchase : purchases) {
+            productIds.add(purchase.getProductId());
+        }
+
+        final Map<Long, Product> productsById = new HashMap<>();
+        for (Product product : productService.findByIds(productIds)) {
+            productsById.put(product.getId(), product);
+        }
+
+        for (Purchase purchase : purchases) {
+            final Product product = productsById.get(purchase.getProductId());
+            if (product != null) {
+                productsByPurchaseId.put(purchase.getPurchaseId(), product);
             }
-            for (User u : followingPage.getResults()) {
-                if (!followStatusMap.containsKey(u.getId())) {
-                    followStatusMap.put(u.getId(), userService.isFollowing(authUser.getUser().getId(), u.getId()));
+        }
+        return productsByPurchaseId;
+    }
+
+    private Map<Long, Boolean> reviewStatusByPurchaseId(final List<Purchase> purchases) {
+        final Map<Long, Boolean> purchaseHasReview = new HashMap<>();
+        if (purchases == null || purchases.isEmpty()) {
+            return purchaseHasReview;
+        }
+
+        final Set<Long> purchaseIds = new HashSet<>();
+        for (Purchase purchase : purchases) {
+            purchaseIds.add(purchase.getPurchaseId());
+        }
+        final Set<Long> reviewedPurchaseIds = reviewService.findReviewedPurchaseIds(purchaseIds);
+        for (Purchase purchase : purchases) {
+            purchaseHasReview.put(purchase.getPurchaseId(), reviewedPurchaseIds.contains(purchase.getPurchaseId()));
+        }
+        return purchaseHasReview;
+    }
+
+    private Map<Long, Boolean> followStatusMapFor(
+            final Long currentUserId,
+            final List<User> followers,
+            final List<User> following) {
+        final List<Long> userIds = new ArrayList<>();
+        final Set<Long> seenIds = new HashSet<>();
+        if (followers != null) {
+            for (User user : followers) {
+                if (seenIds.add(user.getId())) {
+                    userIds.add(user.getId());
                 }
             }
-            mv.addObject("followStatusMap", followStatusMap);
         }
+        if (following != null) {
+            for (User user : following) {
+                if (seenIds.add(user.getId())) {
+                    userIds.add(user.getId());
+                }
+            }
+        }
+        return userService.followingStatusByUserIds(currentUserId, userIds);
     }
 
     @RequestMapping(value = "/profile/admin/hide-product", method = RequestMethod.POST)

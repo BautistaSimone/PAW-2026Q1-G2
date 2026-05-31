@@ -94,22 +94,8 @@ public class HomeController {
 
 		final PaginatedResult<Product> productsPage = productService.listProducts(criteria);
 
-		final Map<Long, String> productImageUrls = new HashMap<>();
-
-		for (Product product : productsPage.getResults()) {
-			if (imageService.existsByProductId(product.getId())) {
-				productImageUrls.put(product.getId(), "/images/product/" + product.getId());
-			}
-		}
-
-		final Set<Long> distinctSellerIds = new HashSet<>();
-		for (Product product : productsPage.getResults()) {
-			distinctSellerIds.add(product.getUserId());
-		}
-		final Map<Long, SellerRatingSummary> sellerRatingByUserId = new HashMap<>();
-		for (Long sellerId : distinctSellerIds) {
-			sellerRatingByUserId.put(sellerId, reviewService.summaryForSeller(sellerId));
-		}
+		final Map<Long, String> productImageUrls = productImageUrlsFor(productsPage.getResults());
+		final Map<Long, SellerRatingSummary> sellerRatingByUserId = sellerRatingsFor(productsPage.getResults());
 
 		final Set<Long> selectedCategoryIds = new HashSet<>();
 		if (categoryIds != null) {
@@ -217,18 +203,8 @@ public class HomeController {
 
 			productsPage = productService.listProducts(criteria);
 
-			for (Product product : productsPage.getResults()) {
-				if (imageService.existsByProductId(product.getId())) {
-					productImageUrls.put(product.getId(), "/images/product/" + product.getId());
-				}
-			}
-
-			final Set<Long> distinctSellerIds = new HashSet<>();
-			for (Product product : productsPage.getResults()) {
-				distinctSellerIds.add(product.getUserId());
-			}
-
-			sellerRatingByUserId = reviewService.sellerRatingByUserId(distinctSellerIds);
+			productImageUrls.putAll(productImageUrlsFor(productsPage.getResults()));
+			sellerRatingByUserId = sellerRatingsFor(productsPage.getResults());
 		}
 
 		mav.addObject("productsPage", productsPage);
@@ -238,23 +214,8 @@ public class HomeController {
 
 		final PaginatedResult<Product> wishlistProductsPage =
 				productService.getRecommendedProductsPage(currentUserId, wishlistPage, 12, null);
-		final Map<Long, String> wishlistProductImageUrls = new HashMap<>();
-		final Map<Long, SellerRatingSummary> wishlistSellerRatingByUserId = new HashMap<>();
-		if (!wishlistProductsPage.getResults().isEmpty()) {
-			for (Product product : wishlistProductsPage.getResults()) {
-				if (imageService.existsByProductId(product.getId())) {
-					wishlistProductImageUrls.put(product.getId(), "/images/product/" + product.getId());
-				}
-			}
-
-			final Set<Long> distinctWishlistSellers = new HashSet<>();
-			for (Product product : wishlistProductsPage.getResults()) {
-				distinctWishlistSellers.add(product.getUserId());
-			}
-			for (Long sellerId : distinctWishlistSellers) {
-				wishlistSellerRatingByUserId.put(sellerId, reviewService.summaryForSeller(sellerId));
-			}
-		}
+		final Map<Long, String> wishlistProductImageUrls = productImageUrlsFor(wishlistProductsPage.getResults());
+		final Map<Long, SellerRatingSummary> wishlistSellerRatingByUserId = sellerRatingsFor(wishlistProductsPage.getResults());
 		mav.addObject("wishlistProductsPage", wishlistProductsPage);
 		mav.addObject("wishlistProducts", wishlistProductsPage.getResults());
 		mav.addObject("wishlistProductImageUrls", wishlistProductImageUrls);
@@ -387,6 +348,33 @@ public class HomeController {
 		formatter.setMinimumFractionDigits(0);
 		formatter.setMaximumFractionDigits(2);
 		return "$" + formatter.format(price);
+	}
+
+	private Map<Long, String> productImageUrlsFor(final List<Product> products) {
+		final Map<Long, String> productImageUrls = new HashMap<>();
+		if (products == null || products.isEmpty()) {
+			return productImageUrls;
+		}
+
+		final List<Long> productIds = new ArrayList<>();
+		for (Product product : products) {
+			productIds.add(product.getId());
+		}
+		final Set<Long> productIdsWithImages = imageService.findProductIdsWithImages(productIds);
+		for (Long productId : productIdsWithImages) {
+			productImageUrls.put(productId, "/images/product/" + productId);
+		}
+		return productImageUrls;
+	}
+
+	private Map<Long, SellerRatingSummary> sellerRatingsFor(final List<Product> products) {
+		final Set<Long> distinctSellerIds = new HashSet<>();
+		if (products != null) {
+			for (Product product : products) {
+				distinctSellerIds.add(product.getUserId());
+			}
+		}
+		return reviewService.sellerRatingByUserId(distinctSellerIds);
 	}
 
 	public static final class CommunityProductsResponse {

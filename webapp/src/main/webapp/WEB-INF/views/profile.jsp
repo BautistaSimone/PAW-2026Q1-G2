@@ -668,9 +668,9 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="profile-div-6">
-                                    <h4 class="mb-3"><spring:message code="Profile.tabs.favoriteGenres" text="Mis géneros favoritos" /></h4>
+                                    <h4 class="mb-3"><spring:message code="Profile.tabs.favoriteGenres" /></h4>
                                     <p class="profile-p-7">
-                                        <spring:message code="Profile.favoriteGenres.help" text="Selecciona los géneros que más te gustan para mejorar tus recomendaciones." />
+                                        <spring:message code="Profile.favoriteGenres.help" />
                                     </p>
                                     <c:url var="profileUpdateGenresUrl" value="/profile/update-genres" />
                                     <form action="${profileUpdateGenresUrl}" method="post" id="genresForm">

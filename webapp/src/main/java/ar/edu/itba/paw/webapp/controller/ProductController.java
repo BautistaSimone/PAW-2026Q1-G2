@@ -497,10 +497,7 @@ public class ProductController {
         for (Product p : relatedProducts) {
             carouselSellerIds.add(p.getUserId());
         }
-        final Map<Long, SellerRatingSummary> sellerRatings = new HashMap<>();
-        for (Long uid : carouselSellerIds) {
-            sellerRatings.put(uid, reviewService.summaryForSeller(uid));
-        }
+        final Map<Long, SellerRatingSummary> sellerRatings = reviewService.sellerRatingByUserId(carouselSellerIds);
 
         mav.addObject("sellerProducts", sellerProducts);
         mav.addObject("relatedProducts", relatedProducts);

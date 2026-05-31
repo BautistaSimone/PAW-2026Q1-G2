@@ -27,6 +27,11 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryDao.findAll();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Category> findByIds(final List<Long> ids) {
+        return categoryDao.findByIds(ids);
+    }
 
     @Override
     @Transactional(readOnly = true)

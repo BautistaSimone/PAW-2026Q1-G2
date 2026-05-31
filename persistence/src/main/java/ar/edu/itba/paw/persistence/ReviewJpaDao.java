@@ -7,6 +7,7 @@ import javax.persistence.Tuple;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,6 +48,20 @@ public class ReviewJpaDao implements ReviewDao {
         final Review review = reviews.get(0);
         populateBuyerUsername(review);
         return Optional.of(review);
+    }
+
+    @Override
+    public Set<Long> findReviewedPurchaseIds(final Set<Long> purchaseIds) {
+        if (purchaseIds == null || purchaseIds.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return em.createQuery(
+                "SELECT r.purchaseId FROM Review r WHERE r.purchaseId IN :purchaseIds",
+                Long.class)
+            .setParameter("purchaseIds", purchaseIds)
+            .getResultList()
+            .stream()
+            .collect(Collectors.toSet());
     }
 
     @Override
@@ -102,20 +117,33 @@ public class ReviewJpaDao implements ReviewDao {
 
     @Override
     public Map<Long, SellerRatingSummary> sellerRatingByUserId(final Set<Long> distinctSellerIds) {
-        final Map<Long, SellerRatingSummary> result = em.createQuery(
+        final Map<Long, SellerRatingSummary> result = new HashMap<>();
+        if (distinctSellerIds == null || distinctSellerIds.isEmpty()) {
+            return result;
+        }
+        for (Long sellerId : distinctSellerIds) {
+            if (sellerId != null) {
+                result.put(sellerId, new SellerRatingSummary(0.0, 0));
+            }
+        }
+        if (result.isEmpty()) {
+            return result;
+        }
+
+        em.createQuery(
             "SELECT r.sellerId AS id, COALESCE(AVG(r.score), 0.0) AS average, COUNT(r) AS count " 
             + "FROM Review r WHERE r.sellerId IN :sellerIds GROUP BY r.sellerId",
             Tuple.class
         )
-        .setParameter("sellerIds", distinctSellerIds)
+        .setParameter("sellerIds", result.keySet())
         .getResultList()
-        .stream()
-        .collect(
-            Collectors.toMap(
-                tuple -> ((Number) tuple.get("id")).longValue(),
-                tuple -> new SellerRatingSummary(((Number) tuple.get("average")).doubleValue(), ((Number) tuple.get("count")).intValue())
+        .forEach(tuple -> result.put(
+            ((Number) tuple.get("id")).longValue(),
+            new SellerRatingSummary(
+                ((Number) tuple.get("average")).doubleValue(),
+                ((Number) tuple.get("count")).intValue()
             )
-        );
+        ));
 
         return result;
     }
