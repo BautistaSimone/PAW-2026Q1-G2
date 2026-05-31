@@ -549,17 +549,24 @@ public class ProductJpaDao implements ProductDao {
         final List<Product> products = em.createQuery(
                 "FROM Product p " +
                 "WHERE p.state = :state AND p.userId IN :ids " +
+                "AND (" +
+                " SELECT COUNT(newer) FROM Product newer " +
+                " WHERE newer.state = :state " +
+                " AND newer.userId = p.userId " +
+                " AND (" +
+                "  newer.published > p.published " +
+                "  OR (newer.published = p.published AND newer.productId >= p.productId)" +
+                " )" +
+                ") <= :limit " +
                 "ORDER BY p.userId ASC, p.published DESC, p.productId DESC",
                 Product.class)
             .setParameter("state", ProductState.ACTIVE.getPersistenceValue())
-            .setParameter("ids", productsByUserId.keySet())
+            .setParameter("ids", distinctUserIds)
+            .setParameter("limit", (long) perUserLimit)
             .getResultList();
 
         for (Product product : products) {
-            final List<Product> userProducts = productsByUserId.computeIfAbsent(product.getUserId(), id -> new ArrayList<>());
-            if (userProducts.size() < perUserLimit) {
-                userProducts.add(product);
-            }
+            productsByUserId.computeIfAbsent(product.getUserId(), id -> new ArrayList<>()).add(product);
         }
         return productsByUserId;
     }

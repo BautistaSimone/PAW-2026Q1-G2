@@ -357,9 +357,6 @@ public class HomeController {
 
 		final PaginatedResult<Product> productsPage =
 				productService.listActiveProductsByUser(userId, page, COMMUNITY_PRODUCT_PAGE_SIZE);
-		if (productsPage.getTotalCount() == 0) {
-			return ResponseEntity.notFound().build();
-		}
 
 		final List<Long> productIds = new ArrayList<>();
 		for (Product product : productsPage.getResults()) {
