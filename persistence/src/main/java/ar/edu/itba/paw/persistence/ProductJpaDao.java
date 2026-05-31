@@ -12,7 +12,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,19 @@ public class ProductJpaDao implements ProductDao {
     @Override
     public Optional<Product> findById(final Long id) {
         return Optional.ofNullable(em.find(Product.class, id));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Product> findByIds(java.util.Set<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        return em.createQuery(
+            "FROM Product p WHERE p.productId IN :ids", Product.class
+        )
+        .setParameter("ids", ids)
+        .getResultList();
     }
 
     @Override
@@ -436,6 +452,116 @@ public class ProductJpaDao implements ProductDao {
             .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
 
         return new PaginatedResult<>(selectQuery.getResultList(), safePage, safePageSize, ids.size());
+    }
+
+    @Override
+    public PaginatedResult<Product> findActiveProductsByUserId(
+        final Long userId,
+        final int page,
+        final int pageSize
+    ) {
+        final int safePage = page < 1 ? 1 : page;
+        final int safePageSize = pageSize < 1 ? 12 : pageSize;
+
+        if (userId == null) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
+        }
+
+        final String activeState = ProductState.ACTIVE.getPersistenceValue();
+        final long totalCount = em.createQuery(
+                "SELECT COUNT(p) FROM Product p WHERE p.userId = :userId AND p.state = :state",
+                Long.class)
+            .setParameter("userId", userId)
+            .setParameter("state", activeState)
+            .getSingleResult();
+
+        if (totalCount == 0) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
+        }
+
+        final List<Product> products = em.createQuery(
+                "FROM Product p " +
+                "WHERE p.userId = :userId AND p.state = :state " +
+                "ORDER BY p.published DESC, p.productId DESC",
+                Product.class)
+            .setParameter("userId", userId)
+            .setParameter("state", activeState)
+            .setFirstResult((safePage - 1) * safePageSize)
+            .setMaxResults(safePageSize)
+            .getResultList();
+
+        return new PaginatedResult<>(products, safePage, safePageSize, totalCount);
+    }
+
+    @Override
+    public Map<Long, Long> countActiveProductsByUserIds(final List<Long> userIds) {
+        final Map<Long, Long> counts = new HashMap<>();
+        if (userIds == null || userIds.isEmpty()) {
+            return counts;
+        }
+        for (Long userId : userIds) {
+            if (userId != null) {
+                counts.put(userId, 0L);
+            }
+        }
+        if (counts.isEmpty()) {
+            return counts;
+        }
+
+        final List<Object[]> rows = em.createQuery(
+                "SELECT p.userId, COUNT(p) " +
+                "FROM Product p " +
+                "WHERE p.userId IN :ids AND p.state = :state " +
+                "GROUP BY p.userId",
+                Object[].class)
+            .setParameter("ids", counts.keySet())
+            .setParameter("state", ProductState.ACTIVE.getPersistenceValue())
+            .getResultList();
+
+        for (Object[] row : rows) {
+            counts.put((Long) row[0], (Long) row[1]);
+        }
+        return counts;
+    }
+
+    @Override
+    public Map<Long, List<Product>> findLatestActiveProductsByUserIds(
+        final List<Long> userIds,
+        final int perUserLimit
+    ) {
+        final Map<Long, List<Product>> productsByUserId = new LinkedHashMap<>();
+        if (userIds == null || userIds.isEmpty() || perUserLimit < 1) {
+            return productsByUserId;
+        }
+
+        final List<Long> distinctUserIds = userIds.stream()
+            .filter(id -> id != null)
+            .distinct()
+            .collect(Collectors.toList());
+
+        for (Long userId : distinctUserIds) {
+            productsByUserId.put(userId, new ArrayList<>());
+        }
+        if (productsByUserId.isEmpty()) {
+            return productsByUserId;
+        }
+
+        final List<Product> products = em.createQuery(
+                "FROM Product p " +
+                "WHERE p.state = :state AND p.userId IN :ids " +
+                "ORDER BY p.userId ASC, p.published DESC, p.productId DESC",
+                Product.class)
+            .setParameter("state", ProductState.ACTIVE.getPersistenceValue())
+            .setParameter("ids", productsByUserId.keySet())
+            .getResultList();
+
+        for (Product product : products) {
+            final List<Product> userProducts = productsByUserId.computeIfAbsent(product.getUserId(), id -> new ArrayList<>());
+            if (userProducts.size() < perUserLimit) {
+                userProducts.add(product);
+            }
+        }
+        return productsByUserId;
     }
 
     @Override

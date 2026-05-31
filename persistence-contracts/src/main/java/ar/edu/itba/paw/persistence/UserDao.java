@@ -63,6 +63,13 @@ public interface UserDao {
 	List<Long> getFollowedUserIds(final Long userId);
 	PaginatedResult<User> searchUsers(final String query, final int page, final int pageSize);
 	List<User> getMostFollowedUsers(final int limit);
+<<<<<<< HEAD
         Map<Long, Boolean> getFollowStatusMap(Long userId, List<Long> userIds);
         Map<Long, Long> getUserFollowerCounts(List<Long> userIds);
+=======
+	PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize);
+	PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize);
+	Map<Long, Long> countFollowersByUserIds(final List<Long> userIds);
+	Map<Long, Boolean> followingStatusByUserIds(final Long followerId, final List<Long> followedIds);
+>>>>>>> 21e8c0616424b57512c8e4f28423579dfb1fd2a5
 }

@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import ar.edu.itba.paw.models.PaginatedResult;
@@ -54,6 +55,12 @@ public interface ProductService {
 
     PaginatedResult<Product> listUserDeletedProducts(final Long userId, final int page, final int pageSize);
 
+    PaginatedResult<Product> listActiveProductsByUser(final Long userId, final int page, final int pageSize);
+
+    Map<Long, Long> countActiveProductsByUserIds(final List<Long> userIds);
+
+    Map<Long, List<Product>> listLatestActiveProductsByUserIds(final List<Long> userIds, final int perUserLimit);
+
     List<String> listDistinctArtists();
 
     List<String> listDistinctRecordLabels();
@@ -63,6 +70,8 @@ public interface ProductService {
     List<String> suggestRecordLabels(final String query, final int limit);
 
     Optional<Product> findById(final Long id);
+
+    List<Product> findByIds(java.util.Set<Long> ids);
 
     Optional<Product> findByIdIfAvailable(final Long id);
 

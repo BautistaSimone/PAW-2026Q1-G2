@@ -8,7 +8,9 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.Tuple;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Map;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Repository;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.ProductState;
 
 @Repository
 public class UserJpaDao implements UserDao {
@@ -322,10 +325,10 @@ public class UserJpaDao implements UserDao {
         final int safePage = Math.max(page, 1);
         final int safeSize = Math.max(pageSize, 1);
 
-        final String likePattern = "%" + query.trim().toLowerCase() + "%";
+        final String likePattern = "%" + escapeForLike(query.trim().toLowerCase()) + "%";
 
         final long totalCount = em.createQuery(
-                "SELECT COUNT(u) FROM User u WHERE LOWER(u.username) LIKE :q AND u.banned = false", Long.class)
+                "SELECT COUNT(u) FROM User u WHERE LOWER(u.username) LIKE :q ESCAPE '\\' AND u.banned = false", Long.class)
             .setParameter("q", likePattern)
             .getSingleResult();
 
@@ -334,7 +337,7 @@ public class UserJpaDao implements UserDao {
         }
 
         final List<User> users = em.createQuery(
-                "FROM User u WHERE LOWER(u.username) LIKE :q AND u.banned = false ORDER BY u.username ASC", User.class)
+                "FROM User u WHERE LOWER(u.username) LIKE :q ESCAPE '\\' AND u.banned = false ORDER BY u.username ASC", User.class)
             .setParameter("q", likePattern)
             .setFirstResult((safePage - 1) * safeSize)
             .setMaxResults(safeSize)
@@ -365,6 +368,7 @@ public class UserJpaDao implements UserDao {
             .getResultList();
     }
 
+<<<<<<< HEAD
     
     @Override
     public Map<Long, Boolean> getFollowStatusMap(Long userId, List<Long> userIds) {
@@ -394,5 +398,176 @@ public class UserJpaDao implements UserDao {
                 row -> ((Number) row[0]).longValue(),
                 row -> ((Number) row[1]).longValue()
             ));
+=======
+    @Override
+    public PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize) {
+        final int safePage = Math.max(page, 1);
+        final int safeSize = Math.max(pageSize, 1);
+
+        final String activeState = ProductState.ACTIVE.getPersistenceValue();
+        final Number countResult = (Number) em.createNativeQuery(
+                "SELECT COUNT(*) FROM users u " +
+                "WHERE u.banned = false " +
+                "AND EXISTS (" +
+                " SELECT 1 FROM products p " +
+                " WHERE p.user_id = u.user_id AND p.state = :state" +
+                ")")
+            .setParameter("state", activeState)
+            .getSingleResult();
+        final long totalCount = countResult == null ? 0 : countResult.longValue();
+
+        if (totalCount == 0) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, 0);
+        }
+
+        @SuppressWarnings("unchecked")
+        final List<Number> ids = em.createNativeQuery(
+                "SELECT u.user_id " +
+                "FROM users u " +
+                "JOIN products p ON p.user_id = u.user_id AND p.state = :state " +
+                "LEFT JOIN user_follows uf ON uf.followed_id = u.user_id " +
+                "WHERE u.banned = false " +
+                "GROUP BY u.user_id " +
+                "ORDER BY COUNT(DISTINCT uf.follower_id) DESC, " +
+                "COUNT(DISTINCT p.product_id) DESC, " +
+                "u.user_id ASC")
+            .setParameter("state", activeState)
+            .setFirstResult((safePage - 1) * safeSize)
+            .setMaxResults(safeSize)
+            .getResultList();
+
+        final List<Long> orderedIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
+        return new PaginatedResult<>(findUsersPreservingOrder(orderedIds), safePage, safeSize, totalCount);
+    }
+
+    @Override
+    public PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize) {
+        final int safePage = Math.max(page, 1);
+        final int safeSize = Math.max(pageSize, 1);
+        final String rawQuery = query == null ? "" : query.trim().toLowerCase();
+        final String likePattern = "%" + escapeForLike(rawQuery) + "%";
+        final String activeState = ProductState.ACTIVE.getPersistenceValue();
+
+        final long totalCount = em.createQuery(
+                "SELECT COUNT(u) " +
+                "FROM User u " +
+                "WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
+                "AND u.banned = false " +
+                "AND EXISTS (" +
+                " SELECT p.productId FROM Product p " +
+                " WHERE p.userId = u.id AND p.state = :state" +
+                ")",
+                Long.class)
+            .setParameter("q", likePattern)
+            .setParameter("state", activeState)
+            .getSingleResult();
+
+        if (totalCount == 0) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, 0);
+        }
+
+        final List<User> users = em.createQuery(
+                "FROM User u " +
+                "WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
+                "AND u.banned = false " +
+                "AND EXISTS (" +
+                " SELECT p.productId FROM Product p " +
+                " WHERE p.userId = u.id AND p.state = :state" +
+                ") " +
+                "ORDER BY LOWER(u.username) ASC, u.id ASC",
+                User.class)
+            .setParameter("q", likePattern)
+            .setParameter("state", activeState)
+            .setFirstResult((safePage - 1) * safeSize)
+            .setMaxResults(safeSize)
+            .getResultList();
+
+        return new PaginatedResult<>(users, safePage, safeSize, totalCount);
+    }
+
+    @Override
+    public Map<Long, Long> countFollowersByUserIds(final List<Long> userIds) {
+        final Map<Long, Long> counts = new HashMap<>();
+        if (userIds == null || userIds.isEmpty()) {
+            return counts;
+        }
+        for (Long userId : userIds) {
+            if (userId != null) {
+                counts.put(userId, 0L);
+            }
+        }
+        if (counts.isEmpty()) {
+            return counts;
+        }
+
+        @SuppressWarnings("unchecked")
+        final List<Object[]> rows = em.createNativeQuery(
+                "SELECT followed_id, COUNT(*) " +
+                "FROM user_follows " +
+                "WHERE followed_id IN (:ids) " +
+                "GROUP BY followed_id")
+            .setParameter("ids", counts.keySet())
+            .getResultList();
+
+        for (Object[] row : rows) {
+            counts.put(((Number) row[0]).longValue(), ((Number) row[1]).longValue());
+        }
+        return counts;
+    }
+
+    @Override
+    public Map<Long, Boolean> followingStatusByUserIds(final Long followerId, final List<Long> followedIds) {
+        final Map<Long, Boolean> statuses = new HashMap<>();
+        if (followerId == null || followedIds == null || followedIds.isEmpty()) {
+            return statuses;
+        }
+        for (Long followedId : followedIds) {
+            if (followedId != null) {
+                statuses.put(followedId, false);
+            }
+        }
+        if (statuses.isEmpty()) {
+            return statuses;
+        }
+
+        @SuppressWarnings("unchecked")
+        final List<Number> rows = em.createNativeQuery(
+                "SELECT followed_id " +
+                "FROM user_follows " +
+                "WHERE follower_id = :followerId AND followed_id IN (:ids)")
+            .setParameter("followerId", followerId)
+            .setParameter("ids", statuses.keySet())
+            .getResultList();
+
+        for (Number followedId : rows) {
+            statuses.put(followedId.longValue(), true);
+        }
+        return statuses;
+    }
+
+    private List<User> findUsersPreservingOrder(final List<Long> orderedIds) {
+        if (orderedIds == null || orderedIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final Map<Long, Integer> orderById = new HashMap<>();
+        for (int i = 0; i < orderedIds.size(); i++) {
+            orderById.put(orderedIds.get(i), i);
+        }
+
+        return em.createQuery("FROM User WHERE id IN :ids", User.class)
+            .setParameter("ids", orderedIds)
+            .getResultList()
+            .stream()
+            .sorted((left, right) -> Integer.compare(orderById.get(left.getId()), orderById.get(right.getId())))
+            .collect(Collectors.toList());
+    }
+
+    private static String escapeForLike(final String value) {
+        return value
+            .replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_");
+>>>>>>> 21e8c0616424b57512c8e4f28423579dfb1fd2a5
     }
 }

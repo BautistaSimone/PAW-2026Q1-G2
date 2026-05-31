@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Map;
 
@@ -270,6 +271,7 @@ public class UserServiceImpl implements UserService {
         return userDao.getMostFollowedUsers(limit);
     }
 
+<<<<<<< HEAD
 
     @Override
     @Transactional(readOnly = true)
@@ -283,4 +285,29 @@ public class UserServiceImpl implements UserService {
         return userDao.getUserFollowerCounts(userIds);
     }
     
+=======
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize) {
+        return userDao.getFeaturedActiveSellers(page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize) {
+        return userDao.searchActiveSellers(query, page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Long> countFollowersByUserIds(final List<Long> userIds) {
+        return userDao.countFollowersByUserIds(userIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Boolean> followingStatusByUserIds(final Long followerId, final List<Long> followedIds) {
+        return userDao.followingStatusByUserIds(followerId, followedIds);
+    }
+>>>>>>> 21e8c0616424b57512c8e4f28423579dfb1fd2a5
 }

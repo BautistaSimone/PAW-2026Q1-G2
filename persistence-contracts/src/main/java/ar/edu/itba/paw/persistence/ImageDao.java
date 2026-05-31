@@ -2,6 +2,7 @@ package ar.edu.itba.paw.persistence;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import ar.edu.itba.paw.models.Image;
 
@@ -15,6 +16,8 @@ public interface ImageDao {
     List<Image> findAllByProductId(Long productId);
 
     boolean existsByProductId(Long productId);
+
+    Set<Long> findProductIdsWithImages(List<Long> productIds);
 
     List<Image> listImages();
 

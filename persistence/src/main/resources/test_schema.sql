@@ -142,3 +142,12 @@ CREATE TABLE IF NOT EXISTS user_favorite_categories (
 	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
 	FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS pending_notifications (
+    notification_id SERIAL PRIMARY KEY,
+    follower_user_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (follower_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
+);
