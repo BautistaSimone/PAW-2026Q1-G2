@@ -34,6 +34,7 @@ import ar.edu.itba.paw.services.PurchaseService;
 import ar.edu.itba.paw.services.VerificationTokenService;
 import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.services.ReportService;
+import ar.edu.itba.paw.services.ReportedProductSummary;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.webapp.form.RegisterForm;
 import ar.edu.itba.paw.webapp.form.LoginForm;
@@ -371,7 +372,7 @@ public class UserController {
             // Load reports for admins (checked via Spring Security role)
             if (authUser != null && authUser.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-                final PaginatedResult<ar.edu.itba.paw.models.ReportedProduct> reportsPage = reportService
+                final PaginatedResult<ReportedProductSummary> reportsPage = reportService
                         .findAllGroupedByProduct(page, PROFILE_OTHER_PAGE_SIZE);
                 mv.addObject("reportsPage", reportsPage);
                 mv.addObject("reportedProducts", reportsPage.getResults());
