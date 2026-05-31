@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -435,9 +436,20 @@ public class ProductJpaDao implements ProductDao {
         final int safePageSize = pageSize < 1 ? 12 : pageSize;
         final String stateVal = state.getPersistenceValue();
 
+        final Number countResult = (Number) em.createNativeQuery(
+                "SELECT COUNT(*) FROM products WHERE user_id = :userId AND state = :state")
+            .setParameter("userId", userId)
+            .setParameter("state", stateVal)
+            .getSingleResult();
+        final long totalCount = countResult == null ? 0L : countResult.longValue();
+        if (totalCount == 0) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
+        }
+
         // Paginate with 1 + 1 queries
         @SuppressWarnings("unchecked")
-        List<Number> ids = em.createNativeQuery("SELECT product_id FROM products WHERE user_id = :userId AND state = :state")
+        List<Number> ids = em.createNativeQuery(
+                "SELECT product_id FROM products WHERE user_id = :userId AND state = :state ORDER BY published DESC, product_id DESC")
             .setParameter("userId", userId)
             .setParameter("state", stateVal)
             .setFirstResult((safePage-1) * safePageSize)
@@ -445,13 +457,21 @@ public class ProductJpaDao implements ProductDao {
             .getResultList();
 
         if (ids.isEmpty()) {
-            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, totalCount);
         }
 
         final TypedQuery<Product> selectQuery = em.createQuery("FROM Product WHERE productId IN :ids", Product.class)
             .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
 
-        return new PaginatedResult<>(selectQuery.getResultList(), safePage, safePageSize, ids.size());
+        final Map<Long, Product> productsById = selectQuery.getResultList().stream()
+            .collect(Collectors.toMap(Product::getId, product -> product));
+        final List<Product> orderedProducts = ids.stream()
+            .map(Number::longValue)
+            .map(productsById::get)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        return new PaginatedResult<>(orderedProducts, safePage, safePageSize, totalCount);
     }
 
     @Override

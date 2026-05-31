@@ -10,6 +10,7 @@ public interface CategoryDao {
 
 
     List<Category> findAll();
+    List<Category> findByIds(final List<Long> ids);
     List<Category> findByProductId(final Long productId);
     Optional<Category> findById(final Long id);
 }

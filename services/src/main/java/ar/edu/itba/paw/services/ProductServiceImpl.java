@@ -93,16 +93,7 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Stock must be at least 1");
         }
 
-        List<Category> categories = new ArrayList<>(); 
-
-        // FIXME: Use Category object directly in webapp
-        for (Long id : categoryIds) {
-            Optional<Category> categoryOpt = categoryService.findById(id);
-
-            if (categoryOpt.isPresent()) {
-                categories.add(categoryOpt.get());
-            }
-        }
+        final List<Category> categories = resolveCategories(categoryIds);
 
         final Product product = productDao.createProduct(
             userId, trimToNull(title), trimToNull(artist), toTitleCase(recordLabel),
@@ -390,16 +381,7 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Stock must be at least 1");
         }
 
-        List<Category> categories = new ArrayList<>(); 
-
-        // FIXME: Use Category object directly in webapp
-        for (Long id : categoryIds) {
-            Optional<Category> categoryOpt = categoryService.findById(id);
-
-            if (categoryOpt.isPresent()) {
-                categories.add(categoryOpt.get());
-            }
-        }
+        final List<Category> categories = resolveCategories(categoryIds);
 
 
         final boolean ok = productDao.updateProduct(
@@ -452,4 +434,30 @@ public class ProductServiceImpl implements ProductService {
 			return null;
 		}
 	}
+
+    private List<Category> resolveCategories(final List<Long> categoryIds) {
+        if (categoryIds == null || categoryIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final List<Long> distinctIds = categoryIds.stream()
+            .filter(id -> id != null)
+            .distinct()
+            .collect(Collectors.toList());
+        if (distinctIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final Map<Long, Category> categoriesById = categoryService.findByIds(distinctIds).stream()
+            .collect(Collectors.toMap(Category::getId, category -> category));
+
+        final List<Category> categories = new ArrayList<>();
+        for (Long id : distinctIds) {
+            final Category category = categoriesById.get(id);
+            if (category != null) {
+                categories.add(category);
+            }
+        }
+        return categories;
+    }
 }
