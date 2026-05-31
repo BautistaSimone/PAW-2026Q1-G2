@@ -208,6 +208,48 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Override
+    @Transactional
+    public void sendNewVinylDigestEmail(final String to, final String username, final java.util.List<Product> products) {
+        final Locale locale = LocaleContextHolder.getLocale();
+        final Context ctx = new Context(locale);
+
+        ctx.setVariable("title",
+                messageSource.getMessage("email.digest.heading", null, locale));
+        ctx.setVariable("recipientName", username);
+
+        final java.util.List<java.util.Map<String, String>> items = new java.util.ArrayList<>();
+        for (final Product p : products) {
+            final java.util.Map<String, String> item = new java.util.LinkedHashMap<>();
+            item.put("name", p.getTitle());
+            item.put("artist", p.getArtist());
+            item.put("price", formatAmount(p));
+            item.put("url", buildProductUrl(p.getId()));
+            items.add(item);
+        }
+        ctx.setVariable("products", items);
+        ctx.setVariable("productCount", products.size());
+
+        try {
+            final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
+
+            messageHelper.setSubject(
+                    messageSource.getMessage("email.digest.subject",
+                            new Object[]{ products.size() }, locale));
+            messageHelper.setTo(to);
+            messageHelper.setFrom("no-reply@vinyland.com");
+
+            final String htmlContent = templateEngine.process("new-vinyl-digest", ctx);
+            messageHelper.setText(htmlContent, true);
+
+            javaMailSender.send(mimeMessage);
+            LOGGER.info("Digest email sent to: {} with {} products", to, products.size());
+        } catch (MessagingException | org.springframework.mail.MailException e) {
+            LOGGER.error("Error sending digest email to: {}", to, e);
+        }
+    }
+
     private void sendOrderEmail(
             final String to,
             final Product product,

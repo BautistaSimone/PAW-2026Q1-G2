@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{email.digest.subject}">Vinyland</title>
+    <th:block th:replace="~{email-base :: emailStyles}"></th:block>
+</head>
+<body style="margin:0;padding:0;background-color:#f8f9fa;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+       style="background-color:#f8f9fa;padding:24px 16px;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0"
+                   style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;
+                          overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);
+                          border:1px solid #e8e8e8;">
+                <tr>
+                    <td th:replace="~{email-base :: emailHeader}"></td>
+                </tr>
+                <tr>
+                    <td class="email-body-cell"
+                        style="padding:28px 24px 32px;font-family:Arial,Helvetica,sans-serif;
+                               color:#264653;font-size:16px;line-height:1.55;">
+
+                        <h1 class="heading-accent"
+                            style="color:#e76f51;font-size:20px;font-weight:700;margin:0 0 14px;"
+                            th:text="#{email.digest.heading}">
+                            Nuevos vinilos de tus seguidos
+                        </h1>
+
+                        <p class="greeting"
+                           style="color:#264653;font-size:17px;font-weight:700;margin:0 0 16px;"
+                           th:text="#{email.digest.greeting(${recipientName})}">
+                            Hola, usuario!
+                        </p>
+
+                        <p style="margin:0 0 18px;color:#264653;"
+                           th:text="#{email.digest.intro(${productCount})}">
+                            Los vendedores que seguís publicaron nuevos vinilos.
+                        </p>
+
+                        <th:block th:each="product : ${products}">
+                            <div class="order-summary"
+                                 style="background-color:#f4f4f4;border:1px solid #e0e0e0;
+                                        border-radius:8px;padding:18px 20px;margin:0 0 12px;">
+                                <table role="presentation" width="100%" cellpadding="0"
+                                       cellspacing="0"
+                                       style="font-family:Arial,Helvetica,sans-serif;font-size:15px;">
+                                    <tr>
+                                        <td style="padding:4px 0;vertical-align:top;width:30%;">
+                                            <span style="color:#e76f51;font-weight:700;font-size:14px;"
+                                                  th:text="#{email.digest.label.title}">Título</span>
+                                        </td>
+                                        <td>
+                                            <span style="color:#264653;"
+                                                  th:text="${product.name}">Album Name</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:8px 0 4px;">
+                                            <span style="color:#e76f51;font-weight:700;font-size:14px;"
+                                                  th:text="#{email.digest.label.artist}">Artista</span>
+                                        </td>
+                                        <td style="padding:8px 0 4px;">
+                                            <span style="color:#264653;"
+                                                  th:text="${product.artist}">Artist Name</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:8px 0 4px;">
+                                            <span style="color:#e76f51;font-weight:700;font-size:14px;"
+                                                  th:text="#{email.digest.label.price}">Precio</span>
+                                        </td>
+                                        <td style="padding:8px 0 4px;">
+                                            <span style="color:#264653;font-weight:700;"
+                                                  th:text="${product.price}">$1.000</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="padding:10px 0 0;text-align:center;">
+                                            <a th:href="${product.url}"
+                                               style="display:inline-block;background-color:#264653;
+                                                      color:#e76f51 !important;text-decoration:none;
+                                                      padding:10px 20px;border-radius:6px;
+                                                      font-weight:700;font-size:14px;"
+                                               th:text="#{email.digest.cta.viewProduct}">
+                                                Ver vinilo
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </th:block>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td th:replace="~{email-base :: emailFooter}"></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

@@ -42,6 +42,19 @@ public class ProductJpaDao implements ProductDao {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<Product> findByIds(java.util.Set<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        return em.createQuery(
+            "FROM Product p WHERE p.productId IN :ids", Product.class
+        )
+        .setParameter("ids", ids)
+        .getResultList();
+    }
+
+    @Override
     public Product createProduct(
         final Long userId,
         final String title,

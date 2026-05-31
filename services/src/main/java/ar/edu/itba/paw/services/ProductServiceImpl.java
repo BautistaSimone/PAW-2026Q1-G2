@@ -26,13 +26,17 @@ import ar.edu.itba.paw.persistence.ProductDao;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductDao productDao;
-
     private final CategoryService categoryService;
+    private final PendingNotificationService pendingNotificationService;
 
     @Autowired
-    public ProductServiceImpl(final ProductDao productDao, final CategoryService categoryService) {
+    public ProductServiceImpl(
+            final ProductDao productDao,
+            final CategoryService categoryService,
+            final PendingNotificationService pendingNotificationService) {
         this.productDao = productDao;
         this.categoryService = categoryService;
+        this.pendingNotificationService = pendingNotificationService;
     }
 
     private static String trimToNull(final String s) {
@@ -97,11 +101,15 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        return productDao.createProduct(
+        final Product product = productDao.createProduct(
             userId, trimToNull(title), trimToNull(artist), toTitleCase(recordLabel),
-            trimToNull(catalogNumber), trimToNull(editionCountry), categories, trimToNull(description),
-            sleeveCondition, recordCondition, price, stock
+            trimToNull(catalogNumber), trimToNull(editionCountry), categories,
+            trimToNull(description), sleeveCondition, recordCondition, price, stock
         );
+
+        pendingNotificationService.enqueueForFollowers(userId, product.getId());
+
+        return product;
     }
 
     private static void validateProductFields(
@@ -308,6 +316,12 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public Optional<Product> findById(final Long id) {
         return productDao.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Product> findByIds(java.util.Set<Long> ids) {
+        return productDao.findByIds(ids);
     }
 
     @Override

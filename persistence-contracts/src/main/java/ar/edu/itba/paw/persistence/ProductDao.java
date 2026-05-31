@@ -70,6 +70,8 @@ public interface ProductDao {
 
     Optional<Product> findById(final Long id);
 
+    List<Product> findByIds(java.util.Set<Long> ids);
+
     Optional<Product> findByIdIfAvailable(final Long id);
 
     boolean decrementStock(final Long id);

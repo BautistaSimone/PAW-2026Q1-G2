@@ -29,6 +29,8 @@ public interface EmailService {
 
     void sendProductReportEmail(Product product, User reporter, final User seller);
     
+    void sendNewVinylDigestEmail(String to, String username, java.util.List<Product> products);
+
     void sendPasswordResetEmail(String to, String resetToken, String username);
     void sendVerificationEmail(String to, String resetToken, String username);
 }
