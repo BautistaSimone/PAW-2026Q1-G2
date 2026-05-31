@@ -124,31 +124,32 @@ When generating new code, always strictly adhere to the following rules to ensur
 
 ## Internationalization (i18n)
 
-The application uses **Spring MessageSource**. The default locale is **Spanish (es_AR)**, and the Spanish message bundle is the only maintained source of user-facing text. `messages_en.properties` is intentionally empty and must remain empty.
+The application uses **Spring MessageSource**. The default locale is **English**, and the English message bundle is the primary source of user-facing text. `messages_en.properties` is intentionally empty and must remain empty.
 
 ### Configuration (WebConfig.java)
 - **`MessageSource`**: A `ReloadableResourceBundleMessageSource` bean loads message bundles from `classpath:messages` with UTF-8 encoding.
-- **`LocaleResolver`**: A `SessionLocaleResolver` stores the user's chosen locale in their session (default: `es_AR`).
+- **`LocaleResolver`**: A `SessionLocaleResolver` stores the user's chosen locale in their session (default: `en`).
 - **`LocaleChangeInterceptor`**: Registered in `addInterceptors()`, listens for the `lang` request parameter to switch locale dynamically.
 
 ### Message Files
-- **`webapp/src/main/resources/messages.properties`** — Default (Spanish). This is the **primary** file.
-- **`webapp/src/main/resources/messages_en.properties`** — Must stay empty. Do not add English translations, duplicated Spanish keys, or placeholder keys.
-- When adding new user-facing text, add the key only to **`messages.properties`**.
+- **`webapp/src/main/resources/messages.properties`** — Default (English). This is the **primary** file.
+- **`webapp/src/main/resources/messages_es.properties`** — Spanish translations.
+- **`webapp/src/main/resources/messages_en.properties`** — Must stay empty. Do not add English translations, duplicated keys, or placeholder keys.
+- When adding new user-facing text, add the key to **`messages.properties`** and the Spanish translation to **`messages_es.properties`**.
 
 ### Key Naming Convention
 Keys follow a hierarchical `PageName.element.property` pattern. Examples:
 ```properties
-Login.subtitle=Inicia sesión para comprar y vender vinilos
+Login.subtitle=Log in to buy and sell vinyl
 Login.email.label=Email
-Login.email.placeholder=tu@email.com
-Login.password.label=Contraseña
-Login.password.placeholder=Tu contraseña
-Login.password.show.ariaLabel=Mostrar contraseña
-Login.rememberMe.label=Recordarme
-ProductForm.albumTitle.label=Título del álbum
-Header.search.placeholder=Buscar vinilos, artistas, sellos...
-Footer.copyright=Copyright Vinyland - 2026. Todos los derechos reservados.
+Login.email.placeholder=you@email.com
+Login.password.label=Password
+Login.password.placeholder=Your password
+Login.password.show.ariaLabel=Show password
+Login.rememberMe.label=Remember me
+ProductForm.albumTitle.label=Album title
+Header.search.placeholder=Search vinyl, artists, labels...
+Footer.copyright=Copyright Vinyland - 2026. All rights reserved.
 ```
 
 ### Usage in JSPs and Tag Files
@@ -158,10 +159,10 @@ Every JSP and tag file that uses i18n must declare the Spring taglib:
 ```
 
 #### Inline text replacement
-Replace hardcoded Spanish text with `<spring:message>`:
+Replace hardcoded text with `<spring:message>`:
 ```jsp
 <%-- WRONG: hardcoded text --%>
-<p>Inicia sesión para comprar y vender vinilos</p>
+<p>Log in to buy and sell vinyl</p>
 
 <%-- CORRECT: internationalized --%>
 <p><spring:message code="Login.subtitle" /></p>
@@ -195,7 +196,7 @@ Page titles must also be internationalized using a `var`:
 
 ### Critical Rules
 1. **NEVER hardcode user-facing text** in JSPs or tag files. Always use `<spring:message>` keys.
-2. **Always add keys to** `messages.properties` (Spanish) **only**. Keep `messages_en.properties` empty.
+2. **Always add keys to** `messages.properties` (English) **and** `messages_es.properties` (Spanish). Keep `messages_en.properties` empty.
 3. **Keep key names consistent** with the `PageName.element.property` convention.
 4. **Aria-labels and accessibility text** must also be internationalized.
 5. **The `<c:out>` XSS rule still applies** — when printing dynamic model data, use `<c:out>`. The `<spring:message>` tag is only for static translatable text from the message bundles.
