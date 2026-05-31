@@ -46,12 +46,22 @@ public class PurchaseServiceImplTest {
     @Mock
     private MessageSource messageSource;
 
+    @Mock
+    private NotificationService notificationService;
+
 
     private PurchaseServiceImpl purchaseService;
 
     @BeforeEach
     public void setUp() {
-        purchaseService = new PurchaseServiceImpl(purchaseDao, productService, userService, emailService, messageSource);
+        purchaseService = new PurchaseServiceImpl(
+            purchaseDao,
+            productService,
+            userService,
+            emailService,
+            messageSource,
+            notificationService
+        );
     }
 
     private static Product product() {

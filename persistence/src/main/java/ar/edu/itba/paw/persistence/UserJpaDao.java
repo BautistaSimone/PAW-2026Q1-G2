@@ -72,6 +72,16 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
+    public List<User> findByIds(final List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return em.createQuery("FROM User u WHERE u.id IN :ids", User.class)
+            .setParameter("ids", ids)
+            .getResultList();
+    }
+
+    @Override
     public void updateUserProfile(
             final Long userId,
             final String firstName,

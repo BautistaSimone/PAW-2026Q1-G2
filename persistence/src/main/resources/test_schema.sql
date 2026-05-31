@@ -151,3 +151,25 @@ CREATE TABLE IF NOT EXISTS pending_notifications (
     FOREIGN KEY (follower_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS notifications (
+	notification_id SERIAL PRIMARY KEY,
+	recipient_user_id INTEGER NOT NULL,
+	actor_user_id INTEGER,
+	type VARCHAR(32) NOT NULL,
+	product_id INTEGER,
+	purchase_id INTEGER,
+	purchase_status VARCHAR(32),
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	read_at TIMESTAMP,
+	FOREIGN KEY (recipient_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+	FOREIGN KEY (actor_user_id) REFERENCES users(user_id) ON DELETE SET NULL,
+	FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE SET NULL,
+	FOREIGN KEY (purchase_id) REFERENCES purchases(purchase_id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS notifications_recipient_read_idx
+	ON notifications (recipient_user_id, read_at, created_at);
+
+CREATE INDEX IF NOT EXISTS notifications_recipient_type_idx
+	ON notifications (recipient_user_id, type, created_at);

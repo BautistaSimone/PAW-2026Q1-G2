@@ -157,6 +157,61 @@ CREATE TABLE IF NOT EXISTS pending_notifications (
     FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS notifications (
+	notification_id SERIAL PRIMARY KEY,
+	recipient_user_id INTEGER NOT NULL,
+	actor_user_id INTEGER,
+	type VARCHAR(32) NOT NULL,
+	product_id INTEGER,
+	purchase_id INTEGER,
+	purchase_status VARCHAR(32),
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	read_at TIMESTAMP,
+	FOREIGN KEY (recipient_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+	FOREIGN KEY (actor_user_id) REFERENCES users(user_id) ON DELETE SET NULL,
+	FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE SET NULL,
+	FOREIGN KEY (purchase_id) REFERENCES purchases(purchase_id) ON DELETE SET NULL
+);
+
+CREATE SEQUENCE IF NOT EXISTS notifications_notification_id_seq;
+ALTER TABLE notifications ALTER COLUMN notification_id SET DEFAULT nextval('notifications_notification_id_seq');
+
+CREATE INDEX IF NOT EXISTS notifications_recipient_read_idx
+	ON notifications (recipient_user_id, read_at, created_at);
+
+CREATE INDEX IF NOT EXISTS notifications_recipient_type_idx
+	ON notifications (recipient_user_id, type, created_at);
+
+-- Ensure SERIAL defaults exist even when Hibernate created the tables first
+CREATE SEQUENCE IF NOT EXISTS users_user_id_seq;
+ALTER TABLE users ALTER COLUMN user_id SET DEFAULT nextval('users_user_id_seq');
+
+CREATE SEQUENCE IF NOT EXISTS password_tokens_token_id_seq;
+ALTER TABLE password_tokens ALTER COLUMN token_id SET DEFAULT nextval('password_tokens_token_id_seq');
+
+CREATE SEQUENCE IF NOT EXISTS verification_tokens_token_id_seq;
+ALTER TABLE verification_tokens ALTER COLUMN token_id SET DEFAULT nextval('verification_tokens_token_id_seq');
+
+CREATE SEQUENCE IF NOT EXISTS products_product_id_seq;
+ALTER TABLE products ALTER COLUMN product_id SET DEFAULT nextval('products_product_id_seq');
+
+CREATE SEQUENCE IF NOT EXISTS images_image_id_seq;
+ALTER TABLE images ALTER COLUMN image_id SET DEFAULT nextval('images_image_id_seq');
+
+CREATE SEQUENCE IF NOT EXISTS categories_category_id_seq;
+ALTER TABLE categories ALTER COLUMN category_id SET DEFAULT nextval('categories_category_id_seq');
+
+CREATE SEQUENCE IF NOT EXISTS purchases_purchase_id_seq;
+ALTER TABLE purchases ALTER COLUMN purchase_id SET DEFAULT nextval('purchases_purchase_id_seq');
+
+CREATE SEQUENCE IF NOT EXISTS reviews_review_id_seq;
+ALTER TABLE reviews ALTER COLUMN review_id SET DEFAULT nextval('reviews_review_id_seq');
+
+CREATE SEQUENCE IF NOT EXISTS reports_report_id_seq;
+ALTER TABLE reports ALTER COLUMN report_id SET DEFAULT nextval('reports_report_id_seq');
+
+CREATE SEQUENCE IF NOT EXISTS pending_notifications_notification_id_seq;
+ALTER TABLE pending_notifications ALTER COLUMN notification_id SET DEFAULT nextval('pending_notifications_notification_id_seq');
 
 -- Seed default categories (genres) using more compatible EXISTS check instead of ON CONFLICT
 INSERT INTO categories (name) SELECT 'Rock'        WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name='Rock');

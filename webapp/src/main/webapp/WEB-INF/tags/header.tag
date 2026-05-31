@@ -50,6 +50,191 @@
                 </nav>
 
                 <sec:authorize access="isAuthenticated()">
+                    <div class="notifications-wrapper">
+                        <spring:message code="Header.notifications.ariaLabel" var="notificationsAriaLabel" />
+                        <button type="button" class="notifications-btn" id="notificationsToggle" aria-label="<c:out value='${notificationsAriaLabel}'/>">
+                            <i class="bi bi-bell" aria-hidden="true"></i>
+                            <c:if test="${notificationPanelUnreadCount > 0}">
+                                <span class="notifications-badge"><c:out value="${notificationPanelUnreadCount}" /></span>
+                            </c:if>
+                        </button>
+
+                        <div class="notifications-panel" id="notificationsPanel" aria-hidden="true">
+                            <div class="notifications-panel-header">
+                                <span class="notifications-title"><spring:message code="Notifications.title" /></span>
+                                <c:if test="${notificationPanelUnreadCount > 0}">
+                                    <form method="post" action="<c:url value='/notifications/read-all'/>" class="notifications-markall-form">
+                                        <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
+                                        <button type="submit" class="notifications-markall-btn">
+                                            <spring:message code="Notifications.markAll" />
+                                        </button>
+                                    </form>
+                                </c:if>
+                            </div>
+
+                            <div class="notifications-filters">
+                                <c:set var="notifFilterAllClass" value="notifications-filter ${notificationPanelFilter eq 'ALL' ? 'is-active' : ''}" />
+                                <button type="button" class="<c:out value='${notifFilterAllClass}'/>" data-notif-filter="ALL">
+                                    <spring:message code="Notifications.filter.all" />
+                                </button>
+                                <c:set var="notifFilterFollowClass" value="notifications-filter ${notificationPanelFilter eq 'FOLLOW' ? 'is-active' : ''}" />
+                                <button type="button" class="<c:out value='${notifFilterFollowClass}'/>" data-notif-filter="FOLLOW">
+                                    <spring:message code="Notifications.filter.follow" />
+                                </button>
+                                <c:set var="notifFilterNewProductClass" value="notifications-filter ${notificationPanelFilter eq 'NEW_PRODUCT' ? 'is-active' : ''}" />
+                                <button type="button" class="<c:out value='${notifFilterNewProductClass}'/>" data-notif-filter="NEW_PRODUCT">
+                                    <spring:message code="Notifications.filter.newProduct" />
+                                </button>
+                                <c:set var="notifFilterPurchaseClass" value="notifications-filter ${notificationPanelFilter eq 'PURCHASE_STATUS' ? 'is-active' : ''}" />
+                                <button type="button" class="<c:out value='${notifFilterPurchaseClass}'/>" data-notif-filter="PURCHASE_STATUS">
+                                    <spring:message code="Notifications.filter.purchase" />
+                                </button>
+                                <c:set var="notifFilterReviewClass" value="notifications-filter ${notificationPanelFilter eq 'REVIEW_RECEIVED' ? 'is-active' : ''}" />
+                                <button type="button" class="<c:out value='${notifFilterReviewClass}'/>" data-notif-filter="REVIEW_RECEIVED">
+                                    <spring:message code="Notifications.filter.review" />
+                                </button>
+                            </div>
+
+                            <div class="notifications-list">
+                                <c:choose>
+                                    <c:when test="${not empty notificationPanelNotifications}">
+                                        <c:forEach items="${notificationPanelNotifications}" var="notification">
+                                            <c:set var="actorUser" value="${notificationPanelUsersById[notification.actorUserId]}" />
+                                            <c:set var="product" value="${notificationPanelProductsById[notification.productId]}" />
+
+                                            <c:set var="notificationItemClass" value="notification-item ${notification.readAt == null ? 'is-unread' : ''}" />
+                                            <div class="<c:out value='${notificationItemClass}'/>">
+                                                <div class="notification-text">
+                                                    <c:choose>
+                                                        <c:when test="${notification.type == 'FOLLOW'}">
+                                                            <span class="notification-actor">
+                                                                <c:choose>
+                                                                    <c:when test="${actorUser != null}">
+                                                                        <c:out value="${actorUser.username}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <spring:message code="Notifications.actor.unknown" />
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </span>
+                                                            <spring:message code="Notifications.item.follow" />
+                                                        </c:when>
+                                                        <c:when test="${notification.type == 'NEW_PRODUCT'}">
+                                                            <span class="notification-actor">
+                                                                <c:choose>
+                                                                    <c:when test="${actorUser != null}">
+                                                                        <c:out value="${actorUser.username}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <spring:message code="Notifications.actor.unknown" />
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </span>
+                                                            <spring:message code="Notifications.item.newProduct" />
+                                                            <span class="notification-product">
+                                                                <c:choose>
+                                                                    <c:when test="${product != null}">
+                                                                        <c:out value="${product.title}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <spring:message code="Notifications.product.unknown" />
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </span>
+                                                        </c:when>
+                                                        <c:when test="${notification.type == 'PURCHASE_STATUS'}">
+                                                            <span class="notification-actor">
+                                                                <c:choose>
+                                                                    <c:when test="${actorUser != null}">
+                                                                        <c:out value="${actorUser.username}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <spring:message code="Notifications.actor.system" />
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </span>
+                                                            <spring:message code="Notifications.item.purchase" />
+                                                            <span class="notification-status">
+                                                                <c:set var="purchaseStatusKey" value="PurchaseStatus.${notification.purchaseStatus}" />
+                                                                <spring:message code="${purchaseStatusKey}" />
+                                                            </span>
+                                                            <c:if test="${product != null}">
+                                                                <spring:message code="Notifications.item.purchase.suffix" />
+                                                                <span class="notification-product"><c:out value="${product.title}" /></span>
+                                                            </c:if>
+                                                        </c:when>
+                                                        <c:when test="${notification.type == 'REVIEW_RECEIVED'}">
+                                                            <span class="notification-actor">
+                                                                <c:choose>
+                                                                    <c:when test="${actorUser != null}">
+                                                                        <c:out value="${actorUser.username}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <spring:message code="Notifications.actor.unknown" />
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </span>
+                                                            <spring:message code="Notifications.item.review" />
+                                                            <span class="notification-product">
+                                                                <c:choose>
+                                                                    <c:when test="${product != null}">
+                                                                        <c:out value="${product.title}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <spring:message code="Notifications.product.unknown" />
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </span>
+                                                        </c:when>
+                                                    </c:choose>
+                                                </div>
+
+                                                <div class="notification-meta">
+                                                    <span class="notification-time"><c:out value="${notification.createdAt}" /></span>
+                                                    <c:if test="${notification.readAt == null}">
+                                                        <form method="post" action="<c:url value='/notifications/read'/>" class="notification-read-form">
+                                                            <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
+                                                            <input type="hidden" name="id" value="<c:out value='${notification.notificationId}'/>" />
+                                                            <button type="submit" class="notification-read-btn">
+                                                                <spring:message code="Notifications.markRead" />
+                                                            </button>
+                                                        </form>
+                                                    </c:if>
+                                                </div>
+
+                                                <div class="notification-links">
+                                                    <c:if test="${notification.productId != null}">
+                                                        <c:url value="/products/${notification.productId}" var="productUrl" />
+                                                        <a class="notification-link" href="<c:out value='${productUrl}'/>">
+                                                            <spring:message code="Notifications.link.product" />
+                                                        </a>
+                                                    </c:if>
+                                                    <c:if test="${notification.purchaseId != null}">
+                                                        <c:url value="/purchases/${notification.purchaseId}" var="purchaseUrl" />
+                                                        <a class="notification-link" href="<c:out value='${purchaseUrl}'/>">
+                                                            <spring:message code="Notifications.link.purchase" />
+                                                        </a>
+                                                    </c:if>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="notifications-empty">
+                                            <spring:message code="Notifications.empty" />
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+
+                            <c:if test="${notificationPanelPage.hasNextPage}">
+                                <button type="button" class="notifications-more" data-notif-page="<c:out value='${notificationPanelPage.currentPage + 1}'/>">
+                                    <spring:message code="Notifications.loadMore" />
+                                </button>
+                            </c:if>
+                        </div>
+                    </div>
+
                     <a href="<c:url value='/profile'/>" class="profile-btn" aria-label="<spring:message code='Header.profile.ariaLabel' />">
                         <i class="bi bi-person-fill" aria-hidden="true"></i>
                         <span><sec:authentication property="principal.user.username" /></span>

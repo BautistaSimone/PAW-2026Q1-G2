@@ -28,15 +28,18 @@ public class ProductServiceImpl implements ProductService {
     private final ProductDao productDao;
     private final CategoryService categoryService;
     private final PendingNotificationService pendingNotificationService;
+    private final NotificationService notificationService;
 
     @Autowired
     public ProductServiceImpl(
             final ProductDao productDao,
             final CategoryService categoryService,
-            final PendingNotificationService pendingNotificationService) {
+            final PendingNotificationService pendingNotificationService,
+            final NotificationService notificationService) {
         this.productDao = productDao;
         this.categoryService = categoryService;
         this.pendingNotificationService = pendingNotificationService;
+        this.notificationService = notificationService;
     }
 
     private static String trimToNull(final String s) {
@@ -108,6 +111,7 @@ public class ProductServiceImpl implements ProductService {
         );
 
         pendingNotificationService.enqueueForFollowers(userId, product.getId());
+        notificationService.notifyNewProduct(userId, product.getId());
 
         return product;
     }

@@ -42,6 +42,7 @@ public interface UserService {
 
     Optional<User> findByEmail(final String email);
     Optional<User> findById(final Long id);
+        List<User> findByIds(final List<Long> ids);
 
     Boolean isPasswordEmpty(User usr);
     Boolean isVerified(User usr);

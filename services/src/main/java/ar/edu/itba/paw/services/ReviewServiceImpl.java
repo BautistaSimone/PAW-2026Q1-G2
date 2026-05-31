@@ -24,16 +24,19 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewDao reviewDao;
     private final PurchaseService purchaseService;
     private final ProductService productService;
+    private final NotificationService notificationService;
 
     @Autowired
     public ReviewServiceImpl(
         final ReviewDao reviewDao,
         final PurchaseService purchaseService,
-        final ProductService productService
+        final ProductService productService,
+        final NotificationService notificationService
     ) {
         this.reviewDao = reviewDao;
         this.purchaseService = purchaseService;
         this.productService = productService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -59,7 +62,9 @@ public class ReviewServiceImpl implements ReviewService {
 
         final long sellerId = product.getUserId();
 
-        return reviewDao.create(purchaseId, sellerId, buyerId, score, text);
+        final Review review = reviewDao.create(purchaseId, sellerId, buyerId, score, text);
+        notificationService.notifyReviewReceived(sellerId, buyerId, purchaseId, product.getId());
+        return review;
     }
 
     @Override

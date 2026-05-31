@@ -33,6 +33,9 @@ public class ReviewServiceImplTest {
     @Mock
     private ProductService productService;
 
+    @Mock
+    private NotificationService notificationService;
+
     private Purchase makePurchase(PurchaseStatus status, long buyerId) {
         return new Purchase(1L, 10L, buyerId, 99L, LocalDate.now(), status, "bt", "st");
     }

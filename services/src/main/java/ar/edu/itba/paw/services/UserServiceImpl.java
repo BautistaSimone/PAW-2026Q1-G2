@@ -37,6 +37,9 @@ public class UserServiceImpl implements UserService {
     private ReportService reportService;
 
     @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
     public UserServiceImpl(final UserDao userDao, final PasswordEncoder passwordEncoder) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
@@ -138,6 +141,12 @@ public class UserServiceImpl implements UserService {
         return userDao.findById(id);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> findByIds(final List<Long> ids) {
+        return userDao.findByIds(ids);
+    }
+
 	@Override
     @Transactional(readOnly = true)
     public Boolean isPasswordEmpty(User usr) {
@@ -215,6 +224,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Cannot follow yourself");
         }
         userDao.follow(followerId, followedId);
+        notificationService.notifyFollow(followedId, followerId);
     }
 
     @Override

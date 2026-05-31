@@ -34,6 +34,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final UserService userService;
     private final EmailService emailService;
     private final MessageSource messageSource;
+    private final NotificationService notificationService;
 
     @Autowired
     public PurchaseServiceImpl(
@@ -41,12 +42,14 @@ public class PurchaseServiceImpl implements PurchaseService {
             final ProductService productService,
             final UserService userService,
             final EmailService emailService,
-            final MessageSource messageSource) {
+            final MessageSource messageSource,
+            final NotificationService notificationService) {
         this.purchaseDao = purchaseDao;
         this.productService = productService;
         this.userService = userService;
         this.emailService = emailService;
         this.messageSource = messageSource;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -169,6 +172,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         final boolean isBuyer = userId.equals(purchase.getBuyerId());
         final boolean isSeller = userId.equals(purchase.getSellerId());
+        boolean updatedStatus = false;
 
         if (!isBuyer && !isSeller) {
             throw new IllegalArgumentException("You are not authorized to update this purchase");
@@ -182,6 +186,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
             purchase.setPaymentProof(paymentProof, paymentProofContentType, paymentProofFileName);
             purchaseDao.updateStatus(purchaseId, newStatus);
+            updatedStatus = true;
 
             // Notify seller to confirm payment
             emailService.sendSellerEmail(
@@ -197,6 +202,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                     LocaleContextHolder.getLocale());
         } else if (newStatus == PurchaseStatus.SHIPPED && isSeller && purchase.getStatus() == PurchaseStatus.PAID) {
             purchaseDao.updateStatus(purchaseId, newStatus);
+            updatedStatus = true;
             // Notify buyer
             final Locale locale = LocaleContextHolder.getLocale();
             emailService.sendBuyerEmail(
@@ -211,9 +217,14 @@ public class PurchaseServiceImpl implements PurchaseService {
                     LocaleContextHolder.getLocale());
         } else if (newStatus == PurchaseStatus.DELIVERED && isBuyer && purchase.getStatus() == PurchaseStatus.SHIPPED) {
             purchaseDao.updateStatus(purchaseId, newStatus);
+            updatedStatus = true;
             // Stock was already decremented at purchase creation; no further action needed.
         } else {
             throw new IllegalStateException("Invalid state transition or unauthorized role.");
+        }
+
+        if (updatedStatus) {
+            notifyPurchaseStatusChange(purchase, userId, newStatus);
         }
 
         return purchaseDao.findById(purchaseId).get();
@@ -243,7 +254,29 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
         purchase.setStatus(PurchaseStatus.CANCELLED);
         productService.incrementStock(purchase.getProductId());
+        notifyPurchaseStatusChange(purchase, null, PurchaseStatus.CANCELLED);
         return true;
+    }
+
+    private void notifyPurchaseStatusChange(
+            final Purchase purchase,
+            final Long actorUserId,
+            final PurchaseStatus newStatus) {
+        notificationService.notifyPurchaseStatus(
+                purchase.getBuyerId(),
+                actorUserId,
+                purchase.getPurchaseId(),
+                purchase.getProductId(),
+                newStatus);
+
+        if (!purchase.getSellerId().equals(purchase.getBuyerId())) {
+            notificationService.notifyPurchaseStatus(
+                    purchase.getSellerId(),
+                    actorUserId,
+                    purchase.getPurchaseId(),
+                    purchase.getProductId(),
+                    newStatus);
+        }
     }
 
     @Override
