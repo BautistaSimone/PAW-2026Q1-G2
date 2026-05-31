@@ -218,18 +218,37 @@ public class EmailServiceImpl implements EmailService {
                 messageSource.getMessage("email.digest.heading", null, locale));
         ctx.setVariable("recipientName", username);
 
-        final java.util.Map<String, java.util.List<java.util.Map<String, String>>> groupedItems = new java.util.LinkedHashMap<>();
+        final java.util.Map<String, java.util.Map<String, Object>> groupedSellers = new java.util.LinkedHashMap<>();
+        
         for (final Product p : products) {
             final String sellerName = p.getSeller().getUsername();
-            final java.util.Map<String, String> item = new java.util.LinkedHashMap<>();
-            item.put("name", p.getTitle());
-            item.put("artist", p.getArtist());
-            item.put("price", formatAmount(p));
-            item.put("url", buildProductUrl(p.getId()));
+            final Long sellerId = p.getSeller().getId();
             
-            groupedItems.computeIfAbsent(sellerName, k -> new java.util.ArrayList<>()).add(item);
+            final java.util.Map<String, Object> sellerData = groupedSellers.computeIfAbsent(sellerName, k -> {
+                final java.util.Map<String, Object> map = new java.util.LinkedHashMap<>();
+                map.put("sellerName", sellerName);
+                map.put("profileUrl", baseUrl + "profile?userId=" + sellerId);
+                map.put("products", new java.util.ArrayList<java.util.Map<String, String>>());
+                map.put("extraCount", 0);
+                return map;
+            });
+            
+            @SuppressWarnings("unchecked")
+            final java.util.List<java.util.Map<String, String>> sellerProducts = 
+                (java.util.List<java.util.Map<String, String>>) sellerData.get("products");
+                
+            if (sellerProducts.size() < 3) {
+                final java.util.Map<String, String> item = new java.util.LinkedHashMap<>();
+                item.put("name", p.getTitle());
+                item.put("artist", p.getArtist());
+                item.put("price", formatAmount(p));
+                item.put("url", buildProductUrl(p.getId()));
+                sellerProducts.add(item);
+            } else {
+                sellerData.put("extraCount", ((Integer) sellerData.get("extraCount")) + 1);
+            }
         }
-        ctx.setVariable("groupedProducts", groupedItems);
+        ctx.setVariable("groupedProducts", groupedSellers.values());
         ctx.setVariable("productCount", products.size());
 
         try {
