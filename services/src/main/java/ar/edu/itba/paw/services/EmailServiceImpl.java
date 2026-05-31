@@ -218,16 +218,18 @@ public class EmailServiceImpl implements EmailService {
                 messageSource.getMessage("email.digest.heading", null, locale));
         ctx.setVariable("recipientName", username);
 
-        final java.util.List<java.util.Map<String, String>> items = new java.util.ArrayList<>();
+        final java.util.Map<String, java.util.List<java.util.Map<String, String>>> groupedItems = new java.util.LinkedHashMap<>();
         for (final Product p : products) {
+            final String sellerName = p.getSeller().getUsername();
             final java.util.Map<String, String> item = new java.util.LinkedHashMap<>();
             item.put("name", p.getTitle());
             item.put("artist", p.getArtist());
             item.put("price", formatAmount(p));
             item.put("url", buildProductUrl(p.getId()));
-            items.add(item);
+            
+            groupedItems.computeIfAbsent(sellerName, k -> new java.util.ArrayList<>()).add(item);
         }
-        ctx.setVariable("products", items);
+        ctx.setVariable("groupedProducts", groupedItems);
         ctx.setVariable("productCount", products.size());
 
         try {

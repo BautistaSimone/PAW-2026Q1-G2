@@ -10,6 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Id;
 import javax.persistence.Column;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
 //import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
@@ -30,6 +32,10 @@ public class Product {
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private User seller;
     private String title;
     private String artist;
 
@@ -143,6 +149,10 @@ public class Product {
 
     public Long getUserId() {
         return userId;
+    }
+
+    public User getSeller() {
+        return seller;
     }
 
     public String getTitle() {
