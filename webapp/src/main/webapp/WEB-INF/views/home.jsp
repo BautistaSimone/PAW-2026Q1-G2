@@ -56,11 +56,9 @@
                 <section class="products-content-column">
                     <div class="products-header">
                         <div class="products-header-titles">
-                            <c:if test="${hasActiveFilters}">
-                                <h2 class="products-count m-0">
-                                    <spring:message code="Home.productsCount" arguments="${fn:length(products)}" />
+                            <h2 class="products-count m-0">
+                                <spring:message code="Home.productsCount" arguments="${productsPage.totalCount}" />
                                 </h2>
-                            </c:if>
                             <c:if test="${not empty activeSearchText}">
                                 <p class="products-search-context m-0" role="status">
                                     <spring:message code="Home.searchResultsFor" /> <span class="products-search-query">"<c:out value="${activeSearchText}" />"</span>
