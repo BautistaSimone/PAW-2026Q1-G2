@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.services;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import ar.edu.itba.paw.models.PaginatedResult;
@@ -65,4 +66,6 @@ public interface UserService {
 	List<Long> getFollowedUserIds(final Long userId);
 	PaginatedResult<User> searchUsers(final String query, final int page, final int pageSize);
 	List<User> getMostFollowedUsers(final int limit);
+        Map<Long, Boolean> getFollowStatusMap(Long userId, List<Long> userIds);
+        Map<Long, Long> getUserFollowerCounts(List<Long> userIds);
 }

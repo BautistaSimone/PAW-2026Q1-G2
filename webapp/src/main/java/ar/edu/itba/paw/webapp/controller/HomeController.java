@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -279,14 +280,18 @@ public class HomeController {
 
 		if (authUser != null) {
 			final List<User> displayedUsers = (List<User>) mav.getModel().get("users");
-			final Map<Long, Boolean> followStatusMap = new HashMap<>();
-			final Map<Long, Long> userFollowerCounts = new HashMap<>();
+
+			Map<Long, Boolean> followStatusMap = new HashMap<>();
+			Map<Long, Long> userFollowerCounts = new HashMap<>();
+
 			if (displayedUsers != null) {
-				for (User u : displayedUsers) {
-					followStatusMap.put(u.getId(), userService.isFollowing(authUser.getUser().getId(), u.getId()));
-					userFollowerCounts.put(u.getId(), userService.countFollowers(u.getId()));
-				}
+				// Get the user ids
+				final List<Long> userIds = displayedUsers.stream().map(item -> {return item.getId();}).collect(Collectors.toList());
+
+				followStatusMap = userService.getFollowStatusMap(authUser.getUser().getId(), userIds);
+				userFollowerCounts = userService.getUserFollowerCounts(userIds);
 			}
+
 			mav.addObject("followStatusMap", followStatusMap);
 			mav.addObject("userFollowerCounts", userFollowerCounts);
 			mav.addObject("currentUserId", authUser.getUser().getId());

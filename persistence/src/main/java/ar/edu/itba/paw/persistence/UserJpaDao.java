@@ -5,11 +5,13 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.Tuple;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
@@ -361,5 +363,36 @@ public class UserJpaDao implements UserDao {
         return em.createQuery("FROM User WHERE id IN :ids", User.class)
             .setParameter("ids", longIds)
             .getResultList();
+    }
+
+    
+    @Override
+    public Map<Long, Boolean> getFollowStatusMap(Long userId, List<Long> userIds) {
+        final List<Object[]> result = em.createNativeQuery(
+                "SELECT followed_id, COUNT(*) AS count FROM user_follows " 
+                + "WHERE follower_id = :fid AND followed_id IN :lids GROUP BY followed_id")
+            .setParameter("fid", userId)
+            .setParameter("lids", userIds)
+            .getResultList();
+
+        return result.stream()
+            .collect(Collectors.toMap(
+                row -> ((Number) row[0]).longValue(),
+                row -> ((Number) row[1]).intValue() > 0
+            ));
+    }
+
+    @Override
+    public Map<Long, Long> getUserFollowerCounts(List<Long> userIds) {
+        final List<Object[]> result = em.createNativeQuery(
+                "SELECT followed_id, COUNT(*) as count FROM user_follows WHERE followed_id = :uids GROUP BY followed_id")
+            .setParameter("uids", userIds)
+            .getResultList();
+            
+        return  result.stream()
+            .collect(Collectors.toMap(
+                row -> ((Number) row[0]).longValue(),
+                row -> ((Number) row[1]).longValue()
+            ));
     }
 }

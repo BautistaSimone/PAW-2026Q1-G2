@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -268,4 +269,18 @@ public class UserServiceImpl implements UserService {
     public List<User> getMostFollowedUsers(final int limit) {
         return userDao.getMostFollowedUsers(limit);
     }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Boolean> getFollowStatusMap(Long userId, List<Long> userIds) {
+        return userDao.getFollowStatusMap(userId, userIds);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Long> getUserFollowerCounts(List<Long> userIds) {
+        return userDao.getUserFollowerCounts(userIds);
+    }
+    
 }
