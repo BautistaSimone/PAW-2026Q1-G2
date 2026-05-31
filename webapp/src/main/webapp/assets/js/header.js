@@ -63,6 +63,11 @@
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get("notifOpen") === "1") {
     openPanel();
+    // Esto elimina el parametro de la URL para evitar que el panel se abra cuando recargas
+    urlParams.delete("notifOpen");
+    const queryString = urlParams.toString();
+    const nextUrl = queryString ? `?${queryString}` : window.location.pathname;
+    window.history.replaceState(null, "", nextUrl);
   }
 
   const filterButtons = document.querySelectorAll("[data-notif-filter]");
