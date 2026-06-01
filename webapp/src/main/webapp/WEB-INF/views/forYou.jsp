@@ -41,8 +41,6 @@
                                                         </div>
                                                     </c:forEach>
                                                 </div>
-                                                <ui:pagination result="${wishlistProductsPage}"
-                                                    pageParamName="wishlistPage" />
                                             </c:when>
                                             <c:otherwise>
                                                 <div class="empty-products-state">

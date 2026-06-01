@@ -165,14 +165,13 @@ public class HomeController {
 	@RequestMapping(value = "/for-you", method = RequestMethod.GET)
 	public ModelAndView forYou(
 			@AuthenticationPrincipal PawAuthUser authUser,
-			@RequestParam(value = "page", defaultValue = "1") final int page,
-			@RequestParam(value = "wishlistPage", defaultValue = "1") final int wishlistPage) {
+			@RequestParam(value = "page", defaultValue = "1") final int page) {
 
 		if (authUser == null) {
 			return new ModelAndView("redirect:/login");
 		}
 
-		if (page < 1 || wishlistPage < 1) {
+		if (page < 1) {
 			throw new IllegalArgumentException("Invalid page");
 		}
 
@@ -212,12 +211,10 @@ public class HomeController {
 		mav.addObject("productImageUrls", productImageUrls);
 		mav.addObject("sellerRatingByUserId", sellerRatingByUserId);
 
-		final PaginatedResult<Product> wishlistProductsPage =
-				productService.getRecommendedProductsPage(currentUserId, wishlistPage, 12, null);
-		final Map<Long, String> wishlistProductImageUrls = productImageUrlsFor(wishlistProductsPage.getResults());
-		final Map<Long, SellerRatingSummary> wishlistSellerRatingByUserId = sellerRatingsFor(wishlistProductsPage.getResults());
-		mav.addObject("wishlistProductsPage", wishlistProductsPage);
-		mav.addObject("wishlistProducts", wishlistProductsPage.getResults());
+		final List<Product> wishlistProducts = productService.getRecommendedProducts(currentUserId, 12, null);
+		final Map<Long, String> wishlistProductImageUrls = productImageUrlsFor(wishlistProducts);
+		final Map<Long, SellerRatingSummary> wishlistSellerRatingByUserId = sellerRatingsFor(wishlistProducts);
+		mav.addObject("wishlistProducts", wishlistProducts);
 		mav.addObject("wishlistProductImageUrls", wishlistProductImageUrls);
 		mav.addObject("wishlistSellerRatingByUserId", wishlistSellerRatingByUserId);
 
