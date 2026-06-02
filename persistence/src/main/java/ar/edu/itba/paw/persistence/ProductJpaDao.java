@@ -160,7 +160,7 @@ public class ProductJpaDao implements ProductDao {
 
         // Category filter
         if (!criteria.getCategoryIds().isEmpty()) {
-            whereSql.append(" AND EXISTS (SELECT 1 FROM product_categories pc WHERE pc.product_id = p.id AND pc.category_id IN :categoryIds)");
+            whereSql.append(" AND EXISTS (SELECT 1 FROM products_categories pc WHERE pc.product_id = p.product_id AND pc.category_id IN :categoryIds)");
             params.put("categoryIds", criteria.getCategoryIds());
         }
 
