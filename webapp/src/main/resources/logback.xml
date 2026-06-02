@@ -35,7 +35,5 @@
         <appender-ref ref="STDOUT" /> 
     </logger> 
 
-    <logger name="ar.edu.itba.paw.services" level="INFO" additivity="false"> 
-        <appender-ref ref="general" /> 
-    </logger> 
+    
 </configuration>
