@@ -3,15 +3,19 @@ package ar.edu.itba.paw.persistence;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.JoinType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.function.Function;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.HashMap;
@@ -26,6 +30,7 @@ import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.ConditionBucket;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductState;
 
@@ -96,159 +101,152 @@ public class ProductJpaDao implements ProductDao {
     public PaginatedResult<Product> listProducts() {
         return findProducts(ProductSearchCriteria.empty());
     }
+        
+    private String orderBySql(ProductSortOrder sortOrder) {
+        return switch (sortOrder) {
+
+            case NEWEST ->
+                "p.published DESC, p.product_id DESC";
+
+            case OLDEST ->
+                "p.published ASC, p.product_id ASC";
+
+            case PRICE_ASC ->
+                "p.price ASC";
+
+            case PRICE_DESC ->
+                "p.price DESC";
+
+            case NAME_ASC ->
+                "LOWER(p.title) ASC";
+
+            case NAME_DESC ->
+                "LOWER(p.title) DESC";
+
+            case CONDITION_ASC ->
+                "(p.sleeve_condition + p.record_condition)/2 ASC";
+
+            case CONDITION_DESC ->
+                "(p.sleeve_condition + p.record_condition)/2 DESC";
+        };
+    }
 
     @Override
     public PaginatedResult<Product> findProducts(final ProductSearchCriteria criteria) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Product> query = cb.createQuery(Product.class);
-        Root<Product> root = query.from(Product.class);
+        final StringBuilder whereSql = new StringBuilder("WHERE p.state = :state");
+        final Map<String, Object> params = new HashMap<>();
+        params.put("state", ProductState.ACTIVE.getPersistenceValue());
 
-        List<Predicate> conditions = new ArrayList<>();
+        // Search text filter
+        if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
+            String raw = criteria.getSearchText().trim().toLowerCase();
+            boolean needsEscape = raw.contains("%") || raw.contains("_") || raw.contains("\\");
+            String needle = "%" + (needsEscape ? escapeForLike(raw) : raw) + "%";
+            whereSql.append(" AND (LOWER(p.title) LIKE :searchText ESCAPE '\\' ")
+                    .append("OR LOWER(p.artist) LIKE :searchText ESCAPE '\\' ")
+                    .append("OR LOWER(p.description) LIKE :searchText ESCAPE '\\')");
+            params.put("searchText", needle);
+        }
 
-        // Product must be active
-        conditions.add(cb.equal(root.get("state"), ProductState.ACTIVE.getPersistenceValue()));
-
+        // Price filter
         if (criteria.getMinPrice() != null) {
-            conditions.add(cb.ge(root.get("price"), criteria.getMinPrice()));
+            whereSql.append(" AND p.price >= :minPrice");
+            params.put("minPrice", criteria.getMinPrice());
         }
-
         if (criteria.getMaxPrice() != null) {
-            conditions.add(cb.le(root.get("price"), criteria.getMaxPrice()));
+            whereSql.append(" AND p.price <= :maxPrice");
+            params.put("maxPrice", criteria.getMaxPrice());
         }
 
-        if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
-            final String raw = criteria.getSearchText().trim().toLowerCase();
-            final boolean needsEscape = raw.contains("%") || raw.contains("_") || raw.contains("\\");
-            final String needle = "%" + (needsEscape ? escapeForLike(raw) : raw) + "%";
-            javax.persistence.criteria.Expression<String> pattern = cb.literal(needle);
-            Predicate p1 = needsEscape
-                ? cb.like(cb.lower(root.get("title")), pattern, '\\')
-                : cb.like(cb.lower(root.get("title")), pattern);
-            Predicate p2 = needsEscape
-                ? cb.like(cb.lower(root.get("artist")), pattern, '\\')
-                : cb.like(cb.lower(root.get("artist")), pattern);
-            Predicate p3 = needsEscape
-                ? cb.like(cb.lower(root.get("description")), pattern, '\\')
-                : cb.like(cb.lower(root.get("description")), pattern);
-            conditions.add(cb.or(p1, p2, p3));
-        }
-
+        // Category filter
         if (!criteria.getCategoryIds().isEmpty()) {
-            javax.persistence.criteria.Join<Product, Category> categoriesJoin = root.join("categories");
-            conditions.add(categoriesJoin.get("id").in(criteria.getCategoryIds()));
+            whereSql.append(" AND EXISTS (SELECT 1 FROM product_categories pc WHERE pc.product_id = p.id AND pc.category_id IN :categoryIds)");
+            params.put("categoryIds", criteria.getCategoryIds());
         }
 
+        // Record label filter
         if (!criteria.getRecordLabels().isEmpty()) {
-            conditions.add(root.get("recordLabel").in(criteria.getRecordLabels()));
+            whereSql.append(" AND p.record_label IN :recordLabels");
+            params.put("recordLabels", criteria.getRecordLabels());
         }
 
+        // ConditionBuckets filter (average of sleeveCondition + recordCondition)/2
         if (!criteria.getConditionBuckets().isEmpty()) {
-            List<Predicate> bucketPredicates = new ArrayList<>();
-            javax.persistence.criteria.Expression<Number> avgCond = cb.quot(cb.sum(root.get("sleeveCondition"), root.get("recordCondition")), 2.0);
-            
+            whereSql.append(" AND (");
+            boolean first = true;
             for (ConditionBucket bucket : criteria.getConditionBuckets()) {
+                if (!first) whereSql.append(" OR ");
+                first = false;
                 switch (bucket) {
-                    case EXCELENTE -> bucketPredicates.add(cb.ge(avgCond, 9.0));
-                    case MUY_BUENO -> bucketPredicates.add(cb.and(cb.ge(avgCond, 8.0), cb.lt(avgCond, 9.0)));
-                    case BUENO -> bucketPredicates.add(cb.and(cb.ge(avgCond, 7.0), cb.lt(avgCond, 8.0)));
-                    case REGULAR -> bucketPredicates.add(cb.lt(avgCond, 7.0));
+                    case EXCELENTE -> whereSql.append("( (p.sleeve_condition + p.record_condition)/2 >= 9.0 )");
+                    case MUY_BUENO -> whereSql.append("( (p.sleeve_condition + p.record_condition)/2 >= 8.0 AND (p.sleeve_condition + p.record_condition)/2 < 9.0 )");
+                    case BUENO -> whereSql.append("( (p.sleeve_condition + p.record_condition)/2 >= 7.0 AND (p.sleeve_condition + p.record_condition)/2 < 8.0 )");
+                    case REGULAR -> whereSql.append("( (p.sleeve_condition + p.record_condition)/2 < 7.0 )");
                 }
             }
-            conditions.add(cb.or(bucketPredicates.toArray(new Predicate[0])));
+            whereSql.append(")");
         }
 
+        // User filters
         if (criteria.getUserId() != null) {
-            conditions.add(cb.equal(root.get("userId"), criteria.getUserId()));
+            whereSql.append(" AND p.user_id = :userId");
+            params.put("userId", criteria.getUserId());
         }
-
         if (!criteria.getUserIds().isEmpty()) {
-            conditions.add(root.get("userId").in(criteria.getUserIds()));
+            whereSql.append(" AND p.user_id IN :userIds");
+            params.put("userIds", criteria.getUserIds());
         }
 
-        // Fetches the count of all Products as per given criteria
-        Predicate[] predicates = conditions.toArray(new Predicate[0]);
-        
-        // Create Count Query
-        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-        Root<Product> productRootCount = countQuery.from(Product.class);
-        
-        // We need to recreate the joins for the count query if they exist
-        List<Predicate> countConditions = new ArrayList<>();
-        countConditions.add(cb.equal(productRootCount.get("state"), ProductState.ACTIVE.getPersistenceValue()));
-        if (criteria.getMinPrice() != null) countConditions.add(cb.ge(productRootCount.get("price"), criteria.getMinPrice()));
-        if (criteria.getMaxPrice() != null) countConditions.add(cb.le(productRootCount.get("price"), criteria.getMaxPrice()));
-        if (criteria.getSearchText() != null && !criteria.getSearchText().isBlank()) {
-            final String raw = criteria.getSearchText().trim().toLowerCase();
-            final boolean needsEscape = raw.contains("%") || raw.contains("_") || raw.contains("\\");
-            final String needle = "%" + (needsEscape ? escapeForLike(raw) : raw) + "%";
-            javax.persistence.criteria.Expression<String> pattern = cb.literal(needle);
-            Predicate p1 = needsEscape
-                ? cb.like(cb.lower(productRootCount.get("title")), pattern, '\\')
-                : cb.like(cb.lower(productRootCount.get("title")), pattern);
-            Predicate p2 = needsEscape
-                ? cb.like(cb.lower(productRootCount.get("artist")), pattern, '\\')
-                : cb.like(cb.lower(productRootCount.get("artist")), pattern);
-            Predicate p3 = needsEscape
-                ? cb.like(cb.lower(productRootCount.get("description")), pattern, '\\')
-                : cb.like(cb.lower(productRootCount.get("description")), pattern);
-            countConditions.add(cb.or(p1, p2, p3));
-        }
-        if (!criteria.getCategoryIds().isEmpty()) {
-            javax.persistence.criteria.Join<Product, Category> countCategoriesJoin = productRootCount.join("categories");
-            countConditions.add(countCategoriesJoin.get("id").in(criteria.getCategoryIds()));
-        }
-        if (!criteria.getRecordLabels().isEmpty()) countConditions.add(productRootCount.get("recordLabel").in(criteria.getRecordLabels()));
-        if (!criteria.getConditionBuckets().isEmpty()) {
-            List<Predicate> bucketPredicates = new ArrayList<>();
-            javax.persistence.criteria.Expression<Number> avgCond = cb.quot(cb.sum(productRootCount.get("sleeveCondition"), productRootCount.get("recordCondition")), 2.0);
-            for (ConditionBucket bucket : criteria.getConditionBuckets()) {
-                switch (bucket) {
-                    case EXCELENTE -> bucketPredicates.add(cb.ge(avgCond, 9.0));
-                    case MUY_BUENO -> bucketPredicates.add(cb.and(cb.ge(avgCond, 8.0), cb.lt(avgCond, 9.0)));
-                    case BUENO -> bucketPredicates.add(cb.and(cb.ge(avgCond, 7.0), cb.lt(avgCond, 8.0)));
-                    case REGULAR -> bucketPredicates.add(cb.lt(avgCond, 7.0));
-                }
-            }
-            countConditions.add(cb.or(bucketPredicates.toArray(new Predicate[0])));
-        }
-        if (criteria.getUserId() != null) countConditions.add(cb.equal(productRootCount.get("userId"), criteria.getUserId()));
-        if (!criteria.getUserIds().isEmpty()) countConditions.add(productRootCount.get("userId").in(criteria.getUserIds()));
+        // Get count
+        final String countSql = "SELECT COUNT(*) FROM products p " + whereSql;
+        final Query countQuery = em.createNativeQuery(countSql);
+        params.forEach(countQuery::setParameter);
+        final long totalCount = ((Number) countQuery.getSingleResult()).longValue();
 
-        countQuery.select(cb.countDistinct(productRootCount)).where(cb.and(countConditions.toArray(new Predicate[0])));
-        Long count = em.createQuery(countQuery).getSingleResult();
-
-        if (count == 0) {
+        if (totalCount == 0) {
             return new PaginatedResult<>(Collections.emptyList(), criteria.getPage(), criteria.getPageSize(), 0);
         }
 
-        query.select(root).distinct(true).where(cb.and(predicates));
+        // Fetch IDs only (1+1 pattern)
+        final int safePage = criteria.getPage() < 1 ? 1 : criteria.getPage();
+        final int safePageSize = criteria.getPageSize() < 1 ? 12 : criteria.getPageSize();
 
-        List<javax.persistence.criteria.Order> orders = new ArrayList<>();
-        switch(criteria.getSortOrder()) {
-            case NEWEST -> {
-                orders.add(cb.desc(root.get("published"))); 
-                orders.add(cb.desc(root.get("productId")));
-            }
-            case OLDEST -> {
-                orders.add(cb.asc(root.get("published"))); 
-                orders.add(cb.asc(root.get("productId")));
-            }
-            case PRICE_ASC -> orders.add(cb.asc(root.get("price")));
-            case PRICE_DESC -> orders.add(cb.desc(root.get("price")));
-            case NAME_ASC -> orders.add(cb.asc(cb.lower(root.get("title"))));
-            case NAME_DESC -> orders.add(cb.desc(cb.lower(root.get("title"))));
-            case CONDITION_DESC -> orders.add(cb.desc(cb.quot(cb.sum(root.get("sleeveCondition"), root.get("recordCondition")), 2.0)));
-            case CONDITION_ASC -> orders.add(cb.asc(cb.quot(cb.sum(root.get("sleeveCondition"), root.get("recordCondition")), 2.0)));
-        }
-        query.orderBy(orders);
+        final String idsSql = "SELECT p.product_id FROM products p "
+                + whereSql
+                + " ORDER BY " + orderBySql(criteria.getSortOrder());
 
-        // This query fetches the Products as per the Page Limit
-        List<Product> result = em.createQuery(query)
-            .setFirstResult((criteria.getPage() - 1) * criteria.getPageSize())
-            .setMaxResults(criteria.getPageSize())
+        final Query idsQuery = em.createNativeQuery(idsSql);
+        params.forEach(idsQuery::setParameter);
+
+        @SuppressWarnings("unchecked")
+        List<Number> ids = idsQuery
+            .setFirstResult((safePage-1) * safePageSize)
+            .setMaxResults(safePageSize)
             .getResultList();
 
-        return new PaginatedResult<>(result, criteria.getPage(), criteria.getPageSize(), count);
+        boolean hasNext = ids.size() > criteria.getPageSize();
+        if (hasNext) {
+            ids = ids.subList(0, criteria.getPageSize());
+        }
+
+        // Fetch full entities by IDs
+        if (ids.isEmpty()) {
+            return new PaginatedResult<>(Collections.emptyList(), criteria.getPage(), criteria.getPageSize(), totalCount);
+        }
+
+        final TypedQuery<Product> selectQuery = em.createQuery("FROM Product WHERE productId IN :ids", Product.class)
+            .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
+
+        // Mantain ordering
+        final Map<Long, Product> productsById = selectQuery.getResultList().stream()
+            .collect(Collectors.toMap(Product::getId, product -> product));
+        final List<Product> orderedProducts = ids.stream()
+            .map(Number::longValue)
+            .map(productsById::get)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        return new PaginatedResult<>(orderedProducts, safePage, safePageSize, totalCount);
     }
 
     @Override
@@ -555,7 +553,7 @@ public class ProductJpaDao implements ProductDao {
         }
 
         final List<Long> distinctUserIds = userIds.stream()
-            .filter(id -> id != null)
+            .filter(productId -> productId != null)
             .distinct()
             .collect(Collectors.toList());
 
@@ -586,7 +584,7 @@ public class ProductJpaDao implements ProductDao {
             .getResultList();
 
         for (Product product : products) {
-            productsByUserId.computeIfAbsent(product.getUserId(), id -> new ArrayList<>()).add(product);
+            productsByUserId.computeIfAbsent(product.getUserId(), productId -> new ArrayList<>()).add(product);
         }
         return productsByUserId;
     }
