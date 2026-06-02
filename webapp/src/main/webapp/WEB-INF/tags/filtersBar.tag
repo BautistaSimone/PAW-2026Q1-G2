@@ -464,15 +464,13 @@
             var dMin = btn.getAttribute('data-min');
             var dMax = btn.getAttribute('data-max');
             if (minPriceInput) {
-                minPriceInput.value = dMin !== null && dMin !== '' && window.VinylandPriceFormat
-                    ? window.VinylandPriceFormat.normalizePrice(dMin).formatted
-                    : (dMin || '');
+                minPriceInput.value = dMin || '';
             }
+
             if (maxPriceInput) {
-                maxPriceInput.value = dMax !== null && dMax !== '' && window.VinylandPriceFormat
-                    ? window.VinylandPriceFormat.normalizePrice(dMax).formatted
-                    : (dMax || '');
+                maxPriceInput.value = dMax || '';
             }
+
             checkChanges();
         });
     });

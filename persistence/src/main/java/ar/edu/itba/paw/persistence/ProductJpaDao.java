@@ -106,10 +106,10 @@ public class ProductJpaDao implements ProductDao {
         return switch (sortOrder) {
 
             case NEWEST ->
-                "p.published DESC, p.product_id DESC";
+                "p.published DESC";
 
             case OLDEST ->
-                "p.published ASC, p.product_id ASC";
+                "p.published ASC";
 
             case PRICE_ASC ->
                 "p.price ASC";
@@ -128,7 +128,7 @@ public class ProductJpaDao implements ProductDao {
 
             case CONDITION_DESC ->
                 "(p.sleeve_condition + p.record_condition)/2 DESC";
-        };
+        } + ", p.product_id ASC";
     }
 
     @Override
@@ -240,6 +240,7 @@ public class ProductJpaDao implements ProductDao {
         // Mantain ordering
         final Map<Long, Product> productsById = selectQuery.getResultList().stream()
             .collect(Collectors.toMap(Product::getId, product -> product));
+            
         final List<Product> orderedProducts = ids.stream()
             .map(Number::longValue)
             .map(productsById::get)
