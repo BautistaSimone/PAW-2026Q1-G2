@@ -193,7 +193,7 @@ public class ProductServiceImpl implements ProductService {
             effectiveSort,
             null,
             page,
-            12
+            ProductSearchCriteria.DEFAULT_PAGE_SIZE
         );
     }
 
@@ -260,7 +260,7 @@ public class ProductServiceImpl implements ProductService {
     public PaginatedResult<Product> listActiveProductsByUser(final Long userId, final int page, final int pageSize) {
         if (userId == null) {
             final int safePage = page < 1 ? 1 : page;
-            final int safePageSize = pageSize < 1 ? 12 : pageSize;
+            final int safePageSize = pageSize < 1 ? ProductSearchCriteria.DEFAULT_PAGE_SIZE : pageSize;
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
         }
         return productDao.findActiveProductsByUserId(userId, page, pageSize);

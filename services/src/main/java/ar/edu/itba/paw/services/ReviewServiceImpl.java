@@ -90,7 +90,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public SellerRatingSummary summaryForSeller(long sellerId) {
         return reviewDao.summaryForSeller(sellerId);
     }

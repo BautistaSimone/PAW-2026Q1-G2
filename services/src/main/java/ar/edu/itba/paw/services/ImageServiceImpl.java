@@ -51,7 +51,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean existsByProductId(final Long productId) {
         return imageDao.existsByProductId(productId);
     }

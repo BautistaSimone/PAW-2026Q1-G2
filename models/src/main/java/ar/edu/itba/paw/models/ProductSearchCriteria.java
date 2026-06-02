@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 public final class ProductSearchCriteria {
 
+    public static final int DEFAULT_PAGE_SIZE = 12;
+
     public static final ProductSearchCriteria EMPTY = new ProductSearchCriteria(
         null,
         Collections.emptyList(),
@@ -19,7 +21,7 @@ public final class ProductSearchCriteria {
         null,
         Collections.emptyList(),
         1,
-        12
+        DEFAULT_PAGE_SIZE
     );
 
     private final String searchText;
@@ -80,7 +82,7 @@ public final class ProductSearchCriteria {
         this.userId = userId;
         this.userIds = userIds == null ? Collections.emptyList() : List.copyOf(userIds);
         this.page = page < 1 ? 1 : page;
-        this.pageSize = pageSize < 1 ? 12 : pageSize;
+        this.pageSize = pageSize < 1 ? DEFAULT_PAGE_SIZE : pageSize;
     }
 
     public static ProductSearchCriteria empty() {
