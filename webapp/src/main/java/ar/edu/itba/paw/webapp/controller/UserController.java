@@ -172,7 +172,7 @@ public class UserController {
             @RequestParam(value = "userId", required = false) final Long userId,
             @RequestParam(value = "page", defaultValue = "1") final int page,
             @RequestParam(value = "trashPage", defaultValue = "1") final int trashPage,
-            @RequestParam(value = "status", required = false) final List<String> statuses,
+            @RequestParam(value = "status", required = false) final List<PurchaseStatus> statuses,
             final Model model) {
         if (page < 1) {
             throw new IllegalArgumentException("Invalid page");
@@ -200,13 +200,10 @@ public class UserController {
         List<PurchaseStatus> purchaseStatuses = new ArrayList<>();
         List<String> validStatusesStr = new ArrayList<>();
         if (statuses != null) {
-            for (String s : statuses) {
-                try {
-                    PurchaseStatus ps = PurchaseStatus.valueOf(s);
-                    purchaseStatuses.add(ps);
-                    validStatusesStr.add(ps.name());
-                } catch (IllegalArgumentException e) {
-                    // Ignore invalid statuses
+            for (PurchaseStatus status : statuses) {
+                if (status != null) {
+                    purchaseStatuses.add(status);
+                    validStatusesStr.add(status.name());
                 }
             }
         }

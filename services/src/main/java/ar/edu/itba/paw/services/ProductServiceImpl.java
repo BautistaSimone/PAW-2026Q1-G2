@@ -155,45 +155,46 @@ public class ProductServiceImpl implements ProductService {
     public ProductSearchCriteria getProductSearchCriteria(
         final String searchText,
         final List<Long> categoryIds,
-        final String minPriceParam,
-        final String maxPriceParam,
+        final BigDecimal minPrice,
+        final BigDecimal maxPrice,
         final List<String> recordLabels,
-        final List<String> estadoParams,
-        final String sortParam,
+        final List<ConditionBucket> estadoParams,
+        final ProductSortOrder sortOrder,
         final int page
     ) {
-        BigDecimal minPrice = parsePriceParam(minPriceParam);
-		BigDecimal maxPrice = parsePriceParam(maxPriceParam);
-		if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
-			final BigDecimal tmp = minPrice;
-			minPrice = maxPrice;
-			maxPrice = tmp;
-		}
+        BigDecimal normalizedMin = minPrice;
+        BigDecimal normalizedMax = maxPrice;
+        if (normalizedMin != null && normalizedMax != null && normalizedMin.compareTo(normalizedMax) > 0) {
+            final BigDecimal tmp = normalizedMin;
+            normalizedMin = normalizedMax;
+            normalizedMax = tmp;
+        }
 
-		final List<ConditionBucket> buckets = new ArrayList<>();
-		if (estadoParams != null) {
-			for (String raw : estadoParams) {
-				ConditionBucket.parse(raw).ifPresent(buckets::add);
-			}
-		}
+        final List<ConditionBucket> buckets = new ArrayList<>();
+        if (estadoParams != null) {
+            for (ConditionBucket bucket : estadoParams) {
+                if (bucket != null) {
+                    buckets.add(bucket);
+                }
+            }
+        }
 
-		final String trimmedSearch = searchText != null ? searchText.trim() : "";
-		
-		final boolean hasActiveSearch = !trimmedSearch.isEmpty();
-		final ProductSortOrder sortOrder = ProductSortOrder.parse(sortParam).orElse(ProductSortOrder.NEWEST);
+        final String trimmedSearch = searchText != null ? searchText.trim() : "";
+        final boolean hasActiveSearch = !trimmedSearch.isEmpty();
+        final ProductSortOrder effectiveSort = sortOrder != null ? sortOrder : ProductSortOrder.NEWEST;
 
-		return new ProductSearchCriteria(
-			hasActiveSearch ? trimmedSearch : null,
-			categoryIds,
-			minPrice,
-			maxPrice,
-			recordLabels,
-			buckets,
-			sortOrder,
-			null,
-			page,
-			12
-		);
+        return new ProductSearchCriteria(
+            hasActiveSearch ? trimmedSearch : null,
+            categoryIds,
+            normalizedMin,
+            normalizedMax,
+            recordLabels,
+            buckets,
+            effectiveSort,
+            null,
+            page,
+            12
+        );
     }
 
     @Override
@@ -414,26 +415,6 @@ public class ProductServiceImpl implements ProductService {
         }
         return productDao.restoreUserDeletedProduct(productId);
     }
-
-	private static BigDecimal parsePriceParam(final String raw) {
-		if (raw == null || raw.isBlank()) {
-			return null;
-		}
-		String normalized = raw.trim();
-		if (normalized.contains(",")) {
-			normalized = normalized.replace(".", "").replace(",", ".");
-		} else if (normalized.matches("\\d{1,3}(\\.\\d{3})+")) {
-			normalized = normalized.replace(".", "");
-		}
-		if (normalized.endsWith(".")) {
-			normalized = normalized.substring(0, normalized.length() - 1);
-		}
-		try {
-			return new BigDecimal(normalized);
-		} catch (NumberFormatException ex) {
-			return null;
-		}
-	}
 
     private List<Category> resolveCategories(final List<Long> categoryIds) {
         if (categoryIds == null || categoryIds.isEmpty()) {

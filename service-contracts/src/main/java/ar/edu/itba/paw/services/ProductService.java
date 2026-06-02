@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import ar.edu.itba.paw.models.ConditionBucket;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
+import ar.edu.itba.paw.models.ProductSortOrder;
 
 public interface ProductService {
     Product createProduct(
@@ -28,11 +30,11 @@ public interface ProductService {
     ProductSearchCriteria getProductSearchCriteria(
         final String searchText,
         final List<Long> categoryIds,
-        final String minPriceParam,
-        final String maxPriceParam,
+        final BigDecimal minPrice,
+        final BigDecimal maxPrice,
         final List<String> recordLabels,
-        final List<String> estadoParams,
-        final String sortParam,
+        final List<ConditionBucket> estadoParams,
+        final ProductSortOrder sortOrder,
         final int page
     );
 

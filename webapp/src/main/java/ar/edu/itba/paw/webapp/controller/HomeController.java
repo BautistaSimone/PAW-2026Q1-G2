@@ -71,11 +71,11 @@ public class HomeController {
 			@AuthenticationPrincipal PawAuthUser authUser,
 			@RequestParam(value = "search-text", required = false) final String searchText,
 			@RequestParam(value = "categories", required = false) final List<Long> categoryIds,
-			@RequestParam(value = "minPrice", required = false) final String minPriceParam,
-			@RequestParam(value = "maxPrice", required = false) final String maxPriceParam,
+			@RequestParam(value = "minPrice", required = false) final BigDecimal minPrice,
+			@RequestParam(value = "maxPrice", required = false) final BigDecimal maxPrice,
 			@RequestParam(value = "label", required = false) final List<String> recordLabels,
-			@RequestParam(value = "estado", required = false) final List<String> estadoParams,
-			@RequestParam(value = "sort", required = false) final String sortParam,
+			@RequestParam(value = "estado", required = false) final List<ConditionBucket> estadoParams,
+			@RequestParam(value = "sort", required = false) final ProductSortOrder sortOrder,
 			@RequestParam(value = "page", defaultValue = "1") final int page) {
 
 		if (page < 1) {
@@ -85,11 +85,11 @@ public class HomeController {
 		final ProductSearchCriteria criteria = productService.getProductSearchCriteria(
 				searchText,
 				categoryIds,
-				minPriceParam,
-				maxPriceParam,
+				minPrice,
+				maxPrice,
 				recordLabels,
 				estadoParams,
-				sortParam,
+				sortOrder,
 				page);
 
 		final PaginatedResult<Product> productsPage = productService.listProducts(criteria);
@@ -121,12 +121,14 @@ public class HomeController {
 				|| (recordLabels != null && !recordLabels.isEmpty())
 				|| (estadoParams != null && !estadoParams.isEmpty());
 
-		final ProductSortOrder sortOrder = ProductSortOrder.parse(sortParam).orElse(ProductSortOrder.NEWEST);
+		final ProductSortOrder effectiveSortOrder = sortOrder != null ? sortOrder : ProductSortOrder.NEWEST;
 
 		final List<ConditionBucket> buckets = new ArrayList<>();
 		if (estadoParams != null) {
-			for (String raw : estadoParams) {
-				ConditionBucket.parse(raw).ifPresent(buckets::add);
+			for (ConditionBucket bucket : estadoParams) {
+				if (bucket != null) {
+					buckets.add(bucket);
+				}
 			}
 		}
 
@@ -152,10 +154,10 @@ public class HomeController {
 		mav.addObject("selectedCategoryIds", selectedCategoryIds);
 		mav.addObject("selectedLabels", selectedLabels);
 		mav.addObject("selectedEstados", selectedEstados);
-		mav.addObject("filterMinPrice", minPriceParam != null ? minPriceParam : "");
-		mav.addObject("filterMaxPrice", maxPriceParam != null ? maxPriceParam : "");
+		mav.addObject("filterMinPrice", minPrice != null ? minPrice.toPlainString() : "");
+		mav.addObject("filterMaxPrice", maxPrice != null ? maxPrice.toPlainString() : "");
 		mav.addObject("sortOptions", ProductSortOrder.values());
-		mav.addObject("selectedSort", sortOrder.name());
+		mav.addObject("selectedSort", effectiveSortOrder.name());
 		mav.addObject("activeSearchText", hasActiveSearch ? trimmedSearch : null);
 		mav.addObject("hasActiveFilters", hasActiveFilters);
 		mav.addObject("noProductsMatchFilters", productsPage.getResults().isEmpty() && hasActiveFilters);

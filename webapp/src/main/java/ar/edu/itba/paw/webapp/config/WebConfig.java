@@ -37,11 +37,15 @@ import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.format.FormatterRegistry;
 import java.util.Locale;
 
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
 import ar.edu.itba.paw.webapp.interceptor.BannedUserInterceptor;
 import ar.edu.itba.paw.webapp.interceptor.VerificationInterceptor;
+import ar.edu.itba.paw.models.ConditionBucket;
+import ar.edu.itba.paw.models.ProductSortOrder;
+import ar.edu.itba.paw.models.PurchaseStatus;
 
 @EnableWebMvc // Use all the defaults from webmvc
 @EnableTransactionManagement
@@ -199,5 +203,31 @@ public class WebConfig implements WebMvcConfigurer {
                     "/assets/**"
                 );
         registry.addInterceptor(localeChangeInterceptor());
+    }
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(String.class, ProductSortOrder.class, source -> {
+            if (source == null || source.trim().isEmpty()) {
+                return null;
+            }
+            return ProductSortOrder.parse(source).orElse(null);
+        });
+        registry.addConverter(String.class, ConditionBucket.class, source -> {
+            if (source == null || source.trim().isEmpty()) {
+                return null;
+            }
+            return ConditionBucket.parse(source).orElse(null);
+        });
+        registry.addConverter(String.class, PurchaseStatus.class, source -> {
+            if (source == null || source.trim().isEmpty()) {
+                return null;
+            }
+            try {
+                return PurchaseStatus.valueOf(source.trim().toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                return null;
+            }
+        });
     }
 }
