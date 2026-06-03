@@ -36,7 +36,7 @@ import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 public class HomeController {
 
 	private static final int COMMUNITY_USER_PAGE_SIZE = 6;
-	private static final int COMMUNITY_PRODUCT_LIMIT = 15;
+	private static final int COMMUNITY_PRODUCT_LIMIT = 8;
 
 	private final ImageService imageService;
 	private final ProductService productService;
