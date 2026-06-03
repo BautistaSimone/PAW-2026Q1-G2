@@ -7,13 +7,9 @@
 
 <spring:message code="SearchUsers.title" var="searchUsersTitle" />
 <spring:message code="SearchUsers.placeholder" var="searchPlaceholder" />
+<spring:message code="SearchUsers.carousel.viewMore.ariaLabel" var="carouselViewMoreAria" />
 <spring:message code="SearchUsers.carousel.prev.ariaLabel" var="carouselPrevAria" />
 <spring:message code="SearchUsers.carousel.next.ariaLabel" var="carouselNextAria" />
-<spring:message code="SearchUsers.carousel.empty" var="carouselEmptyMessage" />
-<spring:message code="SearchUsers.carousel.error" var="carouselErrorMessage" />
-<spring:message code="SearchUsers.carousel.loading" var="carouselLoadingMessage" />
-<spring:message code="SearchUsers.carousel.pageLabel" var="carouselPageLabel" />
-<spring:message code="SearchUsers.carousel.ofLabel" var="carouselOfLabel" />
 
 <ui:layout title="${searchUsersTitle}">
 
@@ -71,11 +67,10 @@
                             <c:url value="/profile" var="profileUrl">
                                 <c:param name="userId" value="${u.id}" />
                             </c:url>
-                            <c:url value="/search-users/${u.id}/products" var="communityProductsEndpoint" />
-                            <c:set var="userProductsPage" value="${communityProductsByUserId[u.id]}" />
+                            <c:set var="userProductsPage" value="${sellerProductPagesByUserId[u.id]}" />
                             <c:set var="userProducts" value="${userProductsPage.results}" />
 
-                            <article class="community-seller-row">
+                            <article class="community-seller-row" id="seller-<c:out value='${u.id}' />">
                                 <aside class="community-user-panel">
                                     <a href="<c:out value='${profileUrl}' />" class="community-user-link">
                                         <div class="community-avatar">
@@ -137,16 +132,7 @@
                                     </div>
                                 </aside>
 
-                                <section class="community-carousel"
-                                    data-community-carousel
-                                    data-endpoint="<c:out value='${communityProductsEndpoint}' />"
-                                    data-current-page="${userProductsPage.currentPage}"
-                                    data-total-pages="${userProductsPage.totalPages}"
-                                    data-empty-message="${carouselEmptyMessage}"
-                                    data-error-message="${carouselErrorMessage}"
-                                    data-loading-message="${carouselLoadingMessage}"
-                                    data-page-label="${carouselPageLabel}"
-                                    data-of-label="${carouselOfLabel}">
+                                <section class="community-carousel">
                                     <div class="community-carousel-header">
                                         <div>
                                             <h2 class="community-carousel-title">
@@ -156,52 +142,54 @@
                                                 <spring:message code="SearchUsers.carousel.total" arguments="${userProductsPage.totalCount}" />
                                             </p>
                                         </div>
-                                        <div class="community-carousel-controls">
-                                            <button type="button" class="community-carousel-button"
-                                                data-carousel-prev
-                                                aria-label="${carouselPrevAria}"
-                                                ${userProductsPage.hasPreviousPage ? '' : 'disabled'}>
+                                    </div>
+
+                                    <div class="community-carousel-frame">
+                                        <c:if test="${not empty userProducts}">
+                                            <button type="button" class="community-carousel-button community-carousel-button-prev" data-carousel-scroll-prev aria-label="${carouselPrevAria}">
                                                 <i class="bi bi-chevron-left" aria-hidden="true"></i>
                                             </button>
-                                            <span class="community-carousel-status" data-carousel-status>
-                                                <spring:message code="SearchUsers.carousel.pageStatus" arguments="${userProductsPage.currentPage},${userProductsPage.totalPages}" />
-                                            </span>
-                                            <button type="button" class="community-carousel-button"
-                                                data-carousel-next
-                                                aria-label="${carouselNextAria}"
-                                                ${userProductsPage.hasNextPage ? '' : 'disabled'}>
+                                            <button type="button" class="community-carousel-button community-carousel-button-next" data-carousel-scroll-next aria-label="${carouselNextAria}">
                                                 <i class="bi bi-chevron-right" aria-hidden="true"></i>
                                             </button>
+                                        </c:if>
+
+                                        <div class="community-carousel-track" data-carousel-scroll-track>
+                                            <c:choose>
+                                                <c:when test="${not empty userProducts}">
+                                                    <c:forEach items="${userProducts}" var="product">
+                                                        <c:url value="/products/${product.id}" var="productUrl" />
+                                                        <a href="<c:out value='${productUrl}' />" class="community-product-tile">
+                                                            <div class="community-product-cover">
+                                                                <c:choose>
+                                                                    <c:when test="${not empty productImageUrls[product.id]}">
+                                                                        <img src="<c:url value='${productImageUrls[product.id]}' />"
+                                                                            alt="<c:out value='${product.artist}' /> - <c:out value='${product.title}' />" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <i class="bi bi-vinyl" aria-hidden="true"></i>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </div>
+                                                            <div class="community-product-body">
+                                                                <h3><c:out value="${product.title}" /></h3>
+                                                                <p><c:out value="${product.artist}" /></p>
+                                                                <span><ui:price value="${product.price}" /></span>
+                                                            </div>
+                                                        </a>
+                                                    </c:forEach>
+                                                    <a href="<c:out value='${profileUrl}' />" class="community-carousel-more-tile" aria-label="${carouselViewMoreAria}">
+                                                        <i class="bi bi-arrow-right-circle" aria-hidden="true"></i>
+                                                        <span><spring:message code="SearchUsers.carousel.viewMore" /></span>
+                                                    </a>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="community-carousel-message community-carousel-message-empty">
+                                                        <spring:message code="SearchUsers.carousel.empty" />
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
-                                    </div>
-
-                                    <div class="community-carousel-loading" data-carousel-loading hidden>
-                                        <span class="community-spinner" aria-hidden="true"></span>
-                                        <span><spring:message code="SearchUsers.carousel.loading" /></span>
-                                    </div>
-
-                                    <div class="community-carousel-track" data-carousel-track>
-                                        <c:forEach items="${userProducts}" var="product">
-                                            <c:url value="/products/${product.id}" var="productUrl" />
-                                            <a href="<c:out value='${productUrl}' />" class="community-product-tile">
-                                                <div class="community-product-cover">
-                                                    <c:choose>
-                                                        <c:when test="${not empty productImageUrls[product.id]}">
-                                                            <img src="<c:url value='${productImageUrls[product.id]}' />"
-                                                                alt="<c:out value='${product.artist}' /> - <c:out value='${product.title}' />" />
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <i class="bi bi-vinyl" aria-hidden="true"></i>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </div>
-                                                <div class="community-product-body">
-                                                    <h3><c:out value="${product.title}" /></h3>
-                                                    <p><c:out value="${product.artist}" /></p>
-                                                    <span><ui:price value="${product.price}" /></span>
-                                                </div>
-                                            </a>
-                                        </c:forEach>
                                     </div>
                                 </section>
                             </article>
@@ -229,5 +217,8 @@
         </div>
     </div>
 
-    <script src="<c:url value='/assets/js/community.js'/>"></script>
+    <c:url value="/assets/js/community.js" var="communityJsUrl">
+        <c:param name="v" value="carousel-floating-v3" />
+    </c:url>
+    <script src="<c:out value='${communityJsUrl}' />"></script>
 </ui:layout>

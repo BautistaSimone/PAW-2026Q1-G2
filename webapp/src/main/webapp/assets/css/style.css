@@ -4659,91 +4659,64 @@ input[type="password"]::-ms-clear {
   margin: 0.1rem 0 0;
 }
 
-.community-carousel-controls {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
+.community-carousel-frame {
+  position: relative;
+  min-width: 0;
 }
 
 .community-carousel-button {
-  width: 36px;
-  height: 36px;
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  width: 42px;
+  height: 42px;
   border: 1.5px solid var(--color-border);
   border-radius: 50%;
-  background: var(--color-card-bg);
+  background: rgba(255, 255, 255, 0.94);
   color: var(--color-text-main);
+  box-shadow: var(--shadow-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transform: translateY(-50%);
   transition: all var(--transition);
+}
+
+.community-carousel-button-prev {
+  left: 0.5rem;
+}
+
+.community-carousel-button-next {
+  right: 0.5rem;
 }
 
 .community-carousel-button:not(:disabled):hover {
   color: #fff;
   background: var(--color-accent);
   border-color: var(--color-accent);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-warm);
+  transform: translateY(-50%) scale(1.04);
 }
 
 .community-carousel-button:disabled {
-  opacity: 0.45;
+  opacity: 0;
   cursor: not-allowed;
-}
-
-.community-carousel-status {
-  min-width: 74px;
-  text-align: center;
-  color: var(--color-text-muted);
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
-.community-carousel-loading {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  position: absolute;
-  top: 5.15rem;
-  left: 50%;
-  z-index: 3;
-  transform: translateX(-50%);
-  padding: 0.45rem 0.8rem;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1.5px solid rgba(38, 70, 83, 0.12);
-  border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-sm);
-  color: var(--color-text-main);
-  font-size: 0.85rem;
-  font-weight: 700;
   pointer-events: none;
-  white-space: nowrap;
-}
-
-.community-spinner {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid rgba(231, 111, 81, 0.25);
-  border-top-color: var(--color-accent);
-  animation: community-spin 0.75s linear infinite;
-}
-
-@keyframes community-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .community-carousel-track {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: flex;
   gap: 0.85rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
   min-height: 244px;
+  padding: 0 3.2rem 0.35rem;
 }
 
 .community-product-tile {
-  min-width: 0;
+  flex: 0 0 clamp(170px, 18vw, 210px);
+  min-width: 170px;
   color: inherit;
   text-decoration: none;
   background: var(--color-bg-light);
@@ -4753,6 +4726,7 @@ input[type="password"]::-ms-clear {
   display: flex;
   flex-direction: column;
   transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  scroll-snap-align: start;
 }
 
 .community-product-tile:hover {
@@ -4820,8 +4794,40 @@ input[type="password"]::-ms-clear {
   font-size: 0.9rem;
 }
 
+.community-carousel-more-tile {
+  flex: 0 0 clamp(150px, 16vw, 190px);
+  min-width: 150px;
+  min-height: 100%;
+  color: var(--color-accent);
+  text-decoration: none;
+  background: #fff7f2;
+  border: 1.5px dashed rgba(231, 111, 81, 0.45);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  font-weight: 800;
+  text-align: center;
+  scroll-snap-align: start;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition), background var(--transition);
+}
+
+.community-carousel-more-tile i {
+  font-size: 1.9rem;
+}
+
+.community-carousel-more-tile:hover {
+  color: #fff;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-warm);
+  transform: translateY(-4px);
+}
+
 .community-carousel-message {
-  grid-column: 1 / -1;
+  flex: 1 1 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4832,12 +4838,6 @@ input[type="password"]::-ms-clear {
   color: var(--color-text-muted);
   text-align: center;
   background: var(--color-bg-light);
-}
-
-.community-carousel-message-error {
-  color: #8a3b12;
-  background: #fff8e1;
-  border-color: #ffe082;
 }
 
 .community-empty-state {
@@ -5018,16 +5018,8 @@ input[type="password"]::-ms-clear {
     justify-content: flex-end;
   }
 
-  .community-carousel-track {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 0.35rem;
-  }
-
   .community-product-tile {
     flex: 0 0 clamp(150px, 36vw, 210px);
-    scroll-snap-align: start;
   }
 }
 
@@ -5048,9 +5040,8 @@ input[type="password"]::-ms-clear {
     flex-direction: column;
   }
 
-  .community-carousel-controls {
-    width: 100%;
-    justify-content: space-between;
+  .community-carousel-more-tile {
+    flex-basis: 150px;
   }
 
   .community-profile-link,
