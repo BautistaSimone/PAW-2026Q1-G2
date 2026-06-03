@@ -1,28 +1,20 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import java.text.NumberFormat;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
@@ -44,7 +36,7 @@ import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 public class HomeController {
 
 	private static final int COMMUNITY_USER_PAGE_SIZE = 6;
-	private static final int COMMUNITY_PRODUCT_PAGE_SIZE = 4;
+	private static final int COMMUNITY_PRODUCT_LIMIT = 15;
 
 	private final ImageService imageService;
 	private final ProductService productService;
@@ -256,7 +248,7 @@ public class HomeController {
 		final Map<Long, Long> userFollowerCounts = userService.countFollowersByUserIds(displayedUserIds);
 		final Map<Long, Long> userPublicationCounts = productService.countActiveProductsByUserIds(displayedUserIds);
 		final Map<Long, List<Product>> productsByUserId =
-				productService.listLatestActiveProductsByUserIds(displayedUserIds, COMMUNITY_PRODUCT_PAGE_SIZE);
+				productService.listLatestActiveProductsByUserIds(displayedUserIds, COMMUNITY_PRODUCT_LIMIT);
 
 		final Map<Long, PaginatedResult<Product>> productPagesByUserId = new HashMap<>();
 		final List<Long> initialProductIds = new ArrayList<>();
@@ -270,7 +262,7 @@ public class HomeController {
 					new PaginatedResult<>(
 							userProducts,
 							1,
-							COMMUNITY_PRODUCT_PAGE_SIZE,
+							COMMUNITY_PRODUCT_LIMIT,
 							userPublicationCounts.getOrDefault(user.getId(), 0L)
 					)
 			);
@@ -286,7 +278,7 @@ public class HomeController {
 		mav.addObject("users", displayedUsers);
 		mav.addObject("userFollowerCounts", userFollowerCounts);
 		mav.addObject("userPublicationCounts", userPublicationCounts);
-		mav.addObject("communityProductsByUserId", productPagesByUserId);
+		mav.addObject("sellerProductPagesByUserId", productPagesByUserId);
 		mav.addObject("productImageUrls", productImageUrls);
 
 		if (authUser != null) {
@@ -297,56 +289,6 @@ public class HomeController {
 		}
 
 		return mav;
-	}
-
-	@ResponseBody
-	@RequestMapping(value = "/search-users/{userId}/products", method = RequestMethod.GET, produces = "application/json")
-	public ResponseEntity<CommunityProductsResponse> communityUserProducts(
-			@PathVariable("userId") final Long userId,
-			@RequestParam(value = "page", defaultValue = "1") final int page,
-			final HttpServletRequest request) {
-
-		if (page < 1) {
-			throw new IllegalArgumentException("Invalid page");
-		}
-
-		final Optional<User> user = userService.findById(userId);
-		if (user.isEmpty() || Boolean.TRUE.equals(user.get().getBanned())) {
-			return ResponseEntity.notFound().build();
-		}
-
-		final PaginatedResult<Product> productsPage =
-				productService.listActiveProductsByUser(userId, page, COMMUNITY_PRODUCT_PAGE_SIZE);
-
-		final List<Long> productIds = new ArrayList<>();
-		for (Product product : productsPage.getResults()) {
-			productIds.add(product.getId());
-		}
-		final Set<Long> productIdsWithImages = imageService.findProductIdsWithImages(productIds);
-		final String contextPath = request == null ? "" : request.getContextPath();
-		final List<CommunityProductDto> products = new ArrayList<>();
-		for (Product product : productsPage.getResults()) {
-			products.add(CommunityProductDto.fromProduct(product, productIdsWithImages, contextPath));
-		}
-
-		return ResponseEntity.ok(new CommunityProductsResponse(
-				products,
-				productsPage.getCurrentPage(),
-				productsPage.getTotalPages(),
-				productsPage.isHasPreviousPage(),
-				productsPage.isHasNextPage()
-		));
-	}
-
-	private static String formatPrice(final BigDecimal price) {
-		if (price == null) {
-			return "";
-		}
-		final NumberFormat formatter = NumberFormat.getNumberInstance(Locale.forLanguageTag("es-AR"));
-		formatter.setGroupingUsed(true);
-		formatter.setMinimumFractionDigits(0);
-		formatter.setMaximumFractionDigits(2);
-		return "$" + formatter.format(price);
 	}
 
 	private Map<Long, String> productImageUrlsFor(final List<Product> products) {
@@ -374,112 +316,5 @@ public class HomeController {
 			}
 		}
 		return reviewService.sellerRatingByUserId(distinctSellerIds);
-	}
-
-	public static final class CommunityProductsResponse {
-		private final List<CommunityProductDto> products;
-		private final int currentPage;
-		private final int totalPages;
-		private final boolean hasPreviousPage;
-		private final boolean hasNextPage;
-
-		public CommunityProductsResponse(
-				final List<CommunityProductDto> products,
-				final int currentPage,
-				final int totalPages,
-				final boolean hasPreviousPage,
-				final boolean hasNextPage) {
-			this.products = products;
-			this.currentPage = currentPage;
-			this.totalPages = totalPages;
-			this.hasPreviousPage = hasPreviousPage;
-			this.hasNextPage = hasNextPage;
-		}
-
-		public List<CommunityProductDto> getProducts() {
-			return products;
-		}
-
-		public int getCurrentPage() {
-			return currentPage;
-		}
-
-		public int getTotalPages() {
-			return totalPages;
-		}
-
-		public boolean isHasPreviousPage() {
-			return hasPreviousPage;
-		}
-
-		public boolean isHasNextPage() {
-			return hasNextPage;
-		}
-	}
-
-	public static final class CommunityProductDto {
-		private final Long id;
-		private final String title;
-		private final String artist;
-		private final String priceLabel;
-		private final String href;
-		private final String imageUrl;
-
-		public CommunityProductDto(
-				final Long id,
-				final String title,
-				final String artist,
-				final String priceLabel,
-				final String href,
-				final String imageUrl) {
-			this.id = id;
-			this.title = title;
-			this.artist = artist;
-			this.priceLabel = priceLabel;
-			this.href = href;
-			this.imageUrl = imageUrl;
-		}
-
-		private static CommunityProductDto fromProduct(
-				final Product product,
-				final Set<Long> productIdsWithImages,
-				final String contextPath) {
-			final String basePath = contextPath == null ? "" : contextPath;
-			final String imageUrl = productIdsWithImages.contains(product.getId())
-					? basePath + "/images/product/" + product.getId()
-					: null;
-			return new CommunityProductDto(
-					product.getId(),
-					product.getTitle(),
-					product.getArtist(),
-					formatPrice(product.getPrice()),
-					basePath + "/products/" + product.getId(),
-					imageUrl
-			);
-		}
-
-		public Long getId() {
-			return id;
-		}
-
-		public String getTitle() {
-			return title;
-		}
-
-		public String getArtist() {
-			return artist;
-		}
-
-		public String getPriceLabel() {
-			return priceLabel;
-		}
-
-		public String getHref() {
-			return href;
-		}
-
-		public String getImageUrl() {
-			return imageUrl;
-		}
 	}
 }
