@@ -357,6 +357,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    public int hideAllProductsByAdmin(final Long userId) {
+        return productDao.markAllAsAdminHiddenByUserId(userId);
+    }
+
+    @Override
+    @Transactional
     public Product updateProduct(
         final Long ownerUserId,
         final Long productId,

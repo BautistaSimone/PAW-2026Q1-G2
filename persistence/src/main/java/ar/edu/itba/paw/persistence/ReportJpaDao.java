@@ -82,4 +82,11 @@ public class ReportJpaDao implements ReportDao {
             .setParameter("productId", productId)
             .executeUpdate();
     }
+
+    @Override
+    public void deleteByOwnerUserId(final long ownerUserId) {
+        em.createQuery("DELETE FROM Report r WHERE r.ownerUserId = :ownerUserId")
+            .setParameter("ownerUserId", ownerUserId)
+            .executeUpdate();
+    }
 }

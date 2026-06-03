@@ -88,4 +88,10 @@ public class ReportServiceImpl implements ReportService {
     public void deleteByProductId(final long productId) {
         reportDao.deleteByProductId(productId);
     }
+
+    @Override
+    @Transactional
+    public void deleteByOwnerUserId(final long ownerUserId) {
+        reportDao.deleteByOwnerUserId(ownerUserId);
+    }
 }

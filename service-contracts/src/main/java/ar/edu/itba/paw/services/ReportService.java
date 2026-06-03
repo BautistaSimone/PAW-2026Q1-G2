@@ -8,4 +8,10 @@ public interface ReportService {
     boolean hasReported(long productId, long reporterUserId);
     PaginatedResult<ReportedProductSummary> findAllGroupedByProduct(int page, int pageSize);
     void deleteByProductId(long productId);
+
+    /**
+     * Deletes all reports for products owned by the given user.
+     * @param ownerUserId the product owner
+     */
+    void deleteByOwnerUserId(long ownerUserId);
 }

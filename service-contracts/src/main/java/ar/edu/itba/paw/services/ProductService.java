@@ -90,6 +90,13 @@ public interface ProductService {
     /** Hides a product from the catalog (admin / moderation); any previous state is overwritten. */
     void hideProductByAdmin(final Long id);
 
+    /**
+     * Hides all active products belonging to the given user (admin/moderation bulk action).
+     * @param userId the product owner
+     * @return the number of products hidden
+     */
+    int hideAllProductsByAdmin(final Long userId);
+
     Product updateProduct(
         final Long ownerUserId,
         final Long productId,

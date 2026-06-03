@@ -98,4 +98,11 @@ public interface ProductDao {
     );
 
     boolean restoreUserDeletedProduct(final Long id);
+
+    /**
+     * Marks ALL active products of a given user as ADMIN_HIDDEN in a single UPDATE.
+     * @param userId the owner whose products should be hidden
+     * @return the number of products affected
+     */
+    int markAllAsAdminHiddenByUserId(final Long userId);
 }

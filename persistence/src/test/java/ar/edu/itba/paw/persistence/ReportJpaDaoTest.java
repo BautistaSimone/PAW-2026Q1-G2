@@ -147,4 +147,38 @@ public class ReportJpaDaoTest {
         Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, otherReporterId));
         Assertions.assertTrue(reportDao.existsByProductAndReporter(otherProductId, reporterId));
     }
+
+    @Test
+    public void testDeleteByOwnerUserIdDeletesOnlyReportsForThatOwner() {
+        // Arrange
+        final User otherOwner = userDao.createUser("report-other-owner@test.com", "pass", "OtherOwner",
+            false, true, null, null, null, null, null, null, null, null);
+        final Product otherOwnerProduct = productDao.createProduct(
+            otherOwner.getId(), "Other Owner Album", "Artist", "Label", "CAT3", "Argentina",
+            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
+            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
+        );
+        em.flush();
+
+        // Reports for the original owner (ownerId) on both their products
+        reportDao.create(productId, ownerId, reporterId);
+        reportDao.create(productId, ownerId, otherReporterId);
+        reportDao.create(otherProductId, ownerId, reporterId);
+
+        // Reports for the other owner
+        reportDao.create(otherOwnerProduct.getId(), otherOwner.getId(), reporterId);
+        em.flush();
+
+        // Act
+        reportDao.deleteByOwnerUserId(ownerId);
+        em.flush();
+
+        // Assert — all reports for ownerId are gone
+        Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, reporterId));
+        Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, otherReporterId));
+        Assertions.assertFalse(reportDao.existsByProductAndReporter(otherProductId, reporterId));
+
+        // Assert — other owner's reports are intact
+        Assertions.assertTrue(reportDao.existsByProductAndReporter(otherOwnerProduct.getId(), reporterId));
+    }
 }

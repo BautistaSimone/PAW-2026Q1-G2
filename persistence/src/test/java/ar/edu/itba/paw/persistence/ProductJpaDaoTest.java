@@ -471,4 +471,49 @@ public class ProductJpaDaoTest {
         Assertions.assertEquals(1, productsByUser.get(userB.getId()).size());
         Assertions.assertEquals(onlyB.getId(), productsByUser.get(userB.getId()).get(0).getId());
     }
+
+    @Test
+    public void markAllAsAdminHiddenByUserIdOnlyHidesActiveProductsOfTargetUser() {
+        // Arrange
+        final User targetUser = userDao.createUser("ban-target@test.com", "password", "ban_target",
+            false, true, null, null, null, null, null, null, null, null);
+        final User otherUser = userDao.createUser("ban-other@test.com", "password", "ban_other",
+            false, true, null, null, null, null, null, null, null, null);
+
+        // 3 active products for target user
+        final Product active1 = createSuggestionProduct(targetUser, "Active1", "Artist", "Label");
+        final Product active2 = createSuggestionProduct(targetUser, "Active2", "Artist", "Label");
+        final Product active3 = createSuggestionProduct(targetUser, "Active3", "Artist", "Label");
+
+        // 1 sold product for target user (should NOT be affected)
+        final Product sold = createSuggestionProduct(targetUser, "Sold", "Artist", "Label");
+        productDao.decrementStock(sold.getId()); // stock=1 -> stock=0 -> SOLD
+
+        // 1 active product for another user (should NOT be affected)
+        final Product otherProduct = createSuggestionProduct(otherUser, "Other", "Artist", "Label");
+
+        em.flush();
+        em.clear();
+
+        // Act
+        final int affected = productDao.markAllAsAdminHiddenByUserId(targetUser.getId());
+
+        em.flush();
+        em.clear();
+
+        // Assert
+        Assertions.assertEquals(3, affected);
+
+        // Target user's active products are now ADMIN_HIDDEN
+        Assertions.assertTrue(productDao.findByIdIfAvailable(active1.getId()).isEmpty());
+        Assertions.assertTrue(productDao.findByIdIfAvailable(active2.getId()).isEmpty());
+        Assertions.assertTrue(productDao.findByIdIfAvailable(active3.getId()).isEmpty());
+
+        // Target user's SOLD product was NOT affected
+        final Product reloadedSold = productDao.findById(sold.getId()).orElseThrow();
+        Assertions.assertEquals(ProductState.SOLD.getPersistenceValue(), reloadedSold.getState());
+
+        // Other user's product was NOT affected
+        Assertions.assertTrue(productDao.findByIdIfAvailable(otherProduct.getId()).isPresent());
+    }
 }

@@ -2,11 +2,9 @@ package ar.edu.itba.paw.services;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Product;
-import ar.edu.itba.paw.models.ProductSearchCriteria;
 
 import ar.edu.itba.paw.persistence.UserDao;
 
@@ -168,20 +165,8 @@ public class UserServiceImpl implements UserService {
 	@Override
     @Transactional
     public void ban(final Long id) {
-
-        // Hide all their active products
-        final ProductSearchCriteria criteria = new ProductSearchCriteria(
-            null, Collections.emptyList(), null, null,
-            Collections.emptyList(), Collections.emptyList(), null, id,
-            1, 1000000
-        );
-
-        final List<Product> userProducts = productService.listProducts(criteria).getResults();
-        for (Product p : userProducts) {
-            productService.hideProductByAdmin(p.getId());
-            reportService.deleteByProductId(p.getId());
-        }
-
+        productService.hideAllProductsByAdmin(id);
+        reportService.deleteByOwnerUserId(id);
         userDao.ban(id);
     }
 

@@ -787,4 +787,15 @@ public class ProductJpaDao implements ProductDao {
         }
         return escaped.toString();
     }
+
+    @Override
+    public int markAllAsAdminHiddenByUserId(final Long userId) {
+        return em.createQuery(
+            "UPDATE Product p SET p.state = :newState " +
+            "WHERE p.userId = :userId AND p.state = :activeState")
+            .setParameter("newState", ProductState.ADMIN_HIDDEN.getPersistenceValue())
+            .setParameter("userId", userId)
+            .setParameter("activeState", ProductState.ACTIVE.getPersistenceValue())
+            .executeUpdate();
+    }
 }
