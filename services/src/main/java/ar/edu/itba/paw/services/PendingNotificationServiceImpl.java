@@ -7,7 +7,6 @@ import ar.edu.itba.paw.models.PendingNotification;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.persistence.PendingNotificationDao;
-import ar.edu.itba.paw.persistence.ProductDao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,18 +22,18 @@ public class PendingNotificationServiceImpl implements PendingNotificationServic
     private static final Logger LOGGER = LoggerFactory.getLogger(PendingNotificationServiceImpl.class);
 
     private final PendingNotificationDao pendingNotificationDao;
-    private final ProductDao productDao;
+    private final ProductService productService;
     private final UserService userService;
     private final EmailService emailService;
 
     @Autowired
     public PendingNotificationServiceImpl(
             final PendingNotificationDao pendingNotificationDao,
-            final ProductDao productDao,
+            final ProductService productService,
             final UserService userService,
             final EmailService emailService) {
         this.pendingNotificationDao = pendingNotificationDao;
-        this.productDao = productDao;
+        this.productService = productService;
         this.userService = userService;
         this.emailService = emailService;
     }
@@ -63,7 +62,7 @@ public class PendingNotificationServiceImpl implements PendingNotificationServic
                 .map(PendingNotification::getProductId)
                 .collect(Collectors.toSet());
 
-        final Map<Long, Product> productMap = productDao.findByIds(allProductIds)
+        final Map<Long, Product> productMap = productService.findByIds(allProductIds)
                 .stream()
                 .collect(Collectors.toMap(Product::getId, p -> p));
 

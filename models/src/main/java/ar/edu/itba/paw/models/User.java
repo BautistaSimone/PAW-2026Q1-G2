@@ -33,9 +33,9 @@ public class User {
     
     @Column(length = 255, nullable = false)
     private String username;
-    private Boolean mod;
-    private Boolean enabled;
-    private Boolean banned;
+    private boolean mod;
+    private boolean enabled;
+    private boolean banned;
 
     @Column(name = "first_name", length = 100)
     private String firstName;
@@ -84,9 +84,9 @@ public class User {
             String email,
             String password,
             String username,
-            Boolean mod,
-            Boolean enabled,
-            Boolean banned,
+            boolean mod,
+            boolean enabled,
+            boolean banned,
             String firstName,
             String lastName,
             String streetName,
@@ -116,9 +116,9 @@ public class User {
             String email,
             String password,
             String username,
-            Boolean mod,
-            Boolean enabled,
-            Boolean banned,
+            boolean mod,
+            boolean enabled,
+            boolean banned,
             String firstName,
             String lastName,
             String streetName,
@@ -224,15 +224,15 @@ public class User {
         return username;
     }
 
-    public Boolean getMod() {
+    public boolean getMod() {
         return mod;
     }
 
-    public Boolean getEnabled() {
+    public boolean getEnabled() {
         return enabled;
     }
 
-    public Boolean getBanned() {
+    public boolean getBanned() {
         return banned;
     }
 
@@ -280,11 +280,11 @@ public class User {
         this.password = password;
     }
 
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
-    public void setBanned(Boolean banned) {
+    public void setBanned(boolean banned) {
         this.banned = banned;
     }
 

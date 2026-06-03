@@ -41,7 +41,7 @@ public class Purchase {
     private String paymentMethod;
 
     @Column(nullable = false)
-    private Boolean confirmed;
+    private boolean confirmed;
 
     @Column(name = "reserved_until")
     private LocalDateTime reservedUntil;
@@ -167,7 +167,7 @@ public class Purchase {
         return sellerToken;
     }
 
-    public Boolean getConfirmed() {
+    public boolean getConfirmed() {
         return confirmed;
     }
 

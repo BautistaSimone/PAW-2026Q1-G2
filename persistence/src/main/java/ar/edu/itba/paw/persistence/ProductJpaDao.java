@@ -54,7 +54,7 @@ public class ProductJpaDao implements ProductDao {
             return java.util.Collections.emptyList();
         }
         return em.createQuery(
-            "FROM Product p WHERE p.productId IN :ids", Product.class
+            "FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId IN :ids", Product.class
         )
         .setParameter("ids", ids)
         .getResultList();
@@ -234,7 +234,7 @@ public class ProductJpaDao implements ProductDao {
             return new PaginatedResult<>(Collections.emptyList(), criteria.getPage(), criteria.getPageSize(), totalCount);
         }
 
-        final TypedQuery<Product> selectQuery = em.createQuery("FROM Product WHERE productId IN :ids", Product.class)
+        final TypedQuery<Product> selectQuery = em.createQuery("FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId IN :ids", Product.class)
             .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
 
         // Mantain ordering
@@ -459,7 +459,7 @@ public class ProductJpaDao implements ProductDao {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, totalCount);
         }
 
-        final TypedQuery<Product> selectQuery = em.createQuery("FROM Product WHERE productId IN :ids", Product.class)
+        final TypedQuery<Product> selectQuery = em.createQuery("FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId IN :ids", Product.class)
             .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
 
         final Map<Long, Product> productsById = selectQuery.getResultList().stream()
@@ -667,7 +667,7 @@ public class ProductJpaDao implements ProductDao {
     @Override
     public Optional<Product> findByIdIfAvailable(final Long id) {
         final TypedQuery<Product> query = em.createQuery(
-            "FROM Product WHERE productId = :productId AND state = :state", Product.class
+            "FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId = :productId AND p.state = :state", Product.class
         );
         query.setParameter("productId", id);
         query.setParameter("state", ProductState.ACTIVE.getPersistenceValue());

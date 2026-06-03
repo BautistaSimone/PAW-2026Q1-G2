@@ -13,14 +13,13 @@ import ar.edu.itba.paw.models.Report;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.persistence.ReportDao;
-import ar.edu.itba.paw.persistence.ProductDao;
 import ar.edu.itba.paw.persistence.ReportedProductProjection;
 
 @Service
 public class ReportServiceImpl implements ReportService {
 
     private final ReportDao reportDao;
-    private final ProductDao productDao;
+    private final ProductService productService;
 
     @Autowired
     EmailService emailService;
@@ -29,15 +28,15 @@ public class ReportServiceImpl implements ReportService {
     UserService userService;
 
     @Autowired
-    public ReportServiceImpl(final ReportDao reportDao, final ProductDao productDao) {
+    public ReportServiceImpl(final ReportDao reportDao, final ProductService productService) {
         this.reportDao = reportDao;
-        this.productDao = productDao;
+        this.productService = productService;
     }
 
     @Override
     @Transactional
     public Report report(long productId, long reporterUserId, long reportedUserId) {
-        final Product product = productDao.findById(productId)
+        final Product product = productService.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         if (product.getUserId().equals(reporterUserId)) {
