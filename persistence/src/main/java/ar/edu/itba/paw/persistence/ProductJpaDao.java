@@ -239,7 +239,7 @@ public class ProductJpaDao implements ProductDao {
 
         // Mantain ordering
         final Map<Long, Product> productsById = selectQuery.getResultList().stream()
-            .collect(Collectors.toMap(Product::getId, product -> product));
+            .collect(Collectors.toMap(Product::getId, product -> product, (existing, replacement) -> existing));
             
         final List<Product> orderedProducts = ids.stream()
             .map(Number::longValue)
@@ -463,7 +463,7 @@ public class ProductJpaDao implements ProductDao {
             .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
 
         final Map<Long, Product> productsById = selectQuery.getResultList().stream()
-            .collect(Collectors.toMap(Product::getId, product -> product));
+            .collect(Collectors.toMap(Product::getId, product -> product, (existing, replacement) -> existing));
         final List<Product> orderedProducts = ids.stream()
             .map(Number::longValue)
             .map(productsById::get)

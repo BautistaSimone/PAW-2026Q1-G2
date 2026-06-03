@@ -65,7 +65,7 @@ public class PendingNotificationServiceImpl implements PendingNotificationServic
 
         final Map<Long, Product> productMap = productDao.findByIds(allProductIds)
                 .stream()
-                .collect(Collectors.toMap(Product::getId, p -> p));
+                .collect(Collectors.toMap(Product::getId, p -> p, (existing, replacement) -> existing));
 
         final List<Long> processedIds = new ArrayList<>();
 
