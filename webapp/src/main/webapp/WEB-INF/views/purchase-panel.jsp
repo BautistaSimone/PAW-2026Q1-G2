@@ -227,7 +227,9 @@
                                                                         </ul>
                                                                     </div>
                                                                     <c:url var="statusPostUrl"
-                                                                        value='/purchases/${purchase.purchaseId}/status' />
+                                                                        value='/purchases/${purchase.purchaseId}/status'>
+                                                                        <c:param name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                                    </c:url>
                                                                     <form:form modelAttribute="purchaseStatusForm"
                                                                         method="POST" action="${statusPostUrl}"
                                                                         enctype="multipart/form-data"
