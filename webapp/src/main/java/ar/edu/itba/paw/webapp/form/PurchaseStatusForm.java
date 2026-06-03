@@ -4,6 +4,9 @@ import javax.validation.constraints.NotBlank;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import ar.edu.itba.paw.webapp.validation.ValidPurchaseStatusForm;
+
+@ValidPurchaseStatusForm
 public class PurchaseStatusForm {
 
     @NotBlank

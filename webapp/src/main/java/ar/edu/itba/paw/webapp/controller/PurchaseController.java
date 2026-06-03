@@ -162,23 +162,15 @@ public class PurchaseController {
             return getPurchase(authUser, id, form);
         }
 
-        PurchaseStatus statusObj;
-        try {
-            statusObj = PurchaseStatus.valueOf(form.getNewStatus());
-        } catch (IllegalArgumentException e) {
-            errors.rejectValue("newStatus", "Pattern.purchaseForm.newStatus");
-            return getPurchase(authUser, id, form);
-        }
+        // Status was validated by PurchaseStatusFormValidator — parse directly.
+        final PurchaseStatus statusObj = PurchaseStatus.valueOf(form.getNewStatus());
 
+        // Proof was validated by PurchaseStatusFormValidator — read directly if PAID.
         ValidatedPaymentProof proof = null;
         if (statusObj == PurchaseStatus.PAID) {
-            try {
-                proof = PaymentProofValidator.validate(form.getProofFile());
-            } catch (PaymentProofValidator.InvalidPaymentProofException e) {
-                errors.rejectValue("proofFile", e.getMessageKey());
-                return getPurchase(authUser, id, form);
-            }
+            proof = PaymentProofValidator.validate(form.getProofFile());
         }
+
         final Purchase updated;
         try {
             updated = purchaseService.updateStatus(

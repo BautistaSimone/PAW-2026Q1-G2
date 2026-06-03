@@ -16,6 +16,9 @@ import javax.validation.constraints.PositiveOrZero;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import ar.edu.itba.paw.webapp.validation.ValidProductForm;
+
+@ValidProductForm
 public class ProductForm {
 
     @NotBlank

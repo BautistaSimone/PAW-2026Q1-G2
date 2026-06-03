@@ -44,7 +44,6 @@ import ar.edu.itba.paw.webapp.product.ProductImageLayoutParser;
 import ar.edu.itba.paw.webapp.product.ProductImageLayoutParser.Slot;
 import ar.edu.itba.paw.webapp.product.ProductImageLayoutParser.SlotKind;
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
-import ar.edu.itba.paw.webapp.validation.ImageUploadValidator.InvalidImageUploadException;
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator.ValidatedImage;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.EmailService;
@@ -147,22 +146,6 @@ public class ProductController {
             return productFormView();
         }
 
-        final List<ValidatedImage> validatedImages;
-        try {
-            validatedImages = ImageUploadValidator.validateAll(form.getImages());
-        } catch (InvalidImageUploadException e) {
-            errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
-            return productFormView();
-        } catch (IOException e) {
-            errors.rejectValue("images", "Read.productForm.images", null);
-            return productFormView();
-        }
-
-        if (validatedImages.isEmpty()) {
-            errors.rejectValue("images", "Required.productForm.images", null);
-            return productFormView();
-        }
-
         final User publisher = userService.findById(authUser.getUser().getId())
             .orElseThrow(() -> new IllegalStateException("User not found"));
 
@@ -181,6 +164,8 @@ public class ProductController {
             form.getStock()
         );
 
+        // Images were fully validated by ProductFormValidator — read and persist directly.
+        final List<ValidatedImage> validatedImages = ImageUploadValidator.readAll(form.getImages());
         for (ValidatedImage image : validatedImages) {
             imageService.createImage(
                 product.getId(),
@@ -254,103 +239,29 @@ public class ProductController {
         final String layoutRaw = form.getImageLayout();
         final boolean useLayout = hadImages && layoutRaw != null && !layoutRaw.isBlank();
 
+        // Images were fully validated by ProductFormValidator — read and persist directly.
         final List<ValidatedImage> replacementImages;
-
         if (!hadImages) {
-            final List<ValidatedImage> validatedImages;
-            try {
-                validatedImages = ImageUploadValidator.validateAll(form.getImages());
-            } catch (InvalidImageUploadException e) {
-                errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
-                return editProductFormModelAndView(id);
-            } catch (IOException e) {
-                errors.rejectValue("images", "Read.productForm.images", null);
-                return editProductFormModelAndView(id);
-            }
-            if (validatedImages.isEmpty()) {
-                errors.rejectValue("images", "Required.productForm.images", null);
-                return editProductFormModelAndView(id);
-            }
-            replacementImages = validatedImages;
+            replacementImages = ImageUploadValidator.readAll(form.getImages());
         } else if (useLayout) {
-            final List<Slot> slots;
-            try {
-                slots = ProductImageLayoutParser.parse(layoutRaw);
-            } catch (RuntimeException ex) {
-                errors.rejectValue("images", "Invalid.productForm.imageLayout", null);
-                return editProductFormModelAndView(id);
-            }
-            if (slots.isEmpty() || slots.size() > ImageUploadValidator.MAX_IMAGES_PER_PRODUCT) {
-                errors.rejectValue("images", "Invalid.productForm.imageLayout", null);
-                return editProductFormModelAndView(id);
-            }
-            final long newSlotCount = slots.stream().filter(s -> s.getKind() == SlotKind.NEW).count();
+            final List<Slot> slots = ProductImageLayoutParser.parse(layoutRaw);
             final List<org.springframework.web.multipart.MultipartFile> newFiles =
                 extractNonEmptyMultipartFilesList(form.getImages());
-            if (newSlotCount != newFiles.size()) {
-                errors.rejectValue("images", "Invalid.productForm.imageLayout", null);
-                return editProductFormModelAndView(id);
-            }
-            long newBytesTotal = 0;
-            for (org.springframework.web.multipart.MultipartFile f : newFiles) {
-                newBytesTotal += f.getSize();
-            }
-            if (newBytesTotal > ImageUploadValidator.MAX_REQUEST_BYTES) {
-                errors.rejectValue("images", "Invalid.productForm.images", null);
-                return editProductFormModelAndView(id);
-            }
             final List<ValidatedImage> built = new ArrayList<>(slots.size());
             int newFileIndex = 0;
             for (final Slot slot : slots) {
                 if (slot.getKind() == SlotKind.EXISTING) {
-                    final Optional<Image> imgOpt = imageService.findById(slot.getExistingImageId());
-                    if (imgOpt.isEmpty() || !imgOpt.get().getProductId().equals(id)) {
-                        errors.rejectValue("images", "Invalid.productForm.imageLayout", null);
-                        return editProductFormModelAndView(id);
-                    }
-                    try {
-                        built.add(ImageUploadValidator.validateStoredImageBytes(imgOpt.get().getData()));
-                    } catch (InvalidImageUploadException e) {
-                        errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
-                        return editProductFormModelAndView(id);
-                    } catch (IOException e) {
-                        errors.rejectValue("images", "Read.productForm.images", null);
-                        return editProductFormModelAndView(id);
-                    }
+                    final Image img = imageService.findById(slot.getExistingImageId()).orElseThrow();
+                    built.add(ImageUploadValidator.readStoredImageBytes(img.getData()));
                 } else {
-                    try {
-                        built.add(ImageUploadValidator.validate(newFiles.get(newFileIndex++)));
-                    } catch (InvalidImageUploadException e) {
-                        errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
-                        return editProductFormModelAndView(id);
-                    } catch (IOException e) {
-                        errors.rejectValue("images", "Read.productForm.images", null);
-                        return editProductFormModelAndView(id);
-                    }
+                    built.add(ImageUploadValidator.read(newFiles.get(newFileIndex++)));
                 }
             }
             replacementImages = built;
         } else {
-            final boolean hasNewImages = hasNonEmptyMultipartFiles(form.getImages());
-            if (hasNewImages) {
-                final List<ValidatedImage> validatedImages = new ArrayList<>();
-                try {
-                    validatedImages.addAll(ImageUploadValidator.validateAll(form.getImages()));
-                } catch (InvalidImageUploadException e) {
-                    errors.rejectValue("images", "Invalid.productForm.images", e.getMessage());
-                    return editProductFormModelAndView(id);
-                } catch (IOException e) {
-                    errors.rejectValue("images", "Read.productForm.images", null);
-                    return editProductFormModelAndView(id);
-                }
-                if (validatedImages.isEmpty()) {
-                    errors.rejectValue("images", "Required.productForm.images", null);
-                    return editProductFormModelAndView(id);
-                }
-                replacementImages = validatedImages;
-            } else {
-                replacementImages = null;
-            }
+            replacementImages = hasNonEmptyMultipartFiles(form.getImages())
+                ? ImageUploadValidator.readAll(form.getImages())
+                : null;
         }
 
         productService.updateProduct(

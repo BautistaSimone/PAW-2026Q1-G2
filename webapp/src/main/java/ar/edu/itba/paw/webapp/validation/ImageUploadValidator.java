@@ -104,6 +104,59 @@ public final class ImageUploadValidator {
         return new ValidatedImage(Arrays.copyOf(data, data.length), kind.contentType);
     }
 
+    // -------------------------------------------------------------------------
+    // Read-only methods: called AFTER @Valid validation has already passed.
+    // These do NOT re-validate business rules; they only read bytes and detect
+    // the content type. Any IOException here is an infrastructure failure and
+    // is wrapped in RuntimeException so GlobalExceptionHandler can handle it.
+    // -------------------------------------------------------------------------
+
+    /**
+     * Reads all non-empty uploaded files into ValidatedImage instances without
+     * re-running validation. Call this only when @Valid has already passed.
+     */
+    public static List<ValidatedImage> readAll(final MultipartFile[] files) {
+        if (files == null || files.length == 0) {
+            return Collections.emptyList();
+        }
+        final List<ValidatedImage> result = new ArrayList<>();
+        for (final MultipartFile file : files) {
+            if (file == null || file.isEmpty()) {
+                continue;
+            }
+            result.add(read(file));
+        }
+        return result;
+    }
+
+    /**
+     * Reads a single uploaded file into a ValidatedImage without re-running
+     * validation. Call this only when @Valid has already passed.
+     */
+    public static ValidatedImage read(final MultipartFile file) {
+        final byte[] data;
+        try {
+            data = file.getBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read uploaded image bytes", e);
+        }
+        final String contentType = detectKind(data)
+            .map(k -> k.contentType)
+            .orElse(JPEG_CONTENT_TYPE);
+        return new ValidatedImage(data, contentType);
+    }
+
+    /**
+     * Wraps already-stored image bytes into a ValidatedImage without re-running
+     * validation. Call this only when @Valid has already passed.
+     */
+    public static ValidatedImage readStoredImageBytes(final byte[] data) {
+        final String contentType = detectKind(data)
+            .map(k -> k.contentType)
+            .orElse(JPEG_CONTENT_TYPE);
+        return new ValidatedImage(Arrays.copyOf(data, data.length), contentType);
+    }
+
     public static Optional<String> detectSafeContentType(final byte[] data) {
         try {
             return Optional.of(validateImageData(data).contentType);
