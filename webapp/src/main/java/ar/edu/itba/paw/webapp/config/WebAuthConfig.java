@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,8 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @ComponentScan("ar.edu.itba.paw.webapp.auth")
-public class WebAuthConfig{
-
+public class WebAuthConfig {
 
     @Value("${auth.rememberme}")
     private String authRemeberMe;
@@ -37,10 +35,12 @@ public class WebAuthConfig{
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
 
         http.sessionManagement()
-            .and()
-            .authorizeHttpRequests()
+                .and()
+                .authorizeHttpRequests()
                 .requestMatchers("/login", "/register").anonymous()
-                .requestMatchers("/", "/changePassword", "/resetPassword", "/verificationStatus", "/search-users", "/banned").permitAll()
+                .requestMatchers("/", "/changePassword", "/resetPassword", "/verificationStatus", "/search-users",
+                        "/banned")
+                .permitAll()
                 .requestMatchers("/verifyEmail", "/notVerified", "/for-you", "/notifications/**").authenticated()
                 // Role based routes — more specific first
                 .requestMatchers("/profile/admin/**").hasRole("ADMIN")
@@ -50,21 +50,21 @@ public class WebAuthConfig{
                 .requestMatchers(HttpMethod.POST, "/images", "/images/**").denyAll()
                 // Public routes
                 .requestMatchers("/css/**", "/js/**", "/img/**", "/favicon.ico", "/403").permitAll()
-            .and().formLogin()
+                .and().formLogin()
                 .loginPage("/login")
                 .usernameParameter("email")
                 .passwordParameter("password")
                 .defaultSuccessUrl("/", false)
-            .and().rememberMe()
+                .and().rememberMe()
                 .rememberMeParameter("rememberMe")
                 .userDetailsService(userDetailsService)
                 .key(authRemeberMe)
                 .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30))
-            .and().logout()
+                .and().logout()
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
                 .permitAll()
-            .and().exceptionHandling()
+                .and().exceptionHandling()
                 .accessDeniedPage("/403");
 
         return http.build();

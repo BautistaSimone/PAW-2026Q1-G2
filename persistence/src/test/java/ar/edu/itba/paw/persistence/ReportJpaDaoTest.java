@@ -3,7 +3,6 @@ package ar.edu.itba.paw.persistence;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -49,26 +48,24 @@ public class ReportJpaDaoTest {
     @BeforeEach
     public void setUp() {
         final User owner = userDao.createUser("report-owner@test.com", "pass", "Owner",
-            false, true, null, null, null, null, null, null, null, null);
+                false, true, null, null, null, null, null, null, null, null);
         final User reporter = userDao.createUser("report-reporter@test.com", "pass", "Reporter",
-            false, true, null, null, null, null, null, null, null, null);
+                false, true, null, null, null, null, null, null, null, null);
         final User otherReporter = userDao.createUser("report-other@test.com", "pass", "Other Reporter",
-            false, true, null, null, null, null, null, null, null, null);
+                false, true, null, null, null, null, null, null, null, null);
 
         ownerId = owner.getId();
         reporterId = reporter.getId();
         otherReporterId = otherReporter.getId();
 
         final Product product = productDao.createProduct(
-            ownerId, "Reported Album", "Reported Artist", "Label", "CAT", "Argentina",
-            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
-        );
+                ownerId, "Reported Album", "Reported Artist", "Label", "CAT", "Argentina",
+                Collections.emptyList(), "Description", BigDecimal.valueOf(8),
+                BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1);
         final Product otherProduct = productDao.createProduct(
-            ownerId, "Other Reported Album", "Other Artist", "Label", "CAT2", "Argentina",
-            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
-        );
+                ownerId, "Other Reported Album", "Other Artist", "Label", "CAT2", "Argentina",
+                Collections.emptyList(), "Description", BigDecimal.valueOf(8),
+                BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1);
 
         productId = product.getId();
         otherProductId = otherProduct.getId();
@@ -86,9 +83,8 @@ public class ReportJpaDaoTest {
 
         // Assert
         Long count = em.createQuery(
-            "SELECT COUNT(r) FROM Report r",
-            Long.class
-        ).getSingleResult();
+                "SELECT COUNT(r) FROM Report r",
+                Long.class).getSingleResult();
 
         Assertions.assertEquals(1L, count);
     }
@@ -152,12 +148,11 @@ public class ReportJpaDaoTest {
     public void testDeleteByOwnerUserIdDeletesOnlyReportsForThatOwner() {
         // Arrange
         final User otherOwner = userDao.createUser("report-other-owner@test.com", "pass", "OtherOwner",
-            false, true, null, null, null, null, null, null, null, null);
+                false, true, null, null, null, null, null, null, null, null);
         final Product otherOwnerProduct = productDao.createProduct(
-            otherOwner.getId(), "Other Owner Album", "Artist", "Label", "CAT3", "Argentina",
-            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
-        );
+                otherOwner.getId(), "Other Owner Album", "Artist", "Label", "CAT3", "Argentina",
+                Collections.emptyList(), "Description", BigDecimal.valueOf(8),
+                BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1);
         em.flush();
 
         // Reports for the original owner (ownerId) on both their products

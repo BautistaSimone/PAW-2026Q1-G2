@@ -4,7 +4,6 @@ import java.time.Instant;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Column;
 
 @Entity
 @Table(name = "password_tokens")

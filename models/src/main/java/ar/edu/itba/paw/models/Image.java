@@ -7,7 +7,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Id;
 import javax.persistence.Column;
-import javax.persistence.Lob;
 
 @Entity
 @Table(name = "images")
@@ -62,9 +61,8 @@ public class Image {
 
     @Override
     public String toString() {
-        return 
-            "Image [product_id=" + productId 
-            + ", contentType=" + contentType
-            + "]";
+        return "Image [product_id=" + productId
+                + ", contentType=" + contentType
+                + "]";
     }
 }

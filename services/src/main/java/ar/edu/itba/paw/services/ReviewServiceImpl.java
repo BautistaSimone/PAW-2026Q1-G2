@@ -3,7 +3,6 @@ package ar.edu.itba.paw.services;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Map;
@@ -29,11 +28,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Autowired
     public ReviewServiceImpl(
-        final ReviewDao reviewDao,
-        final PurchaseService purchaseService,
-        final ProductService productService,
-        final NotificationService notificationService
-    ) {
+            final ReviewDao reviewDao,
+            final PurchaseService purchaseService,
+            final ProductService productService,
+            final NotificationService notificationService) {
         this.reviewDao = reviewDao;
         this.purchaseService = purchaseService;
         this.productService = productService;
@@ -44,7 +42,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public Review create(long purchaseId, long buyerId, int score, String text) {
         final Purchase purchase = purchaseService.findById(purchaseId)
-            .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
 
         if (!purchase.getBuyerId().equals(buyerId)) {
             throw new IllegalArgumentException("Only the buyer can leave a review");
@@ -59,7 +57,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         final Product product = productService.findById(purchase.getProductId())
-            .orElseThrow(() -> new IllegalStateException("Product not found"));
+                .orElseThrow(() -> new IllegalStateException("Product not found"));
 
         final long sellerId = product.getUserId();
 

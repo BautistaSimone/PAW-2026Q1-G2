@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.Locale;
 import org.springframework.context.MessageSource;
 
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -49,195 +48,180 @@ public class PurchaseServiceImplTest {
     @Mock
     private NotificationService notificationService;
 
-
     private PurchaseServiceImpl purchaseService;
 
     @BeforeEach
     public void setUp() {
         purchaseService = new PurchaseServiceImpl(
-            purchaseDao,
-            productService,
-            userService,
-            emailService,
-            messageSource,
-            notificationService
-        );
+                purchaseDao,
+                productService,
+                userService,
+                emailService,
+                messageSource,
+                notificationService);
     }
 
     private static Product product() {
         return new Product(
-            PRODUCT_ID,
-            SELLER_ID,
-            "Dynamo",
-            "Soda Stereo",
-            "Sony",
-            "EPC 85930",
-            "Argentina",
-            Collections.emptyList(),
-            "Edicion original",
-            BigDecimal.valueOf(9),
-            BigDecimal.valueOf(9),
-            LocalDate.now(),
-            BigDecimal.valueOf(32000),
-            1
-        );
+                PRODUCT_ID,
+                SELLER_ID,
+                "Dynamo",
+                "Soda Stereo",
+                "Sony",
+                "EPC 85930",
+                "Argentina",
+                Collections.emptyList(),
+                "Edicion original",
+                BigDecimal.valueOf(9),
+                BigDecimal.valueOf(9),
+                LocalDate.now(),
+                BigDecimal.valueOf(32000),
+                1);
     }
 
     @Test
     public void createPurchaseReservesProductBeforeCreatingPurchase() {
         final Product product = product();
         final User seller = new User(
-            SELLER_ID, 
-            "seller@test.com", 
-            "password", 
-            "seller", 
-            false, 
-            true, 
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-            );
+                SELLER_ID,
+                "seller@test.com",
+                "password",
+                "seller",
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         final User buyer = new User(
-            BUYER_ID, 
-            "buyer@test.com", 
-            "password", 
-            "buyer", 
-            false, 
-            true, 
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-            );
+                BUYER_ID,
+                "buyer@test.com",
+                "password",
+                "buyer",
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
 
-        final Purchase purchase = new Purchase(99L, PRODUCT_ID, BUYER_ID, SELLER_ID, LocalDate.now(), PurchaseStatus.PENDING, "buyer-token", "seller-token");
+        final Purchase purchase = new Purchase(99L, PRODUCT_ID, BUYER_ID, SELLER_ID, LocalDate.now(),
+                PurchaseStatus.PENDING, "buyer-token", "seller-token");
 
         Mockito.when(productService.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         Mockito.when(userService.findById(SELLER_ID)).thenReturn(Optional.of(seller));
         Mockito.when(userService.findById(BUYER_ID)).thenReturn(Optional.of(buyer));
         Mockito.when(productService.decrementStock(PRODUCT_ID)).thenReturn(true);
         Mockito.when(purchaseDao.createPurchase(
-            Mockito.eq(PRODUCT_ID),
-            Mockito.eq(BUYER_ID),
-            Mockito.eq(SELLER_ID),
-            Mockito.eq(PurchaseStatus.PENDING),
-            Mockito.anyString(),
-            Mockito.anyString(),
-            Mockito.any(LocalDateTime.class)
-        )).thenReturn(purchase);
+                Mockito.eq(PRODUCT_ID),
+                Mockito.eq(BUYER_ID),
+                Mockito.eq(SELLER_ID),
+                Mockito.eq(PurchaseStatus.PENDING),
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.any(LocalDateTime.class))).thenReturn(purchase);
         Mockito.when(messageSource.getMessage(
-            Mockito.eq("Email.purchase.buyer.confirmed.title"),
-            Mockito.<Object[]>isNull(),
-            Mockito.any()
-        )).thenReturn("buyer title");
+                Mockito.eq("Email.purchase.buyer.confirmed.title"),
+                Mockito.<Object[]>isNull(),
+                Mockito.any())).thenReturn("buyer title");
         Mockito.when(messageSource.getMessage(
-            Mockito.eq("Email.purchase.buyer.confirmed.msg"),
-            Mockito.<Object[]>isNull(),
-            Mockito.any()
-        )).thenReturn("buyer message");
+                Mockito.eq("Email.purchase.buyer.confirmed.msg"),
+                Mockito.<Object[]>isNull(),
+                Mockito.any())).thenReturn("buyer message");
         Mockito.when(messageSource.getMessage(
-            Mockito.eq("Email.purchase.seller.requested.title"),
-            Mockito.<Object[]>isNull(),
-            Mockito.any()
-        )).thenReturn("seller title");
+                Mockito.eq("Email.purchase.seller.requested.title"),
+                Mockito.<Object[]>isNull(),
+                Mockito.any())).thenReturn("seller title");
         Mockito.when(messageSource.getMessage(
-            Mockito.eq("Email.purchase.seller.requested.msg"),
-            Mockito.any(Object[].class),
-            Mockito.any()
-        )).thenReturn("seller message");
+                Mockito.eq("Email.purchase.seller.requested.msg"),
+                Mockito.any(Object[].class),
+                Mockito.any())).thenReturn("seller message");
 
         final Purchase result = purchaseService.createPurchase(PRODUCT_ID, BUYER_ID);
 
         Assertions.assertSame(purchase, result);
         Mockito.verify(emailService).sendBuyerEmail(
-            Mockito.eq("buyer@test.com"),
-            Mockito.same(purchase),
-            Mockito.same(product),
-            Mockito.eq("buyer title"),
-            Mockito.eq("buyer message"),
-            Mockito.same(buyer),
-            Mockito.same(seller),
-            Mockito.eq(PurchaseStatus.PENDING),
-            Mockito.eq(LocaleContextHolder.getLocale())
-        );
+                Mockito.eq("buyer@test.com"),
+                Mockito.same(purchase),
+                Mockito.same(product),
+                Mockito.eq("buyer title"),
+                Mockito.eq("buyer message"),
+                Mockito.same(buyer),
+                Mockito.same(seller),
+                Mockito.eq(PurchaseStatus.PENDING),
+                Mockito.eq(LocaleContextHolder.getLocale()));
         Mockito.verify(emailService).sendSellerEmail(
-            Mockito.eq("seller@test.com"),
-            Mockito.same(purchase),
-            Mockito.same(product),
-            Mockito.eq("seller title"),
-            Mockito.eq("seller message"),
-            Mockito.same(buyer),
-            Mockito.same(seller),
-            Mockito.eq(PurchaseStatus.PENDING),
-            Mockito.eq(LocaleContextHolder.getLocale())
-        );
+                Mockito.eq("seller@test.com"),
+                Mockito.same(purchase),
+                Mockito.same(product),
+                Mockito.eq("seller title"),
+                Mockito.eq("seller message"),
+                Mockito.same(buyer),
+                Mockito.same(seller),
+                Mockito.eq(PurchaseStatus.PENDING),
+                Mockito.eq(LocaleContextHolder.getLocale()));
     }
 
     @Test
     public void createPurchaseRejectsUnavailableProduct() {
         final Product product = product();
         final User seller = new User(
-            SELLER_ID, 
-            "seller@test.com", 
-            "password", 
-            "seller", 
-            false, 
-            true, 
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-            );
+                SELLER_ID,
+                "seller@test.com",
+                "password",
+                "seller",
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         final User buyer = new User(
-            BUYER_ID, 
-            "buyer@test.com", 
-            "password", 
-            "buyer", 
-            false, 
-            true, 
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-            );
+                BUYER_ID,
+                "buyer@test.com",
+                "password",
+                "buyer",
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
 
         Mockito.when(productService.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         Mockito.when(userService.findById(SELLER_ID)).thenReturn(Optional.of(seller));
         Mockito.when(userService.findById(BUYER_ID)).thenReturn(Optional.of(buyer));
         Mockito.when(productService.decrementStock(PRODUCT_ID)).thenReturn(false);
 
-        Assertions.assertThrows(IllegalStateException.class, () ->
-            purchaseService.createPurchase(PRODUCT_ID, BUYER_ID)
-        );
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> purchaseService.createPurchase(PRODUCT_ID, BUYER_ID));
     }
 
     @Test
     public void createPurchaseRejectsOwnProduct() {
         Mockito.when(productService.findById(PRODUCT_ID)).thenReturn(Optional.of(product()));
 
-        Assertions.assertThrows(IllegalArgumentException.class, () ->
-            purchaseService.createPurchase(PRODUCT_ID, SELLER_ID)
-        );
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> purchaseService.createPurchase(PRODUCT_ID, SELLER_ID));
     }
 }

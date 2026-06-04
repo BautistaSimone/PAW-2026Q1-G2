@@ -6,7 +6,6 @@ import java.util.List;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -70,7 +69,10 @@ public class ProductForm {
     @Min(1)
     private Integer stock = 1;
 
-    /** Comma-separated layout for edit: {@code e:123} = existing image id, {@code n} = next new upload. */
+    /**
+     * Comma-separated layout for edit: {@code e:123} = existing image id, {@code n}
+     * = next new upload.
+     */
     private String imageLayout;
 
     public String getTitle() {

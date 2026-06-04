@@ -1,9 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +9,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,9 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.Image;
 import ar.edu.itba.paw.models.Product;
-import ar.edu.itba.paw.models.ProductSearchCriteria;
-import ar.edu.itba.paw.models.ProductSortOrder;
-import ar.edu.itba.paw.models.Review;
 import ar.edu.itba.paw.models.SellerRatingSummary;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.Util;
@@ -71,14 +62,13 @@ public class ProductController {
 
     @Autowired
     public ProductController(
-        final ProductService productService,
-        final CategoryService categoryService,
-        final ImageService imageService,
-        final EmailService emailService,
-        final ReportService reportService,
-        final ReviewService reviewService,
-        final UserService userService
-    ) {
+            final ProductService productService,
+            final CategoryService categoryService,
+            final ImageService imageService,
+            final EmailService emailService,
+            final ReportService reportService,
+            final ReviewService reviewService,
+            final UserService userService) {
         this.productService = productService;
         this.categoryService = categoryService;
         this.imageService = imageService;
@@ -87,7 +77,6 @@ public class ProductController {
         this.reviewService = reviewService;
         this.userService = userService;
     }
-
 
     @ModelAttribute("categories")
     public List<Category> categories() {
@@ -124,18 +113,16 @@ public class ProductController {
 
     @RequestMapping(value = "/products/new", method = RequestMethod.GET)
     public ModelAndView newProductForm(
-        @AuthenticationPrincipal final PawAuthUser authUser,
-        @ModelAttribute("productForm") final ProductForm form
-    ) {
+            @AuthenticationPrincipal final PawAuthUser authUser,
+            @ModelAttribute("productForm") final ProductForm form) {
         return redirectIfCannotPublish(authUser).orElseGet(this::productFormView);
     }
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
     public ModelAndView createProduct(
-        @AuthenticationPrincipal PawAuthUser authUser,
-        @Valid @ModelAttribute("productForm") final ProductForm form,
-        final BindingResult errors
-    ) {
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @Valid @ModelAttribute("productForm") final ProductForm form,
+            final BindingResult errors) {
 
         final Optional<ModelAndView> publishGuard = redirectIfCannotPublish(authUser);
         if (publishGuard.isPresent()) {
@@ -147,31 +134,30 @@ public class ProductController {
         }
 
         final User publisher = userService.findById(authUser.getUser().getId())
-            .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new IllegalStateException("User not found"));
 
         final Product product = productService.createProduct(
-            publisher.getId(),
-            form.getTitle(),
-            form.getArtist(),
-            form.getRecordLabel(),
-            form.getCatalogNumber(),
-            form.getEditionCountry(),
-            form.getCategories(),
-            form.getDescription(),
-            form.getSleeveCondition(),
-            form.getRecordCondition(),
-            form.getPrice(),
-            form.getStock()
-        );
+                publisher.getId(),
+                form.getTitle(),
+                form.getArtist(),
+                form.getRecordLabel(),
+                form.getCatalogNumber(),
+                form.getEditionCountry(),
+                form.getCategories(),
+                form.getDescription(),
+                form.getSleeveCondition(),
+                form.getRecordCondition(),
+                form.getPrice(),
+                form.getStock());
 
-        // Images were fully validated by ProductFormValidator — read and persist directly.
+        // Images were fully validated by ProductFormValidator — read and persist
+        // directly.
         final List<ValidatedImage> validatedImages = ImageUploadValidator.readAll(form.getImages());
         for (ValidatedImage image : validatedImages) {
             imageService.createImage(
-                product.getId(),
-                image.getData(),
-                image.getContentType()
-            );
+                    product.getId(),
+                    image.getData(),
+                    image.getContentType());
         }
 
         return new ModelAndView("redirect:/products/" + product.getId() + "?created=1");
@@ -179,17 +165,16 @@ public class ProductController {
 
     @RequestMapping(value = "/products/{id:\\d+}/edit", method = RequestMethod.GET)
     public ModelAndView editProductForm(
-        @AuthenticationPrincipal final PawAuthUser authUser,
-        @PathVariable("id") final Long id,
-        @ModelAttribute("productForm") final ProductForm form
-    ) {
+            @AuthenticationPrincipal final PawAuthUser authUser,
+            @PathVariable("id") final Long id,
+            @ModelAttribute("productForm") final ProductForm form) {
         final Optional<ModelAndView> publishGuard = redirectIfCannotPublish(authUser);
         if (publishGuard.isPresent()) {
             return publishGuard.get();
         }
 
         final Product product = productService.findByIdIfAvailable(id)
-            .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
 
         if (!product.getUserId().equals(authUser.getUser().getId())) {
             throw new ResourceNotFoundException();
@@ -205,8 +190,7 @@ public class ProductController {
         form.setRecordCondition(product.getRecordCondition());
         form.setPrice(product.getPrice());
         form.setCategories(
-            product.getCategories().stream().map(c -> c.getId()).collect(Collectors.toList())
-        );
+                product.getCategories().stream().map(c -> c.getId()).collect(Collectors.toList()));
         form.setStock(product.getStock());
 
         return editProductFormModelAndView(id);
@@ -214,18 +198,17 @@ public class ProductController {
 
     @RequestMapping(value = "/products/{id:\\d+}/edit", method = RequestMethod.POST)
     public ModelAndView updateProduct(
-        @AuthenticationPrincipal final PawAuthUser authUser,
-        @PathVariable("id") final Long id,
-        @Valid @ModelAttribute("productForm") final ProductForm form,
-        final BindingResult errors
-    ) {
+            @AuthenticationPrincipal final PawAuthUser authUser,
+            @PathVariable("id") final Long id,
+            @Valid @ModelAttribute("productForm") final ProductForm form,
+            final BindingResult errors) {
         final Optional<ModelAndView> publishGuard = redirectIfCannotPublish(authUser);
         if (publishGuard.isPresent()) {
             return publishGuard.get();
         }
 
         final Product existing = productService.findByIdIfAvailable(id)
-            .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
 
         if (!existing.getUserId().equals(authUser.getUser().getId())) {
             throw new ResourceNotFoundException();
@@ -239,14 +222,15 @@ public class ProductController {
         final String layoutRaw = form.getImageLayout();
         final boolean useLayout = hadImages && layoutRaw != null && !layoutRaw.isBlank();
 
-        // Images were fully validated by ProductFormValidator — read and persist directly.
+        // Images were fully validated by ProductFormValidator — read and persist
+        // directly.
         final List<ValidatedImage> replacementImages;
         if (!hadImages) {
             replacementImages = ImageUploadValidator.readAll(form.getImages());
         } else if (useLayout) {
             final List<Slot> slots = ProductImageLayoutParser.parse(layoutRaw);
-            final List<org.springframework.web.multipart.MultipartFile> newFiles =
-                extractNonEmptyMultipartFilesList(form.getImages());
+            final List<org.springframework.web.multipart.MultipartFile> newFiles = extractNonEmptyMultipartFilesList(
+                    form.getImages());
             final List<ValidatedImage> built = new ArrayList<>(slots.size());
             int newFileIndex = 0;
             for (final Slot slot : slots) {
@@ -260,25 +244,24 @@ public class ProductController {
             replacementImages = built;
         } else {
             replacementImages = hasNonEmptyMultipartFiles(form.getImages())
-                ? ImageUploadValidator.readAll(form.getImages())
-                : null;
+                    ? ImageUploadValidator.readAll(form.getImages())
+                    : null;
         }
 
         productService.updateProduct(
-            authUser.getUser().getId(),
-            id,
-            form.getTitle(),
-            form.getArtist(),
-            form.getRecordLabel(),
-            form.getCatalogNumber(),
-            form.getEditionCountry(),
-            form.getCategories(),
-            form.getDescription(),
-            form.getSleeveCondition(),
-            form.getRecordCondition(),
-            form.getPrice(),
-            form.getStock()
-        );
+                authUser.getUser().getId(),
+                id,
+                form.getTitle(),
+                form.getArtist(),
+                form.getRecordLabel(),
+                form.getCatalogNumber(),
+                form.getEditionCountry(),
+                form.getCategories(),
+                form.getDescription(),
+                form.getSleeveCondition(),
+                form.getRecordCondition(),
+                form.getPrice(),
+                form.getStock());
 
         if (replacementImages != null) {
             imageService.deleteImagesByProductId(id);
@@ -292,9 +275,8 @@ public class ProductController {
 
     @RequestMapping(value = "/products/{id:\\d+}/restore", method = RequestMethod.POST)
     public ModelAndView restoreDeletedProduct(
-        @AuthenticationPrincipal final PawAuthUser authUser,
-        @PathVariable("id") final Long id
-    ) {
+            @AuthenticationPrincipal final PawAuthUser authUser,
+            @PathVariable("id") final Long id) {
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }
@@ -337,8 +319,8 @@ public class ProductController {
         mav.addObject("hasExistingProductImages", hasImg);
         if (hasImg) {
             final List<Long> ids = imageService.findAllByProductId(productId).stream()
-                .map(Image::getImageId)
-                .collect(Collectors.toList());
+                    .map(Image::getImageId)
+                    .collect(Collectors.toList());
             mav.addObject("existingProductImageIds", ids);
         }
         return mav;
@@ -346,13 +328,12 @@ public class ProductController {
 
     @RequestMapping(value = "/products/{id:\\d+}", method = RequestMethod.GET)
     public ModelAndView productDetail(
-        @PathVariable("id") final Long id,
-        @AuthenticationPrincipal final PawAuthUser authUser,
-        final HttpServletRequest request,
-        @ModelAttribute("purchaseCreateForm") final ar.edu.itba.paw.webapp.form.PurchaseCreateForm purchaseForm
-    ) {
+            @PathVariable("id") final Long id,
+            @AuthenticationPrincipal final PawAuthUser authUser,
+            final HttpServletRequest request,
+            @ModelAttribute("purchaseCreateForm") final ar.edu.itba.paw.webapp.form.PurchaseCreateForm purchaseForm) {
         final Product product = productService.findByIdIfAvailable(id)
-            .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
 
         final ModelAndView mav = new ModelAndView("product-detail");
         mav.addObject("product", product);
@@ -381,9 +362,7 @@ public class ProductController {
         }
 
         mav.addObject("sellerRating", reviewService.summaryForSeller(product.getUserId()));
-        userService.findById(product.getUserId()).ifPresent(seller ->
-            mav.addObject("seller", seller)
-        );
+        userService.findById(product.getUserId()).ifPresent(seller -> mav.addObject("seller", seller));
         mav.addObject("sellerReviews", reviewService.findBySellerId(product.getUserId(), 1, 3).getResults());
 
         List<Product> sellerProducts = productService.listProductsByUserExcept(product.getUserId(), product.getId());
@@ -423,15 +402,14 @@ public class ProductController {
 
     @RequestMapping(value = "/products/{id:\\d+}/report", method = RequestMethod.POST)
     public ModelAndView reportProduct(
-        @AuthenticationPrincipal final PawAuthUser authUser,
-        @PathVariable("id") final Long id
-    ) {
+            @AuthenticationPrincipal final PawAuthUser authUser,
+            @PathVariable("id") final Long id) {
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }
 
         final Product product = productService.findByIdIfAvailable(id)
-            .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
 
         if (reportService.hasReported(id, authUser.getUser().getId())) {
             return new ModelAndView("redirect:/products/" + id + "?alreadyReported=1");
@@ -444,15 +422,14 @@ public class ProductController {
 
     @RequestMapping(value = "/products/{id:\\d+}/delete", method = RequestMethod.POST)
     public ModelAndView deleteOwnProduct(
-        @AuthenticationPrincipal final PawAuthUser authUser,
-        @PathVariable("id") final Long id
-    ) {
+            @AuthenticationPrincipal final PawAuthUser authUser,
+            @PathVariable("id") final Long id) {
         if (authUser == null) {
             return new ModelAndView("redirect:/login");
         }
 
         final Product product = productService.findById(id)
-            .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
 
         if (!product.getUserId().equals(authUser.getUser().getId())) {
             return new ModelAndView("redirect:/profile?deleteError=forbidden");
@@ -464,14 +441,16 @@ public class ProductController {
         return new ModelAndView("redirect:/profile?deleted=1");
     }
 
-
-    /** Not logged in → login; no CBU/CVU → profile Mis datos with warning. Empty if OK to show or submit the publish form. */
+    /**
+     * Not logged in → login; no CBU/CVU → profile Mis datos with warning. Empty if
+     * OK to show or submit the publish form.
+     */
     private Optional<ModelAndView> redirectIfCannotPublish(final PawAuthUser authUser) {
         if (authUser == null) {
             return Optional.of(new ModelAndView("redirect:/login"));
         }
         final User publisher = userService.findById(authUser.getUser().getId())
-            .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new IllegalStateException("User not found"));
         if (!publisher.hasCbuCvu() || !publisher.hasNeighborhoodAndProvince()) {
             return Optional.of(new ModelAndView("redirect:/profile?tab=mydata&missingData=publish"));
         }
@@ -484,4 +463,3 @@ public class ProductController {
         return mav;
     }
 }
-

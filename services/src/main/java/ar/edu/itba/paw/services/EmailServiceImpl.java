@@ -1,10 +1,7 @@
 package ar.edu.itba.paw.services;
 
-import ar.edu.itba.paw.services.EmailService;
-
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -18,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -71,7 +67,7 @@ public class EmailServiceImpl implements EmailService {
             final String message,
             final User buyer,
             final User seller,
-            final PurchaseStatus currentStatus, 
+            final PurchaseStatus currentStatus,
             Locale locale) {
         final String purchaseUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId());
         sendOrderEmail(to, product, purchase, title, message, purchaseUrl, buyer, seller, true, currentStatus, locale);
@@ -88,7 +84,7 @@ public class EmailServiceImpl implements EmailService {
             final String message,
             final User buyer,
             final User seller,
-            final PurchaseStatus currentStatus, 
+            final PurchaseStatus currentStatus,
             Locale locale) {
         final String purchaseUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId());
         sendOrderEmail(to, product, purchase, title, message, purchaseUrl, buyer, seller, false, currentStatus, locale);
@@ -206,7 +202,8 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Transactional
-    public void sendNewVinylDigestEmail(final String to, final String username, final java.util.List<Product> products, Locale locale) {
+    public void sendNewVinylDigestEmail(final String to, final String username, final java.util.List<Product> products,
+            Locale locale) {
         final Context ctx = new Context(locale);
 
         ctx.setVariable("title",
@@ -214,11 +211,11 @@ public class EmailServiceImpl implements EmailService {
         ctx.setVariable("recipientName", username);
 
         final java.util.Map<String, java.util.Map<String, Object>> groupedSellers = new java.util.LinkedHashMap<>();
-        
+
         for (final Product p : products) {
             final String sellerName = p.getSeller().getUsername();
             final Long sellerId = p.getSeller().getId();
-            
+
             final java.util.Map<String, Object> sellerData = groupedSellers.computeIfAbsent(sellerName, k -> {
                 final java.util.Map<String, Object> map = new java.util.LinkedHashMap<>();
                 map.put("sellerName", sellerName);
@@ -227,11 +224,11 @@ public class EmailServiceImpl implements EmailService {
                 map.put("extraCount", 0);
                 return map;
             });
-            
+
             @SuppressWarnings("unchecked")
-            final java.util.List<java.util.Map<String, String>> sellerProducts = 
-                (java.util.List<java.util.Map<String, String>>) sellerData.get("products");
-                
+            final java.util.List<java.util.Map<String, String>> sellerProducts = (java.util.List<java.util.Map<String, String>>) sellerData
+                    .get("products");
+
             if (sellerProducts.size() < 3) {
                 final java.util.Map<String, String> item = new java.util.LinkedHashMap<>();
                 item.put("name", p.getTitle());
@@ -252,7 +249,7 @@ public class EmailServiceImpl implements EmailService {
 
             messageHelper.setSubject(
                     messageSource.getMessage("email.digest.subject",
-                            new Object[]{ products.size() }, locale));
+                            new Object[] { products.size() }, locale));
             messageHelper.setTo(to);
             messageHelper.setFrom("no-reply@vinyland.com");
 
@@ -291,8 +288,9 @@ public class EmailServiceImpl implements EmailService {
         ctx.setVariable("purchaseId", purchase.getPurchaseId());
         ctx.setVariable("currentStep", currentStatus.ordinal());
         ctx.setVariable("purchaseStatusKey", currentStatus.name());
-        
-        ctx.setVariable("purchaseStatusDescription", messageSource.getMessage("PurchaseStatus." + currentStatus.name(), null, locale));
+
+        ctx.setVariable("purchaseStatusDescription",
+                messageSource.getMessage("PurchaseStatus." + currentStatus.name(), null, locale));
         ctx.setVariable("formattedPurchaseDate", purchase.getDate() != null
                 ? purchase.getDate().format(PURCHASE_DATE_FMT)
                 : "");

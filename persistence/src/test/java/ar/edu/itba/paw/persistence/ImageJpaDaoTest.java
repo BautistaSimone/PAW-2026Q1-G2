@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -44,23 +43,22 @@ public class ImageJpaDaoTest {
     public void testFindImageById() {
 
         // Arrange
-        final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null, null, null, null, null, null);
+        final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null,
+                null, null, null, null, null);
         final Product product = productDao.createProduct(
-            user.getId(),
-            "Dynamo",
-            "Soda Stereo",
-            "Sony Music",
-            "EPC 85930",
-            "Argentina",
-            Collections.emptyList(),
-            "Edicion original",
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(32000), 1
-        );
+                user.getId(),
+                "Dynamo",
+                "Soda Stereo",
+                "Sony Music",
+                "EPC 85930",
+                "Argentina",
+                Collections.emptyList(),
+                "Edicion original",
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(32000), 1);
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
         final Image createdImage = imageDao.createImage(product.getId(), imageData, "image/jpeg");
-        
 
         // Act
         final Optional<Image> imageById = imageDao.findById(createdImage.getImageId());
@@ -75,23 +73,23 @@ public class ImageJpaDaoTest {
     public void testFindImageByProductId() {
 
         // Arrange
-        final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null, null, null, null, null, null);
+        final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null,
+                null, null, null, null, null);
         final Product product = productDao.createProduct(
-            user.getId(),
-            "Dynamo",
-            "Soda Stereo",
-            "Sony Music",
-            "EPC 85930",
-            "Argentina",
-            Collections.emptyList(),
-            "Edicion original",
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(32000), 1
-        );
+                user.getId(),
+                "Dynamo",
+                "Soda Stereo",
+                "Sony Music",
+                "EPC 85930",
+                "Argentina",
+                Collections.emptyList(),
+                "Edicion original",
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(32000), 1);
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
         final Image createdImage = imageDao.createImage(product.getId(), imageData, "image/jpeg");
-        
+
         // Act
         final Optional<Image> imageByProduct = imageDao.findByProductId(product.getId());
 
@@ -105,23 +103,23 @@ public class ImageJpaDaoTest {
     public void testDeleteImageByProductId() {
 
         // Arrange
-        final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null, null, null, null, null, null);
+        final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null,
+                null, null, null, null, null);
         final Product product = productDao.createProduct(
-            user.getId(),
-            "Dynamo",
-            "Soda Stereo",
-            "Sony Music",
-            "EPC 85930",
-            "Argentina",
-            Collections.emptyList(),
-            "Edicion original",
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(32000), 1
-        );
+                user.getId(),
+                "Dynamo",
+                "Soda Stereo",
+                "Sony Music",
+                "EPC 85930",
+                "Argentina",
+                Collections.emptyList(),
+                "Edicion original",
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(32000), 1);
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
         final Image createdImage = imageDao.createImage(product.getId(), imageData, "image/jpeg");
-        
+
         // Act
         final Integer deleted = imageDao.deleteByProductId(product.getId());
 
@@ -134,20 +132,20 @@ public class ImageJpaDaoTest {
     public void testCreateImage() {
 
         // Arrange
-        final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null, null, null, null, null, null);
+        final User user = userDao.createUser("image@test.com", "password", "seller", false, true, null, null, null,
+                null, null, null, null, null);
         final Product product = productDao.createProduct(
-            user.getId(),
-            "Dynamo",
-            "Soda Stereo",
-            "Sony Music",
-            "EPC 85930",
-            "Argentina",
-            Collections.emptyList(),
-            "Edicion original",
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(32000), 1
-        );
+                user.getId(),
+                "Dynamo",
+                "Soda Stereo",
+                "Sony Music",
+                "EPC 85930",
+                "Argentina",
+                Collections.emptyList(),
+                "Edicion original",
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(32000), 1);
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
 
         // Act
