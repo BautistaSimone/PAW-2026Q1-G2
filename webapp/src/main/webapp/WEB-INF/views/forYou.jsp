@@ -8,7 +8,7 @@
                         <spring:message code="ForYou.title" var="forYouTitle" />
                         <ui:layout title="${forYouTitle}">
 
-                            <ui:header showHeaderActions="true" />
+                            <ui:header showHeaderActions="true" activeSection="forYou" />
 
                             <div class="products-section">
                                 <div class="container-fluid products-shell">

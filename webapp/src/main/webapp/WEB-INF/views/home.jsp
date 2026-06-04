@@ -8,7 +8,7 @@
 <ui:layout title="${homeTitle}">
 
     <ui:sidebar />
-    <ui:header showHeaderActions="true"/>
+    <ui:header showHeaderActions="true" activeSection="vinyls"/>
 
     <!-- Tell user to change its password -->
     <c:if test="${changePsswdModal}">

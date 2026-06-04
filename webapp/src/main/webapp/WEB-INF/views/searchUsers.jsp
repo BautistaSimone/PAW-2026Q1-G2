@@ -12,7 +12,7 @@
 
 <ui:layout title="${searchUsersTitle}">
 
-    <ui:header showHeaderActions="true" searchMode="users" searchValue="${searchQuery}" />
+    <ui:header showHeaderActions="true" searchMode="users" searchValue="${searchQuery}" activeSection="community" />
 
     <div class="products-section community-page" id="community-section">
         <div class="container-fluid products-shell">

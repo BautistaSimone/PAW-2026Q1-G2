@@ -6,6 +6,7 @@
 <%@ attribute name="showHeaderActions" required="false" type="java.lang.Boolean" %>
 <%@ attribute name="searchMode" required="false" type="java.lang.String" %>
 <%@ attribute name="searchValue" required="false" type="java.lang.String" %>
+<%@ attribute name="activeSection" required="false" type="java.lang.String" %>
 
 <c:set var="activeSearchMode" value="${not empty searchMode ? searchMode : 'vinyls'}" />
 <c:set var="headerSearchText" value="${param['search-text']}" />
@@ -72,12 +73,16 @@
 
             <div class="header-right">
                 <nav class="header-nav-links">
-                    <a href="<c:url value='/search-users'/>" class="header-nav-link" aria-label="<spring:message code='Header.searchUsers.ariaLabel' />">
+                    <a href="<c:url value='/'/>" class="header-nav-link ${activeSection eq 'vinyls' ? 'is-active' : ''}" aria-label="<spring:message code='Header.nav.vinyls.ariaLabel' />">
+                        <i class="bi bi-vinyl" aria-hidden="true"></i>
+                        <span><spring:message code="Header.nav.vinyls" /></span>
+                    </a>
+                    <a href="<c:url value='/search-users'/>" class="header-nav-link ${activeSection eq 'community' ? 'is-active' : ''}" aria-label="<spring:message code='Header.searchUsers.ariaLabel' />">
                         <i class="bi bi-people" aria-hidden="true"></i>
                         <span><spring:message code="Header.searchUsers" /></span>
                     </a>
                     <sec:authorize access="isAuthenticated()">
-                        <a href="<c:url value='/for-you'/>" class="header-nav-link" aria-label="<spring:message code='Header.forYou.ariaLabel' />">
+                        <a href="<c:url value='/for-you'/>" class="header-nav-link ${activeSection eq 'forYou' ? 'is-active' : ''}" aria-label="<spring:message code='Header.forYou.ariaLabel' />">
                             <i class="bi bi-heart" aria-hidden="true"></i>
                             <span><spring:message code="Header.forYou" /></span>
                         </a>
