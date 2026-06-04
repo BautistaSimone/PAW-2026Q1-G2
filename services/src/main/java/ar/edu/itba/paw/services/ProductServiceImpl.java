@@ -88,10 +88,7 @@ public class ProductServiceImpl implements ProductService {
         final BigDecimal price,
         final int stock
     ) {
-        validateProductFields(title, artist, description, sleeveCondition, recordCondition, price);
-        if (stock < 1) {
-            throw new IllegalArgumentException("Stock must be at least 1");
-        }
+        validateProductFields(title, artist, description, sleeveCondition, recordCondition, price, stock);
 
         final List<Category> categories = resolveCategories(categoryIds);
 
@@ -113,8 +110,12 @@ public class ProductServiceImpl implements ProductService {
         final String description,
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
-        final BigDecimal price
+        final BigDecimal price,
+        final int stock
     ) {
+        if (stock < 1) {
+            throw new IllegalArgumentException("Stock must be at least 1");
+        }
         if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Price must be strictly positive");
         }
@@ -383,10 +384,7 @@ public class ProductServiceImpl implements ProductService {
         if (!product.getUserId().equals(ownerUserId)) {
             throw new IllegalArgumentException("Not the product owner");
         }
-        validateProductFields(title, artist, description, sleeveCondition, recordCondition, price);
-        if (stock < 1) {
-            throw new IllegalArgumentException("Stock must be at least 1");
-        }
+        validateProductFields(title, artist, description, sleeveCondition, recordCondition, price, stock);
 
         final List<Category> categories = resolveCategories(categoryIds);
 
