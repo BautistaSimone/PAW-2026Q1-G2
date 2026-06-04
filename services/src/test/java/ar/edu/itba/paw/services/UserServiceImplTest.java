@@ -32,19 +32,12 @@ public class UserServiceImplTest {
     @Mock
     private ReportService reportService;
 
+    @Mock
+    private NotificationService notificationService;
+
     @BeforeEach
     void setUp() throws Exception {
-        userService = new UserServiceImpl(userDao, passwordEncoder);
-
-        // Inject field-level @Autowired dependencies via reflection
-        setField(userService, "productService", productService);
-        setField(userService, "reportService", reportService);
-    }
-
-    private static void setField(final Object target, final String fieldName, final Object value) throws Exception {
-        final Field field = target.getClass().getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(target, value);
+        userService = new UserServiceImpl(userDao, passwordEncoder, productService, reportService, notificationService);
     }
 
     @Test

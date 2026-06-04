@@ -26,20 +26,19 @@ public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
+    private final ProductService productService;
+    private final ReportService reportService;
+    private final NotificationService notificationService;
 
     @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private ReportService reportService;
-
-    @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
-    public UserServiceImpl(final UserDao userDao, final PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(final UserDao userDao, final PasswordEncoder passwordEncoder,
+            final ProductService productService, final ReportService reportService,
+            final NotificationService notificationService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
+        this.productService = productService;
+        this.reportService = reportService;
+        this.notificationService = notificationService;
     }
 
     private static String trimToNull(final String s) {

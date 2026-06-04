@@ -20,17 +20,16 @@ public class ReportServiceImpl implements ReportService {
 
     private final ReportDao reportDao;
     private final ProductService productService;
+    private final EmailService emailService;
+    private final UserService userService;
 
     @Autowired
-    EmailService emailService;
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    public ReportServiceImpl(final ReportDao reportDao, final ProductService productService) {
+    public ReportServiceImpl(final ReportDao reportDao, final ProductService productService,
+            final EmailService emailService, final UserService userService) {
         this.reportDao = reportDao;
         this.productService = productService;
+        this.emailService = emailService;
+        this.userService = userService;
     }
 
     @Override
