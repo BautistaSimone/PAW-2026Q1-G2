@@ -1,9 +1,9 @@
 package ar.edu.itba.paw.persistence;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -31,12 +31,6 @@ public class ReportJpaDaoTest {
     @Autowired
     private ReportJpaDao reportDao;
 
-    @Autowired
-    private UserJpaDao userDao;
-
-    @Autowired
-    private ProductJpaDao productDao;
-
     @PersistenceContext
     private EntityManager em;
 
@@ -46,29 +40,68 @@ public class ReportJpaDaoTest {
     private long productId;
     private long otherProductId;
 
+    private User insertUser(final String email, final String username) {
+        final User user = new User(
+            email,
+            "pass",
+            username,
+            false,
+            true,
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+        em.persist(user);
+        em.flush();
+        return user;
+    }
+
+    private Product insertProduct(final Long ownerId, final String title, final String artist, final String catalogNumber) {
+        final Product product = new Product(
+            ownerId,
+            title,
+            artist,
+            "Label",
+            catalogNumber,
+            "Argentina",
+            Collections.emptyList(),
+            "Description",
+            BigDecimal.valueOf(8),
+            BigDecimal.valueOf(9),
+            LocalDate.now(),
+            BigDecimal.valueOf(1000),
+            1
+        );
+        em.persist(product);
+        em.flush();
+        return product;
+    }
+
+    private Report insertReport(final Long productId, final Long ownerUserId, final Long reporterUserId) {
+        final Report report = new Report(productId, ownerUserId, reporterUserId);
+        em.persist(report);
+        em.flush();
+        return report;
+    }
+
     @BeforeEach
     public void setUp() {
-        final User owner = userDao.createUser("report-owner@test.com", "pass", "Owner",
-            false, true, null, null, null, null, null, null, null, null);
-        final User reporter = userDao.createUser("report-reporter@test.com", "pass", "Reporter",
-            false, true, null, null, null, null, null, null, null, null);
-        final User otherReporter = userDao.createUser("report-other@test.com", "pass", "Other Reporter",
-            false, true, null, null, null, null, null, null, null, null);
+        final User owner = insertUser("report-owner@test.com", "Owner");
+        final User reporter = insertUser("report-reporter@test.com", "Reporter");
+        final User otherReporter = insertUser("report-other@test.com", "Other Reporter");
 
         ownerId = owner.getId();
         reporterId = reporter.getId();
         otherReporterId = otherReporter.getId();
 
-        final Product product = productDao.createProduct(
-            ownerId, "Reported Album", "Reported Artist", "Label", "CAT", "Argentina",
-            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
-        );
-        final Product otherProduct = productDao.createProduct(
-            ownerId, "Other Reported Album", "Other Artist", "Label", "CAT2", "Argentina",
-            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
-        );
+        final Product product = insertProduct(ownerId, "Reported Album", "Reported Artist", "CAT");
+        final Product otherProduct = insertProduct(ownerId, "Other Reported Album", "Other Artist", "CAT2");
 
         productId = product.getId();
         otherProductId = otherProduct.getId();
@@ -81,7 +114,7 @@ public class ReportJpaDaoTest {
         // Arrange
 
         // Act
-        final Report report = reportDao.create(productId, ownerId, reporterId);
+        reportDao.create(productId, ownerId, reporterId);
         em.flush();
 
         // Assert
@@ -99,8 +132,9 @@ public class ReportJpaDaoTest {
         // Arrange
 
         // Act
-        final Report report = reportDao.create(productId, ownerId, reporterId);
+        insertReport(productId, ownerId, reporterId);
         em.flush();
+        em.clear();
 
         // Assert
         Assertions.assertTrue(reportDao.existsByProductAndReporter(productId, reporterId));
@@ -111,10 +145,11 @@ public class ReportJpaDaoTest {
     public void testFindAllGroupedByProductReturnsReportCountsAndProductMetadata() {
 
         // Arrange
-        reportDao.create(productId, ownerId, reporterId);
-        reportDao.create(productId, ownerId, otherReporterId);
-        reportDao.create(otherProductId, ownerId, reporterId);
+        insertReport(productId, ownerId, reporterId);
+        insertReport(productId, ownerId, otherReporterId);
+        insertReport(otherProductId, ownerId, reporterId);
         em.flush();
+        em.clear();
 
         // Act
         final List<ReportedProductProjection> reportedProducts = reportDao.findAllGroupedByProduct(1, 10).getResults();
@@ -133,52 +168,61 @@ public class ReportJpaDaoTest {
     @Test
     public void testDeleteByProductIdDeletesOnlyReportsForThatProduct() {
         // Arrange
-        reportDao.create(productId, ownerId, reporterId);
-        reportDao.create(productId, ownerId, otherReporterId);
-        reportDao.create(otherProductId, ownerId, reporterId);
+        insertReport(productId, ownerId, reporterId);
+        insertReport(productId, ownerId, otherReporterId);
+        insertReport(otherProductId, ownerId, reporterId);
         em.flush();
+        em.clear();
 
         // Act
         reportDao.deleteByProductId(productId);
         em.flush();
 
         // Assert
-        Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, reporterId));
-        Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, otherReporterId));
-        Assertions.assertTrue(reportDao.existsByProductAndReporter(otherProductId, reporterId));
+        final Long productCount = em.createQuery(
+            "SELECT COUNT(r) FROM Report r WHERE r.productId = :productId",
+            Long.class
+        ).setParameter("productId", productId).getSingleResult();
+        final Long otherProductCount = em.createQuery(
+            "SELECT COUNT(r) FROM Report r WHERE r.productId = :productId",
+            Long.class
+        ).setParameter("productId", otherProductId).getSingleResult();
+        Assertions.assertEquals(0L, productCount.longValue());
+        Assertions.assertEquals(1L, otherProductCount.longValue());
     }
 
     @Test
     public void testDeleteByOwnerUserIdDeletesOnlyReportsForThatOwner() {
         // Arrange
-        final User otherOwner = userDao.createUser("report-other-owner@test.com", "pass", "OtherOwner",
-            false, true, null, null, null, null, null, null, null, null);
-        final Product otherOwnerProduct = productDao.createProduct(
-            otherOwner.getId(), "Other Owner Album", "Artist", "Label", "CAT3", "Argentina",
-            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
-        );
+        final User otherOwner = insertUser("report-other-owner@test.com", "OtherOwner");
+        final Product otherOwnerProduct = insertProduct(otherOwner.getId(), "Other Owner Album", "Artist", "CAT3");
         em.flush();
 
         // Reports for the original owner (ownerId) on both their products
-        reportDao.create(productId, ownerId, reporterId);
-        reportDao.create(productId, ownerId, otherReporterId);
-        reportDao.create(otherProductId, ownerId, reporterId);
+        insertReport(productId, ownerId, reporterId);
+        insertReport(productId, ownerId, otherReporterId);
+        insertReport(otherProductId, ownerId, reporterId);
 
         // Reports for the other owner
-        reportDao.create(otherOwnerProduct.getId(), otherOwner.getId(), reporterId);
+        insertReport(otherOwnerProduct.getId(), otherOwner.getId(), reporterId);
         em.flush();
+        em.clear();
 
         // Act
         reportDao.deleteByOwnerUserId(ownerId);
         em.flush();
 
         // Assert — all reports for ownerId are gone
-        Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, reporterId));
-        Assertions.assertFalse(reportDao.existsByProductAndReporter(productId, otherReporterId));
-        Assertions.assertFalse(reportDao.existsByProductAndReporter(otherProductId, reporterId));
+        final Long ownerReports = em.createQuery(
+            "SELECT COUNT(r) FROM Report r WHERE r.ownerUserId = :ownerUserId",
+            Long.class
+        ).setParameter("ownerUserId", ownerId).getSingleResult();
+        final Long otherOwnerReports = em.createQuery(
+            "SELECT COUNT(r) FROM Report r WHERE r.ownerUserId = :ownerUserId",
+            Long.class
+        ).setParameter("ownerUserId", otherOwner.getId()).getSingleResult();
 
-        // Assert — other owner's reports are intact
-        Assertions.assertTrue(reportDao.existsByProductAndReporter(otherOwnerProduct.getId(), reporterId));
+        Assertions.assertEquals(0L, ownerReports.longValue());
+        Assertions.assertEquals(1L, otherOwnerReports.longValue());
     }
 }

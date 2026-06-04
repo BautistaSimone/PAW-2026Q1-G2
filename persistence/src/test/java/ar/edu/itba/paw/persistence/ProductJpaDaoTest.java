@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductState;
@@ -32,18 +34,85 @@ public class ProductJpaDaoTest {
     @Autowired
     private ProductJpaDao productDao;
 
-    @Autowired
-    private UserJpaDao userDao;
-
     @PersistenceContext
     private EntityManager em;
 
+    private User insertUser(final String email, final String username) {
+        final User user = new User(
+            email,
+            "password",
+            username,
+            false,
+            true,
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+        em.persist(user);
+        em.flush();
+        return user;
+    }
+
+    private Product insertProduct(
+        final Long userId,
+        final String title,
+        final String artist,
+        final String recordLabel,
+        final String catalogNumber,
+        final String editionCountry,
+        final List<Category> categories,
+        final String description,
+        final BigDecimal sleeveCondition,
+        final BigDecimal recordCondition,
+        final BigDecimal price,
+        final int stock
+    ) {
+        final Product product = new Product(
+            userId,
+            title,
+            artist,
+            recordLabel,
+            catalogNumber,
+            editionCountry,
+            categories,
+            description,
+            sleeveCondition,
+            recordCondition,
+            LocalDate.now(),
+            price,
+            stock
+        );
+        em.persist(product);
+        em.flush();
+        return product;
+    }
+
+    private void setProductState(final Product product, final ProductState state) {
+        product.setState(state.getPersistenceValue());
+        em.flush();
+    }
+
     private Product createSuggestionProduct(final User user, final String title,
                                             final String artist, final String recordLabel) {
-        return productDao.createProduct(
-            user.getId(), title, artist, recordLabel, "CAT-001", "Argentina",
-            Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000), 1
+        return insertProduct(
+            user.getId(),
+            title,
+            artist,
+            recordLabel,
+            "CAT-001",
+            "Argentina",
+            Collections.emptyList(),
+            "Desc",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(1000),
+            1
         );
     }
 
@@ -51,8 +120,7 @@ public class ProductJpaDaoTest {
     public void testCreateProductAllowsMoreThanOneProductPerUser() {
 
         // Arrange
-        final User user = userDao.createUser("seller@test.com", "password", "seller",
-            false, true, null, null, null, null, null, null, null, null);
+        final User user = insertUser("seller@test.com", "seller");
 
         // Act
         final Product firstProduct = productDao.createProduct(
@@ -70,20 +138,30 @@ public class ProductJpaDaoTest {
         Assertions.assertNotNull(firstProduct);
         Assertions.assertNotNull(secondProduct);
 
+        em.flush();
+        em.clear();
+
         final long count = em.createQuery("SELECT COUNT(p) FROM Product p", Long.class).getSingleResult();
-        Assertions.assertEquals(2, count); 
-        Assertions.assertEquals(2, productDao.listProducts().getResults().size());
+        Assertions.assertEquals(2, count);
     }
 
     @Test
     public void findProductsSearchMatchesArtist() {
         // Arrange
-        final User user = userDao.createUser("seller2@test.com", "password", "seller2",
-            false, true, null, null, null, null, null, null, null, null);
-        productDao.createProduct(
-            user.getId(), "Bocanada", "Gustavo Cerati", "Ariola", "74321", "Argentina",
-            Collections.emptyList(), "Album solista", BigDecimal.valueOf(10.0),
-            BigDecimal.valueOf(10.0), BigDecimal.valueOf(28000), 1
+        final User user = insertUser("seller2@test.com", "seller2");
+        insertProduct(
+            user.getId(),
+            "Bocanada",
+            "Gustavo Cerati",
+            "Ariola",
+            "74321",
+            "Argentina",
+            Collections.emptyList(),
+            "Album solista",
+            BigDecimal.valueOf(10.0),
+            BigDecimal.valueOf(10.0),
+            BigDecimal.valueOf(28000),
+            1
         );
 
         final ProductSearchCriteria criteria = new ProductSearchCriteria(
@@ -125,12 +203,20 @@ public class ProductJpaDaoTest {
     @Test
     public void decrementStockOnlySucceedsWhenStockAvailable() {
         // Arrange
-        final User user = userDao.createUser("seller4@test.com", "password", "seller4",
-            false, true, null, null, null, null, null, null, null, null);
-        final Product product = productDao.createProduct(
-            user.getId(), "Artaud", "Pescado Rabioso", "Talent", "SE-515", "Argentina",
-            Collections.emptyList(), "Original", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(45000), 1
+        final User user = insertUser("seller4@test.com", "seller4");
+        final Product product = insertProduct(
+            user.getId(),
+            "Artaud",
+            "Pescado Rabioso",
+            "Talent",
+            "SE-515",
+            "Argentina",
+            Collections.emptyList(),
+            "Original",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(45000),
+            1
         );
 
         em.flush();
@@ -147,12 +233,20 @@ public class ProductJpaDaoTest {
     @Test
     public void markAsUserDeleted() {
         // Arrange
-        final User user = userDao.createUser("seller5@test.com", "password", "seller5",
-            false, true, null, null, null, null, null, null, null, null);
-        final Product product = productDao.createProduct(
-            user.getId(), "Album", "Artist", "Label", "CAT-1", "Argentina",
-            Collections.emptyList(), "Desc", BigDecimal.valueOf(8.0),
-            BigDecimal.valueOf(8.0), BigDecimal.valueOf(1000), 1
+        final User user = insertUser("seller5@test.com", "seller5");
+        final Product product = insertProduct(
+            user.getId(),
+            "Album",
+            "Artist",
+            "Label",
+            "CAT-1",
+            "Argentina",
+            Collections.emptyList(),
+            "Desc",
+            BigDecimal.valueOf(8.0),
+            BigDecimal.valueOf(8.0),
+            BigDecimal.valueOf(1000),
+            1
         );
 
         em.flush();
@@ -165,20 +259,33 @@ public class ProductJpaDaoTest {
         Assertions.assertTrue(first);
         Assertions.assertFalse(second);
 
-        Assertions.assertEquals(1, productDao.findProductsByUserIdAndState(
-            user.getId(), ProductState.USER_DELETED, 1, 10).getResults().size());
-        Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isEmpty());
+        em.flush();
+        em.clear();
+
+        final String state = em.createQuery(
+            "SELECT p.state FROM Product p WHERE p.productId = :productId",
+            String.class
+        ).setParameter("productId", product.getId()).getSingleResult();
+        Assertions.assertEquals(ProductState.USER_DELETED.getPersistenceValue(), state);
     }
 
     @Test
     public void markAsUserDeletedAndRestore() {
         // Arrange
-        final User user = userDao.createUser("seller5@test.com", "password", "seller5",
-            false, true, null, null, null, null, null, null, null, null);
-        final Product product = productDao.createProduct(
-            user.getId(), "Album", "Artist", "Label", "CAT-1", "Argentina",
-            Collections.emptyList(), "Desc", BigDecimal.valueOf(8.0),
-            BigDecimal.valueOf(8.0), BigDecimal.valueOf(1000), 1
+        final User user = insertUser("seller5@test.com", "seller5");
+        final Product product = insertProduct(
+            user.getId(),
+            "Album",
+            "Artist",
+            "Label",
+            "CAT-1",
+            "Argentina",
+            Collections.emptyList(),
+            "Desc",
+            BigDecimal.valueOf(8.0),
+            BigDecimal.valueOf(8.0),
+            BigDecimal.valueOf(1000),
+            1
         );
 
         em.flush();
@@ -192,19 +299,34 @@ public class ProductJpaDaoTest {
         // Assert
         Assertions.assertTrue(first);
         Assertions.assertFalse(second);
-        Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isPresent());
+        em.flush();
+        em.clear();
+
+        final String state = em.createQuery(
+            "SELECT p.state FROM Product p WHERE p.productId = :productId",
+            String.class
+        ).setParameter("productId", product.getId()).getSingleResult();
+        Assertions.assertEquals(ProductState.ACTIVE.getPersistenceValue(), state);
     }
 
     @Test
     public void decrementStockSetsSoldAtZero() {
 
         // Arrange
-        final User user = userDao.createUser("seller6@test.com", "password", "seller6",
-            false, true, null, null, null, null, null, null, null, null);
-        final Product product = productDao.createProduct(
-            user.getId(), "X", "Y", "L", "C", "Argentina",
-            Collections.emptyList(), "D", BigDecimal.valueOf(7.0),
-            BigDecimal.valueOf(7.0), BigDecimal.valueOf(500), 1
+        final User user = insertUser("seller6@test.com", "seller6");
+        final Product product = insertProduct(
+            user.getId(),
+            "X",
+            "Y",
+            "L",
+            "C",
+            "Argentina",
+            Collections.emptyList(),
+            "D",
+            BigDecimal.valueOf(7.0),
+            BigDecimal.valueOf(7.0),
+            BigDecimal.valueOf(500),
+            1
         );
 
         em.flush();
@@ -213,19 +335,31 @@ public class ProductJpaDaoTest {
         productDao.decrementStock(product.getId());
 
         // Assert
-        Assertions.assertTrue(productDao.findByIdIfAvailable(product.getId()).isEmpty());
-        Assertions.assertTrue(productDao.findById(product.getId()).isPresent());
+        em.flush();
+        em.clear();
+
+        final Product reloaded = em.find(Product.class, product.getId());
+        Assertions.assertEquals(ProductState.SOLD.getPersistenceValue(), reloaded.getState());
+        Assertions.assertEquals(0, reloaded.getStock());
     }
 
     @Test
     public void updateProductChangesTitleWhenActive() {
         // Arrange
-        final User user = userDao.createUser("seller7@test.com", "password", "seller7",
-            false, true, null, null, null, null, null, null, null, null);
-        final Product product = productDao.createProduct(
-            user.getId(), "Old", "Artist", "Label", "CAT", "Argentina",
-            Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(2000), 1
+        final User user = insertUser("seller7@test.com", "seller7");
+        final Product product = insertProduct(
+            user.getId(),
+            "Old",
+            "Artist",
+            "Label",
+            "CAT",
+            "Argentina",
+            Collections.emptyList(),
+            "Desc",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(2000),
+            1
         );
 
         em.flush();
@@ -239,7 +373,10 @@ public class ProductJpaDaoTest {
 
         // Assert
         Assertions.assertTrue(updated);
-        final Product reloaded = productDao.findById(product.getId()).orElseThrow();
+        em.flush();
+        em.clear();
+
+        final Product reloaded = em.find(Product.class, product.getId());
         Assertions.assertEquals("NewTitle", reloaded.getTitle());
         Assertions.assertEquals(0, reloaded.getPrice().compareTo(BigDecimal.valueOf(2500)));
     }
@@ -247,8 +384,7 @@ public class ProductJpaDaoTest {
     @Test
     public void listDistinctArtistsReturnsUniqueVisibleNonBlankArtistsSorted() {
         // Arrange
-        final User user = userDao.createUser("seller10@test.com", "password", "seller10",
-            false, true, null, null, null, null, null, null, null, null);
+        final User user = insertUser("seller10@test.com", "seller10");
         createSuggestionProduct(user, "Visible B", "Zoo Artist", "Label B");
         createSuggestionProduct(user, "Visible A", " Alpha Artist ", "Label A");
         createSuggestionProduct(user, "Duplicate", "Zoo Artist", "Label C");
@@ -256,7 +392,7 @@ public class ProductJpaDaoTest {
         final Product hiddenProduct = createSuggestionProduct(user, "Hidden", "Hidden Artist", "Hidden Label");
 
         em.flush();
-        productDao.markAsUserDeleted(hiddenProduct.getId());
+        setProductState(hiddenProduct, ProductState.USER_DELETED);
 
         em.flush();
         em.clear();
@@ -275,8 +411,7 @@ public class ProductJpaDaoTest {
     public void listDistinctRecordLabelsReturnsUniqueVisibleNonBlankLabelsSorted() {
 
         // Arrange
-        final User user = userDao.createUser("seller11@test.com", "password", "seller11",
-            false, true, null, null, null, null, null, null, null, null);
+        final User user = insertUser("seller11@test.com", "seller11");
         createSuggestionProduct(user, "Visible B", "Artist B", "Zoo Label");
         createSuggestionProduct(user, "Visible A", "Artist A", " Alpha Label ");
         createSuggestionProduct(user, "Duplicate", "Artist C", "Zoo Label");
@@ -284,8 +419,7 @@ public class ProductJpaDaoTest {
         final Product hiddenProduct = createSuggestionProduct(user, "Hidden", "Artist E", "Hidden Label");
 
         em.flush();
-
-        productDao.markAsUserDeleted(hiddenProduct.getId());
+        setProductState(hiddenProduct, ProductState.USER_DELETED);
 
         em.flush();
         em.clear();
@@ -303,8 +437,7 @@ public class ProductJpaDaoTest {
     @Test
     public void suggestArtistsReturnsRankedLimitedUniqueVisibleMatches() {
         // Arrange
-        final User user = userDao.createUser("seller12@test.com", "password", "seller12",
-            false, true, null, null, null, null, null, null, null, null);
+        final User user = insertUser("seller12@test.com", "seller12");
         createSuggestionProduct(user, "Exact", " Son ", "Label A");
         createSuggestionProduct(user, "Prefix 1", "Sons", "Label B");
         createSuggestionProduct(user, "Prefix 2", "Sony", "Label C");
@@ -319,7 +452,7 @@ public class ProductJpaDaoTest {
         final Product hiddenProduct = createSuggestionProduct(user, "Hidden", "Son Hidden", "Hidden Label");
 
         em.flush();
-        productDao.markAsUserDeleted(hiddenProduct.getId());
+        setProductState(hiddenProduct, ProductState.USER_DELETED);
         em.flush();
         em.clear();
 
@@ -336,8 +469,7 @@ public class ProductJpaDaoTest {
     @Test
     public void suggestRecordLabelsReturnsRankedLimitedUniqueVisibleMatches() {
         // Arrange
-        final User user = userDao.createUser("seller13@test.com", "password", "seller13",
-            false, true, null, null, null, null, null, null, null, null);
+        final User user = insertUser("seller13@test.com", "seller13");
         createSuggestionProduct(user, "Exact", "Artist A", " Cap ");
         createSuggestionProduct(user, "Prefix 1", "Artist B", "Cape");
         createSuggestionProduct(user, "Prefix 2", "Artist C", "Caps");
@@ -352,7 +484,7 @@ public class ProductJpaDaoTest {
         final Product hiddenProduct = createSuggestionProduct(user, "Hidden", "Artist L", "Cap Hidden");
 
         em.flush();
-        productDao.markAsUserDeleted(hiddenProduct.getId());
+        setProductState(hiddenProduct, ProductState.USER_DELETED);
         em.flush();
         em.clear();
 
@@ -369,8 +501,7 @@ public class ProductJpaDaoTest {
     @Test
     public void suggestionsEscapeWildcardsAndIgnoreShortQueries() {
         // Arrange
-        final User user = userDao.createUser("seller14@test.com", "password", "seller14",
-            false, true, null, null, null, null, null, null, null, null);
+        final User user = insertUser("seller14@test.com", "seller14");
         createSuggestionProduct(user, "Literal Wildcards", "100%_Artist", "100%_Records");
         createSuggestionProduct(user, "Wildcard Lookalike", "100XAartist", "100XRecords");
 
@@ -393,12 +524,11 @@ public class ProductJpaDaoTest {
     @Test
     public void findActiveProductsByUserIdReturnsOnlyActiveProductsPaginatedAndSorted() {
         // Arrange
-        final User user = userDao.createUser("active-seller@test.com", "password", "active_seller",
-            false, true, null, null, null, null, null, null, null, null);
+        final User user = insertUser("active-seller@test.com", "active_seller");
         final Product first = createSuggestionProduct(user, "First", "Artist", "Label");
         final Product hidden = createSuggestionProduct(user, "Hidden", "Artist", "Label");
         final Product latest = createSuggestionProduct(user, "Latest", "Artist", "Label");
-        productDao.markAsUserDeleted(hidden.getId());
+        setProductState(hidden, ProductState.USER_DELETED);
 
         em.flush();
         em.clear();
@@ -416,16 +546,13 @@ public class ProductJpaDaoTest {
     @Test
     public void countActiveProductsByUserIdsReturnsZeroForMissingUsers() {
         // Arrange
-        final User userA = userDao.createUser("count-a@test.com", "password", "count_a",
-            false, true, null, null, null, null, null, null, null, null);
-        final User userB = userDao.createUser("count-b@test.com", "password", "count_b",
-            false, true, null, null, null, null, null, null, null, null);
-        final User userC = userDao.createUser("count-c@test.com", "password", "count_c",
-            false, true, null, null, null, null, null, null, null, null);
+        final User userA = insertUser("count-a@test.com", "count_a");
+        final User userB = insertUser("count-b@test.com", "count_b");
+        final User userC = insertUser("count-c@test.com", "count_c");
 
         createSuggestionProduct(userA, "A1", "Artist", "Label");
         final Product hidden = createSuggestionProduct(userA, "A2", "Artist", "Label");
-        productDao.markAsUserDeleted(hidden.getId());
+        setProductState(hidden, ProductState.USER_DELETED);
         createSuggestionProduct(userB, "B1", "Artist", "Label");
 
         em.flush();
@@ -443,16 +570,14 @@ public class ProductJpaDaoTest {
     @Test
     public void findLatestActiveProductsByUserIdsLimitsEachUserAndSkipsHidden() {
         // Arrange
-        final User userA = userDao.createUser("latest-a@test.com", "password", "latest_a",
-            false, true, null, null, null, null, null, null, null, null);
-        final User userB = userDao.createUser("latest-b@test.com", "password", "latest_b",
-            false, true, null, null, null, null, null, null, null, null);
+        final User userA = insertUser("latest-a@test.com", "latest_a");
+        final User userB = insertUser("latest-b@test.com", "latest_b");
 
         final Product first = createSuggestionProduct(userA, "A1", "Artist", "Label");
         final Product hidden = createSuggestionProduct(userA, "A2", "Artist", "Label");
         final Product latest = createSuggestionProduct(userA, "A3", "Artist", "Label");
         final Product onlyB = createSuggestionProduct(userB, "B1", "Artist", "Label");
-        productDao.markAsUserDeleted(hidden.getId());
+        setProductState(hidden, ProductState.USER_DELETED);
 
         em.flush();
         em.clear();
@@ -475,10 +600,8 @@ public class ProductJpaDaoTest {
     @Test
     public void markAllAsAdminHiddenByUserIdOnlyHidesActiveProductsOfTargetUser() {
         // Arrange
-        final User targetUser = userDao.createUser("ban-target@test.com", "password", "ban_target",
-            false, true, null, null, null, null, null, null, null, null);
-        final User otherUser = userDao.createUser("ban-other@test.com", "password", "ban_other",
-            false, true, null, null, null, null, null, null, null, null);
+        final User targetUser = insertUser("ban-target@test.com", "ban_target");
+        final User otherUser = insertUser("ban-other@test.com", "ban_other");
 
         // 3 active products for target user
         final Product active1 = createSuggestionProduct(targetUser, "Active1", "Artist", "Label");
@@ -487,7 +610,8 @@ public class ProductJpaDaoTest {
 
         // 1 sold product for target user (should NOT be affected)
         final Product sold = createSuggestionProduct(targetUser, "Sold", "Artist", "Label");
-        productDao.decrementStock(sold.getId()); // stock=1 -> stock=0 -> SOLD
+        sold.setStock(0);
+        setProductState(sold, ProductState.SOLD);
 
         // 1 active product for another user (should NOT be affected)
         final Product otherProduct = createSuggestionProduct(otherUser, "Other", "Artist", "Label");
@@ -505,15 +629,34 @@ public class ProductJpaDaoTest {
         Assertions.assertEquals(3, affected);
 
         // Target user's active products are now ADMIN_HIDDEN
-        Assertions.assertTrue(productDao.findByIdIfAvailable(active1.getId()).isEmpty());
-        Assertions.assertTrue(productDao.findByIdIfAvailable(active2.getId()).isEmpty());
-        Assertions.assertTrue(productDao.findByIdIfAvailable(active3.getId()).isEmpty());
+        final String active1State = em.createQuery(
+            "SELECT p.state FROM Product p WHERE p.productId = :productId",
+            String.class
+        ).setParameter("productId", active1.getId()).getSingleResult();
+        final String active2State = em.createQuery(
+            "SELECT p.state FROM Product p WHERE p.productId = :productId",
+            String.class
+        ).setParameter("productId", active2.getId()).getSingleResult();
+        final String active3State = em.createQuery(
+            "SELECT p.state FROM Product p WHERE p.productId = :productId",
+            String.class
+        ).setParameter("productId", active3.getId()).getSingleResult();
+        Assertions.assertEquals(ProductState.ADMIN_HIDDEN.getPersistenceValue(), active1State);
+        Assertions.assertEquals(ProductState.ADMIN_HIDDEN.getPersistenceValue(), active2State);
+        Assertions.assertEquals(ProductState.ADMIN_HIDDEN.getPersistenceValue(), active3State);
 
         // Target user's SOLD product was NOT affected
-        final Product reloadedSold = productDao.findById(sold.getId()).orElseThrow();
-        Assertions.assertEquals(ProductState.SOLD.getPersistenceValue(), reloadedSold.getState());
+        final String soldState = em.createQuery(
+            "SELECT p.state FROM Product p WHERE p.productId = :productId",
+            String.class
+        ).setParameter("productId", sold.getId()).getSingleResult();
+        Assertions.assertEquals(ProductState.SOLD.getPersistenceValue(), soldState);
 
         // Other user's product was NOT affected
-        Assertions.assertTrue(productDao.findByIdIfAvailable(otherProduct.getId()).isPresent());
+        final String otherState = em.createQuery(
+            "SELECT p.state FROM Product p WHERE p.productId = :productId",
+            String.class
+        ).setParameter("productId", otherProduct.getId()).getSingleResult();
+        Assertions.assertEquals(ProductState.ACTIVE.getPersistenceValue(), otherState);
     }
 }

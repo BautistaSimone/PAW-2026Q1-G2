@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,12 +30,6 @@ public class CategoryJpaDaoTest {
     @Autowired
     private CategoryJpaDao categoryDao;
 
-    @Autowired
-    private ProductJpaDao productDao;
-
-    @Autowired
-    private UserJpaDao userDao;
-
     @PersistenceContext
     private EntityManager em;
 
@@ -42,6 +37,49 @@ public class CategoryJpaDaoTest {
         final Category category = new Category(name);
         em.persist(category);
         return category;
+    }
+
+    private User insertUser(final String email, final String username) {
+        final User user = new User(
+            email,
+            "password",
+            username,
+            false,
+            true,
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+        em.persist(user);
+        em.flush();
+        return user;
+    }
+
+    private Product insertProduct(final Long userId, final String title, final List<Category> categories) {
+        final Product product = new Product(
+            userId,
+            title,
+            "Artist",
+            "Label",
+            "CAT-1",
+            "Argentina",
+            categories,
+            "Desc",
+            BigDecimal.valueOf(9.0),
+            BigDecimal.valueOf(9.0),
+            LocalDate.now(),
+            BigDecimal.valueOf(1000),
+            1
+        );
+        em.persist(product);
+        em.flush();
+        return product;
     }
 
     @Test
@@ -68,18 +106,13 @@ public class CategoryJpaDaoTest {
     @Test
     public void findByProductIdReturnsOnlyLinkedCategories() {
         // Arrange
-        final User user = userDao.createUser("cat-seller@test.com", "password", "seller",
-            false, true, null, null, null, null, null, null, null, null);
+        final User user = insertUser("cat-seller@test.com", "seller");
 
         final Category rock = insertCategory("Rock");
         final Category ambient = insertCategory("Ambient");
         insertCategory("Jazz");
 
-        final Product product = productDao.createProduct(
-            user.getId(), "Album", "Artist", "Label", "CAT-1", "Argentina",
-            List.of(rock, ambient), "Desc", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000), 1
-        );
+        final Product product = insertProduct(user.getId(), "Album", List.of(rock, ambient));
 
         em.flush();
         em.clear();
@@ -94,15 +127,10 @@ public class CategoryJpaDaoTest {
     @Test
     public void findByProductIdReturnsEmptyWhenProductHasNoCategories() {
         // Arrange
-        final User user = userDao.createUser("cat-empty@test.com", "password", "seller",
-            false, true, null, null, null, null, null, null, null, null);
+        final User user = insertUser("cat-empty@test.com", "seller");
         insertCategory("Unlinked");
 
-        final Product product = productDao.createProduct(
-            user.getId(), "Album without categories", "Artist", "Label", "CAT-1", "Argentina",
-            Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000), 1
-        );
+        final Product product = insertProduct(user.getId(), "Album without categories", Collections.emptyList());
 
         em.flush();
         em.clear();

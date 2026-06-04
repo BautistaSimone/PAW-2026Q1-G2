@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -33,12 +34,6 @@ public class PurchaseJpaDaoTest {
     @Autowired
     private PurchaseJpaDao purchaseDao;
 
-    @Autowired
-    private UserJpaDao userDao;
-
-    @Autowired
-    private ProductJpaDao productDao;
-
     @PersistenceContext
     private EntityManager em;
 
@@ -48,39 +43,92 @@ public class PurchaseJpaDaoTest {
     private long otherBuyerId;
     private long productId;
 
+    private User insertUser(final String email, final String username) {
+        final User user = new User(
+            email,
+            "pass",
+            username,
+            false,
+            true,
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+        em.persist(user);
+        em.flush();
+        return user;
+    }
+
+    private Product insertProduct(final Long userId, final String title) {
+        final Product product = new Product(
+            userId,
+            title,
+            "Artist",
+            "Label",
+            "CAT",
+            "Argentina",
+            Collections.emptyList(),
+            "Description",
+            BigDecimal.valueOf(8),
+            BigDecimal.valueOf(9),
+            LocalDate.now(),
+            BigDecimal.valueOf(1000),
+            1
+        );
+        em.persist(product);
+        em.flush();
+        return product;
+    }
+
+    private Purchase insertPurchase(
+        final Long productId,
+        final Long buyerId,
+        final Long sellerId,
+        final PurchaseStatus status,
+        final String buyerToken,
+        final String sellerToken
+    ) {
+        final Purchase purchase = new Purchase(
+            productId,
+            buyerId,
+            sellerId,
+            LocalDate.now(),
+            status,
+            buyerToken,
+            sellerToken
+        );
+        em.persist(purchase);
+        em.flush();
+        return purchase;
+    }
+
     @BeforeEach
     public void setUp() {
-        final User seller = userDao.createUser("purchase-seller@test.com", "pass", "purchase-seller",
-            false, true, null, null, null, null, null, null, null, null);
-        final User otherSeller = userDao.createUser("purchase-other-seller@test.com", "pass", "purchase-other-seller",
-            false, true, null, null, null, null, null, null, null, null);
-        final User buyer = userDao.createUser("purchase-buyer@test.com", "pass", "purchase-buyer",
-            false, true, null, null, null, null, null, null, null, null);
-        final User otherBuyer = userDao.createUser("purchase-other-buyer@test.com", "pass", "purchase-other-buyer",
-            false, true, null, null, null, null, null, null, null, null);
+        final User seller = insertUser("purchase-seller@test.com", "purchase-seller");
+        final User otherSeller = insertUser("purchase-other-seller@test.com", "purchase-other-seller");
+        final User buyer = insertUser("purchase-buyer@test.com", "purchase-buyer");
+        final User otherBuyer = insertUser("purchase-other-buyer@test.com", "purchase-other-buyer");
 
         sellerId = seller.getId();
         otherSellerId = otherSeller.getId();
         buyerId = buyer.getId();
         otherBuyerId = otherBuyer.getId();
 
-        final Product product = productDao.createProduct(
-            sellerId, "Purchase Album", "Artist", "Label", "CAT", "Argentina",
-            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
-        );
+        final Product product = insertProduct(sellerId, "Purchase Album");
         productId = product.getId();
         em.flush();
+        em.clear();
     }
 
     private long createProduct(long userId, String title) {
-        final Product p = productDao.createProduct(
-            userId, title, "Artist", "Label", "CAT", "Argentina",
-            Collections.emptyList(), "Description", BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9), BigDecimal.valueOf(1000), 1
-        );
-        em.flush();
-        return p.getId();
+        final Product product = insertProduct(userId, title);
+        return product.getId();
     }
 
     @Test
@@ -106,8 +154,8 @@ public class PurchaseJpaDaoTest {
     @Test
     public void testFindsById() {
         // Arrange
-        final Purchase purchase = purchaseDao.createPurchase(
-            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token", LocalDateTime.now()
+        final Purchase purchase = insertPurchase(
+            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token"
         );
         em.flush();
         em.clear();
@@ -127,8 +175,8 @@ public class PurchaseJpaDaoTest {
     @Test
     public void testUpdateStatusChangesStatusAndConfirmedFlag() {
         // Arrange
-        final Purchase purchase = purchaseDao.createPurchase(
-            productId, buyerId, sellerId, PurchaseStatus.PAID, "buyer-token", "seller-token", LocalDateTime.now()
+        final Purchase purchase = insertPurchase(
+            productId, buyerId, sellerId, PurchaseStatus.PAID, "buyer-token", "seller-token"
         );
         em.flush();
 
@@ -138,7 +186,10 @@ public class PurchaseJpaDaoTest {
         em.clear();
 
         // Assert
-        final Purchase reloaded = purchaseDao.findById(purchase.getPurchaseId()).orElseThrow();
+        final Purchase reloaded = em.createQuery(
+            "SELECT p FROM Purchase p WHERE p.purchaseId = :purchaseId",
+            Purchase.class
+        ).setParameter("purchaseId", purchase.getPurchaseId()).getSingleResult();
         Assertions.assertEquals(PurchaseStatus.DELIVERED, reloaded.getStatus());
         Assertions.assertEquals("buyer-token", reloaded.getBuyerToken());
         Assertions.assertEquals("seller-token", reloaded.getSellerToken());
@@ -148,8 +199,8 @@ public class PurchaseJpaDaoTest {
     @Test
     public void testUpdateStatusFromPendingToPaidIsPersisted() {
         // Arrange
-        final Purchase purchase = purchaseDao.createPurchase(
-            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token", LocalDateTime.now()
+        final Purchase purchase = insertPurchase(
+            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token"
         );
         em.flush();
 
@@ -159,7 +210,10 @@ public class PurchaseJpaDaoTest {
         em.clear();
 
         // Assert
-        final Purchase reloaded = purchaseDao.findById(purchase.getPurchaseId()).orElseThrow();
+        final Purchase reloaded = em.createQuery(
+            "SELECT p FROM Purchase p WHERE p.purchaseId = :purchaseId",
+            Purchase.class
+        ).setParameter("purchaseId", purchase.getPurchaseId()).getSingleResult();
         Assertions.assertEquals(PurchaseStatus.PAID, reloaded.getStatus());
         Assertions.assertEquals("buyer-token", reloaded.getBuyerToken());
         Assertions.assertEquals("seller-token", reloaded.getSellerToken());
@@ -173,10 +227,11 @@ public class PurchaseJpaDaoTest {
         final long secondProductId = createProduct(sellerId, "Second Purchase Album");
         final long otherBuyerProductId = createProduct(otherSellerId, "Other Buyer Album");
 
-        purchaseDao.createPurchase(productId, buyerId, sellerId, PurchaseStatus.PENDING, "b1", "s1", LocalDateTime.now());
-        purchaseDao.createPurchase(secondProductId, buyerId, sellerId, PurchaseStatus.PAID, "b2", "s2", LocalDateTime.now());
-        purchaseDao.createPurchase(otherBuyerProductId, otherBuyerId, otherSellerId, PurchaseStatus.PAID, "b3", "s3", LocalDateTime.now());
+        insertPurchase(productId, buyerId, sellerId, PurchaseStatus.PENDING, "b1", "s1");
+        insertPurchase(secondProductId, buyerId, sellerId, PurchaseStatus.PAID, "b2", "s2");
+        insertPurchase(otherBuyerProductId, otherBuyerId, otherSellerId, PurchaseStatus.PAID, "b3", "s3");
         em.flush();
+        em.clear();
 
         // Act
         final PaginatedResult<Purchase> result = purchaseDao.findByBuyerId(buyerId, Collections.emptyList(), 1, 10);
@@ -195,10 +250,11 @@ public class PurchaseJpaDaoTest {
         final long secondProductId = createProduct(sellerId, "Second Seller Album");
         final long otherSellerProductId = createProduct(otherSellerId, "Other Seller Album");
 
-        purchaseDao.createPurchase(productId, buyerId, sellerId, PurchaseStatus.PENDING, "b1", "s1", LocalDateTime.now());
-        purchaseDao.createPurchase(secondProductId, otherBuyerId, sellerId, PurchaseStatus.PAID, "b2", "s2", LocalDateTime.now());
-        purchaseDao.createPurchase(otherSellerProductId, buyerId, otherSellerId, PurchaseStatus.PAID, "b3", "s3", LocalDateTime.now());
+        insertPurchase(productId, buyerId, sellerId, PurchaseStatus.PENDING, "b1", "s1");
+        insertPurchase(secondProductId, otherBuyerId, sellerId, PurchaseStatus.PAID, "b2", "s2");
+        insertPurchase(otherSellerProductId, buyerId, otherSellerId, PurchaseStatus.PAID, "b3", "s3");
         em.flush();
+        em.clear();
 
         // Act
         final List<Purchase> purchases = purchaseDao.findBySellerId(sellerId, Collections.emptyList(), 1, 10).getResults();
