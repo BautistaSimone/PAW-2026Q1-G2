@@ -6,45 +6,16 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <spring:message code="SearchUsers.title" var="searchUsersTitle" />
-<spring:message code="SearchUsers.placeholder" var="searchPlaceholder" />
 <spring:message code="SearchUsers.carousel.viewMore.ariaLabel" var="carouselViewMoreAria" />
 <spring:message code="SearchUsers.carousel.prev.ariaLabel" var="carouselPrevAria" />
 <spring:message code="SearchUsers.carousel.next.ariaLabel" var="carouselNextAria" />
 
 <ui:layout title="${searchUsersTitle}">
 
-    <ui:header showHeaderActions="true" />
+    <ui:header showHeaderActions="true" searchMode="users" searchValue="${searchQuery}" />
 
     <div class="products-section community-page">
         <div class="container-fluid products-shell">
-
-            <div class="community-hero">
-                <div class="community-hero-copy">
-                    <span class="community-eyebrow">
-                        <i class="bi bi-people" aria-hidden="true"></i>
-                        <spring:message code="SearchUsers.eyebrow" />
-                    </span>
-                    <h1 class="community-heading">
-                        <spring:message code="SearchUsers.heading" />
-                    </h1>
-                    <p class="community-subtitle">
-                        <spring:message code="SearchUsers.subtitle" />
-                    </p>
-                </div>
-
-                <form class="search-users-form" method="get" action="<c:url value='/search-users'/>" novalidate>
-                    <div class="search-users-input-group">
-                        <input name="q" type="text" class="form-control search-users-input"
-                            placeholder="${searchPlaceholder}"
-                            value="<c:out value='${searchQuery}' />"
-                            aria-label="${searchPlaceholder}" />
-                        <button type="submit" class="btn btn-retro btn-retro-primary community-search-button">
-                            <i class="bi bi-search" aria-hidden="true"></i>
-                            <spring:message code="SearchUsers.button" />
-                        </button>
-                    </div>
-                </form>
-            </div>
 
             <div class="community-section-heading">
                 <c:choose>

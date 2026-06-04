@@ -4,8 +4,19 @@
 <%@ taglib prefix = "spring" uri = "http://www.springframework.org/tags" %>
 
 <%@ attribute name="showHeaderActions" required="false" type="java.lang.Boolean" %>
+<%@ attribute name="searchMode" required="false" type="java.lang.String" %>
+<%@ attribute name="searchValue" required="false" type="java.lang.String" %>
 
+<c:set var="activeSearchMode" value="${not empty searchMode ? searchMode : 'vinyls'}" />
 <c:set var="headerSearchText" value="${param['search-text']}" />
+<c:if test="${activeSearchMode eq 'users' and not empty searchValue}">
+    <c:set var="headerSearchText" value="${searchValue}" />
+</c:if>
+
+<spring:message code="Header.search.placeholder.vinyls" var="vinylsPlaceholder" />
+<spring:message code="Header.search.placeholder.users" var="usersPlaceholder" />
+<spring:message code="Header.search.mode.vinyls" var="modeVinyls" />
+<spring:message code="Header.search.mode.users" var="modeUsers" />
 
 <header class="header-bbdiscos">
 
@@ -20,17 +31,41 @@
         <c:if test="${showHeaderActions != false}">
             <div class="header-center">
                 <div class="search-container">
-                    <form class="search-form" method="get" action="<c:url value='/'/>" novalidate>
-                        <spring:message code="Header.search.placeholder" var="searchPlaceholder" />
-                        <input id="search-input" name="search-text"
+                    <form class="search-form" id="unified-search-form" method="get" novalidate
+                          action="<c:url value="${activeSearchMode eq 'users' ? '/search-users' : '/'}"/>"
+                          data-vinyls-action="<c:url value='/'/>"
+                          data-users-action="<c:url value='/search-users'/>"
+                          data-vinyls-param="search-text"
+                          data-users-param="q">
+                        <input id="search-input" name="${activeSearchMode eq 'users' ? 'q' : 'search-text'}"
                             class="search-input"
                             type="text"
-                            placeholder="${searchPlaceholder}"
+                            placeholder="${activeSearchMode eq 'users' ? usersPlaceholder : vinylsPlaceholder}"
                             aria-label="<spring:message code='Header.search.ariaLabel' />"
+                            data-placeholder-vinyls="${vinylsPlaceholder}"
+                            data-placeholder-users="${usersPlaceholder}"
                             value="<c:out value='${headerSearchText}' />">
-                        <button id="search-button" class="search-btn" type="submit" aria-label="<spring:message code='Header.search.button.ariaLabel' />">
-                            <i class="bi bi-search" aria-hidden="true"></i>
-                        </button>
+                        <div class="search-mode-group">
+                            <button id="search-mode-toggle" class="search-mode-btn" type="button"
+                                    aria-haspopup="listbox" aria-expanded="false"
+                                    aria-label="<spring:message code='Header.search.mode.ariaLabel' />">
+                                <span id="search-mode-label"><c:out value="${activeSearchMode eq 'users' ? modeUsers : modeVinyls}" /></span>
+                                <i class="bi bi-chevron-down search-mode-chevron" aria-hidden="true"></i>
+                            </button>
+                            <ul id="search-mode-menu" class="search-mode-dropdown" role="listbox" aria-hidden="true">
+                                <li role="option" data-mode="vinyls" class="search-mode-option ${activeSearchMode eq 'vinyls' ? 'is-selected' : ''}">
+                                    <i class="bi bi-vinyl" aria-hidden="true"></i>
+                                    <c:out value="${modeVinyls}" />
+                                </li>
+                                <li role="option" data-mode="users" class="search-mode-option ${activeSearchMode eq 'users' ? 'is-selected' : ''}">
+                                    <i class="bi bi-people" aria-hidden="true"></i>
+                                    <c:out value="${modeUsers}" />
+                                </li>
+                            </ul>
+                            <button id="search-button" class="search-btn" type="submit" aria-label="<spring:message code='Header.search.button.ariaLabel' />">
+                                <i class="bi bi-search" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>

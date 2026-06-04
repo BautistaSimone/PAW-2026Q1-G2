@@ -1,26 +1,122 @@
 (function () {
-  const form = document.querySelector("form.search-form");
-  const searchInput = document.getElementById("search-input");
-  if (!searchInput) {
+  var form = document.getElementById("unified-search-form");
+  var searchInput = document.getElementById("search-input");
+  var modeToggle = document.getElementById("search-mode-toggle");
+  var modeLabel = document.getElementById("search-mode-label");
+  var modeMenu = document.getElementById("search-mode-menu");
+
+  if (!form || !searchInput || !modeToggle || !modeMenu) {
     return;
   }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const currentSearch = urlParams.get("search-text");
-  if (currentSearch && !searchInput.value) {
-    searchInput.value = currentSearch;
+  var options = modeMenu.querySelectorAll("[data-mode]");
+
+  // Determine current mode from the selected option
+  function getCurrentMode() {
+    var selected = modeMenu.querySelector(".is-selected");
+    return selected ? selected.getAttribute("data-mode") : "vinyls";
   }
 
-  if (!form) {
-    return;
+  // Open / close the dropdown
+  function openMenu() {
+    modeMenu.classList.add("is-open");
+    modeMenu.setAttribute("aria-hidden", "false");
+    modeToggle.setAttribute("aria-expanded", "true");
   }
 
+  function closeMenu() {
+    modeMenu.classList.remove("is-open");
+    modeMenu.setAttribute("aria-hidden", "true");
+    modeToggle.setAttribute("aria-expanded", "false");
+  }
+
+  modeToggle.addEventListener("click", function (e) {
+    e.stopPropagation();
+    if (modeMenu.classList.contains("is-open")) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  modeMenu.addEventListener("click", function (e) {
+    e.stopPropagation();
+  });
+
+  document.addEventListener("click", function () {
+    closeMenu();
+  });
+
+  // Apply mode changes to form
+  function applyMode(newMode) {
+    // Update form action
+    var actionAttr = newMode === "users" ? "data-users-action" : "data-vinyls-action";
+    form.action = form.getAttribute(actionAttr);
+
+    // Update input name
+    var paramAttr = newMode === "users" ? "data-users-param" : "data-vinyls-param";
+    searchInput.name = form.getAttribute(paramAttr);
+
+    // Update placeholder
+    var placeholderAttr = newMode === "users" ? "data-placeholder-users" : "data-placeholder-vinyls";
+    searchInput.placeholder = searchInput.getAttribute(placeholderAttr);
+
+    // Update label text
+    var selectedOption = modeMenu.querySelector('[data-mode="' + newMode + '"]');
+    if (selectedOption && modeLabel) {
+      // Get text without the icon
+      var textContent = selectedOption.textContent.trim();
+      modeLabel.textContent = textContent;
+    }
+
+    // Mark selected option
+    options.forEach(function (opt) {
+      opt.classList.remove("is-selected");
+    });
+    if (selectedOption) {
+      selectedOption.classList.add("is-selected");
+    }
+  }
+
+  // Handle option selection
+  options.forEach(function (opt) {
+    opt.addEventListener("click", function () {
+      var newMode = opt.getAttribute("data-mode");
+      var currentMode = getCurrentMode();
+
+      if (newMode === currentMode) {
+        closeMenu();
+        return;
+      }
+
+      applyMode(newMode);
+      closeMenu();
+
+      var query = searchInput.value.trim();
+      if (query) {
+        // Has text → submit immediately to the new target
+        form.submit();
+      } else {
+        // No text → navigate to the target page
+        window.location.href = form.action;
+      }
+    });
+  });
+
+  // Prevent empty submit
   form.addEventListener("submit", function (e) {
-    const query = searchInput.value.trim();
+    var query = searchInput.value.trim();
     if (!query) {
       e.preventDefault();
     }
   });
+
+  // Restore search text from URL if needed
+  var urlParams = new URLSearchParams(window.location.search);
+  var currentSearch = urlParams.get("search-text") || urlParams.get("q");
+  if (currentSearch && !searchInput.value) {
+    searchInput.value = currentSearch;
+  }
 })();
 
 (function () {
