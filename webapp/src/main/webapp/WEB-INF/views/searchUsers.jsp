@@ -149,10 +149,12 @@
                                                             </div>
                                                         </a>
                                                     </c:forEach>
-                                                    <a href="<c:out value='${profileUrl}' />" class="community-carousel-more-tile" aria-label="${carouselViewMoreAria}">
-                                                        <i class="bi bi-arrow-right-circle" aria-hidden="true"></i>
-                                                        <span><spring:message code="SearchUsers.carousel.viewMore" /></span>
-                                                    </a>
+                                                    <c:if test="${userProductsPage.hasNextPage}">
+                                                        <a href="<c:out value='${profileUrl}' />" class="community-carousel-more-tile" aria-label="${carouselViewMoreAria}">
+                                                            <i class="bi bi-arrow-right-circle" aria-hidden="true"></i>
+                                                            <span><spring:message code="SearchUsers.carousel.viewMore" /></span>
+                                                        </a>
+                                                    </c:if>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <div class="community-carousel-message community-carousel-message-empty">
@@ -189,7 +191,7 @@
     </div>
 
     <c:url value="/assets/js/community.js" var="communityJsUrl">
-        <c:param name="v" value="carousel-floating-v3" />
+        <c:param name="v" value="carousel-dynamic-padding-v1" />
     </c:url>
     <script src="<c:out value='${communityJsUrl}' />"></script>
 </ui:layout>

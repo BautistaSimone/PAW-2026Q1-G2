@@ -4735,7 +4735,11 @@ input[type="password"]::-ms-clear {
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   min-height: 244px;
-  padding: 0 3.2rem 0.35rem;
+  padding: 0 0 0.35rem;
+}
+
+.community-carousel-track-scrollable {
+  padding-inline: 3.2rem;
 }
 
 .community-product-tile {

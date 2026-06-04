@@ -54,13 +54,32 @@
         return Math.max(Math.round(track.clientWidth * 0.85), Math.round(tileStep * 3));
     }
 
+    function getTrackContentWidth(track) {
+        var firstItem = track.firstElementChild;
+        var lastItem = track.lastElementChild;
+        if (!firstItem || !lastItem) {
+            return 0;
+        }
+
+        var firstRect = firstItem.getBoundingClientRect();
+        var lastRect = lastItem.getBoundingClientRect();
+        return Math.max(lastRect.right - firstRect.left, 0);
+    }
+
     function updateCarouselControls(track, prev, next) {
+        var contentOverflows = getTrackContentWidth(track) > track.clientWidth + 1;
+        track.classList.toggle('community-carousel-track-scrollable', contentOverflows);
+
+        if (!contentOverflows) {
+            track.scrollLeft = 0;
+        }
+
         var maxScrollLeft = Math.max(track.scrollWidth - track.clientWidth, 0);
         var atStart = track.scrollLeft <= 1;
         var atEnd = track.scrollLeft >= maxScrollLeft - 1;
 
-        prev.disabled = atStart;
-        next.disabled = atEnd;
+        prev.disabled = !contentOverflows || atStart;
+        next.disabled = !contentOverflows || atEnd;
     }
 
     function scrollCarousel(track, delta) {
