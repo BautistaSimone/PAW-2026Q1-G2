@@ -20,7 +20,7 @@
             text="${psswdText}" />
     </c:if>
 
-    <div class="products-section">
+    <div class="products-section" id="vinyls-section">
         <div class="container-fluid products-shell">
             <c:if test="${param.created eq '1'}">
                 <div class="alert-retro alert-retro-success mb-3" role="alert">

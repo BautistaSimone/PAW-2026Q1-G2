@@ -10,6 +10,10 @@
   }
 
   var options = modeMenu.querySelectorAll("[data-mode]");
+  var anchorByMode = {
+    vinyls: "#vinyls-section",
+    users: "#community-section",
+  };
 
   // Determine current mode from the selected option
   function getCurrentMode() {
@@ -78,6 +82,13 @@
     }
   }
 
+  function buildEmptySearchUrl(mode) {
+    var actionAttr = mode === "users" ? "data-users-action" : "data-vinyls-action";
+    var baseUrl = form.getAttribute(actionAttr) || form.action || "/";
+    var anchor = anchorByMode[mode] || "";
+    return baseUrl + anchor;
+  }
+
   // Handle option selection
   options.forEach(function (opt) {
     opt.addEventListener("click", function () {
@@ -98,7 +109,7 @@
         form.submit();
       } else {
         // No text → navigate to the target page
-        window.location.href = form.action;
+        window.location.href = buildEmptySearchUrl(newMode);
       }
     });
   });
@@ -108,6 +119,7 @@
     var query = searchInput.value.trim();
     if (!query) {
       e.preventDefault();
+      window.location.href = buildEmptySearchUrl(getCurrentMode());
     }
   });
 

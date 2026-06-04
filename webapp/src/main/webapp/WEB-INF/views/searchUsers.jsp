@@ -14,7 +14,7 @@
 
     <ui:header showHeaderActions="true" searchMode="users" searchValue="${searchQuery}" />
 
-    <div class="products-section community-page">
+    <div class="products-section community-page" id="community-section">
         <div class="container-fluid products-shell">
 
             <div class="community-section-heading">
