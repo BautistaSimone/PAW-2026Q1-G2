@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import ar.edu.itba.paw.models.Product;
@@ -25,7 +26,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     public ReportServiceImpl(final ReportDao reportDao, final ProductService productService,
-            final EmailService emailService, final UserService userService) {
+            final EmailService emailService, @Lazy final UserService userService) {
         this.reportDao = reportDao;
         this.productService = productService;
         this.emailService = emailService;
