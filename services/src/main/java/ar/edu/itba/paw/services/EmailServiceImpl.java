@@ -1,7 +1,5 @@
 package ar.edu.itba.paw.services;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -58,7 +56,6 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    @Transactional
     public void sendBuyerEmail(
             final String to,
             final Purchase purchase,
@@ -75,7 +72,6 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    @Transactional
     public void sendSellerEmail(
             final String to,
             final Purchase purchase,
@@ -92,7 +88,6 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    @Transactional
     public void sendProductReportEmail(final Product product, final User reporter, final User seller, Locale locale) {
 
         final Context ctx = new Context(locale);
@@ -135,7 +130,6 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    @Transactional
     public void sendPasswordResetEmail(String to, String resetToken, String username, Locale locale) {
 
         String resetUrl = buildAbsoluteUrl("/changePassword?token=" + resetToken);
@@ -169,7 +163,6 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    @Transactional
     public void sendVerificationEmail(String to, String resetToken, String username, Locale locale) {
 
         String resetUrl = buildAbsoluteUrl("/verifyEmail?token=" + resetToken);
@@ -201,7 +194,6 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    @Transactional
     public void sendNewVinylDigestEmail(final String to, final String username, final java.util.List<Product> products,
             Locale locale) {
         final Context ctx = new Context(locale);

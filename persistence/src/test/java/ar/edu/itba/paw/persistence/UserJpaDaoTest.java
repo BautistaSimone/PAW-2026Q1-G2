@@ -242,7 +242,7 @@ public class UserJpaDaoTest {
         userDao.addWishlistProduct(user.getId(), product);
 
         // Act
-        final Boolean isWishlisted = userDao.isProductInWishlist(user.getId(), product.getId());
+        final boolean isWishlisted = userDao.isProductInWishlist(user.getId(), product.getId());
 
         // Assert
         Assertions.assertTrue(isWishlisted);

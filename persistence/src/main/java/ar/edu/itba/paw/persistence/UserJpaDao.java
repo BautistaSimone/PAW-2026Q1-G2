@@ -163,7 +163,7 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
-    public Boolean isProductInWishlist(final Long userId, final Long productId) {
+    public boolean isProductInWishlist(final Long userId, final Long productId) {
         final TypedQuery<Long> query = em.createQuery(
                 "SELECT COUNT(p) " +
                         "FROM User u JOIN u.wishlistProducts p " +

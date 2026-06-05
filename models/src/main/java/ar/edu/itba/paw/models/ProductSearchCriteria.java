@@ -20,6 +20,8 @@ public final class ProductSearchCriteria {
         null,
         null,
         Collections.emptyList(),
+        null,
+        null,
         1,
         DEFAULT_PAGE_SIZE
     );
@@ -33,6 +35,8 @@ public final class ProductSearchCriteria {
     private final ProductSortOrder sortOrder;
     private final Long userId;
     private final List<Long> userIds;
+    private final Long excludeUserId;
+    private final Long excludeProductId;
     private final int page;
     private final int pageSize;
 
@@ -49,7 +53,7 @@ public final class ProductSearchCriteria {
         final int pageSize
     ) {
         this(searchText, categoryIds, minPrice, maxPrice, recordLabels,
-             conditionBuckets, sortOrder, userId, Collections.emptyList(), page, pageSize);
+             conditionBuckets, sortOrder, userId, Collections.emptyList(), null, null, page, pageSize);
     }
 
     public ProductSearchCriteria(
@@ -62,6 +66,25 @@ public final class ProductSearchCriteria {
         final ProductSortOrder sortOrder,
         final Long userId,
         final List<Long> userIds,
+        final int page,
+        final int pageSize
+    ) {
+        this(searchText, categoryIds, minPrice, maxPrice, recordLabels,
+             conditionBuckets, sortOrder, userId, userIds, null, null, page, pageSize);
+    }
+
+    public ProductSearchCriteria(
+        final String searchText,
+        final List<Long> categoryIds,
+        final BigDecimal minPrice,
+        final BigDecimal maxPrice,
+        final List<String> recordLabels,
+        final List<ConditionBucket> conditionBuckets,
+        final ProductSortOrder sortOrder,
+        final Long userId,
+        final List<Long> userIds,
+        final Long excludeUserId,
+        final Long excludeProductId,
         final int page,
         final int pageSize
     ) {
@@ -81,6 +104,8 @@ public final class ProductSearchCriteria {
         this.sortOrder = sortOrder == null ? ProductSortOrder.NEWEST : sortOrder;
         this.userId = userId;
         this.userIds = userIds == null ? Collections.emptyList() : List.copyOf(userIds);
+        this.excludeUserId = excludeUserId;
+        this.excludeProductId = excludeProductId;
         this.page = page < 1 ? 1 : page;
         this.pageSize = pageSize < 1 ? DEFAULT_PAGE_SIZE : pageSize;
     }
@@ -123,6 +148,14 @@ public final class ProductSearchCriteria {
 
     public List<Long> getUserIds() {
         return userIds;
+    }
+
+    public Long getExcludeUserId() {
+        return excludeUserId;
+    }
+
+    public Long getExcludeProductId() {
+        return excludeProductId;
     }
 
     public int getPage() {
