@@ -89,56 +89,7 @@ public class PurchaseController {
             @AuthenticationPrincipal PawAuthUser authUser,
             @PathVariable("id") final Long id,
             @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form) {
-
-        final Long userId = authUser.getUser().getId();
-
-        Purchase purchase = purchaseService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
-
-        final boolean isBuyer = userId.equals(purchase.getBuyerId());
-        final boolean isSeller = userId.equals(purchase.getSellerId());
-
-        if (!isBuyer && !isSeller) {
-            throw new IllegalArgumentException("You are not authorized to view this purchase");
-        }
-
-        Product product = productService.findById(purchase.getProductId())
-                .orElseThrow(() -> new IllegalStateException("Product missing"));
-
-        final User orderBuyer = userService.findById(purchase.getBuyerId())
-                .orElseThrow(() -> new IllegalStateException("Buyer missing"));
-        /* seller_user_id en la compra (no solo product.user_id) + nombres explícitos para evitar sombras en EL/JSP */
-        final User orderSeller = userService.findById(purchase.getSellerId())
-                .orElseGet(() -> userService.findById(product.getUserId())
-                        .orElseThrow(() -> new IllegalStateException("Seller missing")));
-
-        ModelAndView mav = new ModelAndView("purchase-panel");
-        mav.addObject("purchase", purchase);
-        mav.addObject("product", product);
-        mav.addObject("orderBuyer", orderBuyer);
-        mav.addObject("orderSeller", orderSeller);
-        mav.addObject("isBuyer", isBuyer);
-        mav.addObject("isSeller", isSeller);
-
-        if (purchase.getStatus() == PurchaseStatus.PENDING && purchase.getReservedUntil() != null) {
-            long remainingSeconds = Duration.between(LocalDateTime.now(), purchase.getReservedUntil()).getSeconds();
-            if (remainingSeconds < 0) {
-                remainingSeconds = 0;
-            }
-            mav.addObject("remainingSeconds", remainingSeconds);
-        }
-
-        final boolean hasPaymentProof = purchase.getPaymentProof() != null
-                && purchase.getPaymentProof().length > 0
-                && purchase.getPaymentProofContentType() != null;
-        mav.addObject("hasPaymentProof", hasPaymentProof);
-        mav.addObject("paymentProofFileName", purchase.getPaymentProofFileName());
-
-        if (isBuyer && purchase.getStatus() == PurchaseStatus.DELIVERED) {
-            mav.addObject("hasReview", reviewService.findByPurchaseId(id).isPresent());
-        }
-
-        return mav;
+        return buildPurchaseView(authUser, id);
     }
 
     @RequestMapping(value = "/purchases/{id:\\d+}/status", method = RequestMethod.POST)
@@ -148,7 +99,7 @@ public class PurchaseController {
             @Valid @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form,
             final BindingResult errors) {
         if (errors.hasErrors()) {
-            return getPurchase(authUser, id, form);
+            return buildPurchaseView(authUser, id);
         }
 
         // Status was validated by PurchaseStatusFormValidator — parse directly.
@@ -211,5 +162,57 @@ public class PurchaseController {
                 .contentLength(purchase.getPaymentProof().length)
                 .body(purchase.getPaymentProof()))
             .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    private ModelAndView buildPurchaseView(final PawAuthUser authUser, final Long id) {
+        final Long userId = authUser.getUser().getId();
+
+        Purchase purchase = purchaseService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+
+        final boolean isBuyer = userId.equals(purchase.getBuyerId());
+        final boolean isSeller = userId.equals(purchase.getSellerId());
+
+        if (!isBuyer && !isSeller) {
+            throw new IllegalArgumentException("You are not authorized to view this purchase");
+        }
+
+        Product product = productService.findById(purchase.getProductId())
+                .orElseThrow(() -> new IllegalStateException("Product missing"));
+
+        final User orderBuyer = userService.findById(purchase.getBuyerId())
+                .orElseThrow(() -> new IllegalStateException("Buyer missing"));
+        /* seller_user_id en la compra (no solo product.user_id) + nombres explícitos para evitar sombras en EL/JSP */
+        final User orderSeller = userService.findById(purchase.getSellerId())
+                .orElseGet(() -> userService.findById(product.getUserId())
+                        .orElseThrow(() -> new IllegalStateException("Seller missing")));
+
+        ModelAndView mav = new ModelAndView("purchase-panel");
+        mav.addObject("purchase", purchase);
+        mav.addObject("product", product);
+        mav.addObject("orderBuyer", orderBuyer);
+        mav.addObject("orderSeller", orderSeller);
+        mav.addObject("isBuyer", isBuyer);
+        mav.addObject("isSeller", isSeller);
+
+        if (purchase.getStatus() == PurchaseStatus.PENDING && purchase.getReservedUntil() != null) {
+            long remainingSeconds = Duration.between(LocalDateTime.now(), purchase.getReservedUntil()).getSeconds();
+            if (remainingSeconds < 0) {
+                remainingSeconds = 0;
+            }
+            mav.addObject("remainingSeconds", remainingSeconds);
+        }
+
+        final boolean hasPaymentProof = purchase.getPaymentProof() != null
+                && purchase.getPaymentProof().length > 0
+                && purchase.getPaymentProofContentType() != null;
+        mav.addObject("hasPaymentProof", hasPaymentProof);
+        mav.addObject("paymentProofFileName", purchase.getPaymentProofFileName());
+
+        if (isBuyer && purchase.getStatus() == PurchaseStatus.DELIVERED) {
+            mav.addObject("hasReview", reviewService.findByPurchaseId(id).isPresent());
+        }
+
+        return mav;
     }
 }

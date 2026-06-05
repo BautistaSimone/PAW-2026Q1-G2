@@ -133,6 +133,13 @@ public class ProductController {
             return productFormView();
         }
 
+        // Image validation for creation: at least one image is required
+        final List<MultipartFile> presentFiles = extractNonEmptyMultipartFilesList(form.getImages());
+        if (presentFiles.isEmpty()) {
+            errors.rejectValue("images", "Required.productForm.images");
+            return productFormView();
+        }
+
         final User publisher = userService.findById(authUser.getUser().getId())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
 
@@ -150,8 +157,7 @@ public class ProductController {
                 form.getPrice(),
                 form.getStock());
 
-        // Images were fully validated by ProductFormValidator — read and persist
-        // directly.
+        // Images were validated by ProductFormValidator — read and persist directly.
         final List<ValidatedImage> validatedImages = ImageUploadValidator.readAll(form.getImages());
         for (ValidatedImage image : validatedImages) {
             imageService.createImage(
@@ -222,10 +228,14 @@ public class ProductController {
         final String layoutRaw = form.getImageLayout();
         final boolean useLayout = hadImages && layoutRaw != null && !layoutRaw.isBlank();
 
-        // Images were fully validated by ProductFormValidator — read and persist
-        // directly.
+        // Image handling for edit: if no existing images, new ones are required
         final List<ValidatedImage> replacementImages;
         if (!hadImages) {
+            final List<MultipartFile> presentFiles = extractNonEmptyMultipartFilesList(form.getImages());
+            if (presentFiles.isEmpty()) {
+                errors.rejectValue("images", "Required.productForm.images");
+                return editProductFormModelAndView(id);
+            }
             replacementImages = ImageUploadValidator.readAll(form.getImages());
         } else if (useLayout) {
             final List<Slot> slots = ProductImageLayoutParser.parse(layoutRaw);
