@@ -49,9 +49,9 @@ public class PurchaseJpaDao implements PurchaseDao {
         for (int i = 0; i < statuses.size(); i++) {
             if (i > 0) jpql.append(" OR ");
             final String paramName = "statusPattern" + i;
-            jpql.append("p.paymentMethod LIKE :").append(paramName);
+            jpql.append("p.status = :").append(paramName);
             paramNames.add(paramName);
-            paramValues.add(statuses.get(i).name() + "|%");
+            paramValues.add(statuses.get(i));
         }
         jpql.append(")");
     }
@@ -134,10 +134,10 @@ public class PurchaseJpaDao implements PurchaseDao {
     @Override
     public List<Purchase> findExpiredPending(final LocalDateTime now) {
         return em.createQuery(
-            "FROM Purchase p WHERE p.reservedUntil IS NOT NULL AND p.reservedUntil < :now AND p.paymentMethod LIKE :statusPattern",
+            "FROM Purchase p WHERE p.reservedUntil IS NOT NULL AND p.reservedUntil < :now AND p.status = :status",
             Purchase.class)
             .setParameter("now", now)
-            .setParameter("statusPattern", PurchaseStatus.PENDING.name() + "|%")
+            .setParameter("status", PurchaseStatus.PENDING)
             .getResultList();
     }
 }

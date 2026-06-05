@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +32,7 @@ public class PendingNotificationServiceImpl implements PendingNotificationServic
     public PendingNotificationServiceImpl(
             final PendingNotificationDao pendingNotificationDao,
             final ProductDao productDao,
-            final UserService userService,
+            @Lazy final UserService userService,
             final EmailService emailService) {
         this.pendingNotificationDao = pendingNotificationDao;
         this.productDao = productDao;
