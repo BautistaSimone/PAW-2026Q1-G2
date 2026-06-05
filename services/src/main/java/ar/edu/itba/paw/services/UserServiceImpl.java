@@ -146,13 +146,13 @@ public class UserServiceImpl implements UserService {
 
 	@Override
     @Transactional(readOnly = true)
-    public Boolean isPasswordEmpty(User usr) {
+    public boolean isPasswordEmpty(User usr) {
         return passwordEncoder.matches("", usr.getPassword());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Boolean isVerified(User usr) {
+    public boolean isVerified(User usr) {
         return usr.getEnabled();
     }
 
@@ -186,7 +186,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Boolean isProductInWishlist(final Long userId, final Long productId) {
+    public boolean isProductInWishlist(final Long userId, final Long productId) {
         return userDao.isProductInWishlist(userId, productId);
     }
 

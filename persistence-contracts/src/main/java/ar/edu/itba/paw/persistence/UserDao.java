@@ -54,7 +54,7 @@ public interface UserDao {
 
         void addWishlistProduct(final Long id, Product product);
 
-        Boolean isProductInWishlist(final Long userId, final Long productId);
+        boolean isProductInWishlist(final Long userId, final Long productId);
 
         List<Product> getWishlistProducts(final Long userId, final int limit);
 
