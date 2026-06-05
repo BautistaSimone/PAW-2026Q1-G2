@@ -488,7 +488,7 @@ public class ProductJpaDao implements ProductDao {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
         }
 
-        final String activeState = ProductState.ACTIVE.getPersistenceValue();
+        final ProductState activeState = ProductState.ACTIVE;
         final long totalCount = em.createQuery(
                 "SELECT COUNT(p) FROM Product p WHERE p.userId = :userId AND p.state = :state",
                 Long.class)
@@ -536,7 +536,7 @@ public class ProductJpaDao implements ProductDao {
                         "GROUP BY p.userId",
                 Object[].class)
                 .setParameter("ids", counts.keySet())
-                .setParameter("state", ProductState.ACTIVE.getPersistenceValue())
+                .setParameter("state", ProductState.ACTIVE)
                 .getResultList();
 
         for (Object[] row : rows) {
@@ -580,7 +580,7 @@ public class ProductJpaDao implements ProductDao {
                         ") <= :limit " +
                         "ORDER BY p.userId ASC, p.published DESC, p.productId DESC",
                 Product.class)
-                .setParameter("state", ProductState.ACTIVE.getPersistenceValue())
+                .setParameter("state", ProductState.ACTIVE)
                 .setParameter("ids", distinctUserIds)
                 .setParameter("limit", (long) perUserLimit)
                 .getResultList();
@@ -597,7 +597,7 @@ public class ProductJpaDao implements ProductDao {
                 "SELECT DISTINCT TRIM(p.artist) FROM Product p " +
                         "WHERE p.artist IS NOT NULL AND p.state = :state AND TRIM(p.artist) <> '' " +
                         "ORDER BY TRIM(p.artist) ASC",
-                String.class).setParameter("state", ProductState.ACTIVE.getPersistenceValue())
+                String.class).setParameter("state", ProductState.ACTIVE)
                 .getResultList();
     }
 
@@ -607,7 +607,7 @@ public class ProductJpaDao implements ProductDao {
                 "SELECT DISTINCT TRIM(p.recordLabel) FROM Product p " +
                         "WHERE p.recordLabel IS NOT NULL AND p.state = :state AND TRIM(p.recordLabel) <> '' " +
                         "ORDER BY TRIM(p.recordLabel) ASC",
-                String.class).setParameter("state", ProductState.ACTIVE.getPersistenceValue())
+                String.class).setParameter("state", ProductState.ACTIVE)
                 .getResultList();
     }
 
@@ -653,7 +653,7 @@ public class ProductJpaDao implements ProductDao {
                 Object[].class);
 
         return suggestionsQuery
-                .setParameter("state", ProductState.ACTIVE.getPersistenceValue())
+                .setParameter("state", ProductState.ACTIVE)
                 .setParameter("query", query)
                 .setParameter("needle", "%" + escapedQuery + "%")
                 .setParameter("prefix", escapedQuery + "%")
@@ -670,7 +670,7 @@ public class ProductJpaDao implements ProductDao {
                 "FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId = :productId AND p.state = :state",
                 Product.class);
         query.setParameter("productId", id);
-        query.setParameter("state", ProductState.ACTIVE.getPersistenceValue());
+        query.setParameter("state", ProductState.ACTIVE);
         return query.getResultList().stream().findFirst();
     }
 
@@ -680,9 +680,9 @@ public class ProductJpaDao implements ProductDao {
                 "UPDATE Product SET stock = stock - 1, " +
                         "state = CASE WHEN stock - 1 = 0 THEN :soldState ELSE state END " +
                         "WHERE productId = :productId AND state = :activeState AND stock > 0")
-                .setParameter("soldState", ProductState.SOLD.getPersistenceValue())
+                .setParameter("soldState", ProductState.SOLD)
                 .setParameter("productId", id)
-                .setParameter("activeState", ProductState.ACTIVE.getPersistenceValue())
+                .setParameter("activeState", ProductState.ACTIVE)
                 .executeUpdate() >= 1;
     }
 
@@ -691,8 +691,8 @@ public class ProductJpaDao implements ProductDao {
         return em.createQuery(
                 "UPDATE Product SET stock = stock + 1, state = :activeState " +
                         "WHERE productId = :productId AND state IN (:activeState, :soldState)")
-                .setParameter("activeState", ProductState.ACTIVE.getPersistenceValue())
-                .setParameter("soldState", ProductState.SOLD.getPersistenceValue())
+                .setParameter("activeState", ProductState.ACTIVE)
+                .setParameter("soldState", ProductState.SOLD)
                 .setParameter("productId", id)
                 .executeUpdate() >= 1;
     }
@@ -701,9 +701,9 @@ public class ProductJpaDao implements ProductDao {
     public boolean markAsUserDeleted(final Long id) {
         return em.createQuery(
                 "UPDATE Product SET state = :newState WHERE productId = :productId AND state = :currentState")
-                .setParameter("newState", ProductState.USER_DELETED.getPersistenceValue())
+                .setParameter("newState", ProductState.USER_DELETED)
                 .setParameter("productId", id)
-                .setParameter("currentState", ProductState.ACTIVE.getPersistenceValue())
+                .setParameter("currentState", ProductState.ACTIVE)
                 .executeUpdate() >= 1;
     }
 
@@ -711,7 +711,7 @@ public class ProductJpaDao implements ProductDao {
     public void markAsAdminHidden(final Long id) {
         em.createQuery(
                 "UPDATE Product SET state = :newState WHERE productId = :productId")
-                .setParameter("newState", ProductState.ADMIN_HIDDEN.getPersistenceValue())
+                .setParameter("newState", ProductState.ADMIN_HIDDEN)
                 .setParameter("productId", id)
                 .executeUpdate();
     }
@@ -754,9 +754,9 @@ public class ProductJpaDao implements ProductDao {
     public boolean restoreUserDeletedProduct(final Long id) {
         return em.createQuery(
                 "UPDATE Product SET state = :newState WHERE productId = :productId AND state = :currentState")
-                .setParameter("newState", ProductState.ACTIVE.getPersistenceValue())
+                .setParameter("newState", ProductState.ACTIVE)
                 .setParameter("productId", id)
-                .setParameter("currentState", ProductState.USER_DELETED.getPersistenceValue())
+                .setParameter("currentState", ProductState.USER_DELETED)
                 .executeUpdate() >= 1;
     }
 
@@ -792,9 +792,9 @@ public class ProductJpaDao implements ProductDao {
         return em.createQuery(
                 "UPDATE Product p SET p.state = :newState " +
                         "WHERE p.userId = :userId AND p.state = :activeState")
-                .setParameter("newState", ProductState.ADMIN_HIDDEN.getPersistenceValue())
+                .setParameter("newState", ProductState.ADMIN_HIDDEN)
                 .setParameter("userId", userId)
-                .setParameter("activeState", ProductState.ACTIVE.getPersistenceValue())
+                .setParameter("activeState", ProductState.ACTIVE)
                 .executeUpdate();
     }
 }

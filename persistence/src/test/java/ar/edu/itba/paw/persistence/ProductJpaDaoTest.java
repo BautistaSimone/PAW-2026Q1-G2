@@ -511,7 +511,7 @@ public class ProductJpaDaoTest {
 
         // Target user's SOLD product was NOT affected
         final Product reloadedSold = productDao.findById(sold.getId()).orElseThrow();
-        Assertions.assertEquals(ProductState.SOLD.getPersistenceValue(), reloadedSold.getState());
+        Assertions.assertEquals(ProductState.SOLD, reloadedSold.getState());
 
         // Other user's product was NOT affected
         Assertions.assertTrue(productDao.findByIdIfAvailable(otherProduct.getId()).isPresent());

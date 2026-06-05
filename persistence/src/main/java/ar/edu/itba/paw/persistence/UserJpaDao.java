@@ -426,7 +426,7 @@ public class UserJpaDao implements UserDao {
         final int safeSize = Math.max(pageSize, 1);
         final String rawQuery = query == null ? "" : query.trim().toLowerCase();
         final String likePattern = "%" + escapeForLike(rawQuery) + "%";
-        final String activeState = ProductState.ACTIVE.getPersistenceValue();
+        final ProductState activeState = ProductState.ACTIVE;
 
         final long totalCount = em.createQuery(
                 "SELECT COUNT(u) " +

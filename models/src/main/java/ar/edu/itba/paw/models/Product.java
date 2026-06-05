@@ -12,6 +12,8 @@ import javax.persistence.Column;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.FetchType;
+import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
 //import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
@@ -73,8 +75,9 @@ public class Product {
     @Column(name = "stock", nullable = false)
     private int stock = 1;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "state", length = 32, nullable = false)
-    private String state = ProductState.ACTIVE.getPersistenceValue();
+    private ProductState state = ProductState.ACTIVE;
 
     Product() {
         // Just for Hibernate, we love you!
@@ -219,11 +222,11 @@ public class Product {
         return published;
     }
 
-    public String getState() {
+    public ProductState getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(ProductState state) {
         this.state = state;
     }
 
