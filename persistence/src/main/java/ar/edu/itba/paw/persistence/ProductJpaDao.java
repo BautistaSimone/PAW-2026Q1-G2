@@ -47,7 +47,7 @@ public class ProductJpaDao implements ProductDao {
             return java.util.Collections.emptyList();
         }
         return em.createQuery(
-                "FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId IN :ids", Product.class)
+                "FROM Product p WHERE p.productId IN :ids", Product.class)
                 .setParameter("ids", ids)
                 .getResultList();
     }
@@ -230,7 +230,7 @@ public class ProductJpaDao implements ProductDao {
         }
 
         final TypedQuery<Product> selectQuery = em
-                .createQuery("FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId IN :ids", Product.class)
+                .createQuery("FROM Product p WHERE p.productId IN :ids", Product.class)
                 .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
 
         // Mantain ordering
@@ -454,7 +454,7 @@ public class ProductJpaDao implements ProductDao {
         }
 
         final TypedQuery<Product> selectQuery = em
-                .createQuery("FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId IN :ids", Product.class)
+                .createQuery("FROM Product p WHERE p.productId IN :ids", Product.class)
                 .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
 
         final Map<Long, Product> productsById = selectQuery.getResultList().stream()
