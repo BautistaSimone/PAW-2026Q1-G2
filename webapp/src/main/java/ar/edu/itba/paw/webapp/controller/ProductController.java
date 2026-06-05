@@ -115,7 +115,7 @@ public class ProductController {
     public ModelAndView newProductForm(
             @AuthenticationPrincipal final PawAuthUser authUser,
             @ModelAttribute("productForm") final ProductForm form) {
-        return redirectIfCannotPublish(authUser).orElseGet(this::productFormView);
+        return redirectIfMissingProfileData(authUser).orElseGet(this::productFormView);
     }
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
@@ -124,7 +124,7 @@ public class ProductController {
             @Valid @ModelAttribute("productForm") final ProductForm form,
             final BindingResult errors) {
 
-        final Optional<ModelAndView> publishGuard = redirectIfCannotPublish(authUser);
+        final Optional<ModelAndView> publishGuard = redirectIfMissingProfileData(authUser);
         if (publishGuard.isPresent()) {
             return publishGuard.get();
         }
@@ -168,7 +168,7 @@ public class ProductController {
             @AuthenticationPrincipal final PawAuthUser authUser,
             @PathVariable("id") final Long id,
             @ModelAttribute("productForm") final ProductForm form) {
-        final Optional<ModelAndView> publishGuard = redirectIfCannotPublish(authUser);
+        final Optional<ModelAndView> publishGuard = redirectIfMissingProfileData(authUser);
         if (publishGuard.isPresent()) {
             return publishGuard.get();
         }
@@ -202,7 +202,7 @@ public class ProductController {
             @PathVariable("id") final Long id,
             @Valid @ModelAttribute("productForm") final ProductForm form,
             final BindingResult errors) {
-        final Optional<ModelAndView> publishGuard = redirectIfCannotPublish(authUser);
+        final Optional<ModelAndView> publishGuard = redirectIfMissingProfileData(authUser);
         if (publishGuard.isPresent()) {
             return publishGuard.get();
         }
@@ -277,9 +277,6 @@ public class ProductController {
     public ModelAndView restoreDeletedProduct(
             @AuthenticationPrincipal final PawAuthUser authUser,
             @PathVariable("id") final Long id) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
         if (!productService.restoreUserDeletedProduct(id, authUser.getUser().getId())) {
             return new ModelAndView("redirect:/profile?tab=trash&restoreError=1");
         }
@@ -404,9 +401,6 @@ public class ProductController {
     public ModelAndView reportProduct(
             @AuthenticationPrincipal final PawAuthUser authUser,
             @PathVariable("id") final Long id) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
 
         final Product product = productService.findByIdIfAvailable(id)
                 .orElseThrow(ResourceNotFoundException::new);
@@ -424,9 +418,6 @@ public class ProductController {
     public ModelAndView deleteOwnProduct(
             @AuthenticationPrincipal final PawAuthUser authUser,
             @PathVariable("id") final Long id) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
 
         final Product product = productService.findById(id)
                 .orElseThrow(ResourceNotFoundException::new);
@@ -442,13 +433,10 @@ public class ProductController {
     }
 
     /**
-     * Not logged in → login; no CBU/CVU → profile Mis datos with warning. Empty if
-     * OK to show or submit the publish form.
+     * No CBU/CVU → profile Mis datos with warning. Empty if OK to show or submit the publish form.
+     * Authentication is enforced by Spring Security.
      */
-    private Optional<ModelAndView> redirectIfCannotPublish(final PawAuthUser authUser) {
-        if (authUser == null) {
-            return Optional.of(new ModelAndView("redirect:/login"));
-        }
+    private Optional<ModelAndView> redirectIfMissingProfileData(final PawAuthUser authUser) {
         final User publisher = userService.findById(authUser.getUser().getId())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         if (!publisher.hasCbuCvu() || !publisher.hasNeighborhoodAndProvince()) {

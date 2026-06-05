@@ -58,10 +58,6 @@ public class PurchaseController {
             @Valid @ModelAttribute("purchaseCreateForm") final PurchaseCreateForm form,
             final BindingResult errors) {
 
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
-
         if (errors.hasErrors()) {
             if (form.getProductId() == null) {
                 return new ModelAndView("redirect:/?purchaseError=1");
@@ -93,9 +89,6 @@ public class PurchaseController {
             @AuthenticationPrincipal PawAuthUser authUser,
             @PathVariable("id") final Long id,
             @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
 
         final Long userId = authUser.getUser().getId();
 
@@ -154,10 +147,6 @@ public class PurchaseController {
             @PathVariable("id") final Long id,
             @Valid @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form,
             final BindingResult errors) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
-
         if (errors.hasErrors()) {
             return getPurchase(authUser, id, form);
         }
@@ -200,9 +189,6 @@ public class PurchaseController {
     public ResponseEntity<byte[]> downloadPaymentProof(
             @AuthenticationPrincipal PawAuthUser authUser,
             @PathVariable("id") final Long id) {
-        if (authUser == null) {
-            return ResponseEntity.status(401).build();
-        }
 
         final Purchase purchase = purchaseService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));

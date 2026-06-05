@@ -44,13 +44,6 @@ public class VerificationController {
     @RequestMapping(value = "/sendVerificationEmail", method = RequestMethod.POST)
     public ModelAndView verificationEmail(@AuthenticationPrincipal PawAuthUser authUser) {
 
-        if (authUser == null) {
-            ModelAndView mv = new ModelAndView("login");
-            mv.addObject("loginForm", new LoginForm());
-            mv.addObject("error", "UserNotFound.authForm.email");
-            return mv;
-        }
-
         ModelAndView mv = new ModelAndView("redirect:/sendVerificationEmail");
         final User user = authUser.getUser();
 

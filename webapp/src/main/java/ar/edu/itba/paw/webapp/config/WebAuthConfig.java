@@ -37,19 +37,30 @@ public class WebAuthConfig {
         http.sessionManagement()
                 .and()
                 .authorizeHttpRequests()
+                // Anonymous-only (redirect to home if already logged in)
                 .requestMatchers("/login", "/register").anonymous()
-                .requestMatchers("/", "/changePassword", "/resetPassword", "/verificationStatus", "/search-users",
-                        "/banned")
-                .permitAll()
+                // Authenticated-only endpoints for purchase flow
+                .requestMatchers("/purchases", "/purchases/**").authenticated()
+                // Authenticated-only endpoints for product management
+                .requestMatchers("/products/new").authenticated()
+                .requestMatchers("/products/*/edit", "/products/*/report", "/products/*/delete", "/products/*/restore")
+                .authenticated()
+                // Authenticated-only miscellaneous actions
+                .requestMatchers("/sendVerificationEmail", "/toggle-wishlist-product", "/profile/follow")
+                .authenticated()
+                // Authenticated-only verification/notification routes
                 .requestMatchers("/verifyEmail", "/notVerified", "/for-you", "/notifications/**").authenticated()
                 // Role based routes — more specific first
                 .requestMatchers("/profile/admin/**").hasRole("ADMIN")
-                .requestMatchers("/profile", "/profile/**").hasRole("USER")
+                .requestMatchers("/profile", "/profile/**").authenticated()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/test-mail", "/test-mail/**").denyAll()
                 .requestMatchers(HttpMethod.POST, "/images", "/images/**").denyAll()
                 // Public routes
-                .requestMatchers("/css/**", "/js/**", "/img/**", "/favicon.ico", "/403").permitAll()
+                .requestMatchers("/", "/changePassword", "/resetPassword", "/verificationStatus", "/search-users",
+                        "/banned")
+                .permitAll()
+                .requestMatchers("/css/**", "/js/**", "/img/**", "/assets/**", "/favicon.ico", "/403").permitAll()
                 .and().formLogin()
                 .loginPage("/login")
                 .usernameParameter("email")
