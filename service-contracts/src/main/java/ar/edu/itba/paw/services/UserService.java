@@ -44,8 +44,8 @@ public interface UserService {
     Optional<User> findById(final Long id);
         List<User> findByIds(final List<Long> ids);
 
-    Boolean isPasswordEmpty(User usr);
-    Boolean isVerified(User usr);
+    boolean isPasswordEmpty(User usr);
+    boolean isVerified(User usr);
 
 	void enable(final Long id);
 
@@ -53,12 +53,13 @@ public interface UserService {
 
 	void toggleWishlistProduct(final Long userId, final Long productId);
 
-	Boolean isProductInWishlist(final Long userId, final Long productId);
+	boolean isProductInWishlist(final Long userId, final Long productId);
         List<Product> getWishlistProducts(final Long userId, final int limit);
         List<Long> getWishlistCategoryIds(final Long userId);
 
 	void follow(final Long followerId, final Long followedId);
 	void unfollow(final Long followerId, final Long followedId);
+	void toggleFollow(final Long followerId, final Long followedId);
 	boolean isFollowing(final Long followerId, final Long followedId);
 	long countFollowers(final Long userId);
 	long countFollowing(final Long userId);

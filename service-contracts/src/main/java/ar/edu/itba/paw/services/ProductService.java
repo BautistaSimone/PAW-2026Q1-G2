@@ -24,7 +24,8 @@ public interface ProductService {
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
         final BigDecimal price,
-        final int stock
+        final int stock,
+        final List<ProductImageData> images
     );
 
     ProductSearchCriteria getProductSearchCriteria(
@@ -110,7 +111,8 @@ public interface ProductService {
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
         final BigDecimal price,
-        final int stock
+        final int stock,
+        final ProductImageUpdate imageUpdate
     );
 
     /**

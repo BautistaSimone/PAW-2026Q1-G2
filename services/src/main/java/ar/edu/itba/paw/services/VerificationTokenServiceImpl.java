@@ -1,10 +1,8 @@
 package ar.edu.itba.paw.services;
 
-import java.util.List;
 import java.util.Optional;
 import java.time.Instant;
 import java.time.Duration;
-import java.sql.Timestamp;
 import java.util.UUID;
 
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -22,7 +20,7 @@ import ar.edu.itba.paw.persistence.VerificationTokenDao;
 public class VerificationTokenServiceImpl implements VerificationTokenService {
 
     private static final int EXPIRATION = 60 * 24;
- 
+
     private final VerificationTokenDao verificationTokenDao;
 
     private final UserService userService;
@@ -30,10 +28,9 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
 
     @Autowired
     public VerificationTokenServiceImpl(
-        final VerificationTokenDao verificationTokenDao,
+            final VerificationTokenDao verificationTokenDao,
             final UserService userService,
-            final EmailService emailService
-            ) {
+            final EmailService emailService) {
         this.verificationTokenDao = verificationTokenDao;
         this.userService = userService;
         this.emailService = emailService;
@@ -66,22 +63,19 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         verificationTokenDao.createToken(userId, token, expiryDate);
 
         final User user = userService.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        runAfterCommit(() ->
-            emailService.sendVerificationEmail(
+        runAfterCommit(() -> emailService.sendVerificationEmail(
                 user.getEmail(),
                 token,
                 user.getUsername(),
-                LocaleContextHolder.getLocale()
-            )
-        );
+                LocaleContextHolder.getLocale()));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<VerificationToken> findByUserId(final Long userId) {
-		return verificationTokenDao.findByUserId(userId);
+        return verificationTokenDao.findByUserId(userId);
     }
 
     @Override

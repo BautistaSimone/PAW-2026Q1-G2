@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
@@ -18,23 +17,23 @@ public final class Util {
     private Util() {
         // Prevent instantiation
     }
+
     public static void refreshAuthenticationPrincipal(final PawAuthUser current, final User refreshedUser) {
         final Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
         final PawAuthUser newPrincipal = new PawAuthUser(
-            refreshedUser.getEmail(),
-            refreshedUser.getPassword(),
-            current.isEnabled(),
-            current.isAccountNonExpired(),
-            current.isCredentialsNonExpired(),
-            current.isAccountNonLocked(),
-            new ArrayList<>(current.getAuthorities()),
-            refreshedUser
-        );
+                refreshedUser.getEmail(),
+                refreshedUser.getPassword(),
+                current.isEnabled(),
+                current.isAccountNonExpired(),
+                current.isCredentialsNonExpired(),
+                current.isAccountNonLocked(),
+                new ArrayList<>(current.getAuthorities()),
+                refreshedUser);
         SecurityContextHolder.getContext().setAuthentication(
-            new UsernamePasswordAuthenticationToken(
-                newPrincipal,
-                currentAuth != null ? currentAuth.getCredentials() : null,
-                newPrincipal.getAuthorities()));
+                new UsernamePasswordAuthenticationToken(
+                        newPrincipal,
+                        currentAuth != null ? currentAuth.getCredentials() : null,
+                        newPrincipal.getAuthorities()));
     }
 
     public static String resolveBackUrl(final HttpServletRequest request) {
@@ -51,7 +50,7 @@ public final class Util {
         try {
             final URI refererUri = URI.create(referer);
             if ((refererUri.isAbsolute() || refererUri.getHost() != null)
-                && !isSameOrigin(refererUri, request)) {
+                    && !isSameOrigin(refererUri, request)) {
                 return fallbackUrl;
             }
 
@@ -72,8 +71,8 @@ public final class Util {
         if (refererUri.getScheme() != null && !refererUri.getScheme().equalsIgnoreCase(request.getScheme())) {
             return false;
         }
-        return effectivePort(refererUri.getScheme(), refererUri.getPort())
-            == effectivePort(request.getScheme(), request.getServerPort());
+        return effectivePort(refererUri.getScheme(), refererUri.getPort()) == effectivePort(request.getScheme(),
+                request.getServerPort());
     }
 
     public static int effectivePort(final String scheme, final int port) {

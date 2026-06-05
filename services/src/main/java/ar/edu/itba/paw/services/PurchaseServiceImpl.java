@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import java.util.Locale;
 
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
@@ -74,6 +72,10 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         final User buyer = userService.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Buyer not found"));
+
+        if (!buyer.hasCompleteBuyerDataForPurchase()) {
+            throw new IllegalStateException("Buyer must complete shipping profile data");
+        }
 
         if (!productService.decrementStock(productId)) {
             throw new IllegalStateException("Product is no longer available");
@@ -198,7 +200,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                             LocaleContextHolder.getLocale()),
                     buyer,
                     seller,
-                    PurchaseStatus.PAID, 
+                    PurchaseStatus.PAID,
                     LocaleContextHolder.getLocale());
         } else if (newStatus == PurchaseStatus.SHIPPED && isSeller && purchase.getStatus() == PurchaseStatus.PAID) {
             purchaseDao.updateStatus(purchaseId, newStatus);
@@ -281,13 +283,15 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginatedResult<Purchase> findByBuyerId(Long buyerId, List<PurchaseStatus> statuses, int page, int pageSize) {
+    public PaginatedResult<Purchase> findByBuyerId(Long buyerId, List<PurchaseStatus> statuses, int page,
+            int pageSize) {
         return purchaseDao.findByBuyerId(buyerId, statuses, page, pageSize);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PaginatedResult<Purchase> findBySellerId(Long sellerId, List<PurchaseStatus> statuses, int page, int pageSize) {
+    public PaginatedResult<Purchase> findBySellerId(Long sellerId, List<PurchaseStatus> statuses, int page,
+            int pageSize) {
         return purchaseDao.findBySellerId(sellerId, statuses, page, pageSize);
     }
 }

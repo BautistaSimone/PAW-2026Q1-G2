@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -191,8 +190,7 @@ public class HomeController {
 					null,
 					followedIds,
 					page,
-					12
-			);
+					12);
 
 			productsPage = productService.listProducts(criteria);
 
@@ -247,8 +245,8 @@ public class HomeController {
 
 		final Map<Long, Long> userFollowerCounts = userService.countFollowersByUserIds(displayedUserIds);
 		final Map<Long, Long> userPublicationCounts = productService.countActiveProductsByUserIds(displayedUserIds);
-		final Map<Long, List<Product>> productsByUserId =
-				productService.listLatestActiveProductsByUserIds(displayedUserIds, COMMUNITY_PRODUCT_LIMIT);
+		final Map<Long, List<Product>> productsByUserId = productService
+				.listLatestActiveProductsByUserIds(displayedUserIds, COMMUNITY_PRODUCT_LIMIT);
 
 		final Map<Long, PaginatedResult<Product>> productPagesByUserId = new HashMap<>();
 		final List<Long> initialProductIds = new ArrayList<>();
@@ -263,9 +261,7 @@ public class HomeController {
 							userProducts,
 							1,
 							COMMUNITY_PRODUCT_LIMIT,
-							userPublicationCounts.getOrDefault(user.getId(), 0L)
-					)
-			);
+							userPublicationCounts.getOrDefault(user.getId(), 0L)));
 		}
 
 		final Set<Long> productIdsWithImages = imageService.findProductIdsWithImages(initialProductIds);
@@ -282,8 +278,8 @@ public class HomeController {
 		mav.addObject("productImageUrls", productImageUrls);
 
 		if (authUser != null) {
-			final Map<Long, Boolean> followStatusMap =
-					userService.followingStatusByUserIds(authUser.getUser().getId(), displayedUserIds);
+			final Map<Long, Boolean> followStatusMap = userService.followingStatusByUserIds(authUser.getUser().getId(),
+					displayedUserIds);
 			mav.addObject("followStatusMap", followStatusMap);
 			mav.addObject("currentUserId", authUser.getUser().getId());
 		}

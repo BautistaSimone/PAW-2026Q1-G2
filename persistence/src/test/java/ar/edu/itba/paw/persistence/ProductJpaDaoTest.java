@@ -94,7 +94,7 @@ public class ProductJpaDaoTest {
     }
 
     private void setProductState(final Product product, final ProductState state) {
-        product.setState(state.getPersistenceValue());
+        product.setState(state);
         em.flush();
     }
 
@@ -262,11 +262,11 @@ public class ProductJpaDaoTest {
         em.flush();
         em.clear();
 
-        final String state = em.createQuery(
+        final ProductState state = em.createQuery(
             "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            String.class
+            ProductState.class
         ).setParameter("productId", product.getId()).getSingleResult();
-        Assertions.assertEquals(ProductState.USER_DELETED.getPersistenceValue(), state);
+        Assertions.assertEquals(ProductState.USER_DELETED, state);
     }
 
     @Test
@@ -302,11 +302,11 @@ public class ProductJpaDaoTest {
         em.flush();
         em.clear();
 
-        final String state = em.createQuery(
+        final ProductState state = em.createQuery(
             "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            String.class
+            ProductState.class
         ).setParameter("productId", product.getId()).getSingleResult();
-        Assertions.assertEquals(ProductState.ACTIVE.getPersistenceValue(), state);
+        Assertions.assertEquals(ProductState.ACTIVE, state);
     }
 
     @Test
@@ -339,7 +339,7 @@ public class ProductJpaDaoTest {
         em.clear();
 
         final Product reloaded = em.find(Product.class, product.getId());
-        Assertions.assertEquals(ProductState.SOLD.getPersistenceValue(), reloaded.getState());
+        Assertions.assertEquals(ProductState.SOLD, reloaded.getState());
         Assertions.assertEquals(0, reloaded.getStock());
     }
 
@@ -629,34 +629,34 @@ public class ProductJpaDaoTest {
         Assertions.assertEquals(3, affected);
 
         // Target user's active products are now ADMIN_HIDDEN
-        final String active1State = em.createQuery(
+        final ProductState active1State = em.createQuery(
             "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            String.class
+            ProductState.class
         ).setParameter("productId", active1.getId()).getSingleResult();
-        final String active2State = em.createQuery(
+        final ProductState active2State = em.createQuery(
             "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            String.class
+            ProductState.class
         ).setParameter("productId", active2.getId()).getSingleResult();
-        final String active3State = em.createQuery(
+        final ProductState active3State = em.createQuery(
             "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            String.class
+            ProductState.class
         ).setParameter("productId", active3.getId()).getSingleResult();
-        Assertions.assertEquals(ProductState.ADMIN_HIDDEN.getPersistenceValue(), active1State);
-        Assertions.assertEquals(ProductState.ADMIN_HIDDEN.getPersistenceValue(), active2State);
-        Assertions.assertEquals(ProductState.ADMIN_HIDDEN.getPersistenceValue(), active3State);
+        Assertions.assertEquals(ProductState.ADMIN_HIDDEN, active1State);
+        Assertions.assertEquals(ProductState.ADMIN_HIDDEN, active2State);
+        Assertions.assertEquals(ProductState.ADMIN_HIDDEN, active3State);
 
         // Target user's SOLD product was NOT affected
-        final String soldState = em.createQuery(
+        final ProductState soldState = em.createQuery(
             "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            String.class
+            ProductState.class
         ).setParameter("productId", sold.getId()).getSingleResult();
-        Assertions.assertEquals(ProductState.SOLD.getPersistenceValue(), soldState);
+        Assertions.assertEquals(ProductState.SOLD, soldState);
 
         // Other user's product was NOT affected
-        final String otherState = em.createQuery(
+        final ProductState otherState = em.createQuery(
             "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            String.class
+            ProductState.class
         ).setParameter("productId", otherProduct.getId()).getSingleResult();
-        Assertions.assertEquals(ProductState.ACTIVE.getPersistenceValue(), otherState);
+        Assertions.assertEquals(ProductState.ACTIVE, otherState);
     }
 }

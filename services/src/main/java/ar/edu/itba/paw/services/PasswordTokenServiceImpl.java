@@ -1,6 +1,5 @@
 package ar.edu.itba.paw.services;
 
-import java.util.List;
 import java.util.Optional;
 import java.time.Instant;
 import java.time.Duration;
@@ -20,7 +19,7 @@ import ar.edu.itba.paw.persistence.PasswordTokenDao;
 public class PasswordTokenServiceImpl implements PasswordTokenService {
 
     private static final int EXPIRATION = 60 * 24;
- 
+
     private final PasswordTokenDao passwordTokenDao;
 
     private final UserService userService;
@@ -28,10 +27,9 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
 
     @Autowired
     public PasswordTokenServiceImpl(
-        final PasswordTokenDao passwordTokenDao,
+            final PasswordTokenDao passwordTokenDao,
             final UserService userService,
-            final EmailService emailService
-            ) {
+            final EmailService emailService) {
         this.passwordTokenDao = passwordTokenDao;
         this.userService = userService;
         this.emailService = emailService;
@@ -56,28 +54,25 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
     @Override
     @Transactional
     public void createPasswordResetTokenForUser(final Long userId, String token) {
-        
+
         Instant expiryDate = Instant.now().plus(Duration.ofMinutes(EXPIRATION));
 
         passwordTokenDao.createToken(userId, token, expiryDate);
 
         final User user = userService.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        runAfterCommit(() ->
-            emailService.sendPasswordResetEmail(
+        runAfterCommit(() -> emailService.sendPasswordResetEmail(
                 user.getEmail(),
                 token,
                 user.getUsername(),
-                LocaleContextHolder.getLocale()
-            )
-        );
+                LocaleContextHolder.getLocale()));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<PasswordToken> findByUserId(final Long userId) {
-		return passwordTokenDao.findByUserId(userId);
+        return passwordTokenDao.findByUserId(userId);
     }
 
     @Override

@@ -93,7 +93,6 @@ public class ImageJpaDaoTest {
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
         final Image createdImage = insertImage(product.getId(), imageData, "image/jpeg");
         em.clear();
-        
 
         // Act
         final Optional<Image> imageById = imageDao.findById(createdImage.getImageId());
@@ -113,7 +112,7 @@ public class ImageJpaDaoTest {
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
         final Image createdImage = insertImage(product.getId(), imageData, "image/jpeg");
         em.clear();
-        
+
         // Act
         final Optional<Image> imageByProduct = imageDao.findByProductId(product.getId());
 
@@ -132,7 +131,7 @@ public class ImageJpaDaoTest {
         final byte[] imageData = "fake-image".getBytes(StandardCharsets.UTF_8);
         insertImage(product.getId(), imageData, "image/jpeg");
         em.clear();
-        
+
         // Act
         final Integer deleted = imageDao.deleteByProductId(product.getId());
 

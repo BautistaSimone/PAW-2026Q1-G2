@@ -58,10 +58,6 @@ public class PurchaseController {
             @Valid @ModelAttribute("purchaseCreateForm") final PurchaseCreateForm form,
             final BindingResult errors) {
 
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
-
         if (errors.hasErrors()) {
             if (form.getProductId() == null) {
                 return new ModelAndView("redirect:/?purchaseError=1");
@@ -93,10 +89,82 @@ public class PurchaseController {
             @AuthenticationPrincipal PawAuthUser authUser,
             @PathVariable("id") final Long id,
             @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
+        return buildPurchaseView(authUser, id);
+    }
+
+    @RequestMapping(value = "/purchases/{id:\\d+}/status", method = RequestMethod.POST)
+    public ModelAndView updateStatus(
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @PathVariable("id") final Long id,
+            @Valid @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form,
+            final BindingResult errors) {
+        if (errors.hasErrors()) {
+            return buildPurchaseView(authUser, id);
         }
 
+        // Status was validated by PurchaseStatusFormValidator — parse directly.
+        final PurchaseStatus statusObj = PurchaseStatus.valueOf(form.getNewStatus());
+
+        // Proof was validated by PurchaseStatusFormValidator — read directly if PAID.
+        ValidatedPaymentProof proof = null;
+        if (statusObj == PurchaseStatus.PAID) {
+            proof = PaymentProofValidator.validate(form.getProofFile());
+        }
+
+        final Purchase updated;
+        try {
+            updated = purchaseService.updateStatus(
+                id,
+                authUser.getUser().getId(),
+                statusObj,
+                proof != null ? proof.getData() : null,
+                proof != null ? proof.getContentType() : null,
+                proof != null ? proof.getFileName() : null
+            );
+        } catch (IllegalStateException e) {
+            return new ModelAndView("redirect:/purchases/" + id + "?expired=1");
+        }
+
+        if (statusObj == PurchaseStatus.DELIVERED) {
+            final boolean isBuyer = authUser.getUser().getId().equals(updated.getBuyerId());
+            if (isBuyer) {
+                return new ModelAndView("redirect:/purchases/" + id + "/review");
+            }
+        }
+
+        return new ModelAndView("redirect:/purchases/" + id + "?updated=1");
+    }
+
+    @RequestMapping(value = "/purchases/{id:\\d+}/proof", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<byte[]> downloadPaymentProof(
+            @AuthenticationPrincipal PawAuthUser authUser,
+            @PathVariable("id") final Long id) {
+
+        final Purchase purchase = purchaseService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+
+        final Long userId = authUser.getUser().getId();
+        if (!userId.equals(purchase.getSellerId())) {
+            return ResponseEntity.status(403).build();
+        }
+
+        if (purchase.getPaymentProof() == null || purchase.getPaymentProof().length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
+        final String safeFileName = PaymentProofValidator.safeFileName(purchase.getPaymentProofFileName());
+        return PaymentProofValidator.detectSafeContentType(purchase.getPaymentProof())
+            .map(contentType -> ResponseEntity.ok()
+                .header("X-Content-Type-Options", "nosniff")
+                .header("Content-Disposition", "attachment; filename=\"" + safeFileName + "\"")
+                .contentType(MediaType.parseMediaType(contentType))
+                .contentLength(purchase.getPaymentProof().length)
+                .body(purchase.getPaymentProof()))
+            .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    private ModelAndView buildPurchaseView(final PawAuthUser authUser, final Long id) {
         final Long userId = authUser.getUser().getId();
 
         Purchase purchase = purchaseService.findById(id)
@@ -146,84 +214,5 @@ public class PurchaseController {
         }
 
         return mav;
-    }
-
-    @RequestMapping(value = "/purchases/{id:\\d+}/status", method = RequestMethod.POST)
-    public ModelAndView updateStatus(
-            @AuthenticationPrincipal PawAuthUser authUser,
-            @PathVariable("id") final Long id,
-            @Valid @ModelAttribute("purchaseStatusForm") final PurchaseStatusForm form,
-            final BindingResult errors) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
-
-        if (errors.hasErrors()) {
-            return getPurchase(authUser, id, form);
-        }
-
-        // Status was validated by PurchaseStatusFormValidator — parse directly.
-        final PurchaseStatus statusObj = PurchaseStatus.valueOf(form.getNewStatus());
-
-        // Proof was validated by PurchaseStatusFormValidator — read directly if PAID.
-        ValidatedPaymentProof proof = null;
-        if (statusObj == PurchaseStatus.PAID) {
-            proof = PaymentProofValidator.validate(form.getProofFile());
-        }
-
-        final Purchase updated;
-        try {
-            updated = purchaseService.updateStatus(
-                id,
-                authUser.getUser().getId(),
-                statusObj,
-                proof != null ? proof.getData() : null,
-                proof != null ? proof.getContentType() : null,
-                proof != null ? proof.getFileName() : null
-            );
-        } catch (IllegalStateException e) {
-            return new ModelAndView("redirect:/purchases/" + id + "?expired=1");
-        }
-
-        if (statusObj == PurchaseStatus.DELIVERED) {
-            final boolean isBuyer = authUser.getUser().getId().equals(updated.getBuyerId());
-            if (isBuyer) {
-                return new ModelAndView("redirect:/purchases/" + id + "/review");
-            }
-        }
-
-        return new ModelAndView("redirect:/purchases/" + id + "?updated=1");
-    }
-
-    @RequestMapping(value = "/purchases/{id:\\d+}/proof", method = RequestMethod.GET)
-    @ResponseBody
-    public ResponseEntity<byte[]> downloadPaymentProof(
-            @AuthenticationPrincipal PawAuthUser authUser,
-            @PathVariable("id") final Long id) {
-        if (authUser == null) {
-            return ResponseEntity.status(401).build();
-        }
-
-        final Purchase purchase = purchaseService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
-
-        final Long userId = authUser.getUser().getId();
-        if (!userId.equals(purchase.getSellerId())) {
-            return ResponseEntity.status(403).build();
-        }
-
-        if (purchase.getPaymentProof() == null || purchase.getPaymentProof().length == 0) {
-            return ResponseEntity.notFound().build();
-        }
-
-        final String safeFileName = PaymentProofValidator.safeFileName(purchase.getPaymentProofFileName());
-        return PaymentProofValidator.detectSafeContentType(purchase.getPaymentProof())
-            .map(contentType -> ResponseEntity.ok()
-                .header("X-Content-Type-Options", "nosniff")
-                .header("Content-Disposition", "attachment; filename=\"" + safeFileName + "\"")
-                .contentType(MediaType.parseMediaType(contentType))
-                .contentLength(purchase.getPaymentProof().length)
-                .body(purchase.getPaymentProof()))
-            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

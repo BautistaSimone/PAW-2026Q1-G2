@@ -3,9 +3,7 @@ package ar.edu.itba.paw.persistence;
 import java.time.Instant;
 import java.time.Duration;
 import java.util.Optional;
-import java.sql.Timestamp;
 import java.util.UUID;
-import javax.sql.DataSource;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -15,11 +13,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import ar.edu.itba.paw.models.User;
@@ -32,7 +28,7 @@ import ar.edu.itba.paw.models.PasswordToken;
 public class PasswordTokenJpaDaoTest {
 
     private static final int EXPIRATION = 60 * 24;
- 
+
     @Autowired
     private PasswordTokenJpaDao passwordTokenDao;
 
@@ -46,24 +42,23 @@ public class PasswordTokenJpaDaoTest {
     @BeforeEach
     public void setUp() {
         User user = new User(
-            "user@test.com",
-            "pass",
-            "User",
-            false,
-            true,
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                "user@test.com",
+                "pass",
+                "User",
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
 
         em.persist(user);
-        
+
         em.flush();
 
         userId = user.getId();
@@ -89,9 +84,8 @@ public class PasswordTokenJpaDaoTest {
         Assertions.assertEquals(tkn, token.getToken());
 
         Long count = em.createQuery(
-            "SELECT COUNT(pt) FROM PasswordToken pt",
-            Long.class
-        ).getSingleResult();
+                "SELECT COUNT(pt) FROM PasswordToken pt",
+                Long.class).getSingleResult();
 
         Assertions.assertEquals(1L, count);
     }

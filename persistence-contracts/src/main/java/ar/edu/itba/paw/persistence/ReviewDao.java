@@ -1,6 +1,5 @@
 package ar.edu.itba.paw.persistence;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 import java.util.Set;
@@ -11,9 +10,14 @@ import ar.edu.itba.paw.models.SellerRatingSummary;
 
 public interface ReviewDao {
     Review create(long purchaseId, long sellerId, long buyerId, int score, String text);
+
     Optional<Review> findByPurchaseId(long purchaseId);
+
     Set<Long> findReviewedPurchaseIds(Set<Long> purchaseIds);
+
     PaginatedResult<Review> findBySellerId(long sellerId, int page, int pageSize);
+
     SellerRatingSummary summaryForSeller(long sellerId);
+
     Map<Long, SellerRatingSummary> sellerRatingByUserId(final Set<Long> distinctSellerIds);
 }

@@ -6,7 +6,6 @@ import javax.persistence.EntityManagerFactory;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
-import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -50,7 +49,8 @@ import ar.edu.itba.paw.models.PurchaseStatus;
 @EnableWebMvc // Use all the defaults from webmvc
 @EnableTransactionManagement
 @EnableScheduling
-@ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.webapp.interceptor", "ar.edu.itba.paw.services", "ar.edu.itba.paw.persistence" })
+@ComponentScan({ "ar.edu.itba.paw.webapp.controller", "ar.edu.itba.paw.webapp.interceptor", "ar.edu.itba.paw.services",
+        "ar.edu.itba.paw.persistence" })
 @Configuration
 @PropertySource("classpath:application.properties")
 public class WebConfig implements WebMvcConfigurer {
@@ -75,7 +75,7 @@ public class WebConfig implements WebMvcConfigurer {
         final InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
         viewResolver.setPrefix("/WEB-INF/views/");
         viewResolver.setSuffix(".jsp");
-        
+
         return viewResolver;
     }
 
@@ -93,7 +93,7 @@ public class WebConfig implements WebMvcConfigurer {
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriverClass(org.postgresql.Driver.class);
         dataSource.setUrl(dbUrl);
-        dataSource.setUsername(dbUsername); 
+        dataSource.setUsername(dbUsername);
         dataSource.setPassword(dbPassword);
 
         return dataSource;
@@ -116,7 +116,7 @@ public class WebConfig implements WebMvcConfigurer {
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
     }
-    
+
     @Bean
     public LocalValidatorFactoryBean validator(MessageSource messageSource) {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
@@ -150,8 +150,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-        final LocalContainerEntityManagerFactoryBean factoryBean = new
-        LocalContainerEntityManagerFactoryBean();
+        final LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setPackagesToScan("ar.edu.itba.paw.models");
 
         factoryBean.setDataSource(dataSource());
@@ -163,13 +162,14 @@ public class WebConfig implements WebMvcConfigurer {
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL92Dialect");
 
         // Si ponen esto en prod, hay tabla!!!
-        //properties.setProperty("hibernate.show_sql", "true");
-        //properties.setProperty("format_sql", "true");
+        // properties.setProperty("hibernate.show_sql", "true");
+        // properties.setProperty("format_sql", "true");
 
         factoryBean.setJpaProperties(properties);
 
         return factoryBean;
     }
+
     @Bean
     public DataSourceInitializer dataSourceInitializer() {
         final DataSourceInitializer initializer = new DataSourceInitializer();
@@ -185,23 +185,21 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(bannedUserInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
-                    "/banned",
-                    "/login",
-                    "/register",
-                    "/logout",
-                    "/assets/**"
-                );
+                        "/banned",
+                        "/login",
+                        "/register",
+                        "/logout",
+                        "/assets/**");
         registry.addInterceptor(verificationInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
-                    "/notVerified",
-                    "/login",
-                    "/register",
-                    "/sendVerificationEmail",
-                    "/verificationStatus",
-                    "/verifyEmail",
-                    "/assets/**"
-                );
+                        "/notVerified",
+                        "/login",
+                        "/register",
+                        "/sendVerificationEmail",
+                        "/verificationStatus",
+                        "/verifyEmail",
+                        "/assets/**");
         registry.addInterceptor(localeChangeInterceptor());
     }
 

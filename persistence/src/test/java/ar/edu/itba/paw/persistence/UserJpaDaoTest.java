@@ -24,7 +24,7 @@ import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductState;
 
-@Rollback   // Clean database before testing
+@Rollback // Clean database before testing
 @Transactional
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestConfiguration.class)
@@ -40,11 +40,11 @@ public class UserJpaDaoTest {
     public void createFollowTable() {
         em.createNativeQuery(
                 "CREATE TABLE IF NOT EXISTS user_follows (" +
-                "follower_id INTEGER NOT NULL, " +
-                "followed_id INTEGER NOT NULL, " +
-                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, " +
-                "PRIMARY KEY (follower_id, followed_id))")
-            .executeUpdate();
+                        "follower_id INTEGER NOT NULL, " +
+                        "followed_id INTEGER NOT NULL, " +
+                        "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, " +
+                        "PRIMARY KEY (follower_id, followed_id))")
+                .executeUpdate();
     }
 
     private User createUser(final String username) {
@@ -92,9 +92,9 @@ public class UserJpaDaoTest {
 
     private void follow(final User follower, final User followed) {
         em.createNativeQuery("INSERT INTO user_follows (follower_id, followed_id) VALUES (:followerId, :followedId)")
-            .setParameter("followerId", follower.getId())
-            .setParameter("followedId", followed.getId())
-            .executeUpdate();
+                .setParameter("followerId", follower.getId())
+                .setParameter("followedId", followed.getId())
+                .executeUpdate();
     }
 
     @Test
@@ -129,9 +129,8 @@ public class UserJpaDaoTest {
         Assertions.assertEquals(password, user.getPassword());
 
         Long count = em.createQuery(
-            "SELECT COUNT(u) FROM User u",
-            Long.class
-        ).getSingleResult();
+                "SELECT COUNT(u) FROM User u",
+                Long.class).getSingleResult();
 
         Assertions.assertEquals(1L, count);
     }
@@ -175,9 +174,9 @@ public class UserJpaDaoTest {
         em.flush();
 
         Number count = (Number) em.createNativeQuery(
-            "SELECT COUNT(*) FROM user_wishlist_products wp WHERE wp.user_id = :userId")
-            .setParameter("userId", user.getId())
-            .getSingleResult();
+                "SELECT COUNT(*) FROM user_wishlist_products wp WHERE wp.user_id = :userId")
+                .setParameter("userId", user.getId())
+                .getSingleResult();
 
         Assertions.assertEquals(2L, count.longValue());
     }
@@ -222,9 +221,9 @@ public class UserJpaDaoTest {
 
         // Assert
         Number count = (Number) em.createNativeQuery(
-            "SELECT COUNT(*) FROM user_wishlist_products wp WHERE wp.user_id = :userId")
-            .setParameter("userId", user.getId())
-            .getSingleResult();
+                "SELECT COUNT(*) FROM user_wishlist_products wp WHERE wp.user_id = :userId")
+                .setParameter("userId", user.getId())
+                .getSingleResult();
 
         Assertions.assertEquals(1L, count.longValue());
     }
@@ -263,7 +262,7 @@ public class UserJpaDaoTest {
         em.flush();
 
         // Act
-        final Boolean isWishlisted = userDao.isProductInWishlist(user.getId(), product.getId());
+        final boolean isWishlisted = userDao.isProductInWishlist(user.getId(), product.getId());
 
         // Assert
         Assertions.assertTrue(isWishlisted);
@@ -288,7 +287,7 @@ public class UserJpaDaoTest {
         createProduct(sellerC, "C1");
         createProduct(bannedSeller, "Banned1");
         final Product hiddenProduct = createProduct(hiddenOnly, "Hidden1");
-        hiddenProduct.setState(ProductState.USER_DELETED.getPersistenceValue());
+        hiddenProduct.setState(ProductState.USER_DELETED);
         em.flush();
 
         em.createQuery("UPDATE User u SET u.banned = true WHERE u.id = :userId")
@@ -309,10 +308,10 @@ public class UserJpaDaoTest {
 
         // Act
         final List<Long> resultIds = userDao.getFeaturedActiveSellers(1, 10)
-            .getResults()
-            .stream()
-            .map(User::getId)
-            .collect(Collectors.toList());
+                .getResults()
+                .stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
 
         // Assert
         Assertions.assertIterableEquals(List.of(sellerC.getId(), sellerB.getId(), sellerA.getId()), resultIds);
@@ -356,8 +355,10 @@ public class UserJpaDaoTest {
         em.clear();
 
         // Act
-        final Map<Long, Long> counts = userDao.countFollowersByUserIds(List.of(sellerA.getId(), sellerB.getId(), follower2.getId()));
-        final Map<Long, Boolean> statuses = userDao.followingStatusByUserIds(follower1.getId(), List.of(sellerA.getId(), sellerB.getId(), follower2.getId()));
+        final Map<Long, Long> counts = userDao
+                .countFollowersByUserIds(List.of(sellerA.getId(), sellerB.getId(), follower2.getId()));
+        final Map<Long, Boolean> statuses = userDao.followingStatusByUserIds(follower1.getId(),
+                List.of(sellerA.getId(), sellerB.getId(), follower2.getId()));
 
         // Assert
         Assertions.assertEquals(2L, counts.get(sellerA.getId()));

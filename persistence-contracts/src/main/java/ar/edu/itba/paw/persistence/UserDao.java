@@ -3,7 +3,6 @@ package ar.edu.itba.paw.persistence;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.User;
@@ -11,62 +10,81 @@ import ar.edu.itba.paw.models.Product;
 
 public interface UserDao {
 
-    User createUser(
-            final String email,
-            final String password,
-            final String username,
-            final Boolean mod,
-            final Boolean enabled,
-            final String firstName,
-            final String lastName,
-            final String streetName,
-            final String streetNumber,
-            final String neighborhood,
-            final String province,
-            final String extraAddressInfo,
-            final String cbuCvu);
+        User createUser(
+                        final String email,
+                        final String password,
+                        final String username,
+                        final Boolean mod,
+                        final Boolean enabled,
+                        final String firstName,
+                        final String lastName,
+                        final String streetName,
+                        final String streetNumber,
+                        final String neighborhood,
+                        final String province,
+                        final String extraAddressInfo,
+                        final String cbuCvu);
 
-    void updateUserProfile(
-            final Long userId,
-            final String firstName,
-            final String lastName,
-            final String streetName,
-            final String streetNumber,
-            final String neighborhood,
-            final String province,
-            final String extraAddressInfo,
-            final String cbuCvu);
+        void updateUserProfile(
+                        final Long userId,
+                        final String firstName,
+                        final String lastName,
+                        final String streetName,
+                        final String streetNumber,
+                        final String neighborhood,
+                        final String province,
+                        final String extraAddressInfo,
+                        final String cbuCvu);
 
-    void updatePassword(final Long userId, final String encodedPassword);
+        void updatePassword(final Long userId, final String encodedPassword);
 
-    void updateFavoriteCategories(final Long userId, final List<Long> categoryIds);
-    Optional<User> findByEmail(final String email);
+        void updateFavoriteCategories(final Long userId, final List<Long> categoryIds);
 
-    Optional<User> findById(final Long id);
+        Optional<User> findByEmail(final String email);
+
+        Optional<User> findById(final Long id);
 
         List<User> findByIds(final List<Long> ids);
 
-	void enable(final Long id);
-	void ban(final Long id);
+        void enable(final Long id);
+
+        void ban(final Long id);
 
         void removeWishlistProduct(final Long id, Product product);
-	void addWishlistProduct(final Long id, Product product);
-	Boolean isProductInWishlist(final Long userId, final Long productId);
+
+        void addWishlistProduct(final Long id, Product product);
+
+        boolean isProductInWishlist(final Long userId, final Long productId);
+
         List<Product> getWishlistProducts(final Long userId, final int limit);
+
         List<Long> getWishlistCategoryIds(final Long userId);
 
-	void follow(final Long followerId, final Long followedId);
-	void unfollow(final Long followerId, final Long followedId);
-	boolean isFollowing(final Long followerId, final Long followedId);
-	long countFollowers(final Long userId);
-	long countFollowing(final Long userId);
-	PaginatedResult<User> getFollowers(final Long userId, final int page, final int pageSize);
-	PaginatedResult<User> getFollowing(final Long userId, final int page, final int pageSize);
-	List<Long> getFollowedUserIds(final Long userId);
-	PaginatedResult<User> searchUsers(final String query, final int page, final int pageSize);
-	List<User> getMostFollowedUsers(final int limit);
-	PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize);
-	PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize);
-	Map<Long, Long> countFollowersByUserIds(final List<Long> userIds);
-	Map<Long, Boolean> followingStatusByUserIds(final Long followerId, final List<Long> followedIds);
+        void follow(final Long followerId, final Long followedId);
+
+        void unfollow(final Long followerId, final Long followedId);
+
+        boolean isFollowing(final Long followerId, final Long followedId);
+
+        long countFollowers(final Long userId);
+
+        long countFollowing(final Long userId);
+
+        PaginatedResult<User> getFollowers(final Long userId, final int page, final int pageSize);
+
+        PaginatedResult<User> getFollowing(final Long userId, final int page, final int pageSize);
+
+        List<Long> getFollowedUserIds(final Long userId);
+
+        PaginatedResult<User> searchUsers(final String query, final int page, final int pageSize);
+
+        List<User> getMostFollowedUsers(final int limit);
+
+        PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize);
+
+        PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize);
+
+        Map<Long, Long> countFollowersByUserIds(final List<Long> userIds);
+
+        Map<Long, Boolean> followingStatusByUserIds(final Long followerId, final List<Long> followedIds);
 }

@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.slf4j.Logger;
@@ -26,20 +27,17 @@ public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
+    private final ProductService productService;
+    private final NotificationService notificationService;
 
     @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private ReportService reportService;
-
-    @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
-    public UserServiceImpl(final UserDao userDao, final PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(final UserDao userDao, final PasswordEncoder passwordEncoder,
+            @Lazy final ProductService productService,
+            final NotificationService notificationService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
+        this.productService = productService;
+        this.notificationService = notificationService;
     }
 
     private static String trimToNull(final String s) {
@@ -146,13 +144,13 @@ public class UserServiceImpl implements UserService {
 
 	@Override
     @Transactional(readOnly = true)
-    public Boolean isPasswordEmpty(User usr) {
+    public boolean isPasswordEmpty(User usr) {
         return passwordEncoder.matches("", usr.getPassword());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Boolean isVerified(User usr) {
+    public boolean isVerified(User usr) {
         return usr.getEnabled();
     }
 
@@ -166,7 +164,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void ban(final Long id) {
         productService.hideAllProductsByAdmin(id);
-        reportService.deleteByOwnerUserId(id);
         userDao.ban(id);
     }
 
@@ -186,7 +183,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Boolean isProductInWishlist(final Long userId, final Long productId) {
+    public boolean isProductInWishlist(final Long userId, final Long productId) {
         return userDao.isProductInWishlist(userId, productId);
     }
 
@@ -216,6 +213,20 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void unfollow(final Long followerId, final Long followedId) {
         userDao.unfollow(followerId, followedId);
+    }
+
+    @Override
+    @Transactional
+    public void toggleFollow(final Long followerId, final Long followedId) {
+        if (followerId.equals(followedId)) {
+            throw new IllegalArgumentException("Cannot follow yourself");
+        }
+        if (userDao.isFollowing(followerId, followedId)) {
+            userDao.unfollow(followerId, followedId);
+            return;
+        }
+        userDao.follow(followerId, followedId);
+        notificationService.notifyFollow(followedId, followerId);
     }
 
     @Override

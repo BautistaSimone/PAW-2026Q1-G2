@@ -6,6 +6,7 @@
 <%@ attribute name="showHeaderActions" required="false" type="java.lang.Boolean" %>
 <%@ attribute name="searchMode" required="false" type="java.lang.String" %>
 <%@ attribute name="searchValue" required="false" type="java.lang.String" %>
+<%@ attribute name="activeSection" required="false" type="java.lang.String" %>
 
 <c:set var="activeSearchMode" value="${not empty searchMode ? searchMode : 'vinyls'}" />
 <c:set var="headerSearchText" value="${param['search-text']}" />
@@ -72,12 +73,16 @@
 
             <div class="header-right">
                 <nav class="header-nav-links">
-                    <a href="<c:url value='/search-users'/>" class="header-nav-link" aria-label="<spring:message code='Header.searchUsers.ariaLabel' />">
+                    <a href="<c:url value='/'/>" class="header-nav-link ${activeSection eq 'vinyls' ? 'is-active' : ''}" aria-label="<spring:message code='Header.nav.vinyls.ariaLabel' />">
+                        <i class="bi bi-vinyl" aria-hidden="true"></i>
+                        <span><spring:message code="Header.nav.vinyls" /></span>
+                    </a>
+                    <a href="<c:url value='/search-users'/>" class="header-nav-link ${activeSection eq 'community' ? 'is-active' : ''}" aria-label="<spring:message code='Header.searchUsers.ariaLabel' />">
                         <i class="bi bi-people" aria-hidden="true"></i>
                         <span><spring:message code="Header.searchUsers" /></span>
                     </a>
                     <sec:authorize access="isAuthenticated()">
-                        <a href="<c:url value='/for-you'/>" class="header-nav-link" aria-label="<spring:message code='Header.forYou.ariaLabel' />">
+                        <a href="<c:url value='/for-you'/>" class="header-nav-link ${activeSection eq 'forYou' ? 'is-active' : ''}" aria-label="<spring:message code='Header.forYou.ariaLabel' />">
                             <i class="bi bi-heart" aria-hidden="true"></i>
                             <span><spring:message code="Header.forYou" /></span>
                         </a>
@@ -134,8 +139,8 @@
                                 <c:choose>
                                     <c:when test="${not empty notificationPanelNotifications}">
                                         <c:forEach items="${notificationPanelNotifications}" var="notification">
-                                            <c:set var="actorUser" value="${notificationPanelUsersById[notification.actorUserId]}" />
-                                            <c:set var="product" value="${notificationPanelProductsById[notification.productId]}" />
+                                            <c:set var="notificationActorUser" value="${notificationPanelUsersById[notification.actorUserId]}" />
+                                            <c:set var="notificationProduct" value="${notificationPanelProductsById[notification.productId]}" />
 
                                             <c:set var="notificationItemClass" value="notification-item ${notification.readAt == null ? 'is-unread' : ''}" />
                                             <div class="<c:out value='${notificationItemClass}'/>">
@@ -144,8 +149,8 @@
                                                         <c:when test="${notification.type == 'FOLLOW'}">
                                                             <span class="notification-actor">
                                                                 <c:choose>
-                                                                    <c:when test="${actorUser != null}">
-                                                                        <c:out value="${actorUser.username}" />
+                                                                    <c:when test="${notificationActorUser != null}">
+                                                                        <c:out value="${notificationActorUser.username}" />
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <spring:message code="Notifications.actor.unknown" />
@@ -157,8 +162,8 @@
                                                         <c:when test="${notification.type == 'NEW_PRODUCT'}">
                                                             <span class="notification-actor">
                                                                 <c:choose>
-                                                                    <c:when test="${actorUser != null}">
-                                                                        <c:out value="${actorUser.username}" />
+                                                                    <c:when test="${notificationActorUser != null}">
+                                                                        <c:out value="${notificationActorUser.username}" />
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <spring:message code="Notifications.actor.unknown" />
@@ -168,8 +173,8 @@
                                                             <spring:message code="Notifications.item.newProduct" />
                                                             <span class="notification-product">
                                                                 <c:choose>
-                                                                    <c:when test="${product != null}">
-                                                                        <c:out value="${product.title}" />
+                                                                    <c:when test="${notificationProduct != null}">
+                                                                        <c:out value="${notificationProduct.title}" />
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <spring:message code="Notifications.product.unknown" />
@@ -180,8 +185,8 @@
                                                         <c:when test="${notification.type == 'PURCHASE_STATUS'}">
                                                             <span class="notification-actor">
                                                                 <c:choose>
-                                                                    <c:when test="${actorUser != null}">
-                                                                        <c:out value="${actorUser.username}" />
+                                                                    <c:when test="${notificationActorUser != null}">
+                                                                        <c:out value="${notificationActorUser.username}" />
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <spring:message code="Notifications.actor.system" />
@@ -193,16 +198,16 @@
                                                                 <c:set var="purchaseStatusKey" value="PurchaseStatus.${notification.purchaseStatus}" />
                                                                 <spring:message code="${purchaseStatusKey}" />
                                                             </span>
-                                                            <c:if test="${product != null}">
+                                                            <c:if test="${notificationProduct != null}">
                                                                 <spring:message code="Notifications.item.purchase.suffix" />
-                                                                <span class="notification-product"><c:out value="${product.title}" /></span>
+                                                                <span class="notification-product"><c:out value="${notificationProduct.title}" /></span>
                                                             </c:if>
                                                         </c:when>
                                                         <c:when test="${notification.type == 'REVIEW_RECEIVED'}">
                                                             <span class="notification-actor">
                                                                 <c:choose>
-                                                                    <c:when test="${actorUser != null}">
-                                                                        <c:out value="${actorUser.username}" />
+                                                                    <c:when test="${notificationActorUser != null}">
+                                                                        <c:out value="${notificationActorUser.username}" />
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <spring:message code="Notifications.actor.unknown" />
@@ -212,8 +217,8 @@
                                                             <spring:message code="Notifications.item.review" />
                                                             <span class="notification-product">
                                                                 <c:choose>
-                                                                    <c:when test="${product != null}">
-                                                                        <c:out value="${product.title}" />
+                                                                    <c:when test="${notificationProduct != null}">
+                                                                        <c:out value="${notificationProduct.title}" />
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <spring:message code="Notifications.product.unknown" />

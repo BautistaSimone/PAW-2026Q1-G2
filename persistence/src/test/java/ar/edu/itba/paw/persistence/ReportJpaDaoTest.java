@@ -119,9 +119,8 @@ public class ReportJpaDaoTest {
 
         // Assert
         Long count = em.createQuery(
-            "SELECT COUNT(r) FROM Report r",
-            Long.class
-        ).getSingleResult();
+                "SELECT COUNT(r) FROM Report r",
+                Long.class).getSingleResult();
 
         Assertions.assertEquals(1L, count);
     }

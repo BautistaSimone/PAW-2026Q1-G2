@@ -3,17 +3,15 @@ package ar.edu.itba.paw.models;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Id;
-import javax.persistence.Column;
-import javax.persistence.Transient;
-import javax.persistence.PostLoad;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "purchases")
@@ -37,15 +35,22 @@ public class Purchase {
     @Column(nullable = false)
     private LocalDate date;
 
-    @Column(name = "payment_method", nullable = false)
-    private String paymentMethod;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "purchase_status", nullable = false)
+    private PurchaseStatus status;
+
+    @Column(name = "buyer_token")
+    private String buyerToken;
+
+    @Column(name = "seller_token")
+    private String sellerToken;
 
     @Column(nullable = false)
     private boolean confirmed;
 
     @Column(name = "reserved_until")
     private LocalDateTime reservedUntil;
-    //TODO: fijarse que el @Lob rompia todo aca, hacia error cuando se empezaba una purchase
+
     @Column(name = "payment_proof")
     private byte[] paymentProof;
 
@@ -54,15 +59,6 @@ public class Purchase {
 
     @Column(name = "payment_proof_file_name")
     private String paymentProofFileName;
-
-    @Transient
-    private PurchaseStatus status;
-
-    @Transient
-    private String buyerToken;
-
-    @Transient
-    private String sellerToken;
 
     Purchase() {
         // Just for Hibernate, we love you!
@@ -87,7 +83,6 @@ public class Purchase {
         this.buyerToken = buyerToken;
         this.sellerToken = sellerToken;
         this.confirmed = (status == PurchaseStatus.DELIVERED);
-        encodePaymentMethod();
     }
 
     public Purchase(
@@ -107,23 +102,6 @@ public class Purchase {
         this.buyerToken = buyerToken;
         this.sellerToken = sellerToken;
         this.confirmed = (status == PurchaseStatus.DELIVERED);
-        encodePaymentMethod();
-    }
-
-    @PostLoad
-    private void decodePaymentMethod() {
-        if (paymentMethod != null) {
-            final String[] parts = paymentMethod.split("\\|", 3);
-            this.status = PurchaseStatus.valueOf(parts[0]);
-            this.buyerToken = parts.length > 1 ? parts[1] : "";
-            this.sellerToken = parts.length > 2 ? parts[2] : "";
-        }
-    }
-
-    @PrePersist
-    @PreUpdate
-    private void encodePaymentMethod() {
-        this.paymentMethod = status.name() + "|" + buyerToken + "|" + sellerToken;
     }
 
     public Long getPurchaseId() {
@@ -156,7 +134,6 @@ public class Purchase {
         }
         this.status = status;
         this.confirmed = (status == PurchaseStatus.DELIVERED);
-        encodePaymentMethod();
     }
 
     public String getBuyerToken() {

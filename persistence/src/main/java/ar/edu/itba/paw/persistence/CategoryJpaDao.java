@@ -2,7 +2,6 @@ package ar.edu.itba.paw.persistence;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +21,7 @@ public class CategoryJpaDao implements CategoryDao {
     @Override
     public List<Category> findAll() {
         return em.createQuery("FROM Category ORDER BY name ASC", Category.class)
-            .getResultList();
+                .getResultList();
     }
 
     @Override
@@ -36,8 +35,8 @@ public class CategoryJpaDao implements CategoryDao {
             return Collections.emptyList();
         }
         return em.createQuery("FROM Category WHERE id IN :ids", Category.class)
-            .setParameter("ids", ids)
-            .getResultList();
+                .setParameter("ids", ids)
+                .getResultList();
     }
 
     @Override

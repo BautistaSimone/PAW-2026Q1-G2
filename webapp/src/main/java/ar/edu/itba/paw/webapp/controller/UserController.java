@@ -92,26 +92,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "/login")
-    public ModelAndView login(@AuthenticationPrincipal PawAuthUser authUser) {
-
-        // Don't allow logged in users
-        if (authUser != null)
-            return new ModelAndView("redirect:/");
-
+    public ModelAndView login() {
         ModelAndView mv = new ModelAndView("login");
         mv.addObject("loginForm", new LoginForm());
         return mv;
     }
 
     @RequestMapping(value = "/register")
-    public ModelAndView register(
-            @AuthenticationPrincipal PawAuthUser authUser,
-            @ModelAttribute RegisterForm form) {
-
-        // Don't allow logged in users
-        if (authUser != null)
-            return new ModelAndView("redirect:/");
-
+    public ModelAndView register(@ModelAttribute RegisterForm form) {
         ModelAndView mv = new ModelAndView("register");
         mv.addObject("registerForm", form);
         return mv;
@@ -189,9 +177,6 @@ public class UserController {
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
             isOwnProfile = (authUser != null && authUser.getUser().getId().equals(userId));
         } else {
-            if (authUser == null) {
-                return new ModelAndView("redirect:/login");
-            }
             profileUser = userService.findById(authUser.getUser().getId())
                     .orElseThrow(() -> new IllegalStateException("User not found"));
             isOwnProfile = true;
@@ -225,9 +210,6 @@ public class UserController {
             @Valid @ModelAttribute("userProfileForm") final UserProfileForm form,
             final BindingResult errors,
             final RedirectAttributes redirectAttributes) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
 
         if (errors.hasErrors()) {
             redirectAttributes.addFlashAttribute(
@@ -261,9 +243,6 @@ public class UserController {
     public ModelAndView updateGenres(
             @AuthenticationPrincipal PawAuthUser authUser,
             @RequestParam(value = "favoriteCategories", required = false) final List<Long> categoryIds) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
 
         final User profileUser = userService.findById(authUser.getUser().getId())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
@@ -474,7 +453,6 @@ public class UserController {
         // Authorization enforced by Spring Security: only ROLE_ADMIN can reach this
         // endpoint
         productService.hideProductByAdmin(productId);
-        reportService.deleteByProductId(productId);
         return new ModelAndView("redirect:/profile?tab=reports&hidden=1");
     }
 
@@ -494,10 +472,6 @@ public class UserController {
         if (page < 1) {
             throw new IllegalArgumentException("Invalid page");
         }
-
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
         return new ModelAndView("redirect:/profile?tab=trash&trashPage=" + page);
     }
 
@@ -506,10 +480,6 @@ public class UserController {
             @AuthenticationPrincipal final PawAuthUser authUser,
             @RequestParam("productId") final Long productId,
             HttpServletRequest request) {
-
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
 
         userService.toggleWishlistProduct(authUser.getUser().getId(), productId);
 
@@ -524,20 +494,12 @@ public class UserController {
             @RequestParam("userId") final Long targetUserId,
             HttpServletRequest request) {
 
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
-
         final Long currentUserId = authUser.getUser().getId();
         if (currentUserId.equals(targetUserId)) {
             return new ModelAndView("redirect:/profile");
         }
 
-        if (userService.isFollowing(currentUserId, targetUserId)) {
-            userService.unfollow(currentUserId, targetUserId);
-        } else {
-            userService.follow(currentUserId, targetUserId);
-        }
+        userService.toggleFollow(currentUserId, targetUserId);
 
         final String referer = request.getHeader("Referer");
         if (referer != null && !referer.isEmpty()) {
