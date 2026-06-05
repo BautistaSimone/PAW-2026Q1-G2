@@ -453,7 +453,6 @@ public class UserController {
         // Authorization enforced by Spring Security: only ROLE_ADMIN can reach this
         // endpoint
         productService.hideProductByAdmin(productId);
-        reportService.deleteByProductId(productId);
         return new ModelAndView("redirect:/profile?tab=reports&hidden=1");
     }
 
@@ -500,11 +499,7 @@ public class UserController {
             return new ModelAndView("redirect:/profile");
         }
 
-        if (userService.isFollowing(currentUserId, targetUserId)) {
-            userService.unfollow(currentUserId, targetUserId);
-        } else {
-            userService.follow(currentUserId, targetUserId);
-        }
+        userService.toggleFollow(currentUserId, targetUserId);
 
         final String referer = request.getHeader("Referer");
         if (referer != null && !referer.isEmpty()) {

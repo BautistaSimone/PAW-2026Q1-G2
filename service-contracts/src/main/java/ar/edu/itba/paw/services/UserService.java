@@ -59,6 +59,7 @@ public interface UserService {
 
 	void follow(final Long followerId, final Long followedId);
 	void unfollow(final Long followerId, final Long followedId);
+	void toggleFollow(final Long followerId, final Long followedId);
 	boolean isFollowing(final Long followerId, final Long followedId);
 	long countFollowers(final Long userId);
 	long countFollowing(final Long userId);

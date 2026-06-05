@@ -20,12 +20,22 @@ import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductState;
+import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.Image;
+import ar.edu.itba.paw.persistence.ImageDao;
 import ar.edu.itba.paw.persistence.ProductDao;
+import ar.edu.itba.paw.persistence.ReportDao;
+import ar.edu.itba.paw.persistence.UserDao;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
+    private static final int MAX_IMAGES_PER_PRODUCT = 8;
+
     private final ProductDao productDao;
+    private final ImageDao imageDao;
+    private final ReportDao reportDao;
+    private final UserDao userDao;
     private final CategoryService categoryService;
     private final PendingNotificationService pendingNotificationService;
     private final NotificationService notificationService;
@@ -33,10 +43,16 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     public ProductServiceImpl(
             final ProductDao productDao,
+            final ImageDao imageDao,
+            final ReportDao reportDao,
+            final UserDao userDao,
             final CategoryService categoryService,
             final PendingNotificationService pendingNotificationService,
             final NotificationService notificationService) {
         this.productDao = productDao;
+        this.imageDao = imageDao;
+        this.reportDao = reportDao;
+        this.userDao = userDao;
         this.categoryService = categoryService;
         this.pendingNotificationService = pendingNotificationService;
         this.notificationService = notificationService;
@@ -86,9 +102,12 @@ public class ProductServiceImpl implements ProductService {
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
         final BigDecimal price,
-        final int stock
+        final int stock,
+        final List<ProductImageData> images
     ) {
+        validatePublisherCanSell(userId);
         validateProductFields(title, artist, description, sleeveCondition, recordCondition, price, stock);
+        validateImageDataList(images);
 
         final List<Category> categories = resolveCategories(categoryIds);
 
@@ -98,6 +117,7 @@ public class ProductServiceImpl implements ProductService {
             trimToNull(description), sleeveCondition, recordCondition, price, stock
         );
 
+        persistImages(product.getId(), images);
         pendingNotificationService.enqueueForFollowers(userId, product.getId());
         notificationService.notifyNewProduct(userId, product.getId());
 
@@ -349,12 +369,15 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void hideProductByAdmin(final Long id) {
         productDao.markAsAdminHidden(id);
+        reportDao.deleteByProductId(id);
     }
 
     @Override
     @Transactional
     public int hideAllProductsByAdmin(final Long userId) {
-        return productDao.markAllAsAdminHiddenByUserId(userId);
+        final int hidden = productDao.markAllAsAdminHiddenByUserId(userId);
+        reportDao.deleteByOwnerUserId(userId);
+        return hidden;
     }
 
     @Override
@@ -372,13 +395,15 @@ public class ProductServiceImpl implements ProductService {
         final BigDecimal sleeveCondition,
         final BigDecimal recordCondition,
         final BigDecimal price,
-        final int stock
+        final int stock,
+        final ProductImageUpdate imageUpdate
     ) {
         final Product product = productDao.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
         if (!product.getUserId().equals(ownerUserId)) {
             throw new IllegalArgumentException("Not the product owner");
         }
+        validatePublisherCanSell(ownerUserId);
         validateProductFields(title, artist, description, sleeveCondition, recordCondition, price, stock);
 
         final List<Category> categories = resolveCategories(categoryIds);
@@ -401,6 +426,7 @@ public class ProductServiceImpl implements ProductService {
         if (!ok) {
             throw new IllegalStateException("Product cannot be updated (not active or missing)");
         }
+        applyImageUpdate(productId, imageUpdate);
         return productDao.findById(productId).orElseThrow(() -> new IllegalStateException("Product missing after update"));
     }
 
@@ -439,5 +465,75 @@ public class ProductServiceImpl implements ProductService {
             }
         }
         return categories;
+    }
+
+    private void validatePublisherCanSell(final Long userId) {
+        final User publisher = userDao.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("Publisher not found"));
+        if (!publisher.hasCbuCvu() || !publisher.hasNeighborhoodAndProvince()) {
+            throw new IllegalStateException("Publisher must complete seller profile data");
+        }
+    }
+
+    private static void validateImageDataList(final List<ProductImageData> images) {
+        if (images == null || images.isEmpty()) {
+            throw new IllegalArgumentException("Product must have at least one image");
+        }
+        if (images.size() > MAX_IMAGES_PER_PRODUCT) {
+            throw new IllegalArgumentException("Too many product images");
+        }
+        for (ProductImageData image : images) {
+            if (image == null) {
+                throw new IllegalArgumentException("Image data is required");
+            }
+        }
+    }
+
+    private void persistImages(final Long productId, final List<ProductImageData> images) {
+        validateImageDataList(images);
+        for (ProductImageData image : images) {
+            imageDao.createImage(productId, image.getData(), image.getContentType());
+        }
+    }
+
+    private void applyImageUpdate(final Long productId, final ProductImageUpdate imageUpdate) {
+        final ProductImageUpdate effectiveUpdate = imageUpdate == null ? ProductImageUpdate.unchanged() : imageUpdate;
+        if (!effectiveUpdate.isReplace()) {
+            return;
+        }
+
+        final List<ProductImageData> replacementImages = buildReplacementImages(productId, effectiveUpdate.getEntries());
+        imageDao.deleteByProductId(productId);
+        persistImages(productId, replacementImages);
+    }
+
+    private List<ProductImageData> buildReplacementImages(
+            final Long productId,
+            final List<ProductImageUpdate.Entry> entries) {
+        if (entries == null || entries.isEmpty()) {
+            throw new IllegalArgumentException("Product must have at least one image");
+        }
+        if (entries.size() > MAX_IMAGES_PER_PRODUCT) {
+            throw new IllegalArgumentException("Too many product images");
+        }
+
+        final List<ProductImageData> images = new ArrayList<>(entries.size());
+        for (ProductImageUpdate.Entry entry : entries) {
+            if (entry == null) {
+                throw new IllegalArgumentException("Image update entry is required");
+            }
+            if (entry.getKind() == ProductImageUpdate.EntryKind.EXISTING) {
+                final Image image = imageDao.findById(entry.getExistingImageId())
+                    .orElseThrow(() -> new IllegalArgumentException("Existing image not found"));
+                if (!productId.equals(image.getProductId())) {
+                    throw new IllegalArgumentException("Existing image does not belong to product");
+                }
+                images.add(new ProductImageData(image.getData(), image.getContentType()));
+            } else {
+                images.add(entry.getImageData());
+            }
+        }
+        validateImageDataList(images);
+        return images;
     }
 }

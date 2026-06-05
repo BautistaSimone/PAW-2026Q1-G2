@@ -73,6 +73,10 @@ public class PurchaseServiceImpl implements PurchaseService {
         final User buyer = userService.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Buyer not found"));
 
+        if (!buyer.hasCompleteBuyerDataForPurchase()) {
+            throw new IllegalStateException("Buyer must complete shipping profile data");
+        }
+
         if (!productService.decrementStock(productId)) {
             throw new IllegalStateException("Product is no longer available");
         }

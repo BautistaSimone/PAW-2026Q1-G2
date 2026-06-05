@@ -54,7 +54,7 @@ public class ReportServiceImplTest {
 
         // Act & Assert
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            reportService.report(10L, 1L, 2L);
+            reportService.report(10L, 1L);
         });
     }
 
@@ -66,7 +66,7 @@ public class ReportServiceImplTest {
 
         // Act & Assert
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            reportService.report(10L, 1L, 2L);
+            reportService.report(10L, 1L);
         });
     }
 
@@ -79,7 +79,7 @@ public class ReportServiceImplTest {
 
         // Act & Assert
         Assertions.assertThrows(IllegalStateException.class, () -> {
-            reportService.report(10L, 1L, 2L);
+            reportService.report(10L, 1L);
         });
     }
 
@@ -93,7 +93,7 @@ public class ReportServiceImplTest {
 
         // Act & Assert
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            reportService.report(10L, 1L, 2L);
+            reportService.report(10L, 1L);
         });
     }
 
@@ -109,7 +109,7 @@ public class ReportServiceImplTest {
 
         // Act & Assert
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            reportService.report(10L, 1L, 2L);
+            reportService.report(10L, 1L);
         });
     }
 
@@ -128,7 +128,7 @@ public class ReportServiceImplTest {
         Mockito.when(reportDao.create(10L, 2L, 1L)).thenReturn(report);
 
         // Act
-        Report result = reportService.report(10L, 1L, 2L);
+        Report result = reportService.report(10L, 1L);
 
         // Assert
         Assertions.assertNotNull(result);

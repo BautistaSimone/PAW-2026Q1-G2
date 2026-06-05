@@ -75,6 +75,12 @@ public class ProductForm {
      */
     private String imageLayout;
 
+    private boolean editing;
+
+    private Long productId;
+
+    private boolean hadExistingImages;
+
     public String getTitle() {
         return title;
     }
@@ -169,6 +175,30 @@ public class ProductForm {
 
     public void setImageLayout(final String imageLayout) {
         this.imageLayout = imageLayout;
+    }
+
+    public boolean isEditing() {
+        return editing;
+    }
+
+    public void setEditing(final boolean editing) {
+        this.editing = editing;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(final Long productId) {
+        this.productId = productId;
+    }
+
+    public boolean isHadExistingImages() {
+        return hadExistingImages;
+    }
+
+    public void setHadExistingImages(final boolean hadExistingImages) {
+        this.hadExistingImages = hadExistingImages;
     }
 
     public Integer getStock() {

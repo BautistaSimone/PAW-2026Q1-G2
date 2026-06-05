@@ -35,7 +35,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional
-    public Report report(long productId, long reporterUserId, long reportedUserId) {
+    public Report report(long productId, long reporterUserId) {
         final Product product = productService.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
@@ -50,7 +50,7 @@ public class ReportServiceImpl implements ReportService {
         User reporter = userService.findById(reporterUserId)
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
 
-        User seller = userService.findById(reportedUserId)
+        User seller = userService.findById(product.getUserId())
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
 
         emailService.sendProductReportEmail(product, reporter, seller, LocaleContextHolder.getLocale());

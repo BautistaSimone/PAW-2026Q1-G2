@@ -28,17 +28,15 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
     private final ProductService productService;
-    private final ReportService reportService;
     private final NotificationService notificationService;
 
     @Autowired
     public UserServiceImpl(final UserDao userDao, final PasswordEncoder passwordEncoder,
-            @Lazy final ProductService productService, final ReportService reportService,
+            @Lazy final ProductService productService,
             final NotificationService notificationService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.productService = productService;
-        this.reportService = reportService;
         this.notificationService = notificationService;
     }
 
@@ -166,7 +164,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void ban(final Long id) {
         productService.hideAllProductsByAdmin(id);
-        reportService.deleteByOwnerUserId(id);
         userDao.ban(id);
     }
 
@@ -216,6 +213,20 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void unfollow(final Long followerId, final Long followedId) {
         userDao.unfollow(followerId, followedId);
+    }
+
+    @Override
+    @Transactional
+    public void toggleFollow(final Long followerId, final Long followedId) {
+        if (followerId.equals(followedId)) {
+            throw new IllegalArgumentException("Cannot follow yourself");
+        }
+        if (userDao.isFollowing(followerId, followedId)) {
+            userDao.unfollow(followerId, followedId);
+            return;
+        }
+        userDao.follow(followerId, followedId);
+        notificationService.notifyFollow(followedId, followerId);
     }
 
     @Override

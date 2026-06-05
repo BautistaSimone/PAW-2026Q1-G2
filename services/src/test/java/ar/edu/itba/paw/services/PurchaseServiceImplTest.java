@@ -90,12 +90,12 @@ public class PurchaseServiceImplTest {
                 false,
                 true,
                 false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
+                "Buyer",
+                "User",
+                "Main",
+                "123",
+                "Palermo",
+                "CABA",
                 null,
                 null);
         final User buyer = new User(
@@ -106,12 +106,12 @@ public class PurchaseServiceImplTest {
                 false,
                 true,
                 false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
+                "Buyer",
+                "User",
+                "Main",
+                "123",
+                "Palermo",
+                "CABA",
                 null,
                 null);
 
@@ -199,12 +199,12 @@ public class PurchaseServiceImplTest {
                 false,
                 true,
                 false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
+                "Buyer",
+                "User",
+                "Main",
+                "123",
+                "Palermo",
+                "CABA",
                 null,
                 null);
 
@@ -215,6 +215,60 @@ public class PurchaseServiceImplTest {
 
         Assertions.assertThrows(IllegalStateException.class,
                 () -> purchaseService.createPurchase(PRODUCT_ID, BUYER_ID));
+    }
+
+    @Test
+    public void createPurchaseRejectsIncompleteBuyerBeforeDecrementingStock() {
+        final Product product = product();
+        final User seller = new User(
+                SELLER_ID,
+                "seller@test.com",
+                "password",
+                "seller",
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        final User incompleteBuyer = new User(
+                BUYER_ID,
+                "buyer@test.com",
+                "password",
+                "buyer",
+                false,
+                true,
+                false,
+                "Buyer",
+                null,
+                "Main",
+                "123",
+                "Palermo",
+                "CABA",
+                null,
+                null);
+
+        Mockito.when(productService.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
+        Mockito.when(userService.findById(SELLER_ID)).thenReturn(Optional.of(seller));
+        Mockito.when(userService.findById(BUYER_ID)).thenReturn(Optional.of(incompleteBuyer));
+
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> purchaseService.createPurchase(PRODUCT_ID, BUYER_ID));
+
+        Mockito.verify(productService, Mockito.never()).decrementStock(Mockito.anyLong());
+        Mockito.verify(purchaseDao, Mockito.never()).createPurchase(
+                Mockito.anyLong(),
+                Mockito.anyLong(),
+                Mockito.anyLong(),
+                Mockito.any(PurchaseStatus.class),
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.any(LocalDateTime.class));
     }
 
     @Test
