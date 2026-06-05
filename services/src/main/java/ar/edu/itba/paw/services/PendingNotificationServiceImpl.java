@@ -85,7 +85,7 @@ public class PendingNotificationServiceImpl implements PendingNotificationServic
             final List<Product> products = userNotifs.stream()
                     .map(n -> productMap.get(n.getProductId()))
                     .filter(Objects::nonNull)
-                    .filter(p -> "ACTIVE".equals(p.getState()))
+                    .filter(p -> ar.edu.itba.paw.models.ProductState.ACTIVE.equals(p.getState()))
                     .collect(Collectors.toList());
 
             if (!products.isEmpty()) {
