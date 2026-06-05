@@ -44,21 +44,20 @@ public class ReviewJpaDaoTest {
 
     private User insertUser(final String email, final String username) {
         final User user = new User(
-            email,
-            "pass",
-            username,
-            false,
-            true,
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                email,
+                "pass",
+                username,
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         em.persist(user);
         em.flush();
         return user;
@@ -66,62 +65,57 @@ public class ReviewJpaDaoTest {
 
     private Product insertProduct(final Long sellerId, final String title) {
         final Product product = new Product(
-            sellerId,
-            title,
-            "Test Artist",
-            "Label",
-            "CAT",
-            "Argentina",
-            Collections.emptyList(),
-            "desc",
-            BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9),
-            LocalDate.now(),
-            BigDecimal.valueOf(1000),
-            1
-        );
+                sellerId,
+                title,
+                "Test Artist",
+                "Label",
+                "CAT",
+                "Argentina",
+                Collections.emptyList(),
+                "desc",
+                BigDecimal.valueOf(8),
+                BigDecimal.valueOf(9),
+                LocalDate.now(),
+                BigDecimal.valueOf(1000),
+                1);
         em.persist(product);
         em.flush();
         return product;
     }
 
     private Purchase insertPurchase(
-        final Long productId,
-        final Long buyerId,
-        final Long sellerId,
-        final PurchaseStatus status,
-        final String buyerToken,
-        final String sellerToken
-    ) {
+            final Long productId,
+            final Long buyerId,
+            final Long sellerId,
+            final PurchaseStatus status,
+            final String buyerToken,
+            final String sellerToken) {
         final Purchase purchase = new Purchase(
-            productId,
-            buyerId,
-            sellerId,
-            LocalDate.now(),
-            status,
-            buyerToken,
-            sellerToken
-        );
+                productId,
+                buyerId,
+                sellerId,
+                LocalDate.now(),
+                status,
+                buyerToken,
+                sellerToken);
         em.persist(purchase);
         em.flush();
         return purchase;
     }
 
     private Review insertReview(
-        final Long purchaseId,
-        final Long sellerId,
-        final Long buyerId,
-        final int score,
-        final String text
-    ) {
+            final Long purchaseId,
+            final Long sellerId,
+            final Long buyerId,
+            final int score,
+            final String text) {
         final Review review = new Review(
-            purchaseId,
-            sellerId,
-            buyerId,
-            score,
-            text,
-            LocalDateTime.now()
-        );
+                purchaseId,
+                sellerId,
+                buyerId,
+                score,
+                text,
+                LocalDateTime.now());
         em.persist(review);
         em.flush();
         return review;
@@ -138,8 +132,7 @@ public class ReviewJpaDaoTest {
         final Product product = insertProduct(sellerId, "Test Album");
 
         final Purchase purchase = insertPurchase(
-            product.getId(), buyerId, sellerId, PurchaseStatus.DELIVERED, "token1", "token2"
-        );
+                product.getId(), buyerId, sellerId, PurchaseStatus.DELIVERED, "token1", "token2");
         purchaseId = purchase.getPurchaseId();
         em.flush();
         em.clear();

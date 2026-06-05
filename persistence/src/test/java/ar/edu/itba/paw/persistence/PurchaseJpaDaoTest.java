@@ -45,21 +45,20 @@ public class PurchaseJpaDaoTest {
 
     private User insertUser(final String email, final String username) {
         final User user = new User(
-            email,
-            "pass",
-            username,
-            false,
-            true,
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                email,
+                "pass",
+                username,
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         em.persist(user);
         em.flush();
         return user;
@@ -67,42 +66,39 @@ public class PurchaseJpaDaoTest {
 
     private Product insertProduct(final Long userId, final String title) {
         final Product product = new Product(
-            userId,
-            title,
-            "Artist",
-            "Label",
-            "CAT",
-            "Argentina",
-            Collections.emptyList(),
-            "Description",
-            BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9),
-            LocalDate.now(),
-            BigDecimal.valueOf(1000),
-            1
-        );
+                userId,
+                title,
+                "Artist",
+                "Label",
+                "CAT",
+                "Argentina",
+                Collections.emptyList(),
+                "Description",
+                BigDecimal.valueOf(8),
+                BigDecimal.valueOf(9),
+                LocalDate.now(),
+                BigDecimal.valueOf(1000),
+                1);
         em.persist(product);
         em.flush();
         return product;
     }
 
     private Purchase insertPurchase(
-        final Long productId,
-        final Long buyerId,
-        final Long sellerId,
-        final PurchaseStatus status,
-        final String buyerToken,
-        final String sellerToken
-    ) {
+            final Long productId,
+            final Long buyerId,
+            final Long sellerId,
+            final PurchaseStatus status,
+            final String buyerToken,
+            final String sellerToken) {
         final Purchase purchase = new Purchase(
-            productId,
-            buyerId,
-            sellerId,
-            LocalDate.now(),
-            status,
-            buyerToken,
-            sellerToken
-        );
+                productId,
+                buyerId,
+                sellerId,
+                LocalDate.now(),
+                status,
+                buyerToken,
+                sellerToken);
         em.persist(purchase);
         em.flush();
         return purchase;
@@ -137,16 +133,15 @@ public class PurchaseJpaDaoTest {
 
         // Act
         final Purchase purchase = purchaseDao.createPurchase(
-            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token", LocalDateTime.now()
-        );
+                productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token",
+                LocalDateTime.now());
         em.flush();
         em.clear();
 
         // Assert
         Long count = em.createQuery(
-            "SELECT COUNT(p) FROM Purchase p",
-            Long.class
-        ).getSingleResult();
+                "SELECT COUNT(p) FROM Purchase p",
+                Long.class).getSingleResult();
 
         Assertions.assertEquals(1L, count);
     }
@@ -155,8 +150,7 @@ public class PurchaseJpaDaoTest {
     public void testFindsById() {
         // Arrange
         final Purchase purchase = insertPurchase(
-            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token"
-        );
+                productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token");
         em.flush();
         em.clear();
 
@@ -176,8 +170,7 @@ public class PurchaseJpaDaoTest {
     public void testUpdateStatusChangesStatusAndConfirmedFlag() {
         // Arrange
         final Purchase purchase = insertPurchase(
-            productId, buyerId, sellerId, PurchaseStatus.PAID, "buyer-token", "seller-token"
-        );
+                productId, buyerId, sellerId, PurchaseStatus.PAID, "buyer-token", "seller-token");
         em.flush();
 
         // Act
@@ -187,9 +180,8 @@ public class PurchaseJpaDaoTest {
 
         // Assert
         final Purchase reloaded = em.createQuery(
-            "SELECT p FROM Purchase p WHERE p.purchaseId = :purchaseId",
-            Purchase.class
-        ).setParameter("purchaseId", purchase.getPurchaseId()).getSingleResult();
+                "SELECT p FROM Purchase p WHERE p.purchaseId = :purchaseId",
+                Purchase.class).setParameter("purchaseId", purchase.getPurchaseId()).getSingleResult();
         Assertions.assertEquals(PurchaseStatus.DELIVERED, reloaded.getStatus());
         Assertions.assertEquals("buyer-token", reloaded.getBuyerToken());
         Assertions.assertEquals("seller-token", reloaded.getSellerToken());
@@ -200,8 +192,7 @@ public class PurchaseJpaDaoTest {
     public void testUpdateStatusFromPendingToPaidIsPersisted() {
         // Arrange
         final Purchase purchase = insertPurchase(
-            productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token"
-        );
+                productId, buyerId, sellerId, PurchaseStatus.PENDING, "buyer-token", "seller-token");
         em.flush();
 
         // Act
@@ -211,9 +202,8 @@ public class PurchaseJpaDaoTest {
 
         // Assert
         final Purchase reloaded = em.createQuery(
-            "SELECT p FROM Purchase p WHERE p.purchaseId = :purchaseId",
-            Purchase.class
-        ).setParameter("purchaseId", purchase.getPurchaseId()).getSingleResult();
+                "SELECT p FROM Purchase p WHERE p.purchaseId = :purchaseId",
+                Purchase.class).setParameter("purchaseId", purchase.getPurchaseId()).getSingleResult();
         Assertions.assertEquals(PurchaseStatus.PAID, reloaded.getStatus());
         Assertions.assertEquals("buyer-token", reloaded.getBuyerToken());
         Assertions.assertEquals("seller-token", reloaded.getSellerToken());
@@ -257,7 +247,8 @@ public class PurchaseJpaDaoTest {
         em.clear();
 
         // Act
-        final List<Purchase> purchases = purchaseDao.findBySellerId(sellerId, Collections.emptyList(), 1, 10).getResults();
+        final List<Purchase> purchases = purchaseDao.findBySellerId(sellerId, Collections.emptyList(), 1, 10)
+                .getResults();
 
         // Assert
         Assertions.assertEquals(2, purchases.size());

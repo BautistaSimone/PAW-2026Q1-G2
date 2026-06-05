@@ -49,21 +49,20 @@ public class UserJpaDaoTest {
 
     private User createUser(final String username) {
         final User user = new User(
-            username + "@test.com",
-            "password",
-            username,
-            false,
-            true,
-            false,
-            "Juan",
-            "Perez",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                username + "@test.com",
+                "password",
+                username,
+                false,
+                true,
+                false,
+                "Juan",
+                "Perez",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         em.persist(user);
         em.flush();
         return user;
@@ -71,20 +70,19 @@ public class UserJpaDaoTest {
 
     private Product createProduct(final User user, final String title) {
         final Product product = new Product(
-            user.getId(),
-            title,
-            "Artist",
-            "Label",
-            "CAT-" + title,
-            "Argentina",
-            Collections.emptyList(),
-            "Description",
-            BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9),
-            LocalDate.now(),
-            BigDecimal.valueOf(1000),
-            1
-        );
+                user.getId(),
+                title,
+                "Artist",
+                "Label",
+                "CAT-" + title,
+                "Argentina",
+                Collections.emptyList(),
+                "Description",
+                BigDecimal.valueOf(8),
+                BigDecimal.valueOf(9),
+                LocalDate.now(),
+                BigDecimal.valueOf(1000),
+                1);
         em.persist(product);
         em.flush();
         return product;
@@ -108,20 +106,19 @@ public class UserJpaDaoTest {
 
         // Act
         final User user = userDao.createUser(
-            email,
-            password,
-            username,
-            mod,
-            enabled,
-            "Juan",
-            "Perez",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                email,
+                password,
+                username,
+                mod,
+                enabled,
+                "Juan",
+                "Perez",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
 
         // Assert
         Assertions.assertNotNull(user);
@@ -145,21 +142,20 @@ public class UserJpaDaoTest {
         final Boolean enabled = false;
 
         final User user = new User(
-            email,
-            password,
-            username,
-            mod,
-            enabled,
-            false,
-            "Juan",
-            "Perez",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                email,
+                password,
+                username,
+                mod,
+                enabled,
+                false,
+                "Juan",
+                "Perez",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         em.persist(user);
         em.flush();
 
@@ -191,21 +187,20 @@ public class UserJpaDaoTest {
         final Boolean enabled = false;
 
         final User user = new User(
-            email,
-            password,
-            username,
-            mod,
-            enabled,
-            false,
-            "Juan",
-            "Perez",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                email,
+                password,
+                username,
+                mod,
+                enabled,
+                false,
+                "Juan",
+                "Perez",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         em.persist(user);
         em.flush();
 
@@ -238,26 +233,25 @@ public class UserJpaDaoTest {
         final Boolean enabled = false;
 
         final User user = new User(
-            email,
-            password,
-            username,
-            mod,
-            enabled,
-            false,
-            "Juan",
-            "Perez",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                email,
+                password,
+                username,
+                mod,
+                enabled,
+                false,
+                "Juan",
+                "Perez",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         em.persist(user);
         em.flush();
 
         final Product product = createProduct(user, "Album");
-        
+
         user.getWishlistProducts().add(product);
         em.flush();
 
@@ -291,8 +285,8 @@ public class UserJpaDaoTest {
         em.flush();
 
         em.createQuery("UPDATE User u SET u.banned = true WHERE u.id = :userId")
-            .setParameter("userId", bannedSeller.getId())
-            .executeUpdate();
+                .setParameter("userId", bannedSeller.getId())
+                .executeUpdate();
 
         follow(follower1, sellerA);
         follow(follower2, sellerA);

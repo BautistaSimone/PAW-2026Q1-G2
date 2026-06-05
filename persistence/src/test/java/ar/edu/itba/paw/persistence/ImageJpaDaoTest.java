@@ -36,21 +36,20 @@ public class ImageJpaDaoTest {
 
     private User insertUser(final String email, final String username) {
         final User user = new User(
-            email,
-            "password",
-            username,
-            false,
-            true,
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                email,
+                "password",
+                username,
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         em.persist(user);
         em.flush();
         return user;
@@ -58,20 +57,19 @@ public class ImageJpaDaoTest {
 
     private Product insertProduct(final Long userId) {
         final Product product = new Product(
-            userId,
-            "Dynamo",
-            "Soda Stereo",
-            "Sony Music",
-            "EPC 85930",
-            "Argentina",
-            Collections.emptyList(),
-            "Edicion original",
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0),
-            LocalDate.now(),
-            BigDecimal.valueOf(32000),
-            1
-        );
+                userId,
+                "Dynamo",
+                "Soda Stereo",
+                "Sony Music",
+                "EPC 85930",
+                "Argentina",
+                Collections.emptyList(),
+                "Edicion original",
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(9.0),
+                LocalDate.now(),
+                BigDecimal.valueOf(32000),
+                1);
         em.persist(product);
         em.flush();
         return product;
@@ -142,9 +140,8 @@ public class ImageJpaDaoTest {
         em.clear();
 
         final Long remaining = em.createQuery(
-            "SELECT COUNT(i) FROM Image i WHERE i.productId = :productId",
-            Long.class
-        ).setParameter("productId", product.getId()).getSingleResult();
+                "SELECT COUNT(i) FROM Image i WHERE i.productId = :productId",
+                Long.class).setParameter("productId", product.getId()).getSingleResult();
         Assertions.assertEquals(0L, remaining.longValue());
     }
 
@@ -166,12 +163,11 @@ public class ImageJpaDaoTest {
         em.clear();
 
         final Long count = em.createQuery(
-            "SELECT COUNT(i) FROM Image i WHERE i.productId = :productId AND i.contentType = :contentType",
-            Long.class
-        )
-            .setParameter("productId", product.getId())
-            .setParameter("contentType", "image/jpeg")
-            .getSingleResult();
+                "SELECT COUNT(i) FROM Image i WHERE i.productId = :productId AND i.contentType = :contentType",
+                Long.class)
+                .setParameter("productId", product.getId())
+                .setParameter("contentType", "image/jpeg")
+                .getSingleResult();
         Assertions.assertEquals(1L, count.longValue());
     }
 }

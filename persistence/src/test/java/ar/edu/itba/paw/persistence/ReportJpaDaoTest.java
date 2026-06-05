@@ -42,42 +42,41 @@ public class ReportJpaDaoTest {
 
     private User insertUser(final String email, final String username) {
         final User user = new User(
-            email,
-            "pass",
-            username,
-            false,
-            true,
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                email,
+                "pass",
+                username,
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         em.persist(user);
         em.flush();
         return user;
     }
 
-    private Product insertProduct(final Long ownerId, final String title, final String artist, final String catalogNumber) {
+    private Product insertProduct(final Long ownerId, final String title, final String artist,
+            final String catalogNumber) {
         final Product product = new Product(
-            ownerId,
-            title,
-            artist,
-            "Label",
-            catalogNumber,
-            "Argentina",
-            Collections.emptyList(),
-            "Description",
-            BigDecimal.valueOf(8),
-            BigDecimal.valueOf(9),
-            LocalDate.now(),
-            BigDecimal.valueOf(1000),
-            1
-        );
+                ownerId,
+                title,
+                artist,
+                "Label",
+                catalogNumber,
+                "Argentina",
+                Collections.emptyList(),
+                "Description",
+                BigDecimal.valueOf(8),
+                BigDecimal.valueOf(9),
+                LocalDate.now(),
+                BigDecimal.valueOf(1000),
+                1);
         em.persist(product);
         em.flush();
         return product;
@@ -179,13 +178,11 @@ public class ReportJpaDaoTest {
 
         // Assert
         final Long productCount = em.createQuery(
-            "SELECT COUNT(r) FROM Report r WHERE r.productId = :productId",
-            Long.class
-        ).setParameter("productId", productId).getSingleResult();
+                "SELECT COUNT(r) FROM Report r WHERE r.productId = :productId",
+                Long.class).setParameter("productId", productId).getSingleResult();
         final Long otherProductCount = em.createQuery(
-            "SELECT COUNT(r) FROM Report r WHERE r.productId = :productId",
-            Long.class
-        ).setParameter("productId", otherProductId).getSingleResult();
+                "SELECT COUNT(r) FROM Report r WHERE r.productId = :productId",
+                Long.class).setParameter("productId", otherProductId).getSingleResult();
         Assertions.assertEquals(0L, productCount.longValue());
         Assertions.assertEquals(1L, otherProductCount.longValue());
     }
@@ -213,13 +210,11 @@ public class ReportJpaDaoTest {
 
         // Assert — all reports for ownerId are gone
         final Long ownerReports = em.createQuery(
-            "SELECT COUNT(r) FROM Report r WHERE r.ownerUserId = :ownerUserId",
-            Long.class
-        ).setParameter("ownerUserId", ownerId).getSingleResult();
+                "SELECT COUNT(r) FROM Report r WHERE r.ownerUserId = :ownerUserId",
+                Long.class).setParameter("ownerUserId", ownerId).getSingleResult();
         final Long otherOwnerReports = em.createQuery(
-            "SELECT COUNT(r) FROM Report r WHERE r.ownerUserId = :ownerUserId",
-            Long.class
-        ).setParameter("ownerUserId", otherOwner.getId()).getSingleResult();
+                "SELECT COUNT(r) FROM Report r WHERE r.ownerUserId = :ownerUserId",
+                Long.class).setParameter("ownerUserId", otherOwner.getId()).getSingleResult();
 
         Assertions.assertEquals(0L, ownerReports.longValue());
         Assertions.assertEquals(1L, otherOwnerReports.longValue());

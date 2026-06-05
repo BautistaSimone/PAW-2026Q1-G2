@@ -41,21 +41,20 @@ public class CategoryJpaDaoTest {
 
     private User insertUser(final String email, final String username) {
         final User user = new User(
-            email,
-            "password",
-            username,
-            false,
-            true,
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                email,
+                "password",
+                username,
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         em.persist(user);
         em.flush();
         return user;
@@ -63,20 +62,19 @@ public class CategoryJpaDaoTest {
 
     private Product insertProduct(final Long userId, final String title, final List<Category> categories) {
         final Product product = new Product(
-            userId,
-            title,
-            "Artist",
-            "Label",
-            "CAT-1",
-            "Argentina",
-            categories,
-            "Desc",
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0),
-            LocalDate.now(),
-            BigDecimal.valueOf(1000),
-            1
-        );
+                userId,
+                title,
+                "Artist",
+                "Label",
+                "CAT-1",
+                "Argentina",
+                categories,
+                "Desc",
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(9.0),
+                LocalDate.now(),
+                BigDecimal.valueOf(1000),
+                1);
         em.persist(product);
         em.flush();
         return product;
@@ -98,9 +96,8 @@ public class CategoryJpaDaoTest {
         // Assert
         Assertions.assertEquals(3, categories.size());
         Assertions.assertEquals(
-            List.of("Ambient", "Jazz", "Rock"),
-            categories.stream().map(Category::getName).toList()
-        );
+                List.of("Ambient", "Jazz", "Rock"),
+                categories.stream().map(Category::getName).toList());
     }
 
     @Test

@@ -39,55 +39,52 @@ public class ProductJpaDaoTest {
 
     private User insertUser(final String email, final String username) {
         final User user = new User(
-            email,
-            "password",
-            username,
-            false,
-            true,
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                email,
+                "password",
+                username,
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         em.persist(user);
         em.flush();
         return user;
     }
 
     private Product insertProduct(
-        final Long userId,
-        final String title,
-        final String artist,
-        final String recordLabel,
-        final String catalogNumber,
-        final String editionCountry,
-        final List<Category> categories,
-        final String description,
-        final BigDecimal sleeveCondition,
-        final BigDecimal recordCondition,
-        final BigDecimal price,
-        final int stock
-    ) {
+            final Long userId,
+            final String title,
+            final String artist,
+            final String recordLabel,
+            final String catalogNumber,
+            final String editionCountry,
+            final List<Category> categories,
+            final String description,
+            final BigDecimal sleeveCondition,
+            final BigDecimal recordCondition,
+            final BigDecimal price,
+            final int stock) {
         final Product product = new Product(
-            userId,
-            title,
-            artist,
-            recordLabel,
-            catalogNumber,
-            editionCountry,
-            categories,
-            description,
-            sleeveCondition,
-            recordCondition,
-            LocalDate.now(),
-            price,
-            stock
-        );
+                userId,
+                title,
+                artist,
+                recordLabel,
+                catalogNumber,
+                editionCountry,
+                categories,
+                description,
+                sleeveCondition,
+                recordCondition,
+                LocalDate.now(),
+                price,
+                stock);
         em.persist(product);
         em.flush();
         return product;
@@ -99,21 +96,20 @@ public class ProductJpaDaoTest {
     }
 
     private Product createSuggestionProduct(final User user, final String title,
-                                            final String artist, final String recordLabel) {
+            final String artist, final String recordLabel) {
         return insertProduct(
-            user.getId(),
-            title,
-            artist,
-            recordLabel,
-            "CAT-001",
-            "Argentina",
-            Collections.emptyList(),
-            "Desc",
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(1000),
-            1
-        );
+                user.getId(),
+                title,
+                artist,
+                recordLabel,
+                "CAT-001",
+                "Argentina",
+                Collections.emptyList(),
+                "Desc",
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(1000),
+                1);
     }
 
     @Test
@@ -124,15 +120,13 @@ public class ProductJpaDaoTest {
 
         // Act
         final Product firstProduct = productDao.createProduct(
-            user.getId(), "Dynamo", "Soda Stereo", "Sony Music", "EPC 85930", "Argentina",
-            Collections.emptyList(), "Edicion original", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(32000), 1
-        );
+                user.getId(), "Dynamo", "Soda Stereo", "Sony Music", "EPC 85930", "Argentina",
+                Collections.emptyList(), "Edicion original", BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(9.0), BigDecimal.valueOf(32000), 1);
         final Product secondProduct = productDao.createProduct(
-            user.getId(), "Bocanada", "Gustavo Cerati", "Ariola", "74321 68523-2", "Argentina",
-            Collections.emptyList(), "Reedicion 2024", BigDecimal.valueOf(10.0),
-            BigDecimal.valueOf(10.0), BigDecimal.valueOf(28000), 1
-        );
+                user.getId(), "Bocanada", "Gustavo Cerati", "Ariola", "74321 68523-2", "Argentina",
+                Collections.emptyList(), "Reedicion 2024", BigDecimal.valueOf(10.0),
+                BigDecimal.valueOf(10.0), BigDecimal.valueOf(28000), 1);
 
         // Assert
         Assertions.assertNotNull(firstProduct);
@@ -150,28 +144,26 @@ public class ProductJpaDaoTest {
         // Arrange
         final User user = insertUser("seller2@test.com", "seller2");
         insertProduct(
-            user.getId(),
-            "Bocanada",
-            "Gustavo Cerati",
-            "Ariola",
-            "74321",
-            "Argentina",
-            Collections.emptyList(),
-            "Album solista",
-            BigDecimal.valueOf(10.0),
-            BigDecimal.valueOf(10.0),
-            BigDecimal.valueOf(28000),
-            1
-        );
+                user.getId(),
+                "Bocanada",
+                "Gustavo Cerati",
+                "Ariola",
+                "74321",
+                "Argentina",
+                Collections.emptyList(),
+                "Album solista",
+                BigDecimal.valueOf(10.0),
+                BigDecimal.valueOf(10.0),
+                BigDecimal.valueOf(28000),
+                1);
 
         final ProductSearchCriteria criteria = new ProductSearchCriteria(
-            "cerati", Collections.emptyList(), null, null,
-            Collections.emptyList(), Collections.emptyList(), null, null, 1, 10
-        );
+                "cerati", Collections.emptyList(), null, null,
+                Collections.emptyList(), Collections.emptyList(), null, null, 1, 10);
 
         // Act
         final List<Product> found = productDao.findProducts(criteria).getResults();
-        
+
         // Assert
         Assertions.assertEquals(1, found.size());
         Assertions.assertEquals("Bocanada", found.get(0).getTitle());
@@ -179,25 +171,26 @@ public class ProductJpaDaoTest {
 
     // @Test
     // public void findProductsSearchReturnsEmptyWhenNoMatch() {
-    //     // Arrange
-    //     final User user = userDao.createUser("seller3@test.com", "password", "seller3",
-    //         false, true, null, null, null, null, null, null, null, null);
-    //     productDao.createProduct(
-    //         user.getId(), "Dynamo", "Soda Stereo", "Sony", "1", "Argentina",
-    //         Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
-    //         BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000)
-    //     );
+    // // Arrange
+    // final User user = userDao.createUser("seller3@test.com", "password",
+    // "seller3",
+    // false, true, null, null, null, null, null, null, null, null);
+    // productDao.createProduct(
+    // user.getId(), "Dynamo", "Soda Stereo", "Sony", "1", "Argentina",
+    // Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
+    // BigDecimal.valueOf(9.0), BigDecimal.valueOf(1000)
+    // );
 
-    //     final ProductSearchCriteria criteria = new ProductSearchCriteria(
-    //         "texto_que_no_existe_en_ningun_campo", Collections.emptyList(), null, null,
-    //         Collections.emptyList(), Collections.emptyList(), null, null, 1, 10
-    //     );
+    // final ProductSearchCriteria criteria = new ProductSearchCriteria(
+    // "texto_que_no_existe_en_ningun_campo", Collections.emptyList(), null, null,
+    // Collections.emptyList(), Collections.emptyList(), null, null, 1, 10
+    // );
 
-    //     // Act
-    //     final List<Product> found = productDao.findProducts(criteria).getResults();
+    // // Act
+    // final List<Product> found = productDao.findProducts(criteria).getResults();
 
-    //     // Assert
-    //     Assertions.assertTrue(found.isEmpty());
+    // // Assert
+    // Assertions.assertTrue(found.isEmpty());
     // }
 
     @Test
@@ -205,19 +198,18 @@ public class ProductJpaDaoTest {
         // Arrange
         final User user = insertUser("seller4@test.com", "seller4");
         final Product product = insertProduct(
-            user.getId(),
-            "Artaud",
-            "Pescado Rabioso",
-            "Talent",
-            "SE-515",
-            "Argentina",
-            Collections.emptyList(),
-            "Original",
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(45000),
-            1
-        );
+                user.getId(),
+                "Artaud",
+                "Pescado Rabioso",
+                "Talent",
+                "SE-515",
+                "Argentina",
+                Collections.emptyList(),
+                "Original",
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(45000),
+                1);
 
         em.flush();
 
@@ -235,19 +227,18 @@ public class ProductJpaDaoTest {
         // Arrange
         final User user = insertUser("seller5@test.com", "seller5");
         final Product product = insertProduct(
-            user.getId(),
-            "Album",
-            "Artist",
-            "Label",
-            "CAT-1",
-            "Argentina",
-            Collections.emptyList(),
-            "Desc",
-            BigDecimal.valueOf(8.0),
-            BigDecimal.valueOf(8.0),
-            BigDecimal.valueOf(1000),
-            1
-        );
+                user.getId(),
+                "Album",
+                "Artist",
+                "Label",
+                "CAT-1",
+                "Argentina",
+                Collections.emptyList(),
+                "Desc",
+                BigDecimal.valueOf(8.0),
+                BigDecimal.valueOf(8.0),
+                BigDecimal.valueOf(1000),
+                1);
 
         em.flush();
 
@@ -263,9 +254,8 @@ public class ProductJpaDaoTest {
         em.clear();
 
         final ProductState state = em.createQuery(
-            "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            ProductState.class
-        ).setParameter("productId", product.getId()).getSingleResult();
+                "SELECT p.state FROM Product p WHERE p.productId = :productId",
+                ProductState.class).setParameter("productId", product.getId()).getSingleResult();
         Assertions.assertEquals(ProductState.USER_DELETED, state);
     }
 
@@ -274,19 +264,18 @@ public class ProductJpaDaoTest {
         // Arrange
         final User user = insertUser("seller5@test.com", "seller5");
         final Product product = insertProduct(
-            user.getId(),
-            "Album",
-            "Artist",
-            "Label",
-            "CAT-1",
-            "Argentina",
-            Collections.emptyList(),
-            "Desc",
-            BigDecimal.valueOf(8.0),
-            BigDecimal.valueOf(8.0),
-            BigDecimal.valueOf(1000),
-            1
-        );
+                user.getId(),
+                "Album",
+                "Artist",
+                "Label",
+                "CAT-1",
+                "Argentina",
+                Collections.emptyList(),
+                "Desc",
+                BigDecimal.valueOf(8.0),
+                BigDecimal.valueOf(8.0),
+                BigDecimal.valueOf(1000),
+                1);
 
         em.flush();
 
@@ -303,9 +292,8 @@ public class ProductJpaDaoTest {
         em.clear();
 
         final ProductState state = em.createQuery(
-            "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            ProductState.class
-        ).setParameter("productId", product.getId()).getSingleResult();
+                "SELECT p.state FROM Product p WHERE p.productId = :productId",
+                ProductState.class).setParameter("productId", product.getId()).getSingleResult();
         Assertions.assertEquals(ProductState.ACTIVE, state);
     }
 
@@ -315,19 +303,18 @@ public class ProductJpaDaoTest {
         // Arrange
         final User user = insertUser("seller6@test.com", "seller6");
         final Product product = insertProduct(
-            user.getId(),
-            "X",
-            "Y",
-            "L",
-            "C",
-            "Argentina",
-            Collections.emptyList(),
-            "D",
-            BigDecimal.valueOf(7.0),
-            BigDecimal.valueOf(7.0),
-            BigDecimal.valueOf(500),
-            1
-        );
+                user.getId(),
+                "X",
+                "Y",
+                "L",
+                "C",
+                "Argentina",
+                Collections.emptyList(),
+                "D",
+                BigDecimal.valueOf(7.0),
+                BigDecimal.valueOf(7.0),
+                BigDecimal.valueOf(500),
+                1);
 
         em.flush();
 
@@ -348,28 +335,26 @@ public class ProductJpaDaoTest {
         // Arrange
         final User user = insertUser("seller7@test.com", "seller7");
         final Product product = insertProduct(
-            user.getId(),
-            "Old",
-            "Artist",
-            "Label",
-            "CAT",
-            "Argentina",
-            Collections.emptyList(),
-            "Desc",
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(2000),
-            1
-        );
+                user.getId(),
+                "Old",
+                "Artist",
+                "Label",
+                "CAT",
+                "Argentina",
+                Collections.emptyList(),
+                "Desc",
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(2000),
+                1);
 
         em.flush();
 
         // Act
         final Boolean updated = productDao.updateProduct(
-            product.getId(), "NewTitle", "Artist", "Label", "CAT", "Argentina",
-            Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
-            BigDecimal.valueOf(9.0), BigDecimal.valueOf(2500), 1
-        );
+                product.getId(), "NewTitle", "Artist", "Label", "CAT", "Argentina",
+                Collections.emptyList(), "Desc", BigDecimal.valueOf(9.0),
+                BigDecimal.valueOf(9.0), BigDecimal.valueOf(2500), 1);
 
         // Assert
         Assertions.assertTrue(updated);
@@ -402,9 +387,8 @@ public class ProductJpaDaoTest {
 
         // Assert
         Assertions.assertIterableEquals(
-            List.of("Alpha Artist", "Zoo Artist"),
-            distinct
-        );
+                List.of("Alpha Artist", "Zoo Artist"),
+                distinct);
     }
 
     @Test
@@ -429,9 +413,8 @@ public class ProductJpaDaoTest {
 
         // Assert
         Assertions.assertIterableEquals(
-            List.of("Alpha Label", "Zoo Label"),
-            distinct
-        );
+                List.of("Alpha Label", "Zoo Label"),
+                distinct);
     }
 
     @Test
@@ -461,9 +444,8 @@ public class ProductJpaDaoTest {
 
         // Assert
         Assertions.assertIterableEquals(
-            List.of("Son", "Sons", "Sony", "Sonic", "Sonata", "Sonic Youth", "The Sonics"),
-            suggestions
-        );
+                List.of("Son", "Sons", "Sony", "Sonic", "Sonata", "Sonic Youth", "The Sonics"),
+                suggestions);
     }
 
     @Test
@@ -493,9 +475,8 @@ public class ProductJpaDaoTest {
 
         // Assert
         Assertions.assertIterableEquals(
-            List.of("Cap", "Cape", "Caps", "Capitol", "Capital Records", "Discap", "Blue Cap"),
-            suggestions
-        );
+                List.of("Cap", "Cape", "Caps", "Capitol", "Capital Records", "Discap", "Blue Cap"),
+                suggestions);
     }
 
     @Test
@@ -510,13 +491,11 @@ public class ProductJpaDaoTest {
 
         // Act & Assert
         Assertions.assertIterableEquals(
-            List.of("100%_Artist"),
-            productDao.suggestArtists("%_", 7)
-        );
+                List.of("100%_Artist"),
+                productDao.suggestArtists("%_", 7));
         Assertions.assertIterableEquals(
-            List.of("100%_Records"),
-            productDao.suggestRecordLabels("%_", 7)
-        );
+                List.of("100%_Records"),
+                productDao.suggestRecordLabels("%_", 7));
         Assertions.assertTrue(productDao.suggestArtists("s", 7).isEmpty());
         Assertions.assertTrue(productDao.suggestRecordLabels("r", 7).isEmpty());
     }
@@ -559,7 +538,8 @@ public class ProductJpaDaoTest {
         em.clear();
 
         // Act
-        final Map<Long, Long> counts = productDao.countActiveProductsByUserIds(List.of(userA.getId(), userB.getId(), userC.getId()));
+        final Map<Long, Long> counts = productDao
+                .countActiveProductsByUserIds(List.of(userA.getId(), userB.getId(), userC.getId()));
 
         // Assert
         Assertions.assertEquals(1L, counts.get(userA.getId()));
@@ -584,12 +564,11 @@ public class ProductJpaDaoTest {
 
         // Act
         final Map<Long, List<Product>> productsByUser = productDao.findLatestActiveProductsByUserIds(
-            List.of(userA.getId(), userB.getId()),
-            2
-        );
+                List.of(userA.getId(), userB.getId()),
+                2);
         final List<Long> userAProductIds = productsByUser.get(userA.getId()).stream()
-            .map(Product::getId)
-            .collect(Collectors.toList());
+                .map(Product::getId)
+                .collect(Collectors.toList());
 
         // Assert
         Assertions.assertIterableEquals(List.of(latest.getId(), first.getId()), userAProductIds);
@@ -630,33 +609,28 @@ public class ProductJpaDaoTest {
 
         // Target user's active products are now ADMIN_HIDDEN
         final ProductState active1State = em.createQuery(
-            "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            ProductState.class
-        ).setParameter("productId", active1.getId()).getSingleResult();
+                "SELECT p.state FROM Product p WHERE p.productId = :productId",
+                ProductState.class).setParameter("productId", active1.getId()).getSingleResult();
         final ProductState active2State = em.createQuery(
-            "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            ProductState.class
-        ).setParameter("productId", active2.getId()).getSingleResult();
+                "SELECT p.state FROM Product p WHERE p.productId = :productId",
+                ProductState.class).setParameter("productId", active2.getId()).getSingleResult();
         final ProductState active3State = em.createQuery(
-            "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            ProductState.class
-        ).setParameter("productId", active3.getId()).getSingleResult();
+                "SELECT p.state FROM Product p WHERE p.productId = :productId",
+                ProductState.class).setParameter("productId", active3.getId()).getSingleResult();
         Assertions.assertEquals(ProductState.ADMIN_HIDDEN, active1State);
         Assertions.assertEquals(ProductState.ADMIN_HIDDEN, active2State);
         Assertions.assertEquals(ProductState.ADMIN_HIDDEN, active3State);
 
         // Target user's SOLD product was NOT affected
         final ProductState soldState = em.createQuery(
-            "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            ProductState.class
-        ).setParameter("productId", sold.getId()).getSingleResult();
+                "SELECT p.state FROM Product p WHERE p.productId = :productId",
+                ProductState.class).setParameter("productId", sold.getId()).getSingleResult();
         Assertions.assertEquals(ProductState.SOLD, soldState);
 
         // Other user's product was NOT affected
         final ProductState otherState = em.createQuery(
-            "SELECT p.state FROM Product p WHERE p.productId = :productId",
-            ProductState.class
-        ).setParameter("productId", otherProduct.getId()).getSingleResult();
+                "SELECT p.state FROM Product p WHERE p.productId = :productId",
+                ProductState.class).setParameter("productId", otherProduct.getId()).getSingleResult();
         Assertions.assertEquals(ProductState.ACTIVE, otherState);
     }
 }
