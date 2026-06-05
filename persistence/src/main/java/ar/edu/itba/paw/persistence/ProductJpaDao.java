@@ -190,6 +190,14 @@ public class ProductJpaDao implements ProductDao {
             whereSql.append(" AND p.user_id IN :userIds");
             params.put("userIds", criteria.getUserIds());
         }
+        if (criteria.getExcludeUserId() != null) {
+            whereSql.append(" AND p.user_id <> :excludeUserId");
+            params.put("excludeUserId", criteria.getExcludeUserId());
+        }
+        if (criteria.getExcludeProductId() != null) {
+            whereSql.append(" AND p.product_id <> :excludeProductId");
+            params.put("excludeProductId", criteria.getExcludeProductId());
+        }
 
         // Get count
         final String countSql = "SELECT COUNT(*) FROM products p " + whereSql;
