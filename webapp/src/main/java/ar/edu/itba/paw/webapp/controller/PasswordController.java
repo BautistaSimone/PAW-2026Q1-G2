@@ -61,7 +61,7 @@ public class PasswordController {
     }
 
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
-    public ModelAndView resetPassword(@RequestParam("email") String userEmail) {
+    public ModelAndView resetPassword(@RequestParam("email") String userEmail, final RedirectAttributes redirectAttributes) {
 
         final Optional<User> userOpt = userService.findByEmail(userEmail);
 
@@ -71,18 +71,15 @@ public class PasswordController {
             return mv;
         }
 
-        ModelAndView mv = new ModelAndView("login");
-        mv.addObject("loginForm", new LoginForm());
-
         final User user = userOpt.get();
 
         final String token = UUID.randomUUID().toString();
 
         passwordTokenService.createPasswordResetTokenForUser(user.getId(), token);
 
-        mv.addObject("message", "EmailSent.authForm.email");
+        redirectAttributes.addFlashAttribute("message", "EmailSent.authForm.email");
 
-        return mv;
+        return new ModelAndView("redirect:/login");
     }
 
     @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
