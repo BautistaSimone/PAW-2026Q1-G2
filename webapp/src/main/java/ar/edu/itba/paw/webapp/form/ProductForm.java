@@ -56,7 +56,7 @@ public class ProductForm {
     private BigDecimal recordCondition;
 
     @NotNull
-    @DecimalMin("0.0")
+    @DecimalMin("0.1")
     private BigDecimal price;
 
     @NotBlank
