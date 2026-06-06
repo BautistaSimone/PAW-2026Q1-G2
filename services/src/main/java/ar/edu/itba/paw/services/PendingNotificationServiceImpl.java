@@ -12,7 +12,6 @@ import ar.edu.itba.paw.persistence.ProductDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -94,7 +93,7 @@ public class PendingNotificationServiceImpl implements PendingNotificationServic
                             user.getEmail(),
                             user.getUsername(),
                             products,
-                            LocaleContextHolder.getLocale()
+                            user.getPreferredLocale()
                     );
                     LOGGER.info("Sent digest email to user {} with {} products", userId, products.size());
                 } catch (Exception e) {

@@ -34,6 +34,10 @@ public class UserProfileForm {
     @Pattern(regexp = "^$|^\\d{22}$", message = "{Pattern.userProfileForm.cbuCvu}")
     private String cbuCvu;
 
+    @NotBlank(message = "{NotBlank.userProfileForm.language}")
+    @Pattern(regexp = "^(en|es)$", message = "{Pattern.userProfileForm.language}")
+    private String language;
+
     public static UserProfileForm fromUser(final ar.edu.itba.paw.models.User u) {
         final UserProfileForm f = new UserProfileForm();
         f.setFirstName(u.getFirstName() != null ? u.getFirstName() : "");
@@ -44,6 +48,7 @@ public class UserProfileForm {
         f.setProvince(u.getProvince() != null ? u.getProvince() : "");
         f.setExtraAddressInfo(u.getExtraAddressInfo() != null ? u.getExtraAddressInfo() : "");
         f.setCbuCvu(u.getCbuCvu() != null ? u.getCbuCvu() : "");
+        f.setLanguage(u.getLanguage() != null ? u.getLanguage() : "es");
         return f;
     }
 
@@ -109,5 +114,13 @@ public class UserProfileForm {
 
     public void setCbuCvu(final String cbuCvu) {
         this.cbuCvu = cbuCvu;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(final String language) {
+        this.language = language;
     }
 }

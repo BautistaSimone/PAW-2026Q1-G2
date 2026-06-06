@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS users (
 	province VARCHAR(100),
 	extra_address_info VARCHAR(500),
 	cbu_cvu VARCHAR(22),
-	banned BOOLEAN NOT NULL DEFAULT false
+	banned BOOLEAN NOT NULL DEFAULT false,
+	language VARCHAR(10) NOT NULL DEFAULT 'es'
 );
 
 CREATE TABLE IF NOT EXISTS password_tokens (

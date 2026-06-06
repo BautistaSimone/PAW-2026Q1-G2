@@ -87,7 +87,8 @@ public class UserJpaDao implements UserDao {
             final String neighborhood,
             final String province,
             final String extraAddressInfo,
-            final String cbuCvu) {
+            final String cbuCvu,
+            final String language) {
 
         final User user = em.find(User.class, userId);
         user.setFirstName(firstName);
@@ -98,6 +99,7 @@ public class UserJpaDao implements UserDao {
         user.setProvince(province);
         user.setExtraAddressInfo(extraAddressInfo);
         user.setCbuCvu(cbuCvu);
+        user.setLanguage(language);
     }
 
     @Override

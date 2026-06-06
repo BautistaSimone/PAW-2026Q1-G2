@@ -96,7 +96,8 @@ public class UserServiceImpl implements UserService {
             final String neighborhood,
             final String province,
             final String extraAddressInfo,
-            final String cbuCvu) {
+            final String cbuCvu,
+            final String language) {
         userDao.updateUserProfile(
                 userId,
                 trimToNull(firstName),
@@ -106,7 +107,8 @@ public class UserServiceImpl implements UserService {
                 trimToNull(neighborhood),
                 trimToNull(province),
                 trimToNull(extraAddressInfo),
-                trimToNull(cbuCvu));
+                trimToNull(cbuCvu),
+                trimToNull(language));
     }
 
     @Override

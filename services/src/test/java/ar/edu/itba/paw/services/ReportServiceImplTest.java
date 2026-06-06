@@ -43,8 +43,11 @@ public class ReportServiceImplTest {
     private UserService userService;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
+        java.lang.reflect.Field field = ReportServiceImpl.class.getDeclaredField("adminEmail");
+        field.setAccessible(true);
+        field.set(reportService, "admin@vinyland.com");
     }
 
     @Test
@@ -133,7 +136,7 @@ public class ReportServiceImplTest {
         // Assert
         Assertions.assertNotNull(result);
         Mockito.verify(emailService, Mockito.times(1))
-                .sendProductReportEmail(p, reporter, seller, Locale.ENGLISH);
+                .sendProductReportEmail(p, reporter, seller, new Locale("es"));
     }
 
     @Test
@@ -194,5 +197,31 @@ public class ReportServiceImplTest {
 
         // Assert
         Mockito.verify(reportDao, Mockito.times(1)).deleteByOwnerUserId(2L);
+    }
+
+    @Test
+    public void testReportSuccessWithAdminPreferredLocale() {
+        // Arrange
+        Product p = new Product(10L, 2L, "Title", "Artist", "Label", "Catalog", "Country", Collections.emptyList(), "Desc", BigDecimal.TEN, BigDecimal.TEN, LocalDate.now(), BigDecimal.valueOf(100), 1);
+        User reporter = new User(1L, "rep@test.com", "pass", "reporter", false, true, false, null, null, null, null, null, null, null, null);
+        User seller = new User(2L, "sel@test.com", "pass", "seller", false, true, false, null, null, null, null, null, null, null, null);
+        User admin = new User(3L, "admin@test.com", "pass", "admin", true, true, false, null, null, null, null, null, null, null, null);
+        admin.setLanguage("en");
+        Report report = new Report(10L, 2L, 1L);
+
+        Mockito.when(productService.findById(10L)).thenReturn(Optional.of(p));
+        Mockito.when(reportDao.existsByProductAndReporter(10L, 1L)).thenReturn(false);
+        Mockito.when(userService.findById(1L)).thenReturn(Optional.of(reporter));
+        Mockito.when(userService.findById(2L)).thenReturn(Optional.of(seller));
+        Mockito.when(userService.findByEmail("admin@vinyland.com")).thenReturn(Optional.of(admin));
+        Mockito.when(reportDao.create(10L, 2L, 1L)).thenReturn(report);
+
+        // Act
+        Report result = reportService.report(10L, 1L);
+
+        // Assert
+        Assertions.assertNotNull(result);
+        Mockito.verify(emailService, Mockito.times(1))
+                .sendProductReportEmail(p, reporter, seller, Locale.ENGLISH);
     }
 }

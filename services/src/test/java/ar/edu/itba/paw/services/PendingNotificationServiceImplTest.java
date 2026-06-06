@@ -154,6 +154,7 @@ public class PendingNotificationServiceImplTest {
 
         User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null,
                 null, null, null);
+        user.setLanguage("en");
         Mockito.when(userService.findById(1L)).thenReturn(Optional.of(user));
 
         // Act

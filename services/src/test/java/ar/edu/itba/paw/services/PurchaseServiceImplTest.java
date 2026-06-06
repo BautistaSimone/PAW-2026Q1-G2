@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -133,14 +132,14 @@ public class PurchaseServiceImplTest {
                 Mockito.same(buyer),
                 Mockito.same(seller),
                 Mockito.eq(PurchaseStatus.PENDING),
-                Mockito.eq(LocaleContextHolder.getLocale()));
+                Mockito.eq(buyer.getPreferredLocale()));
         Mockito.verify(emailService).sendSellerEmail(
                 Mockito.same(purchase),
                 Mockito.same(product),
                 Mockito.same(buyer),
                 Mockito.same(seller),
                 Mockito.eq(PurchaseStatus.PENDING),
-                Mockito.eq(LocaleContextHolder.getLocale()));
+                Mockito.eq(seller.getPreferredLocale()));
     }
 
     @Test

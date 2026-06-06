@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.time.Instant;
 import java.time.Duration;
 
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,7 +65,7 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
                 user.getEmail(),
                 token,
                 user.getUsername(),
-                LocaleContextHolder.getLocale()));
+                user.getPreferredLocale()));
     }
 
     @Override

@@ -21,7 +21,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_userid_seq")
-    @SequenceGenerator(sequenceName = "users_userid_seq", name = "users_userid_seq", allocationSize = 1)
+    @SequenceGenerator(sequenceName = "users_user_id_seq", name = "users_userid_seq", allocationSize = 1)
     @Column(name = "user_id")
     private Long id;
 
@@ -57,6 +57,9 @@ public class User {
 
     @Column(name = "cbu_cvu", length = 22)
     private String cbuCvu;
+
+    @Column(length = 10, nullable = false)
+    private String language = "es";
 
     //@BatchSize(size = 20)
     @ManyToMany
@@ -109,6 +112,7 @@ public class User {
         this.province = province;
         this.extraAddressInfo = extraAddressInfo;
         this.cbuCvu = cbuCvu;
+        this.language = "es";
     }
 
     public User(
@@ -142,6 +146,7 @@ public class User {
         this.province = province;
         this.extraAddressInfo = extraAddressInfo;
         this.cbuCvu = cbuCvu;
+        this.language = "es";
     }
 
     private static boolean nonBlank(final String s) {
@@ -318,6 +323,21 @@ public class User {
 
     public void setCbuCvu(String cbuCvu) {
         this.cbuCvu = cbuCvu;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public java.util.Locale getPreferredLocale() {
+        if ("en".equalsIgnoreCase(language)) {
+            return java.util.Locale.ENGLISH;
+        }
+        return new java.util.Locale("es");
     }
 
     public void setWishlistProducts(Set<Product> wishlistProducts) {

@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.time.Duration;
 import java.util.UUID;
 
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +68,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
                 user.getEmail(),
                 token,
                 user.getUsername(),
-                LocaleContextHolder.getLocale()));
+                user.getPreferredLocale()));
     }
 
     @Override

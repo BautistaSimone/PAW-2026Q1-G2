@@ -230,7 +230,8 @@ public class UserController {
                 form.getNeighborhood(),
                 form.getProvince(),
                 form.getExtraAddressInfo(),
-                form.getCbuCvu());
+                form.getCbuCvu(),
+                form.getLanguage());
 
         final User refreshed = userService.findById(profileUser.getId())
                 .orElseThrow(() -> new IllegalStateException("User not found"));

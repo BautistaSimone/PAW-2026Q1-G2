@@ -657,6 +657,17 @@
                                             <form:errors path="cbuCvu"
                                                 cssClass="text-danger small d-block" />
                                         </div>
+                                        <div class="mb-3">
+                                            <label class="form-label" for="pfLanguage">
+                                                <spring:message code="Profile.myData.language" />
+                                            </label>
+                                            <form:select path="language" id="pfLanguage" cssClass="form-select">
+                                                <form:option value="es" label="Español" />
+                                                <form:option value="en" label="English" />
+                                            </form:select>
+                                            <form:errors path="language"
+                                                cssClass="text-danger small d-block" />
+                                        </div>
                                         <button type="submit"
                                             class="btn btn-retro btn-retro-primary"
                                             id="profileSaveBtn" disabled="true">

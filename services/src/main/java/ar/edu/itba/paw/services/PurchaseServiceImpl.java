@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.Locale;
 
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -91,21 +90,20 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         runAfterCommit(() -> {
-            final Locale locale = LocaleContextHolder.getLocale();
             emailService.sendBuyerEmail(
                     purchase,
                     product,
                     buyer,
                     seller,
                     PurchaseStatus.PENDING,
-                    locale);
+                    buyer.getPreferredLocale());
             emailService.sendSellerEmail(
                     purchase,
                     product,
                     buyer,
                     seller,
                     PurchaseStatus.PENDING,
-                    locale);
+                    seller.getPreferredLocale());
         });
 
         return purchase;
@@ -186,7 +184,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                     buyer,
                     seller,
                     PurchaseStatus.PAID,
-                    LocaleContextHolder.getLocale());
+                    seller.getPreferredLocale());
         } else if (newStatus == PurchaseStatus.SHIPPED && isSeller && purchase.getStatus() == PurchaseStatus.PAID) {
             purchaseDao.updateStatus(purchaseId, newStatus);
             updatedStatus = true;
@@ -197,7 +195,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                     buyer,
                     seller,
                     PurchaseStatus.SHIPPED,
-                    LocaleContextHolder.getLocale());
+                    buyer.getPreferredLocale());
         } else if (newStatus == PurchaseStatus.DELIVERED && isBuyer && purchase.getStatus() == PurchaseStatus.SHIPPED) {
             purchaseDao.updateStatus(purchaseId, newStatus);
             updatedStatus = true;

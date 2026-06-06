@@ -34,7 +34,8 @@ public interface UserDao {
                         final String neighborhood,
                         final String province,
                         final String extraAddressInfo,
-                        final String cbuCvu);
+                        final String cbuCvu,
+                        final String language);
 
         void updatePassword(final Long userId, final String encodedPassword);
 

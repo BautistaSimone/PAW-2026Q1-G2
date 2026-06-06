@@ -4,8 +4,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +18,9 @@ import ar.edu.itba.paw.persistence.ReportedProductProjection;
 
 @Service
 public class ReportServiceImpl implements ReportService {
+
+    @Value("${mail.username}")
+    private String adminEmail;
 
     private final ReportDao reportDao;
     private final ProductService productService;
@@ -53,7 +56,10 @@ public class ReportServiceImpl implements ReportService {
         User seller = userService.findById(product.getUserId())
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
 
-        emailService.sendProductReportEmail(product, reporter, seller, LocaleContextHolder.getLocale());
+        final User admin = userService.findByEmail(adminEmail).orElse(null);
+        final java.util.Locale adminLocale = admin != null ? admin.getPreferredLocale() : new java.util.Locale("es");
+
+        emailService.sendProductReportEmail(product, reporter, seller, adminLocale);
 
         return reportDao.create(productId, product.getUserId(), reporterUserId);
     }
