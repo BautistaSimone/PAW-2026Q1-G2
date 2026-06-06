@@ -10,7 +10,13 @@ import ar.edu.itba.paw.models.PurchaseStatus;
 public interface PurchaseService {
     Purchase createPurchase(Long productId, Long userId);
 
+    boolean canCreatePurchases(Long userId);
+
     Optional<Purchase> findById(Long purchaseId);
+
+    PurchaseDetails getPurchaseDetailsForUser(Long purchaseId, Long userId);
+
+    Optional<PurchasePaymentProof> findPaymentProofForSeller(Long purchaseId, Long userId);
 
     Purchase updateStatus(
         Long purchaseId,

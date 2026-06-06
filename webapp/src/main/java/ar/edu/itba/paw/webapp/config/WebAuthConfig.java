@@ -46,10 +46,10 @@ public class WebAuthConfig {
                 .requestMatchers("/products/*/edit", "/products/*/report", "/products/*/delete", "/products/*/restore")
                 .authenticated()
                 // Authenticated-only miscellaneous actions
-                .requestMatchers("/sendVerificationEmail", "/toggle-wishlist-product", "/profile/follow")
+                .requestMatchers(HttpMethod.POST, "/sendVerificationEmail", "/toggle-wishlist-product", "/profile/follow")
                 .authenticated()
                 // Authenticated-only verification/notification routes
-                .requestMatchers("/verifyEmail", "/notVerified", "/for-you", "/notifications/**").authenticated()
+                .requestMatchers("/for-you", "/notifications/**").authenticated()
                 // Role based routes — more specific first
                 .requestMatchers("/profile/admin/**").hasRole("ADMIN")
                 .requestMatchers("/profile", "/profile/**").authenticated()
@@ -57,8 +57,8 @@ public class WebAuthConfig {
                 .requestMatchers("/test-mail", "/test-mail/**").denyAll()
                 .requestMatchers(HttpMethod.POST, "/images", "/images/**").denyAll()
                 // Public routes
-                .requestMatchers("/", "/changePassword", "/resetPassword", "/verificationStatus", "/search-users",
-                        "/banned")
+                .requestMatchers("/", "/changePassword", "/resetPassword", "/verificationStatus", "/verifyEmail",
+                        "/notVerified", "/sendVerificationEmail", "/search-users", "/banned")
                 .permitAll()
                 .requestMatchers("/css/**", "/js/**", "/img/**", "/assets/**", "/favicon.ico", "/403").permitAll()
                 .and().formLogin()

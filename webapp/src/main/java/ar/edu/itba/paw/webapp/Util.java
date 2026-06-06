@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.webapp;
 
 import java.net.URI;
-import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,15 +19,7 @@ public final class Util {
 
     public static void refreshAuthenticationPrincipal(final PawAuthUser current, final User refreshedUser) {
         final Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
-        final PawAuthUser newPrincipal = new PawAuthUser(
-                refreshedUser.getEmail(),
-                refreshedUser.getPassword(),
-                current.isEnabled(),
-                current.isAccountNonExpired(),
-                current.isCredentialsNonExpired(),
-                current.isAccountNonLocked(),
-                new ArrayList<>(current.getAuthorities()),
-                refreshedUser);
+        final PawAuthUser newPrincipal = new PawAuthUser(refreshedUser);
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(
                         newPrincipal,

@@ -131,6 +131,55 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public boolean canCreatePurchases(final Long userId) {
+        return userService.hasCompleteBuyerDataForPurchase(userId);
+    }
+
+    @Override
+    @Transactional
+    public PurchaseDetails getPurchaseDetailsForUser(final Long purchaseId, final Long userId) {
+        final Purchase purchase = purchaseDao.findById(purchaseId)
+                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+        cancelIfExpired(purchase, LocalDateTime.now());
+
+        final boolean isBuyer = userId != null && userId.equals(purchase.getBuyerId());
+        final boolean isSeller = userId != null && userId.equals(purchase.getSellerId());
+        if (!isBuyer && !isSeller) {
+            throw new SecurityException("You are not authorized to view this purchase");
+        }
+
+        final Product product = productService.findById(purchase.getProductId())
+                .orElseThrow(() -> new IllegalStateException("Product missing"));
+        final User buyer = userService.findById(purchase.getBuyerId())
+                .orElseThrow(() -> new IllegalStateException("Buyer missing"));
+        final User seller = userService.findById(purchase.getSellerId())
+                .orElseGet(() -> userService.findById(product.getUserId())
+                        .orElseThrow(() -> new IllegalStateException("Seller missing")));
+
+        return new PurchaseDetails(purchase, product, buyer, seller, isBuyer, isSeller);
+    }
+
+    @Override
+    @Transactional
+    public Optional<PurchasePaymentProof> findPaymentProofForSeller(final Long purchaseId, final Long userId) {
+        final Purchase purchase = purchaseDao.findById(purchaseId)
+                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+        cancelIfExpired(purchase, LocalDateTime.now());
+
+        if (userId == null || !userId.equals(purchase.getSellerId())) {
+            throw new SecurityException("Only the seller can access the payment proof");
+        }
+        if (purchase.getPaymentProof() == null || purchase.getPaymentProof().length == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(new PurchasePaymentProof(
+                purchase.getPaymentProof(),
+                purchase.getPaymentProofContentType(),
+                purchase.getPaymentProofFileName()));
+    }
+
+    @Override
     @Transactional
     public Purchase updateStatus(
             Long purchaseId,

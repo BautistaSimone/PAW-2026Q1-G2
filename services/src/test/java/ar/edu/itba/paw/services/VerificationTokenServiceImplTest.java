@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.VerificationToken;
 import ar.edu.itba.paw.persistence.VerificationTokenDao;
 
@@ -25,6 +26,12 @@ public class VerificationTokenServiceImplTest {
 
     @Mock
     private VerificationTokenDao verificationTokenDao;
+
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private EmailService emailService;
 
     @Test
     public void testAcceptVerificationTokenWhenNotExpired() {
@@ -54,6 +61,57 @@ public class VerificationTokenServiceImplTest {
         boolean result = verificationTokenService.isValidVerificationToken("token");
 
         Assertions.assertFalse(result);
+    }
+
+    @Test
+    public void testVerifyEmailEnablesTokenUser() {
+        VerificationToken token = new VerificationToken(
+            1L,
+            "token",
+            Instant.now().plus(Duration.ofMinutes(EXPIRATION))
+        );
+        User user = new User(
+            1L,
+            "user@test.com",
+            "password",
+            "user",
+            false,
+            true,
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+
+        Mockito.when(verificationTokenDao.findByToken("token")).thenReturn(Optional.of(token));
+        Mockito.when(userService.findById(1L)).thenReturn(Optional.of(user));
+
+        Optional<User> result = verificationTokenService.verifyEmail("token");
+
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(1L, result.get().getId());
+        Mockito.verify(userService).enable(1L);
+    }
+
+    @Test
+    public void testVerifyEmailDoesNotEnableExpiredToken() {
+        VerificationToken token = new VerificationToken(
+            1L,
+            "token",
+            Instant.now().minus(Duration.ofMinutes(1))
+        );
+
+        Mockito.when(verificationTokenDao.findByToken("token")).thenReturn(Optional.of(token));
+
+        Optional<User> result = verificationTokenService.verifyEmail("token");
+
+        Assertions.assertFalse(result.isPresent());
+        Mockito.verify(userService, Mockito.never()).enable(Mockito.anyLong());
     }
 
 }

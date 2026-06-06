@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.slf4j.Logger;
@@ -65,12 +66,93 @@ public class UserServiceImpl implements UserService {
             final String extraAddressInfo,
             final String cbuCvu) {
 
+        final String normalizedEmail = trimToNull(email);
+        if (normalizedEmail == null) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (userDao.findByEmail(normalizedEmail).isPresent()) {
+            throw new IllegalArgumentException("Email already in use");
+        }
+
+        return createUserUnchecked(
+                normalizedEmail,
+                password,
+                username,
+                mod,
+                enabled,
+                firstName,
+                lastName,
+                streetName,
+                streetNumber,
+                neighborhood,
+                province,
+                extraAddressInfo,
+                cbuCvu);
+    }
+
+    @Override
+    @Transactional
+    public Optional<User> createUserIfEmailAvailable(
+            final String email,
+            final String password,
+            final String username,
+            final Boolean mod,
+            final Boolean enabled,
+            final String firstName,
+            final String lastName,
+            final String streetName,
+            final String streetNumber,
+            final String neighborhood,
+            final String province,
+            final String extraAddressInfo,
+            final String cbuCvu) {
+        final String normalizedEmail = trimToNull(email);
+        if (normalizedEmail == null) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (userDao.findByEmail(normalizedEmail).isPresent()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(createUserUnchecked(
+                    normalizedEmail,
+                    password,
+                    username,
+                    mod,
+                    enabled,
+                    firstName,
+                    lastName,
+                    streetName,
+                    streetNumber,
+                    neighborhood,
+                    province,
+                    extraAddressInfo,
+                    cbuCvu));
+        } catch (DataIntegrityViolationException e) {
+            return Optional.empty();
+        }
+    }
+
+    private User createUserUnchecked(
+            final String normalizedEmail,
+            final String password,
+            final String username,
+            final Boolean mod,
+            final Boolean enabled,
+            final String firstName,
+            final String lastName,
+            final String streetName,
+            final String streetNumber,
+            final String neighborhood,
+            final String province,
+            final String extraAddressInfo,
+            final String cbuCvu) {
         final String encodedPassword = passwordEncoder.encode(password);
 
-        LOGGER.atDebug().addArgument(email).log("About to attempt register user {}");
+        LOGGER.atDebug().addArgument(normalizedEmail).log("About to attempt register user {}");
 
         return userDao.createUser(
-                trimToNull(email),
+                normalizedEmail,
                 encodedPassword,
                 trimToNull(username),
                 mod,
@@ -156,6 +238,22 @@ public class UserServiceImpl implements UserService {
         return usr.getEnabled();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isAdmin(final Long userId) {
+        return userDao.findById(userId)
+                .map(User::getMod)
+                .orElse(false);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasCompleteBuyerDataForPurchase(final Long userId) {
+        return userDao.findById(userId)
+                .map(User::hasCompleteBuyerDataForPurchase)
+                .orElse(false);
+    }
+
 	@Override
     @Transactional
     public void enable(final Long id) {
@@ -221,7 +319,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void toggleFollow(final Long followerId, final Long followedId) {
         if (followerId.equals(followedId)) {
-            throw new IllegalArgumentException("Cannot follow yourself");
+            return;
         }
         if (userDao.isFollowing(followerId, followedId)) {
             userDao.unfollow(followerId, followedId);

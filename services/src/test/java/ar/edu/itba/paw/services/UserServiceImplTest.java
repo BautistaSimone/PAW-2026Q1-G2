@@ -96,6 +96,62 @@ public class UserServiceImplTest {
     }
 
     @Test
+    public void testCreateUserIfEmailAvailableReturnsEmptyForDuplicateEmailBeforeEncodingPassword() {
+        final User existing = new User(
+            1L,
+            "taken@test.com",
+            "password",
+            "taken",
+            false,
+            true,
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+        Mockito.when(userDao.findByEmail("taken@test.com")).thenReturn(Optional.of(existing));
+
+        final Optional<User> result = userService.createUserIfEmailAvailable(
+            " taken@test.com ",
+            "password",
+            "user",
+            false,
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+
+        Assertions.assertFalse(result.isPresent());
+        Mockito.verify(passwordEncoder, Mockito.never()).encode(Mockito.anyString());
+        Mockito.verify(userDao, Mockito.never()).createUser(
+            Mockito.anyString(),
+            Mockito.anyString(),
+            Mockito.anyString(),
+            Mockito.anyBoolean(),
+            Mockito.anyBoolean(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any()
+        );
+    }
+
+    @Test
     public void testToggleFollowFollowsWhenNotFollowing() {
         // Arrange
         Mockito.when(userDao.isFollowing(1L, 2L)).thenReturn(false);

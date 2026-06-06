@@ -3,6 +3,7 @@ package ar.edu.itba.paw.services;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,6 +87,18 @@ public class ReportServiceImpl implements ReportService {
             .toList();
 
         return new PaginatedResult<>(summaries, pageResult.getCurrentPage(), pageSize, pageResult.getTotalCount());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<PaginatedResult<ReportedProductSummary>> findAllGroupedByProductForAdmin(
+            final long requesterUserId,
+            final int page,
+            final int pageSize) {
+        if (!userService.isAdmin(requesterUserId)) {
+            return Optional.empty();
+        }
+        return Optional.of(findAllGroupedByProduct(page, pageSize));
     }
 
     @Override

@@ -16,6 +16,7 @@ import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.PurchaseStatus;
 import ar.edu.itba.paw.models.Review;
 import ar.edu.itba.paw.models.SellerRatingSummary;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.persistence.ReviewDao;
 
 @Service
@@ -24,6 +25,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewDao reviewDao;
     private final PurchaseService purchaseService;
     private final ProductService productService;
+    private final UserService userService;
     private final NotificationService notificationService;
 
     @Autowired
@@ -31,34 +33,55 @@ public class ReviewServiceImpl implements ReviewService {
             final ReviewDao reviewDao,
             final PurchaseService purchaseService,
             final ProductService productService,
+            final UserService userService,
             final NotificationService notificationService) {
         this.reviewDao = reviewDao;
         this.purchaseService = purchaseService;
         this.productService = productService;
+        this.userService = userService;
         this.notificationService = notificationService;
     }
 
     @Override
     @Transactional
-    public Review create(long purchaseId, long buyerId, int score, String text) {
+    public ReviewEligibility getReviewEligibility(final long purchaseId, final long buyerId) {
         final Purchase purchase = purchaseService.findById(purchaseId)
                 .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
 
         if (!purchase.getBuyerId().equals(buyerId)) {
-            throw new IllegalArgumentException("Only the buyer can leave a review");
+            return ReviewEligibility.unavailable(ReviewEligibility.Status.NOT_BUYER);
         }
-
         if (purchase.getStatus() != PurchaseStatus.DELIVERED) {
-            throw new IllegalStateException("Can only review after delivery");
+            return ReviewEligibility.unavailable(ReviewEligibility.Status.NOT_DELIVERED);
         }
-
         if (reviewDao.findByPurchaseId(purchaseId).isPresent()) {
-            throw new IllegalStateException("A review already exists for this purchase");
+            return ReviewEligibility.unavailable(ReviewEligibility.Status.ALREADY_REVIEWED);
         }
 
         final Product product = productService.findById(purchase.getProductId())
                 .orElseThrow(() -> new IllegalStateException("Product not found"));
+        final User seller = userService.findById(product.getUserId())
+                .orElseThrow(() -> new IllegalStateException("Seller not found"));
 
+        return ReviewEligibility.available(new ReviewContext(purchase, product, seller));
+    }
+
+    @Override
+    @Transactional
+    public Review create(long purchaseId, long buyerId, int score, String text) {
+        final ReviewEligibility eligibility = getReviewEligibility(purchaseId, buyerId);
+        if (eligibility.getStatus() == ReviewEligibility.Status.NOT_BUYER) {
+            throw new IllegalArgumentException("Only the buyer can leave a review");
+        }
+        if (eligibility.getStatus() == ReviewEligibility.Status.NOT_DELIVERED) {
+            throw new IllegalStateException("Can only review after delivery");
+        }
+        if (eligibility.getStatus() == ReviewEligibility.Status.ALREADY_REVIEWED) {
+            throw new IllegalStateException("A review already exists for this purchase");
+        }
+
+        final ReviewContext context = eligibility.getContext();
+        final Product product = context.getProduct();
         final long sellerId = product.getUserId();
 
         final Review review = reviewDao.create(purchaseId, sellerId, buyerId, score, text);

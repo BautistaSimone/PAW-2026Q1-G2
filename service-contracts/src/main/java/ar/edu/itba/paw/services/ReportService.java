@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.services;
 
+import java.util.Optional;
+
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Report;
 
@@ -7,6 +9,7 @@ public interface ReportService {
     Report report(long productId, long reporterUserId);
     boolean hasReported(long productId, long reporterUserId);
     PaginatedResult<ReportedProductSummary> findAllGroupedByProduct(int page, int pageSize);
+    Optional<PaginatedResult<ReportedProductSummary>> findAllGroupedByProductForAdmin(long requesterUserId, int page, int pageSize);
     void deleteByProductId(long productId);
 
     /**

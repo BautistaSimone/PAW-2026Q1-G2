@@ -53,6 +53,23 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
 
     @Override
     @Transactional
+    public Optional<User> verifyEmail(final String token) {
+        final Optional<VerificationToken> verificationTokenOpt = verificationTokenDao.findByToken(token);
+        if (!verificationTokenOpt.isPresent()) {
+            return Optional.empty();
+        }
+
+        final VerificationToken verificationToken = verificationTokenOpt.get();
+        if (isTokenExpired(verificationToken)) {
+            return Optional.empty();
+        }
+
+        userService.enable(verificationToken.getUserId());
+        return userService.findById(verificationToken.getUserId());
+    }
+
+    @Override
+    @Transactional
     public void createVerificationTokenForUser(final Long userId) {
 
         final String token = UUID.randomUUID().toString();

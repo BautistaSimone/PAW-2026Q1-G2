@@ -343,6 +343,24 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<Product> findEditableProduct(final Long productId, final Long ownerUserId) {
+        if (productId == null || ownerUserId == null) {
+            return Optional.empty();
+        }
+        return productDao.findByIdIfAvailable(productId)
+            .filter(product -> ownerUserId.equals(product.getUserId()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean canPublishProducts(final Long userId) {
+        return userDao.findById(userId)
+            .map(user -> user.hasCbuCvu() && user.hasNeighborhoodAndProvince())
+            .orElse(false);
+    }
+
+    @Override
     @Transactional
     public boolean decrementStock(final Long id) {
         return productDao.decrementStock(id);

@@ -41,7 +41,6 @@ import java.util.Locale;
 
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
 import ar.edu.itba.paw.webapp.interceptor.BannedUserInterceptor;
-import ar.edu.itba.paw.webapp.interceptor.VerificationInterceptor;
 import ar.edu.itba.paw.models.ConditionBucket;
 import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.PurchaseStatus;
@@ -66,9 +65,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
     private BannedUserInterceptor bannedUserInterceptor;
-
-    @Autowired
-    private VerificationInterceptor verificationInterceptor;
 
     @Bean
     public ViewResolver viewResolver() {
@@ -189,16 +185,6 @@ public class WebConfig implements WebMvcConfigurer {
                         "/login",
                         "/register",
                         "/logout",
-                        "/assets/**");
-        registry.addInterceptor(verificationInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns(
-                        "/notVerified",
-                        "/login",
-                        "/register",
-                        "/sendVerificationEmail",
-                        "/verificationStatus",
-                        "/verifyEmail",
                         "/assets/**");
         registry.addInterceptor(localeChangeInterceptor());
     }

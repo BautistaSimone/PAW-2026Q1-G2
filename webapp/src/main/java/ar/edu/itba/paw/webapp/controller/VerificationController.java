@@ -9,35 +9,21 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.VerificationTokenService;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
-import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
 import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.models.VerificationToken;
 
 @Controller
 public class VerificationController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VerificationController.class);
-
-    private final UserService userService;
     private final VerificationTokenService verificationTokenService;
-    private final PawUserDetailsService pawUserDetailsService;
 
     @Autowired
     public VerificationController(
-            final UserService userService,
-            final VerificationTokenService verificationTokenService,
-            PawUserDetailsService pawUserDetailsService) {
+            final VerificationTokenService verificationTokenService) {
 
-        this.userService = userService;
         this.verificationTokenService = verificationTokenService;
-        this.pawUserDetailsService = pawUserDetailsService;
     }
 
     @RequestMapping(value = "/sendVerificationEmail", method = RequestMethod.POST)
@@ -78,24 +64,19 @@ public class VerificationController {
 
         ModelAndView mv = new ModelAndView("redirect:/verificationStatus");
 
-        if (!verificationTokenService.isValidVerificationToken(token)) {
+        final java.util.Optional<User> verifiedUser = verificationTokenService.verifyEmail(token);
+        if (!verifiedUser.isPresent()) {
             redirectAttributes.addFlashAttribute("verificationSuccessful", false);
             redirectAttributes.addFlashAttribute("message", "ExpiredToken.verification");
             return mv;
         }
 
-        final VerificationToken verificationToken = verificationTokenService.findByToken(token).get();
-
-        userService.enable(verificationToken.getUserId());
-
         redirectAttributes.addFlashAttribute("verificationSuccessful", true);
         redirectAttributes.addFlashAttribute("message", "SuccessToken.verification");
 
         // Update the current session too if the user is logged in
-        if (authUser != null) {
-            final User refreshed = userService.findById(authUser.getUser().getId())
-                    .orElseThrow(() -> new IllegalStateException("User not found"));
-            Util.refreshAuthenticationPrincipal(authUser, refreshed);
+        if (authUser != null && authUser.getUser().getId().equals(verifiedUser.get().getId())) {
+            Util.refreshAuthenticationPrincipal(authUser, verifiedUser.get());
         }
 
         return mv;

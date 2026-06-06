@@ -182,6 +182,38 @@ public class ReportServiceImplTest {
     }
 
     @Test
+    public void testFindAllGroupedByProductForAdminRejectsNonAdmin() {
+        Mockito.when(userService.isAdmin(7L)).thenReturn(false);
+
+        Optional<PaginatedResult<ReportedProductSummary>> result = reportService.findAllGroupedByProductForAdmin(7L, 1, 10);
+
+        Assertions.assertFalse(result.isPresent());
+        Mockito.verify(reportDao, Mockito.never()).findAllGroupedByProduct(Mockito.anyInt(), Mockito.anyInt());
+    }
+
+    @Test
+    public void testFindAllGroupedByProductForAdminReturnsReports() {
+        ReportedProductProjection proj = Mockito.mock(ReportedProductProjection.class);
+        Mockito.when(proj.getProductId()).thenReturn(10L);
+        Mockito.when(proj.getOwnerUserId()).thenReturn(2L);
+        Mockito.when(proj.getReportCount()).thenReturn(3);
+        Mockito.when(proj.getProductTitle()).thenReturn("Title");
+        Mockito.when(proj.getProductArtist()).thenReturn("Artist");
+        Mockito.when(proj.getOwnerUsername()).thenReturn("seller");
+
+        PaginatedResult<ReportedProductProjection> pageResult = new PaginatedResult<>(
+                Arrays.asList(proj), 1, 10, 1
+        );
+        Mockito.when(userService.isAdmin(7L)).thenReturn(true);
+        Mockito.when(reportDao.findAllGroupedByProduct(1, 10)).thenReturn(pageResult);
+
+        Optional<PaginatedResult<ReportedProductSummary>> result = reportService.findAllGroupedByProductForAdmin(7L, 1, 10);
+
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(1, result.get().getResults().size());
+    }
+
+    @Test
     public void testDeleteByProductId() {
         // Act
         reportService.deleteByProductId(10L);

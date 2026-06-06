@@ -78,6 +78,10 @@ public interface ProductService {
 
     Optional<Product> findByIdIfAvailable(final Long id);
 
+    Optional<Product> findEditableProduct(final Long productId, final Long ownerUserId);
+
+    boolean canPublishProducts(final Long userId);
+
     boolean decrementStock(final Long id);
 
     boolean incrementStock(final Long id);

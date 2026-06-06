@@ -16,6 +16,7 @@ import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.PurchaseStatus;
 import ar.edu.itba.paw.models.Review;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.persistence.ReviewDao;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +33,9 @@ public class ReviewServiceImplTest {
 
     @Mock
     private ProductService productService;
+
+    @Mock
+    private UserService userService;
 
     @Mock
     private NotificationService notificationService;
@@ -56,6 +60,10 @@ public class ReviewServiceImplTest {
         Mockito.when(purchaseService.findById(1L)).thenReturn(Optional.of(purchase));
         Mockito.when(reviewDao.findByPurchaseId(1L)).thenReturn(Optional.empty());
         Mockito.when(productService.findById(10L)).thenReturn(Optional.of(product));
+        Mockito.when(userService.findById(3L)).thenReturn(Optional.of(new User(
+            3L, "seller@test.com", "password", "seller", false, true, false,
+            null, null, null, null, null, null, null, null
+        )));
         Mockito.when(reviewDao.create(1L, 3L, 2L, 5, "Great")).thenReturn(expected);
 
         Review result = reviewService.create(1L, 2L, 5, "Great");

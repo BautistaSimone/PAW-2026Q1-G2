@@ -87,9 +87,9 @@ public class GlobalExceptionHandler {
         return mav;
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
+    @ExceptionHandler({AccessDeniedException.class, SecurityException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ModelAndView handleForbidden(final AccessDeniedException e) {
+    public ModelAndView handleForbidden(final Exception e) {
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("errorCode", "403");
         mav.addObject("errorMessageCode", "Error.403.message");

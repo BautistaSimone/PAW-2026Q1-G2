@@ -25,6 +25,21 @@ public interface UserService {
             final String extraAddressInfo,
             final String cbuCvu);
 
+    Optional<User> createUserIfEmailAvailable(
+            final String email,
+            final String password,
+            final String username,
+            final Boolean mod,
+            final Boolean enabled,
+            final String firstName,
+            final String lastName,
+            final String streetName,
+            final String streetNumber,
+            final String neighborhood,
+            final String province,
+            final String extraAddressInfo,
+            final String cbuCvu);
+
     void updateUserProfile(
             final Long userId,
             final String firstName,
@@ -47,6 +62,8 @@ public interface UserService {
 
     boolean isPasswordEmpty(User usr);
     boolean isVerified(User usr);
+    boolean isAdmin(final Long userId);
+    boolean hasCompleteBuyerDataForPurchase(final Long userId);
 
 	void enable(final Long id);
 

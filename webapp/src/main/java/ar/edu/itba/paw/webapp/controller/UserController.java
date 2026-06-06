@@ -21,9 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.slf4j.Logger;
@@ -36,7 +33,6 @@ import ar.edu.itba.paw.services.PurchaseService;
 import ar.edu.itba.paw.services.VerificationTokenService;
 import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.services.ReportService;
-import ar.edu.itba.paw.services.ReportedProductSummary;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.webapp.form.RegisterForm;
 import ar.edu.itba.paw.webapp.form.LoginForm;
@@ -119,39 +115,27 @@ public class UserController {
 
         LOGGER.atDebug().addArgument(form.getEmail()).log("About to attempt register email {}");
 
-        if (userService.findByEmail(form.getEmail()).isPresent()) {
-            LOGGER.atDebug().addArgument(form.getEmail()).log("The email {} is already in use");
-
+        final java.util.Optional<User> user = userService.createUserIfEmailAvailable(
+                    form.getEmail(),
+                    form.getPassword(),
+                    form.getUsername(),
+                    false,
+                    false,
+                    form.getFirstName(),
+                    form.getLastName(),
+                    form.getStreetName(),
+                    form.getStreetNumber(),
+                    form.getNeighborhood(),
+                    form.getProvince(),
+                    form.getExtraAddressInfo(),
+                    form.getCbuCvu());
+        if (!user.isPresent()) {
             errors.rejectValue("email", "EmailInUse.authForm.email");
             return mv;
         }
 
-        final User user = userService.createUser(
-                form.getEmail(),
-                form.getPassword(),
-                form.getUsername(),
-                false,
-                false,
-                form.getFirstName(),
-                form.getLastName(),
-                form.getStreetName(),
-                form.getStreetNumber(),
-                form.getNeighborhood(),
-                form.getProvince(),
-                form.getExtraAddressInfo(),
-                form.getCbuCvu());
-
-        final PawAuthUser authUser = new PawAuthUser(user);
-
-        final Authentication auth = new UsernamePasswordAuthenticationToken(
-                authUser,
-                null,
-                authUser.getAuthorities());
-
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        verificationTokenService.createVerificationTokenForUser(user.getId());
-        return new ModelAndView("redirect:/");
+        verificationTokenService.createVerificationTokenForUser(user.get().getId());
+        return new ModelAndView("redirect:/sendVerificationEmail");
     }
 
     @RequestMapping(value = "/profile")
@@ -330,14 +314,11 @@ public class UserController {
             mv.addObject("sales", salesPage.getResults());
             mv.addObject("saleProducts", saleProducts);
 
-            // Load reports for admins (checked via Spring Security role)
-            if (authUser != null && authUser.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-                final PaginatedResult<ReportedProductSummary> reportsPage = reportService
-                        .findAllGroupedByProduct(page, PROFILE_OTHER_PAGE_SIZE);
-                mv.addObject("reportsPage", reportsPage);
-                mv.addObject("reportedProducts", reportsPage.getResults());
-            }
+            reportService.findAllGroupedByProductForAdmin(authUser.getUser().getId(), page, PROFILE_OTHER_PAGE_SIZE)
+                    .ifPresent(reportsPage -> {
+                        mv.addObject("reportsPage", reportsPage);
+                        mv.addObject("reportedProducts", reportsPage.getResults());
+                    });
 
             final PaginatedResult<Product> deletedPage = productService.listUserDeletedProducts(profileUser.getId(),
                     trashPage, PROFILE_TRASH_PAGE_SIZE);
@@ -496,9 +477,6 @@ public class UserController {
             HttpServletRequest request) {
 
         final Long currentUserId = authUser.getUser().getId();
-        if (currentUserId.equals(targetUserId)) {
-            return new ModelAndView("redirect:/profile");
-        }
 
         userService.toggleFollow(currentUserId, targetUserId);
 

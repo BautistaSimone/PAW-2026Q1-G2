@@ -29,7 +29,6 @@ import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.Image;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.SellerRatingSummary;
-import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.webapp.form.ProductForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
@@ -125,7 +124,7 @@ public class ProductController {
     public ModelAndView newProductForm(
             @AuthenticationPrincipal final PawAuthUser authUser,
             @ModelAttribute("productForm") final ProductForm form) {
-        return redirectIfMissingProfileData(authUser).orElseGet(this::productFormView);
+        return redirectIfCannotPublishProducts(authUser).orElseGet(this::productFormView);
     }
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
@@ -134,7 +133,7 @@ public class ProductController {
             @Valid @ModelAttribute("productForm") final ProductForm form,
             final BindingResult errors) {
 
-        final Optional<ModelAndView> publishGuard = redirectIfMissingProfileData(authUser);
+        final Optional<ModelAndView> publishGuard = redirectIfCannotPublishProducts(authUser);
         if (publishGuard.isPresent()) {
             return publishGuard.get();
         }
@@ -166,17 +165,13 @@ public class ProductController {
             @AuthenticationPrincipal final PawAuthUser authUser,
             @PathVariable("id") final Long id,
             @ModelAttribute("productForm") final ProductForm form) {
-        final Optional<ModelAndView> publishGuard = redirectIfMissingProfileData(authUser);
+        final Optional<ModelAndView> publishGuard = redirectIfCannotPublishProducts(authUser);
         if (publishGuard.isPresent()) {
             return publishGuard.get();
         }
 
-        final Product product = productService.findByIdIfAvailable(id)
+        final Product product = productService.findEditableProduct(id, authUser.getUser().getId())
                 .orElseThrow(ResourceNotFoundException::new);
-
-        if (!product.getUserId().equals(authUser.getUser().getId())) {
-            throw new ResourceNotFoundException();
-        }
 
         form.setTitle(product.getTitle());
         form.setArtist(product.getArtist());
@@ -200,17 +195,13 @@ public class ProductController {
             @PathVariable("id") final Long id,
             @Valid @ModelAttribute("productForm") final ProductForm form,
             final BindingResult errors) {
-        final Optional<ModelAndView> publishGuard = redirectIfMissingProfileData(authUser);
+        final Optional<ModelAndView> publishGuard = redirectIfCannotPublishProducts(authUser);
         if (publishGuard.isPresent()) {
             return publishGuard.get();
         }
 
-        final Product existing = productService.findByIdIfAvailable(id)
+        productService.findEditableProduct(id, authUser.getUser().getId())
                 .orElseThrow(ResourceNotFoundException::new);
-
-        if (!existing.getUserId().equals(authUser.getUser().getId())) {
-            throw new ResourceNotFoundException();
-        }
 
         if (errors.hasErrors()) {
             return editProductFormModelAndView(id);
@@ -388,13 +379,6 @@ public class ProductController {
             @AuthenticationPrincipal final PawAuthUser authUser,
             @PathVariable("id") final Long id) {
 
-        final Product product = productService.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
-
-        if (!product.getUserId().equals(authUser.getUser().getId())) {
-            return new ModelAndView("redirect:/profile?deleteError=forbidden");
-        }
-
         if (!productService.hideProductByUser(id, authUser.getUser().getId())) {
             return new ModelAndView("redirect:/profile?deleteError=forbidden");
         }
@@ -405,10 +389,8 @@ public class ProductController {
      * No CBU/CVU → profile Mis datos with warning. Empty if OK to show or submit the publish form.
      * Authentication is enforced by Spring Security.
      */
-    private Optional<ModelAndView> redirectIfMissingProfileData(final PawAuthUser authUser) {
-        final User publisher = userService.findById(authUser.getUser().getId())
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-        if (!publisher.hasCbuCvu() || !publisher.hasNeighborhoodAndProvince()) {
+    private Optional<ModelAndView> redirectIfCannotPublishProducts(final PawAuthUser authUser) {
+        if (!productService.canPublishProducts(authUser.getUser().getId())) {
             return Optional.of(new ModelAndView("redirect:/profile?tab=mydata&missingData=publish"));
         }
         return Optional.empty();
