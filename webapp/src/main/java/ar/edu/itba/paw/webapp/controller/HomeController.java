@@ -160,10 +160,6 @@ public class HomeController {
 			@AuthenticationPrincipal PawAuthUser authUser,
 			@RequestParam(value = "page", defaultValue = "1") final int page) {
 
-		if (authUser == null) {
-			return new ModelAndView("redirect:/login");
-		}
-
 		if (page < 1) {
 			throw new IllegalArgumentException("Invalid page");
 		}
