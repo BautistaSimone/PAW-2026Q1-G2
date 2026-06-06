@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import ar.edu.itba.paw.models.PaginatedResult;
+import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.PurchaseStatus;
+import ar.edu.itba.paw.models.User;
 
 public interface PurchaseService {
     Purchase createPurchase(Long productId, Long userId);
@@ -32,4 +34,63 @@ public interface PurchaseService {
     PaginatedResult<Purchase> findByBuyerId(Long buyerId, List<PurchaseStatus> statuses, int page, int pageSize);
 
     PaginatedResult<Purchase> findBySellerId(Long sellerId, List<PurchaseStatus> statuses, int page, int pageSize);
+
+    final class PurchaseDetails {
+
+        private final Purchase purchase;
+        private final Product product;
+        private final User buyer;
+        private final User seller;
+        private final boolean buyerView;
+        private final boolean sellerView;
+
+        public PurchaseDetails(
+                final Purchase purchase,
+                final Product product,
+                final User buyer,
+                final User seller,
+                final boolean buyerView,
+                final boolean sellerView) {
+            this.purchase = purchase;
+            this.product = product;
+            this.buyer = buyer;
+            this.seller = seller;
+            this.buyerView = buyerView;
+            this.sellerView = sellerView;
+        }
+
+        public Purchase getPurchase() {
+            return purchase;
+        }
+
+        public Product getProduct() {
+            return product;
+        }
+
+        public User getBuyer() {
+            return buyer;
+        }
+
+        public User getSeller() {
+            return seller;
+        }
+
+        public boolean isBuyerView() {
+            return buyerView;
+        }
+
+        public boolean isSellerView() {
+            return sellerView;
+        }
+
+        public boolean hasPaymentProof() {
+            return purchase.getPaymentProof() != null
+                    && purchase.getPaymentProof().length > 0
+                    && purchase.getPaymentProofContentType() != null;
+        }
+
+        public String getPaymentProofFileName() {
+            return purchase.getPaymentProofFileName();
+        }
+    }
 }

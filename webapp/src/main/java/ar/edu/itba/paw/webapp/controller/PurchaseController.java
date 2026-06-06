@@ -21,7 +21,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.PurchaseStatus;
-import ar.edu.itba.paw.services.PurchaseDetails;
 import ar.edu.itba.paw.services.PurchasePaymentProof;
 import ar.edu.itba.paw.services.PurchaseService;
 import ar.edu.itba.paw.services.ReviewService;
@@ -151,7 +150,9 @@ public class PurchaseController {
     }
 
     private ModelAndView buildPurchaseView(final PawAuthUser authUser, final Long id) {
-        final PurchaseDetails details = purchaseService.getPurchaseDetailsForUser(id, authUser.getUser().getId());
+        final PurchaseService.PurchaseDetails details = purchaseService.getPurchaseDetailsForUser(
+                id,
+                authUser.getUser().getId());
         final Purchase purchase = details.getPurchase();
 
         final ModelAndView mav = new ModelAndView("purchase-panel");

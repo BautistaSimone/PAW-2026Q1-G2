@@ -138,7 +138,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Transactional
-    public PurchaseDetails getPurchaseDetailsForUser(final Long purchaseId, final Long userId) {
+    public PurchaseService.PurchaseDetails getPurchaseDetailsForUser(final Long purchaseId, final Long userId) {
         final Purchase purchase = purchaseDao.findById(purchaseId)
                 .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
         cancelIfExpired(purchase, LocalDateTime.now());
@@ -157,7 +157,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .orElseGet(() -> userService.findById(product.getUserId())
                         .orElseThrow(() -> new IllegalStateException("Seller missing")));
 
-        return new PurchaseDetails(purchase, product, buyer, seller, isBuyer, isSeller);
+        return new PurchaseService.PurchaseDetails(purchase, product, buyer, seller, isBuyer, isSeller);
     }
 
     @Override
