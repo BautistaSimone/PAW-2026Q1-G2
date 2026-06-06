@@ -368,6 +368,75 @@ public class ProductServiceImplTest {
         Assertions.assertEquals(0, result.getTotalCount());
     }
 
+    @Test
+    public void getRelatedProductsThrowsExceptionWhenProductIsNull() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            productService.getRelatedProducts(null, USER_ID, 10);
+        });
+    }
+
+    @Test
+    public void getRelatedProductsReturnsRecommendedWhenUserNotNullAndNotEmpty() {
+        final Product product = product(PRODUCT_ID, USER_ID);
+        final List<Product> expected = List.of(product(3L, 4L));
+        Mockito.when(productDao.getRecommendedProducts(USER_ID, 10, PRODUCT_ID)).thenReturn(expected);
+
+        final List<Product> result = productService.getRelatedProducts(product, USER_ID, 10);
+
+        Assertions.assertEquals(expected, result);
+        Mockito.verify(productDao).getRecommendedProducts(USER_ID, 10, PRODUCT_ID);
+        Mockito.verifyNoMoreInteractions(productDao);
+    }
+
+    @Test
+    public void getRelatedProductsFallsBackToArtistWhenRecommendedIsEmpty() {
+        final Product product = product(PRODUCT_ID, USER_ID);
+        final List<Product> expected = List.of(product(3L, 4L));
+        Mockito.when(productDao.getRecommendedProducts(USER_ID, 10, PRODUCT_ID)).thenReturn(Collections.emptyList());
+        Mockito.when(productDao.findProducts(Mockito.any(ProductSearchCriteria.class)))
+                .thenReturn(new PaginatedResult<>(expected, 1, 10, 1));
+
+        final List<Product> result = productService.getRelatedProducts(product, USER_ID, 10);
+
+        Assertions.assertEquals(expected, result);
+        Mockito.verify(productDao).getRecommendedProducts(USER_ID, 10, PRODUCT_ID);
+        Mockito.verify(productDao).findProducts(Mockito.argThat(criteria -> 
+                "Artist".equals(criteria.getSearchText()) && PRODUCT_ID.equals(criteria.getExcludeProductId())
+        ));
+    }
+
+    @Test
+    public void getRelatedProductsFallsBackToArtistWhenUserIsNull() {
+        final Product product = product(PRODUCT_ID, USER_ID);
+        final List<Product> expected = List.of(product(3L, 4L));
+        Mockito.when(productDao.findProducts(Mockito.any(ProductSearchCriteria.class)))
+                .thenReturn(new PaginatedResult<>(expected, 1, 10, 1));
+
+        final List<Product> result = productService.getRelatedProducts(product, null, 10);
+
+        Assertions.assertEquals(expected, result);
+        Mockito.verify(productDao).findProducts(Mockito.argThat(criteria -> 
+                "Artist".equals(criteria.getSearchText()) && PRODUCT_ID.equals(criteria.getExcludeProductId())
+        ));
+        Mockito.verify(productDao, Mockito.never()).getRecommendedProducts(Mockito.anyLong(), Mockito.anyInt(), Mockito.anyLong());
+    }
+
+    @Test
+    public void getRelatedProductsFallsBackToGeneralWhenArtistIsEmpty() {
+        final Product product = product(PRODUCT_ID, USER_ID);
+        final List<Product> expected = List.of(product(3L, 4L));
+        
+        Mockito.when(productDao.getRecommendedProducts(USER_ID, 10, PRODUCT_ID)).thenReturn(Collections.emptyList());
+        
+        Mockito.when(productDao.findProducts(Mockito.any(ProductSearchCriteria.class)))
+                .thenReturn(new PaginatedResult<>(Collections.emptyList(), 1, 10, 0), new PaginatedResult<>(expected, 1, 10, 1));
+
+        final List<Product> result = productService.getRelatedProducts(product, USER_ID, 10);
+
+        Assertions.assertEquals(expected, result);
+        Mockito.verify(productDao, Mockito.times(2)).findProducts(Mockito.any(ProductSearchCriteria.class));
+    }
+
     private static ProductImageData image(final byte[] data, final String contentType) {
         return new ProductImageData(data, contentType);
     }

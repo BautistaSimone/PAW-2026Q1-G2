@@ -46,7 +46,8 @@ public class WebAuthConfig {
                 .requestMatchers("/products/*/edit", "/products/*/report", "/products/*/delete", "/products/*/restore")
                 .authenticated()
                 // Authenticated-only miscellaneous actions
-                .requestMatchers(HttpMethod.POST, "/sendVerificationEmail", "/toggle-wishlist-product", "/profile/follow")
+                .requestMatchers(HttpMethod.POST, "/sendVerificationEmail", "/toggle-wishlist-product",
+                        "/profile/follow")
                 .authenticated()
                 // Authenticated-only verification/notification routes
                 .requestMatchers("/for-you", "/notifications/**").authenticated()

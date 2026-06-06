@@ -256,6 +256,28 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Product> getRelatedProducts(final Product product, final Long userId, final int limit) {
+        if (product == null) {
+            throw new IllegalArgumentException("Product cannot be null");
+        }
+        List<Product> relatedProducts = new ArrayList<>();
+        if (userId != null) {
+            relatedProducts = getRecommendedProducts(userId, limit, product.getId());
+        }
+        if (relatedProducts.isEmpty()) {
+            relatedProducts = listProductsByArtistExcept(product.getArtist(), product.getId());
+        }
+        if (relatedProducts.isEmpty()) {
+            relatedProducts = listProductsNotByUser(product.getUserId());
+        }
+        if (relatedProducts.size() > limit) {
+            return relatedProducts.subList(0, limit);
+        }
+        return relatedProducts;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public PaginatedResult<Product> getRecommendedProductsPage(
         final Long userId,
         final int page,
