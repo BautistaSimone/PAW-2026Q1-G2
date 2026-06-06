@@ -499,18 +499,33 @@ public class ProductJpaDao implements ProductDao {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
         }
 
-        final List<Product> products = em.createQuery(
-                "FROM Product p " +
+        final List<Long> ids = em.createQuery(
+                "SELECT p.productId FROM Product p " +
                         "WHERE p.userId = :userId AND p.state = :state " +
                         "ORDER BY p.published DESC, p.productId DESC",
-                Product.class)
+                Long.class)
                 .setParameter("userId", userId)
                 .setParameter("state", activeState)
                 .setFirstResult((safePage - 1) * safePageSize)
                 .setMaxResults(safePageSize)
                 .getResultList();
 
-        return new PaginatedResult<>(products, safePage, safePageSize, totalCount);
+        if (ids.isEmpty()) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, totalCount);
+        }
+
+        final TypedQuery<Product> selectQuery = em
+                .createQuery("FROM Product p WHERE p.productId IN :ids", Product.class)
+                .setParameter("ids", ids);
+
+        final Map<Long, Product> productsById = selectQuery.getResultList().stream()
+                .collect(Collectors.toMap(Product::getId, product -> product, (existing, replacement) -> existing));
+        final List<Product> orderedProducts = ids.stream()
+                .map(productsById::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return new PaginatedResult<>(orderedProducts, safePage, safePageSize, totalCount);
     }
 
     @Override
