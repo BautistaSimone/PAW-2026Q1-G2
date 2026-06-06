@@ -101,8 +101,8 @@ public class UserJpaDaoTest {
         final String email = "[EMAIL_ADDRESS]";
         final String password = "[PASSWORD]";
         final String username = "[USERNAME]";
-        final Boolean mod = false;
-        final Boolean enabled = false;
+        final boolean mod = false;
+        final boolean enabled = false;
 
         // Act
         final User user = userDao.createUser(
@@ -138,8 +138,8 @@ public class UserJpaDaoTest {
         final String email = "[EMAIL_ADDRESS]";
         final String password = "[PASSWORD]";
         final String username = "[USERNAME]";
-        final Boolean mod = false;
-        final Boolean enabled = false;
+        final boolean mod = false;
+        final boolean enabled = false;
 
         final User user = new User(
                 email,
@@ -183,8 +183,8 @@ public class UserJpaDaoTest {
         final String email = "[EMAIL_ADDRESS]";
         final String password = "[PASSWORD]";
         final String username = "[USERNAME]";
-        final Boolean mod = false;
-        final Boolean enabled = false;
+        final boolean mod = false;
+        final boolean enabled = false;
 
         final User user = new User(
                 email,
@@ -229,8 +229,8 @@ public class UserJpaDaoTest {
         final String email = "[EMAIL_ADDRESS]";
         final String password = "[PASSWORD]";
         final String username = "[USERNAME]";
-        final Boolean mod = false;
-        final Boolean enabled = false;
+        final boolean mod = false;
+        final boolean enabled = false;
 
         final User user = new User(
                 email,
