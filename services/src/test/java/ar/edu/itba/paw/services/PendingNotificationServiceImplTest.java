@@ -3,13 +3,10 @@ package ar.edu.itba.paw.services;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +46,8 @@ public class PendingNotificationServiceImplTest {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
     }
 
-    private PendingNotification createPendingNotification(Long notificationId, Long followerUserId, Long productId) throws Exception {
+    private PendingNotification createPendingNotification(Long notificationId, Long followerUserId, Long productId)
+            throws Exception {
         PendingNotification pn = new PendingNotification(followerUserId, productId);
         Field field = PendingNotification.class.getDeclaredField("notificationId");
         field.setAccessible(true);
@@ -101,9 +99,11 @@ public class PendingNotificationServiceImplTest {
         // Arrange
         PendingNotification pn = createPendingNotification(100L, 1L, 10L);
         Mockito.when(pendingNotificationDao.findAll()).thenReturn(Collections.singletonList(pn));
-        Mockito.when(productDao.findByIds(Collections.singleton(10L))).thenReturn(Collections.emptyList()); // product not found
+        Mockito.when(productDao.findByIds(Collections.singleton(10L))).thenReturn(Collections.emptyList()); // product
+                                                                                                            // not found
 
-        User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null, null, null, null);
+        User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null,
+                null, null, null);
         Mockito.when(userService.findById(1L)).thenReturn(Optional.of(user));
 
         // Act
@@ -120,11 +120,15 @@ public class PendingNotificationServiceImplTest {
         PendingNotification pn = createPendingNotification(100L, 1L, 10L);
         Mockito.when(pendingNotificationDao.findAll()).thenReturn(Collections.singletonList(pn));
 
-        Product inactiveProduct = new Product(10L, 2L, "Title", "Artist", "Label", "Catalog", "Country", Collections.emptyList(), "Desc", BigDecimal.TEN, BigDecimal.TEN, LocalDate.now(), BigDecimal.valueOf(100), 1);
+        Product inactiveProduct = new Product(10L, 2L, "Title", "Artist", "Label", "Catalog", "Country",
+                Collections.emptyList(), "Desc", BigDecimal.TEN, BigDecimal.TEN, LocalDate.now(),
+                BigDecimal.valueOf(100), 1);
         inactiveProduct.setState(ProductState.SOLD); // inactive
-        Mockito.when(productDao.findByIds(Collections.singleton(10L))).thenReturn(Collections.singletonList(inactiveProduct));
+        Mockito.when(productDao.findByIds(Collections.singleton(10L)))
+                .thenReturn(Collections.singletonList(inactiveProduct));
 
-        User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null, null, null, null);
+        User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null,
+                null, null, null);
         Mockito.when(userService.findById(1L)).thenReturn(Optional.of(user));
 
         // Act
@@ -141,11 +145,15 @@ public class PendingNotificationServiceImplTest {
         PendingNotification pn = createPendingNotification(100L, 1L, 10L);
         Mockito.when(pendingNotificationDao.findAll()).thenReturn(Collections.singletonList(pn));
 
-        Product activeProduct = new Product(10L, 2L, "Title", "Artist", "Label", "Catalog", "Country", Collections.emptyList(), "Desc", BigDecimal.TEN, BigDecimal.TEN, LocalDate.now(), BigDecimal.valueOf(100), 1);
+        Product activeProduct = new Product(10L, 2L, "Title", "Artist", "Label", "Catalog", "Country",
+                Collections.emptyList(), "Desc", BigDecimal.TEN, BigDecimal.TEN, LocalDate.now(),
+                BigDecimal.valueOf(100), 1);
         activeProduct.setState(ProductState.ACTIVE); // active
-        Mockito.when(productDao.findByIds(Collections.singleton(10L))).thenReturn(Collections.singletonList(activeProduct));
+        Mockito.when(productDao.findByIds(Collections.singleton(10L)))
+                .thenReturn(Collections.singletonList(activeProduct));
 
-        User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null, null, null, null);
+        User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null,
+                null, null, null);
         Mockito.when(userService.findById(1L)).thenReturn(Optional.of(user));
 
         // Act
@@ -153,7 +161,8 @@ public class PendingNotificationServiceImplTest {
 
         // Assert
         Mockito.verify(emailService, Mockito.times(1))
-                .sendNewVinylDigestEmail("user@test.com", "user", Collections.singletonList(activeProduct), Locale.ENGLISH);
+                .sendNewVinylDigestEmail("user@test.com", "user", Collections.singletonList(activeProduct),
+                        Locale.ENGLISH);
         Mockito.verify(pendingNotificationDao, Mockito.times(1)).deleteByIds(Collections.singletonList(100L));
     }
 
@@ -163,15 +172,20 @@ public class PendingNotificationServiceImplTest {
         PendingNotification pn = createPendingNotification(100L, 1L, 10L);
         Mockito.when(pendingNotificationDao.findAll()).thenReturn(Collections.singletonList(pn));
 
-        Product activeProduct = new Product(10L, 2L, "Title", "Artist", "Label", "Catalog", "Country", Collections.emptyList(), "Desc", BigDecimal.TEN, BigDecimal.TEN, LocalDate.now(), BigDecimal.valueOf(100), 1);
+        Product activeProduct = new Product(10L, 2L, "Title", "Artist", "Label", "Catalog", "Country",
+                Collections.emptyList(), "Desc", BigDecimal.TEN, BigDecimal.TEN, LocalDate.now(),
+                BigDecimal.valueOf(100), 1);
         activeProduct.setState(ProductState.ACTIVE);
-        Mockito.when(productDao.findByIds(Collections.singleton(10L))).thenReturn(Collections.singletonList(activeProduct));
+        Mockito.when(productDao.findByIds(Collections.singleton(10L)))
+                .thenReturn(Collections.singletonList(activeProduct));
 
-        User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null, null, null, null);
+        User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null,
+                null, null, null);
         Mockito.when(userService.findById(1L)).thenReturn(Optional.of(user));
 
         Mockito.doThrow(new RuntimeException("Mail server down"))
-                .when(emailService).sendNewVinylDigestEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyList(), Mockito.any(Locale.class));
+                .when(emailService).sendNewVinylDigestEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyList(),
+                        Mockito.any(Locale.class));
 
         // Act
         pendingNotificationService.processAndSendDigestEmails();

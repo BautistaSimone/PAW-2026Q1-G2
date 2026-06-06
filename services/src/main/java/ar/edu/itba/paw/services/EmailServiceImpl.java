@@ -57,33 +57,49 @@ public class EmailServiceImpl implements EmailService {
     @Async
     @Override
     public void sendBuyerEmail(
-            final String to,
             final Purchase purchase,
             final Product product,
-            final String title,
-            final String message,
             final User buyer,
             final User seller,
-            final PurchaseStatus currentStatus,
+            final PurchaseStatus status,
             Locale locale) {
+        final String title;
+        final String message;
+        if (status == PurchaseStatus.PENDING) {
+            title = messageSource.getMessage("Email.purchase.buyer.confirmed.title", null, locale);
+            message = messageSource.getMessage("Email.purchase.buyer.confirmed.msg", null, locale);
+        } else if (status == PurchaseStatus.SHIPPED) {
+            title = messageSource.getMessage("Email.purchase.buyer.shipped.title", null, locale);
+            message = messageSource.getMessage("Email.purchase.buyer.shipped.msg", null, locale);
+        } else {
+            throw new IllegalArgumentException("Unsupported purchase status for buyer email: " + status);
+        }
         final String purchaseUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId());
-        sendOrderEmail(to, product, purchase, title, message, purchaseUrl, buyer, seller, true, currentStatus, locale);
+        sendOrderEmail(buyer.getEmail(), product, purchase, title, message, purchaseUrl, buyer, seller, true, status, locale);
     }
 
     @Async
     @Override
     public void sendSellerEmail(
-            final String to,
             final Purchase purchase,
             final Product product,
-            final String title,
-            final String message,
             final User buyer,
             final User seller,
-            final PurchaseStatus currentStatus,
+            final PurchaseStatus status,
             Locale locale) {
+        final String title;
+        final String message;
+        if (status == PurchaseStatus.PENDING) {
+            title = messageSource.getMessage("Email.purchase.seller.requested.title", null, locale);
+            message = messageSource.getMessage("Email.purchase.seller.requested.msg", new Object[]{buyer.getUsername()}, locale);
+        } else if (status == PurchaseStatus.PAID) {
+            title = messageSource.getMessage("Email.purchase.seller.paid.title", null, locale);
+            message = messageSource.getMessage("Email.purchase.seller.paid.msg", new Object[]{buyer.getUsername()}, locale);
+        } else {
+            throw new IllegalArgumentException("Unsupported purchase status for seller email: " + status);
+        }
         final String purchaseUrl = buildAbsoluteUrl("/purchases/" + purchase.getPurchaseId());
-        sendOrderEmail(to, product, purchase, title, message, purchaseUrl, buyer, seller, false, currentStatus, locale);
+        sendOrderEmail(seller.getEmail(), product, purchase, title, message, purchaseUrl, buyer, seller, false, status, locale);
     }
 
     @Async

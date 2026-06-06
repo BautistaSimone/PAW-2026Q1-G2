@@ -73,7 +73,7 @@ public class EmailServiceImplTest {
                                 .thenReturn("<html>Buyer HTML</html>");
 
                 // Act
-                emailService.sendBuyerEmail("buyer@test.com", purchase, product, "TitleText", "MsgText", buyer, seller,
+                emailService.sendBuyerEmail(purchase, product, buyer, seller,
                                 PurchaseStatus.PENDING, Locale.ENGLISH);
 
                 // Assert
@@ -90,7 +90,7 @@ public class EmailServiceImplTest {
                                 .thenReturn("<html>Seller HTML</html>");
 
                 // Act
-                emailService.sendSellerEmail("seller@test.com", purchase, product, "TitleText", "MsgText", buyer,
+                emailService.sendSellerEmail(purchase, product, buyer,
                                 seller, PurchaseStatus.PENDING, Locale.ENGLISH);
 
                 // Assert

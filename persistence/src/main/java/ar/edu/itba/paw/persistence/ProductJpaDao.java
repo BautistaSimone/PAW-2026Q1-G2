@@ -41,7 +41,6 @@ public class ProductJpaDao implements ProductDao {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<Product> findByIds(java.util.Set<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return java.util.Collections.emptyList();

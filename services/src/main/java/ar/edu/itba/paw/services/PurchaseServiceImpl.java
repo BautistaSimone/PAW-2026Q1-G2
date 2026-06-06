@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.context.MessageSource;
 
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
@@ -31,7 +30,6 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final ProductService productService;
     private final UserService userService;
     private final EmailService emailService;
-    private final MessageSource messageSource;
     private final NotificationService notificationService;
 
     @Autowired
@@ -40,13 +38,11 @@ public class PurchaseServiceImpl implements PurchaseService {
             final ProductService productService,
             final UserService userService,
             final EmailService emailService,
-            final MessageSource messageSource,
             final NotificationService notificationService) {
         this.purchaseDao = purchaseDao;
         this.productService = productService;
         this.userService = userService;
         this.emailService = emailService;
-        this.messageSource = messageSource;
         this.notificationService = notificationService;
     }
 
@@ -97,26 +93,19 @@ public class PurchaseServiceImpl implements PurchaseService {
         runAfterCommit(() -> {
             final Locale locale = LocaleContextHolder.getLocale();
             emailService.sendBuyerEmail(
-                    buyer.getEmail(),
                     purchase,
                     product,
-                    messageSource.getMessage("Email.purchase.buyer.confirmed.title", null, locale),
-                    messageSource.getMessage("Email.purchase.buyer.confirmed.msg", null, locale),
                     buyer,
                     seller,
                     PurchaseStatus.PENDING,
-                    LocaleContextHolder.getLocale());
+                    locale);
             emailService.sendSellerEmail(
-                    seller.getEmail(),
                     purchase,
                     product,
-                    messageSource.getMessage("Email.purchase.seller.requested.title", null, locale),
-                    messageSource.getMessage("Email.purchase.seller.requested.msg",
-                            new Object[] { buyer.getUsername() }, locale),
                     buyer,
                     seller,
                     PurchaseStatus.PENDING,
-                    LocaleContextHolder.getLocale());
+                    locale);
         });
 
         return purchase;
@@ -192,12 +181,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
             // Notify seller to confirm payment
             emailService.sendSellerEmail(
-                    seller.getEmail(),
                     purchase,
                     product,
-                    messageSource.getMessage("Email.purchase.seller.paid.title", null, LocaleContextHolder.getLocale()),
-                    messageSource.getMessage("Email.purchase.seller.paid.msg", new Object[] { buyer.getUsername() },
-                            LocaleContextHolder.getLocale()),
                     buyer,
                     seller,
                     PurchaseStatus.PAID,
@@ -206,13 +191,9 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchaseDao.updateStatus(purchaseId, newStatus);
             updatedStatus = true;
             // Notify buyer
-            final Locale locale = LocaleContextHolder.getLocale();
             emailService.sendBuyerEmail(
-                    buyer.getEmail(),
                     purchase,
                     product,
-                    messageSource.getMessage("Email.purchase.buyer.shipped.title", null, locale),
-                    messageSource.getMessage("Email.purchase.buyer.shipped.msg", null, locale),
                     buyer,
                     seller,
                     PurchaseStatus.SHIPPED,

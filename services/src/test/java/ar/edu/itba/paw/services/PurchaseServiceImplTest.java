@@ -5,8 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
-import org.springframework.context.MessageSource;
-
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import org.junit.jupiter.api.Assertions;
@@ -43,9 +41,6 @@ public class PurchaseServiceImplTest {
     private EmailService emailService;
 
     @Mock
-    private MessageSource messageSource;
-
-    @Mock
     private NotificationService notificationService;
 
     private PurchaseServiceImpl purchaseService;
@@ -57,7 +52,6 @@ public class PurchaseServiceImplTest {
                 productService,
                 userService,
                 emailService,
-                messageSource,
                 notificationService);
     }
 
@@ -130,42 +124,19 @@ public class PurchaseServiceImplTest {
                 Mockito.anyString(),
                 Mockito.anyString(),
                 Mockito.any(LocalDateTime.class))).thenReturn(purchase);
-        Mockito.when(messageSource.getMessage(
-                Mockito.eq("Email.purchase.buyer.confirmed.title"),
-                Mockito.<Object[]>isNull(),
-                Mockito.any())).thenReturn("buyer title");
-        Mockito.when(messageSource.getMessage(
-                Mockito.eq("Email.purchase.buyer.confirmed.msg"),
-                Mockito.<Object[]>isNull(),
-                Mockito.any())).thenReturn("buyer message");
-        Mockito.when(messageSource.getMessage(
-                Mockito.eq("Email.purchase.seller.requested.title"),
-                Mockito.<Object[]>isNull(),
-                Mockito.any())).thenReturn("seller title");
-        Mockito.when(messageSource.getMessage(
-                Mockito.eq("Email.purchase.seller.requested.msg"),
-                Mockito.any(Object[].class),
-                Mockito.any())).thenReturn("seller message");
-
         final Purchase result = purchaseService.createPurchase(PRODUCT_ID, BUYER_ID);
 
         Assertions.assertSame(purchase, result);
         Mockito.verify(emailService).sendBuyerEmail(
-                Mockito.eq("buyer@test.com"),
                 Mockito.same(purchase),
                 Mockito.same(product),
-                Mockito.eq("buyer title"),
-                Mockito.eq("buyer message"),
                 Mockito.same(buyer),
                 Mockito.same(seller),
                 Mockito.eq(PurchaseStatus.PENDING),
                 Mockito.eq(LocaleContextHolder.getLocale()));
         Mockito.verify(emailService).sendSellerEmail(
-                Mockito.eq("seller@test.com"),
                 Mockito.same(purchase),
                 Mockito.same(product),
-                Mockito.eq("seller title"),
-                Mockito.eq("seller message"),
                 Mockito.same(buyer),
                 Mockito.same(seller),
                 Mockito.eq(PurchaseStatus.PENDING),

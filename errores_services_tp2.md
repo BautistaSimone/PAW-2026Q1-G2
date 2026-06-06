@@ -1,12 +1,3 @@
-
-### 1.2 Email: acoplamiento excesivo (Sección 3.2 del checklist)
-
-* **Ubicación:** [PurchaseServiceImpl.java](file:///c:/Users/bauti/Projects/PAW-2026Q1-G2/services/src/main/java/ar/edu/itba/paw/services/PurchaseServiceImpl.java#L95-L115)
-* **Descripción del checklist:** Servicios (no el de email) que son responsables de rellenar subject, elegir template, y armar variables del mail. Otros servicios que tienen muchas líneas dedicadas a preparar datos para el envío de mail.
-* **Detalle en el proyecto:** `PurchaseServiceImpl` obtiene directamente los mensajes traducidos (e.g. `messageSource.getMessage("Email.purchase.buyer.confirmed.title", null, locale)`) y los pasa como strings al `EmailService` (`sendBuyerEmail`, `sendSellerEmail`). La resolución de subjects y mensajes de mail debería estar encapsulada dentro de `EmailService` o `EmailServiceImpl` para no acoplar la lógica de negocio con los detalles de presentación del mail.
-
-## 2. Errores Moderados (🟡 MODERADO)
-
 ### 2.2 Locale del mail incorrecto (Sección 3.6 del checklist)
 
 * **Ubicación:**

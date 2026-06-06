@@ -22,24 +22,22 @@ public class PendingNotificationJpaDao implements PendingNotificationDao {
     @Override
     public void createForAllFollowersOf(Long sellerUserId, Long productId) {
         em.createNativeQuery(
-            "INSERT INTO pending_notifications (notification_id, follower_user_id, product_id, created_at) " +
-            "SELECT nextval('pending_notifications_notificationid_seq'), uf.follower_id, :productId, :createdAt " +
-            "FROM user_follows uf " +
-            "WHERE uf.followed_id = :sellerId"
-        )
-        .setParameter("productId", productId)
-        .setParameter("sellerId", sellerUserId)
-        .setParameter("createdAt", java.time.LocalDateTime.now())
-        .executeUpdate();
+                "INSERT INTO pending_notifications (notification_id, follower_user_id, product_id, created_at) " +
+                        "SELECT nextval('pending_notifications_notificationid_seq'), uf.follower_id, :productId, :createdAt "
+                        +
+                        "FROM user_follows uf " +
+                        "WHERE uf.followed_id = :sellerId")
+                .setParameter("productId", productId)
+                .setParameter("sellerId", sellerUserId)
+                .setParameter("createdAt", java.time.LocalDateTime.now())
+                .executeUpdate();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<PendingNotification> findAll() {
         return em.createQuery(
-            "FROM PendingNotification pn ORDER BY pn.followerUserId",
-            PendingNotification.class
-        ).getResultList();
+                "FROM PendingNotification pn ORDER BY pn.followerUserId",
+                PendingNotification.class).getResultList();
     }
 
     @Override
@@ -48,9 +46,8 @@ public class PendingNotificationJpaDao implements PendingNotificationDao {
             return;
         }
         em.createQuery(
-            "DELETE FROM PendingNotification pn WHERE pn.notificationId IN :ids"
-        )
-        .setParameter("ids", notificationIds)
-        .executeUpdate();
+                "DELETE FROM PendingNotification pn WHERE pn.notificationId IN :ids")
+                .setParameter("ids", notificationIds)
+                .executeUpdate();
     }
 }
