@@ -45,6 +45,8 @@ public interface ProductService {
 
     List<Product> getRecommendedProducts(final Long userId, final int limit, final Long productIdToExclude);
 
+    List<Product> getRelatedProducts(final Product product, final Long userId, final int limit);
+
     PaginatedResult<Product> getRecommendedProductsPage(
         final Long userId,
         final int page,

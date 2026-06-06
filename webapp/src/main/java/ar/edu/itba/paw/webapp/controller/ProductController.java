@@ -325,18 +325,11 @@ public class ProductController {
 
         List<Product> sellerProducts = productService.listProductsByUserExcept(product.getUserId(), product.getId());
 
-        List<Product> relatedProducts = new ArrayList<>();
-        if (authUser != null) {
-            relatedProducts = productService.getRecommendedProducts(authUser.getUser().getId(), 10, product.getId());
-        }
-
-        if (relatedProducts.isEmpty()) {
-            relatedProducts = productService.listProductsByArtistExcept(product.getArtist(), product.getId());
-        }
-
-        if (relatedProducts.isEmpty()) {
-            relatedProducts = productService.listProductsNotByUser(product.getUserId());
-        }
+        final List<Product> relatedProducts = productService.getRelatedProducts(
+                product,
+                authUser != null ? authUser.getUser().getId() : null,
+                10
+        );
 
         final Set<Long> carouselSellerIds = new HashSet<>();
         for (Product p : sellerProducts) {
@@ -386,7 +379,8 @@ public class ProductController {
     }
 
     /**
-     * No CBU/CVU → profile Mis datos with warning. Empty if OK to show or submit the publish form.
+     * No CBU/CVU → profile Mis datos with warning. Empty if OK to show or submit
+     * the publish form.
      * Authentication is enforced by Spring Security.
      */
     private Optional<ModelAndView> redirectIfCannotPublishProducts(final PawAuthUser authUser) {

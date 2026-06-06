@@ -28,9 +28,6 @@ public class NotificationController {
             @AuthenticationPrincipal final PawAuthUser authUser,
             @RequestParam("id") final Long notificationId,
             final HttpServletRequest request) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
         notificationService.markRead(authUser.getUser().getId(), notificationId);
         return redirectToReferer(request);
     }
@@ -39,9 +36,6 @@ public class NotificationController {
     public ModelAndView markAllRead(
             @AuthenticationPrincipal final PawAuthUser authUser,
             final HttpServletRequest request) {
-        if (authUser == null) {
-            return new ModelAndView("redirect:/login");
-        }
         notificationService.markAllRead(authUser.getUser().getId());
         return redirectToReferer(request);
     }
