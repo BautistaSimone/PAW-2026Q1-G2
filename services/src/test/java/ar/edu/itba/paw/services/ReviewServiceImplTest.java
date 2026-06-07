@@ -44,6 +44,10 @@ public class ReviewServiceImplTest {
         return new Purchase(1L, 10L, buyerId, 99L, LocalDate.now(), status, "bt", "st");
     }
 
+    private Purchase makePurchase(PurchaseStatus status, long buyerId, long sellerId) {
+        return new Purchase(1L, 10L, buyerId, sellerId, LocalDate.now(), status, "bt", "st");
+    }
+
     private Product makeProduct(long userId) {
         return new Product(10L, userId, "Title", "Artist", "", "", "",
             java.util.Collections.emptyList(), "desc",
@@ -53,7 +57,7 @@ public class ReviewServiceImplTest {
 
     @Test
     public void testCreateReviewSuccessfully() {
-        Purchase purchase = makePurchase(PurchaseStatus.DELIVERED, 2L);
+        Purchase purchase = makePurchase(PurchaseStatus.DELIVERED, 2L, 3L);
         Product product = makeProduct(3L);
         Review expected = new Review(1L, 1L, 3L, 2L, 5, "Great", LocalDateTime.now(), null);
 
