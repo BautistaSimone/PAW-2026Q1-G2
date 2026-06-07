@@ -60,7 +60,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         final Product product = productService.findById(purchase.getProductId())
                 .orElseThrow(() -> new IllegalStateException("Product not found"));
-        final User seller = userService.findById(product.getUserId())
+        final User seller = userService.findById(purchase.getSellerId())
                 .orElseThrow(() -> new IllegalStateException("Seller not found"));
 
         return ReviewEligibility.available(new ReviewContext(purchase, product, seller));

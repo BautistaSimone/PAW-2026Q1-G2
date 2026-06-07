@@ -154,8 +154,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         final User buyer = userService.findById(purchase.getBuyerId())
                 .orElseThrow(() -> new IllegalStateException("Buyer missing"));
         final User seller = userService.findById(purchase.getSellerId())
-                .orElseGet(() -> userService.findById(product.getUserId())
-                        .orElseThrow(() -> new IllegalStateException("Seller missing")));
+                .orElseThrow(() -> new IllegalStateException("Seller missing"));
 
         return new PurchaseService.PurchaseDetails(purchase, product, buyer, seller, isBuyer, isSeller);
     }
@@ -202,7 +201,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         final Product product = productService.findById(purchase.getProductId())
                 .orElseThrow(() -> new IllegalStateException("Product missing"));
 
-        final User seller = userService.findById(product.getUserId())
+        final User seller = userService.findById(purchase.getSellerId())
                 .orElseThrow(() -> new IllegalStateException("Seller missing"));
 
         final User buyer = userService.findById(purchase.getBuyerId())
