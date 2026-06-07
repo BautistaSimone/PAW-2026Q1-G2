@@ -64,20 +64,23 @@ public class ReviewJpaDao implements ReviewDao {
 
     @Override
     public PaginatedResult<Review> findBySellerId(long sellerId, int page, int pageSize) {
+        final int safePage = page < 1 ? 1 : page;
+        final int safePageSize = pageSize < 1 ? 10 : pageSize;
+
         final long totalCount = em.createQuery(
                 "SELECT COUNT(r) FROM Review r WHERE r.sellerId = :sellerId", Long.class)
                 .setParameter("sellerId", sellerId)
                 .getSingleResult();
 
         if (totalCount == 0) {
-            return new PaginatedResult<>(Collections.emptyList(), page, pageSize, 0);
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
         }
 
         final List<Review> reviews = em.createQuery(
                 "FROM Review r WHERE r.sellerId = :sellerId ORDER BY r.createdAt DESC", Review.class)
                 .setParameter("sellerId", sellerId)
-                .setMaxResults(pageSize)
-                .setFirstResult((page - 1) * pageSize)
+                .setMaxResults(safePageSize)
+                .setFirstResult((safePage - 1) * safePageSize)
                 .getResultList();
 
         if (!reviews.isEmpty()) {

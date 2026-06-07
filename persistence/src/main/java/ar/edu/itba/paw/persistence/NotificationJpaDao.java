@@ -61,6 +61,8 @@ public class NotificationJpaDao implements NotificationDao {
             final NotificationType typeFilter,
             final int page,
             final int pageSize) {
+        final int safePage = page < 1 ? 1 : page;
+        final int safePageSize = pageSize < 1 ? 20 : pageSize;
 
         final StringBuilder whereJpql = new StringBuilder("WHERE n.recipientUserId = :recipientUserId");
         if (typeFilter != null) {
@@ -88,8 +90,8 @@ public class NotificationJpaDao implements NotificationDao {
         if (typeFilter != null) {
             selectQuery.setParameter("type", typeFilter);
         }
-        selectQuery.setMaxResults(pageSize);
-        selectQuery.setFirstResult((page - 1) * pageSize);
+        selectQuery.setMaxResults(safePageSize);
+        selectQuery.setFirstResult((safePage - 1) * safePageSize);
 
         return new PaginatedResult<>(selectQuery.getResultList(), page, pageSize, totalCount);
     }

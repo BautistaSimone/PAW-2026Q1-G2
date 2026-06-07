@@ -58,6 +58,9 @@ public class PurchaseJpaDao implements PurchaseDao {
 
     @Override
     public PaginatedResult<Purchase> findByBuyerId(Long buyerId, List<PurchaseStatus> statuses, int page, int pageSize) {
+        final int safePage = page < 1 ? 1 : page;
+        final int safePageSize = pageSize < 1 ? 12 : pageSize;
+
         final StringBuilder whereJpql = new StringBuilder("WHERE p.buyerId = :buyerId");
         final List<String> paramNames = new ArrayList<>();
         final List<Object> paramValues = new ArrayList<>();
@@ -74,7 +77,7 @@ public class PurchaseJpaDao implements PurchaseDao {
         final long totalCount = countQuery.getSingleResult();
 
         if (totalCount == 0) {
-            return new PaginatedResult<>(Collections.emptyList(), page, pageSize, 0);
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
         }
 
         final TypedQuery<Purchase> selectQuery = em.createQuery(
@@ -83,14 +86,17 @@ public class PurchaseJpaDao implements PurchaseDao {
         for (int i = 0; i < paramNames.size(); i++) {
             selectQuery.setParameter(paramNames.get(i), paramValues.get(i));
         }
-        selectQuery.setMaxResults(pageSize);
-        selectQuery.setFirstResult((page - 1) * pageSize);
+        selectQuery.setMaxResults(safePageSize);
+        selectQuery.setFirstResult((safePage - 1) * safePageSize);
 
         return new PaginatedResult<>(selectQuery.getResultList(), page, pageSize, totalCount);
     }
 
     @Override
     public PaginatedResult<Purchase> findBySellerId(Long sellerId, List<PurchaseStatus> statuses, int page, int pageSize) {
+        final int safePage = page < 1 ? 1 : page;
+        final int safePageSize = pageSize < 1 ? 12 : pageSize;
+
         final StringBuilder whereJpql = new StringBuilder("WHERE p.sellerId = :sellerId");
         final List<String> paramNames = new ArrayList<>();
         final List<Object> paramValues = new ArrayList<>();
@@ -107,7 +113,7 @@ public class PurchaseJpaDao implements PurchaseDao {
         final long totalCount = countQuery.getSingleResult();
 
         if (totalCount == 0) {
-            return new PaginatedResult<>(Collections.emptyList(), page, pageSize, 0);
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
         }
 
         final TypedQuery<Purchase> selectQuery = em.createQuery(
@@ -116,8 +122,8 @@ public class PurchaseJpaDao implements PurchaseDao {
         for (int i = 0; i < paramNames.size(); i++) {
             selectQuery.setParameter(paramNames.get(i), paramValues.get(i));
         }
-        selectQuery.setMaxResults(pageSize);
-        selectQuery.setFirstResult((page - 1) * pageSize);
+        selectQuery.setMaxResults(safePageSize);
+        selectQuery.setFirstResult((safePage - 1) * safePageSize);
 
         return new PaginatedResult<>(selectQuery.getResultList(), page, pageSize, totalCount);
     }

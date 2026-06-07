@@ -37,14 +37,16 @@ public class ReportJpaDao implements ReportDao {
 
     @Override
     public PaginatedResult<ReportedProductProjection> findAllGroupedByProduct(int page, int pageSize) {
-        final int offset = (page - 1) * pageSize;
+        final int safePage = page < 1 ? 1 : page;
+        final int safePageSize = pageSize < 1 ? 10 : pageSize;
+        final int offset = (safePage - 1) * safePageSize;
 
         final long totalDistinct = em.createQuery(
                 "SELECT COUNT(DISTINCT r.productId) FROM Report r", Long.class).getSingleResult();
 
         final int total = (int) totalDistinct;
         if (total == 0) {
-            return new PaginatedResult<>(Collections.emptyList(), page, pageSize, total);
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, total);
         }
 
         @SuppressWarnings("unchecked")
@@ -55,7 +57,7 @@ public class ReportJpaDao implements ReportDao {
                         "JOIN User u ON r.ownerUserId = u.id " +
                         "GROUP BY r.productId, r.ownerUserId, p.title, p.artist, u.username " +
                         "ORDER BY COUNT(r) DESC")
-                .setMaxResults(pageSize)
+                .setMaxResults(safePageSize)
                 .setFirstResult(offset)
                 .getResultList();
 
@@ -67,7 +69,7 @@ public class ReportJpaDao implements ReportDao {
                 (String) row[4],
                 (String) row[5])).toList();
 
-        return new PaginatedResult<>(results, page, pageSize, total);
+        return new PaginatedResult<>(results, safePage, safePageSize, total);
     }
 
     @Override
