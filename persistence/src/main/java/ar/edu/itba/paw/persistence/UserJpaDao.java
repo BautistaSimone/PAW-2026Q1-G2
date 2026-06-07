@@ -64,7 +64,16 @@ public class UserJpaDao implements UserDao {
 
     @Override
     public Optional<User> findById(final Long id) {
-        return Optional.ofNullable(em.find(User.class, id));
+        if (id == null) {
+            return Optional.empty();
+        }
+        return em.createQuery(
+                "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.favoriteCategories WHERE u.id = :id",
+                User.class)
+                .setParameter("id", id)
+                .getResultList()
+                .stream()
+                .findFirst();
     }
 
     @Override
@@ -196,13 +205,10 @@ public class UserJpaDao implements UserDao {
             return Collections.emptyList();
         }
 
-        final TypedQuery<Product> selectQuery = em.createQuery("FROM Product WHERE productId IN :ids", Product.class)
-                .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
-
         // FIXME: Allow page number to be specified
         // return new PaginatedResult<>(selectQuery.getResultList(), 0, safePageSize,
         // ids.size());
-        return selectQuery.getResultList();
+        return findProductsWithCategoriesPreservingOrder(ids.stream().map(Number::longValue).collect(Collectors.toList()));
     }
 
     @Override
@@ -543,6 +549,28 @@ public class UserJpaDao implements UserDao {
                 .stream()
                 .sorted((left, right) -> Integer.compare(orderById.get(left.getId()), orderById.get(right.getId())))
                 .collect(Collectors.toList());
+    }
+
+    private List<Product> findProductsWithCategoriesPreservingOrder(final List<Long> orderedIds) {
+        if (orderedIds == null || orderedIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final Map<Long, Integer> orderById = new HashMap<>();
+        for (int i = 0; i < orderedIds.size(); i++) {
+            orderById.put(orderedIds.get(i), i);
+        }
+
+        final List<Product> products = em.createQuery(
+                "SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId IN :ids",
+                Product.class)
+                .setParameter("ids", orderedIds)
+                .getResultList();
+
+        products.sort((left, right) -> Integer.compare(
+                orderById.getOrDefault(left.getId(), Integer.MAX_VALUE),
+                orderById.getOrDefault(right.getId(), Integer.MAX_VALUE)));
+        return products;
     }
 
     private static String escapeForLike(final String value) {

@@ -13,7 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -37,7 +36,10 @@ public class ProductJpaDao implements ProductDao {
 
     @Override
     public Optional<Product> findById(final Long id) {
-        return Optional.ofNullable(em.find(Product.class, id));
+        if (id == null) {
+            return Optional.empty();
+        }
+        return findProductsWithCategoriesPreservingOrder(Collections.singletonList(id)).stream().findFirst();
     }
 
     @Override
@@ -45,10 +47,7 @@ public class ProductJpaDao implements ProductDao {
         if (ids == null || ids.isEmpty()) {
             return java.util.Collections.emptyList();
         }
-        return em.createQuery(
-                "FROM Product p WHERE p.productId IN :ids", Product.class)
-                .setParameter("ids", ids)
-                .getResultList();
+        return findProductsWithCategoriesPreservingOrder(new ArrayList<>(ids));
     }
 
     @Override
@@ -236,19 +235,7 @@ public class ProductJpaDao implements ProductDao {
                     totalCount);
         }
 
-        final TypedQuery<Product> selectQuery = em
-                .createQuery("FROM Product p WHERE p.productId IN :ids", Product.class)
-                .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
-
-        // Mantain ordering
-        final Map<Long, Product> productsById = selectQuery.getResultList().stream()
-                .collect(Collectors.toMap(Product::getId, product -> product, (existing, replacement) -> existing));
-
-        final List<Product> orderedProducts = ids.stream()
-                .map(Number::longValue)
-                .map(productsById::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        final List<Product> orderedProducts = findProductsWithCategoriesPreservingOrder(toLongIds(ids));
 
         return new PaginatedResult<>(orderedProducts, safePage, safePageSize, totalCount);
     }
@@ -287,7 +274,7 @@ public class ProductJpaDao implements ProductDao {
                 " JOIN purchase_cats pcats ON pcats.category_id = pc.category_id" +
                 " GROUP BY pc.product_id" +
                 ")" +
-                " SELECT p.*" +
+                " SELECT p.product_id" +
                 " FROM products p" +
                 " LEFT JOIN fav_match fm ON fm.product_id = p.product_id" +
                 " LEFT JOIN wishlist_match wm ON wm.product_id = p.product_id" +
@@ -310,7 +297,7 @@ public class ProductJpaDao implements ProductDao {
                         " COALESCE(pm.match_count, 0) DESC," +
                         " p.published DESC, p.product_id DESC";
 
-        final javax.persistence.Query query = em.createNativeQuery(sql, Product.class)
+        final javax.persistence.Query query = em.createNativeQuery(sql)
                 .setParameter("userId", userId)
                 .setParameter("state", ProductState.ACTIVE.getPersistenceValue());
 
@@ -319,11 +306,11 @@ public class ProductJpaDao implements ProductDao {
         }
 
         @SuppressWarnings("unchecked")
-        final List<Product> results = query
+        final List<Number> ids = query
                 .setMaxResults(limit)
                 .getResultList();
 
-        return results;
+        return findProductsWithCategoriesPreservingOrder(toLongIds(ids));
     }
 
     @Override
@@ -433,17 +420,7 @@ public class ProductJpaDao implements ProductDao {
         }
 
         final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
-        final TypedQuery<Product> selectQuery = em
-                .createQuery("FROM Product p WHERE p.productId IN :ids", Product.class)
-                .setParameter("ids", longIds);
-
-        final Map<Long, Product> productsById = selectQuery.getResultList().stream()
-                .collect(Collectors.toMap(Product::getId, product -> product, (existing, replacement) -> existing));
-
-        final List<Product> orderedProducts = longIds.stream()
-                .map(productsById::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        final List<Product> orderedProducts = findProductsWithCategoriesPreservingOrder(longIds);
 
         return new PaginatedResult<>(orderedProducts, safePage, safePageSize, total);
     }
@@ -487,17 +464,7 @@ public class ProductJpaDao implements ProductDao {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, totalCount);
         }
 
-        final TypedQuery<Product> selectQuery = em
-                .createQuery("FROM Product p WHERE p.productId IN :ids", Product.class)
-                .setParameter("ids", ids.stream().map(Number::longValue).collect(Collectors.toList()));
-
-        final Map<Long, Product> productsById = selectQuery.getResultList().stream()
-                .collect(Collectors.toMap(Product::getId, product -> product, (existing, replacement) -> existing));
-        final List<Product> orderedProducts = ids.stream()
-                .map(Number::longValue)
-                .map(productsById::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        final List<Product> orderedProducts = findProductsWithCategoriesPreservingOrder(toLongIds(ids));
 
         return new PaginatedResult<>(orderedProducts, safePage, safePageSize, totalCount);
     }
@@ -546,16 +513,7 @@ public class ProductJpaDao implements ProductDao {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, totalCount);
         }
 
-        final TypedQuery<Product> selectQuery = em
-                .createQuery("FROM Product p WHERE p.productId IN :ids", Product.class)
-                .setParameter("ids", ids);
-
-        final Map<Long, Product> productsById = selectQuery.getResultList().stream()
-                .collect(Collectors.toMap(Product::getId, product -> product, (existing, replacement) -> existing));
-        final List<Product> orderedProducts = ids.stream()
-                .map(productsById::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        final List<Product> orderedProducts = findProductsWithCategoriesPreservingOrder(ids);
 
         return new PaginatedResult<>(orderedProducts, safePage, safePageSize, totalCount);
     }
@@ -612,8 +570,8 @@ public class ProductJpaDao implements ProductDao {
             return productsByUserId;
         }
 
-        final List<Product> products = em.createQuery(
-                "FROM Product p " +
+        final List<Long> productIds = em.createQuery(
+                "SELECT p.productId FROM Product p " +
                         "WHERE p.state = :state AND p.userId IN :ids " +
                         "AND (" +
                         " SELECT COUNT(newer) FROM Product newer " +
@@ -625,12 +583,13 @@ public class ProductJpaDao implements ProductDao {
                         " )" +
                         ") <= :limit " +
                         "ORDER BY p.userId ASC, p.published DESC, p.productId DESC",
-                Product.class)
+                Long.class)
                 .setParameter("state", ProductState.ACTIVE)
                 .setParameter("ids", distinctUserIds)
                 .setParameter("limit", (long) perUserLimit)
                 .getResultList();
 
+        final List<Product> products = findProductsWithCategoriesPreservingOrder(productIds);
         for (Product product : products) {
             productsByUserId.computeIfAbsent(product.getUserId(), productId -> new ArrayList<>()).add(product);
         }
@@ -713,7 +672,7 @@ public class ProductJpaDao implements ProductDao {
     @Override
     public Optional<Product> findByIdIfAvailable(final Long id) {
         final TypedQuery<Product> query = em.createQuery(
-                "FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId = :productId AND p.state = :state",
+                "SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId = :productId AND p.state = :state",
                 Product.class);
         query.setParameter("productId", id);
         query.setParameter("state", ProductState.ACTIVE);
@@ -831,6 +790,37 @@ public class ProductJpaDao implements ProductDao {
             escaped.append(ch);
         }
         return escaped.toString();
+    }
+
+    private List<Product> findProductsWithCategoriesPreservingOrder(final List<Long> orderedIds) {
+        if (orderedIds == null || orderedIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final Map<Long, Integer> orderById = new HashMap<>();
+        for (int i = 0; i < orderedIds.size(); i++) {
+            orderById.put(orderedIds.get(i), i);
+        }
+
+        final List<Product> products = em.createQuery(
+                "SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId IN :ids",
+                Product.class)
+                .setParameter("ids", orderedIds)
+                .getResultList();
+
+        products.sort((left, right) -> Integer.compare(
+                orderById.getOrDefault(left.getId(), Integer.MAX_VALUE),
+                orderById.getOrDefault(right.getId(), Integer.MAX_VALUE)));
+        return products;
+    }
+
+    private static List<Long> toLongIds(final List<? extends Number> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return ids.stream()
+                .map(Number::longValue)
+                .collect(Collectors.toList());
     }
 
     @Override
