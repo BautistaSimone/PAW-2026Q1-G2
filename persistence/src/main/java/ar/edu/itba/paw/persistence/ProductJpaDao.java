@@ -222,12 +222,12 @@ public class ProductJpaDao implements ProductDao {
         @SuppressWarnings("unchecked")
         List<Number> ids = idsQuery
                 .setFirstResult((safePage - 1) * safePageSize)
-                .setMaxResults(safePageSize)
+                .setMaxResults(safePageSize + 1)
                 .getResultList();
 
-        boolean hasNext = ids.size() > criteria.getPageSize();
+        boolean hasNext = ids.size() > safePageSize;
         if (hasNext) {
-            ids = ids.subList(0, criteria.getPageSize());
+            ids = ids.subList(0, safePageSize);
         }
 
         // Fetch full entities by IDs
@@ -400,8 +400,8 @@ public class ProductJpaDao implements ProductDao {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
         }
 
-        final String selectSql = baseSql +
-                " SELECT p.*" +
+        final String idsSql = baseSql +
+                " SELECT p.product_id" +
                 " FROM products p" +
                 " LEFT JOIN fav_match fm ON fm.product_id = p.product_id" +
                 " LEFT JOIN wishlist_match wm ON wm.product_id = p.product_id" +
@@ -409,21 +409,43 @@ public class ProductJpaDao implements ProductDao {
                 whereSql +
                 orderSql;
 
-        final javax.persistence.Query query = em.createNativeQuery(selectSql, Product.class)
+        final javax.persistence.Query idsNativeQuery = em.createNativeQuery(idsSql)
                 .setParameter("userId", userId)
                 .setParameter("state", ProductState.ACTIVE.getPersistenceValue());
 
         if (productIdToExclude != null) {
-            query.setParameter("excludeId", productIdToExclude);
+            idsNativeQuery.setParameter("excludeId", productIdToExclude);
         }
 
         @SuppressWarnings("unchecked")
-        final List<Product> results = query
+        List<Number> ids = idsNativeQuery
                 .setFirstResult((safePage - 1) * safePageSize)
-                .setMaxResults(safePageSize)
+                .setMaxResults(safePageSize + 1)
                 .getResultList();
 
-        return new PaginatedResult<>(results, safePage, safePageSize, total);
+        boolean hasNext = ids.size() > safePageSize;
+        if (hasNext) {
+            ids = ids.subList(0, safePageSize);
+        }
+
+        if (ids.isEmpty()) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, total);
+        }
+
+        final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
+        final TypedQuery<Product> selectQuery = em
+                .createQuery("FROM Product p WHERE p.productId IN :ids", Product.class)
+                .setParameter("ids", longIds);
+
+        final Map<Long, Product> productsById = selectQuery.getResultList().stream()
+                .collect(Collectors.toMap(Product::getId, product -> product, (existing, replacement) -> existing));
+
+        final List<Product> orderedProducts = longIds.stream()
+                .map(productsById::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return new PaginatedResult<>(orderedProducts, safePage, safePageSize, total);
     }
 
     @Override
@@ -453,8 +475,13 @@ public class ProductJpaDao implements ProductDao {
                 .setParameter("userId", userId)
                 .setParameter("state", stateVal)
                 .setFirstResult((safePage - 1) * safePageSize)
-                .setMaxResults(safePageSize)
+                .setMaxResults(safePageSize + 1)
                 .getResultList();
+
+        boolean hasNext = ids.size() > safePageSize;
+        if (hasNext) {
+            ids = ids.subList(0, safePageSize);
+        }
 
         if (ids.isEmpty()) {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, totalCount);
@@ -499,7 +526,7 @@ public class ProductJpaDao implements ProductDao {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
         }
 
-        final List<Long> ids = em.createQuery(
+        List<Long> ids = em.createQuery(
                 "SELECT p.productId FROM Product p " +
                         "WHERE p.userId = :userId AND p.state = :state " +
                         "ORDER BY p.published DESC, p.productId DESC",
@@ -507,8 +534,13 @@ public class ProductJpaDao implements ProductDao {
                 .setParameter("userId", userId)
                 .setParameter("state", activeState)
                 .setFirstResult((safePage - 1) * safePageSize)
-                .setMaxResults(safePageSize)
+                .setMaxResults(safePageSize + 1)
                 .getResultList();
+
+        boolean hasNext = ids.size() > safePageSize;
+        if (hasNext) {
+            ids = ids.subList(0, safePageSize);
+        }
 
         if (ids.isEmpty()) {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, totalCount);
