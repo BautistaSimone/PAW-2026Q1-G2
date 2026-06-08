@@ -6,15 +6,17 @@
                     <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
                         <spring:message code="ForYou.title" var="forYouTitle" />
+                        <spring:message code="ForYou.cta.favoriteCategories" var="favoriteCategoriesCta" />
+                        <spring:message code="ForYou.cta.favoriteCategories.ariaLabel" var="favoriteCategoriesCtaAriaLabel" />
                         <ui:layout title="${forYouTitle}">
 
                             <ui:header showHeaderActions="true" activeSection="forYou" />
 
                             <div class="products-section">
                                 <div class="container-fluid products-shell">
-
-
-
+                                    <c:url var="favoriteCategoriesUrl" value="/profile">
+                                        <c:param name="tab" value="mydata" />
+                                    </c:url>
 
                                     <div class="foryou-section">
                                         <div class="foryou-section-header">
@@ -22,6 +24,12 @@
                                                 <i class="bi bi-heart" aria-hidden="true"></i>
                                                 <spring:message code="ForYou.section.wishlist" />
                                             </h2>
+                                            <a href="<c:out value='${favoriteCategoriesUrl}'/>#favorite-categories"
+                                                class="btn btn-retro btn-retro-primary foryou-profile-cta"
+                                                aria-label="<c:out value='${favoriteCategoriesCtaAriaLabel}'/>">
+                                                <i class="bi bi-tags" aria-hidden="true"></i>
+                                                <c:out value="${favoriteCategoriesCta}" />
+                                            </a>
                                         </div>
                                         <c:choose>
                                             <c:when test="${not empty wishlistProducts}">

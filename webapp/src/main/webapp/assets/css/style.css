@@ -4896,23 +4896,12 @@ input[type="password"]::-ms-clear {
 }
 
 /* For You page */
-.foryou-header {
-  margin-bottom: 1.5rem;
-}
-
-.foryou-heading {
-  font-size: 1.6rem;
-  font-weight: 700;
-  display: flex;
+.foryou-profile-cta {
+  flex-shrink: 0;
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.foryou-subheading {
-  font-size: 0.95rem;
-  color: var(--color-text-muted);
-  margin: 0;
+  gap: 0.45rem;
+  white-space: nowrap;
 }
 
 .foryou-empty-icon {
@@ -4933,6 +4922,7 @@ input[type="password"]::-ms-clear {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 1rem;
 }
 
@@ -5022,6 +5012,27 @@ input[type="password"]::-ms-clear {
   flex-shrink: 0;
 }
 
+.profile-favorite-categories-card {
+  scroll-margin-top: 6rem;
+}
+
+.profile-favorite-categories-card:target {
+  animation: favorite-categories-focus 1.6s ease-out;
+  border-color: var(--color-accent);
+}
+
+@keyframes favorite-categories-focus {
+  0% {
+    box-shadow: 0 0 0 0 rgba(196, 64, 48, 0.35);
+  }
+  35% {
+    box-shadow: 0 0 0 0.35rem rgba(196, 64, 48, 0.18);
+  }
+  100% {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+}
+
 /* Responsive: header nav links */
 @media (max-width: 768px) {
   .header-nav-links {
@@ -5032,6 +5043,11 @@ input[type="password"]::-ms-clear {
   }
   .header-nav-link {
     padding: 0.45rem 0.55rem;
+  }
+
+  .foryou-profile-cta {
+    justify-content: center;
+    width: 100%;
   }
 }
 

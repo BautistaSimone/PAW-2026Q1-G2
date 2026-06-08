@@ -678,7 +678,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="profile-div-6">
+                                <div class="profile-div-6 profile-favorite-categories-card" id="favorite-categories">
                                     <h4 class="mb-3"><spring:message code="Profile.tabs.favoriteGenres" /></h4>
                                     <p class="profile-p-7">
                                         <spring:message code="Profile.favoriteGenres.help" />
