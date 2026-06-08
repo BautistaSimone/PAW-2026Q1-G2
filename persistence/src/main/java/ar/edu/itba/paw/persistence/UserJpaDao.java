@@ -357,12 +357,30 @@ public class UserJpaDao implements UserDao {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, 0);
         }
 
-        final List<User> users = em.createQuery(
-                "FROM User u WHERE LOWER(u.username) LIKE :q ESCAPE '\\' AND u.banned = false ORDER BY u.username ASC",
-                User.class)
-                .setParameter("q", likePattern)
+	// Paginate with 1 + 1 queries
+        @SuppressWarnings("unchecked")
+        List<Number> ids = em.createNativeQuery(
+                "SELECT user_id FROM users WHERE LOWER(u.username) LIKE :q ESCAPE '\\' AND u.banned = false")
+		.setParameter("q", likePattern)
                 .setFirstResult((safePage - 1) * safeSize)
-                .setMaxResults(safeSize)
+                .setMaxResults(safeSize + 1)
+                .getResultList();
+
+        boolean hasNext = ids.size() > safeSize;
+        if (hasNext) {
+            ids = ids.subList(0, safeSize);
+        }
+
+	if (ids.isEmpty()) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, totalCount);
+        }
+        
+	final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
+ 
+        final List<User> users = em.createQuery(
+                "FROM User u WHERE u.id IN :ids ORDER BY u.username ASC",
+                User.class)
+                .setParameter("ids", longIds)
                 .getResultList();
 
         return new PaginatedResult<>(users, safePage, safeSize, totalCount);
@@ -457,23 +475,39 @@ public class UserJpaDao implements UserDao {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, 0);
         }
 
-        final List<User> users = em.createQuery(
-                "FROM User u " +
-                        "WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
-                        "AND u.banned = false " +
-                        "AND EXISTS (" +
-                        " SELECT p.productId FROM Product p " +
-                        " WHERE p.userId = u.id AND p.state = :state" +
-                        ") " +
-                        "ORDER BY LOWER(u.username) ASC, u.id ASC",
-                User.class)
+	// Paginate with 1 + 1 queries
+        @SuppressWarnings("unchecked")
+        List<Number> ids = em.createNativeQuery(
+                "SELECT u.user_id FROM users AS u " + 
+		"WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
+                "AND u.banned = false " +
+                "AND EXISTS (" +
+                " SELECT p.product_id FROM products AS p " +
+                " WHERE p.user_id = u.user_id AND p.state = :state)")
                 .setParameter("q", likePattern)
-                .setParameter("state", activeState)
+                .setParameter("state", activeState.getPersistenceValue())
                 .setFirstResult((safePage - 1) * safeSize)
-                .setMaxResults(safeSize)
+                .setMaxResults(safeSize + 1)
                 .getResultList();
 
-        return new PaginatedResult<>(users, safePage, safeSize, totalCount);
+        boolean hasNext = ids.size() > safeSize;
+        if (hasNext) {
+            ids = ids.subList(0, safeSize);
+        }
+
+	if (ids.isEmpty()) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, totalCount);
+        }
+         
+	final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
+ 
+        final List<User> users = em.createQuery(
+                "FROM User u WHERE u.id IN :ids ORDER BY LOWER(u.username) ASC, u.id ASC",
+                User.class)
+                .setParameter("ids", longIds)
+                .getResultList();
+
+	return new PaginatedResult<>(users, safePage, safeSize, totalCount);
     }
 
     @Override
