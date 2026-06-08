@@ -104,7 +104,6 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
-                @Transactional
                 public void afterCommit() {
                     task.run();
                 }
