@@ -124,12 +124,17 @@ public class UserJpaDao implements UserDao {
             throw new EntityNotFoundException("User not found");
         }
         user.getFavoriteCategories().clear();
-        if (categoryIds != null) {
-            for (Long cid : categoryIds) {
-                ar.edu.itba.paw.models.Category c = em.find(ar.edu.itba.paw.models.Category.class, cid);
-                if (c != null) {
-                    user.getFavoriteCategories().add(c);
-                }
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            final List<Long> distinctIds = categoryIds.stream()
+                    .filter(cid -> cid != null)
+                    .distinct()
+                    .collect(Collectors.toList());
+            if (!distinctIds.isEmpty()) {
+                final List<ar.edu.itba.paw.models.Category> categories = em
+                        .createQuery("FROM Category WHERE id IN :ids", ar.edu.itba.paw.models.Category.class)
+                        .setParameter("ids", distinctIds)
+                        .getResultList();
+                user.getFavoriteCategories().addAll(categories);
             }
         }
     }
@@ -192,7 +197,6 @@ public class UserJpaDao implements UserDao {
     public List<Product> getWishlistProducts(final Long userId, final int limit) {
         final int safeLimit = Math.max(limit, 1);
 
-        // Paginate with 1 + 1 queries
         @SuppressWarnings("unchecked")
         List<Number> ids = em.createNativeQuery("SELECT product_id FROM user_wishlist_products WHERE user_id = :userId")
                 .setParameter("userId", userId)
@@ -201,14 +205,13 @@ public class UserJpaDao implements UserDao {
                 .getResultList();
 
         if (ids.isEmpty()) {
-            // return new PaginatedResult<>(Collections.emptyList(), 0, safeLimit, 0);
             return Collections.emptyList();
         }
 
-        // FIXME: Allow page number to be specified
-        // return new PaginatedResult<>(selectQuery.getResultList(), 0, safePageSize,
-        // ids.size());
-        return findProductsWithCategoriesPreservingOrder(ids.stream().map(Number::longValue).collect(Collectors.toList()));
+        final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
+        return em.createQuery("FROM Product p WHERE p.productId IN :ids ORDER BY p.published DESC", Product.class)
+                .setParameter("ids", longIds)
+                .getResultList();
     }
 
     @Override
@@ -549,28 +552,6 @@ public class UserJpaDao implements UserDao {
                 .stream()
                 .sorted((left, right) -> Integer.compare(orderById.get(left.getId()), orderById.get(right.getId())))
                 .collect(Collectors.toList());
-    }
-
-    private List<Product> findProductsWithCategoriesPreservingOrder(final List<Long> orderedIds) {
-        if (orderedIds == null || orderedIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        final Map<Long, Integer> orderById = new HashMap<>();
-        for (int i = 0; i < orderedIds.size(); i++) {
-            orderById.put(orderedIds.get(i), i);
-        }
-
-        final List<Product> products = em.createQuery(
-                "SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId IN :ids",
-                Product.class)
-                .setParameter("ids", orderedIds)
-                .getResultList();
-
-        products.sort((left, right) -> Integer.compare(
-                orderById.getOrDefault(left.getId(), Integer.MAX_VALUE),
-                orderById.getOrDefault(right.getId(), Integer.MAX_VALUE)));
-        return products;
     }
 
     private static String escapeForLike(final String value) {
