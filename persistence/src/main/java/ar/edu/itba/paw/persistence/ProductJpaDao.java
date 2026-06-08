@@ -121,12 +121,7 @@ public class ProductJpaDao implements ProductDao {
 
     @Override
     public PaginatedResult<Product> findProducts(final ProductSearchCriteria criteria) {
-        final StringBuilder whereSql = new StringBuilder(
-                "WHERE p.state = :state " +
-                        "AND EXISTS (" +
-                        " SELECT 1 FROM users u" +
-                        " WHERE u.user_id = p.user_id AND u.enabled = true AND u.banned = false" +
-                        ")");
+        final StringBuilder whereSql = new StringBuilder("WHERE p.state = :state");
         final Map<String, Object> params = new HashMap<>();
         params.put("state", ProductState.ACTIVE.getPersistenceValue());
 
@@ -285,10 +280,6 @@ public class ProductJpaDao implements ProductDao {
                 " LEFT JOIN wishlist_match wm ON wm.product_id = p.product_id" +
                 " LEFT JOIN purchase_match pm ON pm.product_id = p.product_id" +
                 " WHERE p.state = :state" +
-                " AND EXISTS (" +
-                " SELECT 1 FROM users u" +
-                " WHERE u.user_id = p.user_id AND u.enabled = true AND u.banned = false" +
-                ")" +
                 " AND p.user_id <> :userId";
 
         final String sql = productIdToExclude == null
@@ -365,18 +356,8 @@ public class ProductJpaDao implements ProductDao {
                 ")";
 
         final String whereSql = productIdToExclude == null
-                ? " WHERE p.state = :state" +
-                        " AND EXISTS (" +
-                        " SELECT 1 FROM users u" +
-                        " WHERE u.user_id = p.user_id AND u.enabled = true AND u.banned = false" +
-                        ")" +
-                        " AND p.user_id <> :userId"
-                : " WHERE p.state = :state" +
-                        " AND EXISTS (" +
-                        " SELECT 1 FROM users u" +
-                        " WHERE u.user_id = p.user_id AND u.enabled = true AND u.banned = false" +
-                        ")" +
-                        " AND p.user_id <> :userId AND p.product_id <> :excludeId";
+                ? " WHERE p.state = :state AND p.user_id <> :userId"
+                : " WHERE p.state = :state AND p.user_id <> :userId AND p.product_id <> :excludeId";
 
         final String orderSql = " ORDER BY" +
                 " COALESCE(fm.match_count, 0) DESC," +
@@ -691,11 +672,7 @@ public class ProductJpaDao implements ProductDao {
     @Override
     public Optional<Product> findByIdIfAvailable(final Long id) {
         final TypedQuery<Product> query = em.createQuery(
-                "SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.categories " +
-                        "WHERE p.productId = :productId " +
-                        "AND p.state = :state " +
-                        "AND p.seller.enabled = true " +
-                        "AND p.seller.banned = false",
+                "SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId = :productId AND p.state = :state",
                 Product.class);
         query.setParameter("productId", id);
         query.setParameter("state", ProductState.ACTIVE);

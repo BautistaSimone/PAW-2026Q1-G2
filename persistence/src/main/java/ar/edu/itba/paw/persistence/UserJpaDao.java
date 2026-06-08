@@ -348,7 +348,7 @@ public class UserJpaDao implements UserDao {
         final String likePattern = "%" + escapeForLike(query.trim().toLowerCase()) + "%";
 
         final long totalCount = em.createQuery(
-                "SELECT COUNT(u) FROM User u WHERE LOWER(u.username) LIKE :q ESCAPE '\\' AND u.enabled = true AND u.banned = false",
+                "SELECT COUNT(u) FROM User u WHERE LOWER(u.username) LIKE :q ESCAPE '\\' AND u.banned = false",
                 Long.class)
                 .setParameter("q", likePattern)
                 .getSingleResult();
@@ -358,7 +358,7 @@ public class UserJpaDao implements UserDao {
         }
 
         final List<User> users = em.createQuery(
-                "FROM User u WHERE LOWER(u.username) LIKE :q ESCAPE '\\' AND u.enabled = true AND u.banned = false ORDER BY u.username ASC",
+                "FROM User u WHERE LOWER(u.username) LIKE :q ESCAPE '\\' AND u.banned = false ORDER BY u.username ASC",
                 User.class)
                 .setParameter("q", likePattern)
                 .setFirstResult((safePage - 1) * safeSize)
@@ -374,7 +374,7 @@ public class UserJpaDao implements UserDao {
         final List<Number> ids = em.createNativeQuery(
                 "SELECT u.user_id FROM users u " +
                         "LEFT JOIN user_follows uf ON u.user_id = uf.followed_id " +
-                        "WHERE u.enabled = true AND u.banned = false " +
+                        "WHERE u.banned = false " +
                         "GROUP BY u.user_id " +
                         "ORDER BY COUNT(uf.follower_id) DESC, u.user_id ASC")
                 .setMaxResults(limit)
@@ -398,8 +398,7 @@ public class UserJpaDao implements UserDao {
         final String activeState = ProductState.ACTIVE.getPersistenceValue();
         final Number countResult = (Number) em.createNativeQuery(
                 "SELECT COUNT(*) FROM users u " +
-                        "WHERE u.enabled = true " +
-                        "AND u.banned = false " +
+                        "WHERE u.banned = false " +
                         "AND EXISTS (" +
                         " SELECT 1 FROM products p " +
                         " WHERE p.user_id = u.user_id AND p.state = :state" +
@@ -418,8 +417,7 @@ public class UserJpaDao implements UserDao {
                         "FROM users u " +
                         "JOIN products p ON p.user_id = u.user_id AND p.state = :state " +
                         "LEFT JOIN user_follows uf ON uf.followed_id = u.user_id " +
-                        "WHERE u.enabled = true " +
-                        "AND u.banned = false " +
+                        "WHERE u.banned = false " +
                         "GROUP BY u.user_id " +
                         "ORDER BY COUNT(DISTINCT uf.follower_id) DESC, " +
                         "COUNT(DISTINCT p.product_id) DESC, " +
@@ -445,7 +443,6 @@ public class UserJpaDao implements UserDao {
                 "SELECT COUNT(u) " +
                         "FROM User u " +
                         "WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
-                        "AND u.enabled = true " +
                         "AND u.banned = false " +
                         "AND EXISTS (" +
                         " SELECT p.productId FROM Product p " +
@@ -463,7 +460,6 @@ public class UserJpaDao implements UserDao {
         final List<User> users = em.createQuery(
                 "FROM User u " +
                         "WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
-                        "AND u.enabled = true " +
                         "AND u.banned = false " +
                         "AND EXISTS (" +
                         " SELECT p.productId FROM Product p " +
