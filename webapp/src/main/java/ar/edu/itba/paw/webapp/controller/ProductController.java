@@ -195,9 +195,6 @@ public class ProductController {
             return publishGuard.get();
         }
 
-        productService.findEditableProduct(id, authUser.getUser().getId())
-                .orElseThrow(ResourceNotFoundException::new);
-
         if (errors.hasErrors()) {
             return editProductFormModelAndView(id);
         }

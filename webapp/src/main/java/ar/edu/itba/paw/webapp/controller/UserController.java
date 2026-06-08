@@ -198,11 +198,10 @@ public class UserController {
             return new ModelAndView("redirect:/profile?tab=mydata");
         }
 
-        final User profileUser = userService.findById(authUser.getUser().getId())
-                .orElseThrow(() -> new IllegalStateException("User not found"));
+        final Long currentUserId = authUser.getUser().getId();
 
         userService.updateUserProfile(
-                profileUser.getId(),
+                currentUserId,
                 form.getFirstName(),
                 form.getLastName(),
                 form.getStreetName(),
@@ -213,7 +212,7 @@ public class UserController {
                 form.getCbuCvu(),
                 form.getLanguage());
 
-        final User refreshed = userService.findById(profileUser.getId())
+        final User refreshed = userService.findById(currentUserId)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         Util.refreshAuthenticationPrincipal(authUser, refreshed);
 
@@ -225,10 +224,7 @@ public class UserController {
             @AuthenticationPrincipal PawAuthUser authUser,
             @RequestParam(value = "favoriteCategories", required = false) final List<Long> categoryIds) {
 
-        final User profileUser = userService.findById(authUser.getUser().getId())
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-
-        userService.updateFavoriteCategories(profileUser.getId(), categoryIds != null ? categoryIds : Collections.emptyList());
+        userService.updateFavoriteCategories(authUser.getUser().getId(), categoryIds != null ? categoryIds : Collections.emptyList());
 
         return new ModelAndView("redirect:/profile?tab=mydata&updated=1");
     }
