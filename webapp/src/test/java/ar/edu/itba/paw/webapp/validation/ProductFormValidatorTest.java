@@ -225,11 +225,6 @@ class ProductFormValidatorTest {
         }
 
         @Override
-        public List<Image> listImages() {
-            return images;
-        }
-
-        @Override
         public void deleteImagesByProductId(final Long productId) {
             throw new UnsupportedOperationException();
         }

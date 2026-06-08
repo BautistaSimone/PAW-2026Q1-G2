@@ -114,19 +114,6 @@ public class ImageServiceImplTest {
     }
 
     @Test
-    public void testListImages() {
-        // Arrange
-        Image image = new Image(1L, 10L, new byte[]{1}, "image/jpeg");
-        Mockito.when(imageDao.listImages()).thenReturn(Collections.singletonList(image));
-
-        // Act
-        List<Image> result = imageService.listImages();
-
-        // Assert
-        Assertions.assertEquals(1, result.size());
-    }
-
-    @Test
     public void testDeleteImagesByProductId() {
         // Act
         imageService.deleteImagesByProductId(10L);

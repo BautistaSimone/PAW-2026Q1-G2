@@ -63,12 +63,6 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Image> listImages() {
-        return imageDao.listImages();
-    }
-
-    @Override
     @Transactional
     public void deleteImagesByProductId(final Long productId) {
         imageDao.deleteByProductId(productId);

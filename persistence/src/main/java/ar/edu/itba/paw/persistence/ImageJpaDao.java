@@ -77,11 +77,6 @@ public class ImageJpaDao implements ImageDao {
     }
 
     @Override
-    public List<Image> listImages() {
-        return em.createQuery("FROM Image", Image.class).getResultList();
-    }
-
-    @Override
     public int deleteByProductId(final Long productId) {
         return em.createQuery("DELETE FROM Image WHERE productId = :productId")
             .setParameter("productId", productId)

@@ -19,7 +19,5 @@ public interface ImageDao {
 
     Set<Long> findProductIdsWithImages(List<Long> productIds);
 
-    List<Image> listImages();
-
     int deleteByProductId(Long productId);
 }

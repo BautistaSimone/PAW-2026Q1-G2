@@ -23,7 +23,5 @@ public interface ImageService {
 
     Set<Long> findProductIdsWithImages(final List<Long> productIds);
 
-    List<Image> listImages();
-
     void deleteImagesByProductId(final Long productId);
 }
