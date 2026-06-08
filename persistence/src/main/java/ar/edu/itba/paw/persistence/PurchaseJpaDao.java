@@ -79,7 +79,8 @@ public class PurchaseJpaDao implements PurchaseDao {
         if (totalCount == 0) {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
         }
-
+	
+	// No need for 1 + 1 query pattern since we are just filtering by id
         final TypedQuery<Purchase> selectQuery = em.createQuery(
             "SELECT p FROM Purchase p " + whereJpql + " ORDER BY p.date DESC", Purchase.class
         );

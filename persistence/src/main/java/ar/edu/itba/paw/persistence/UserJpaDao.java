@@ -363,7 +363,7 @@ public class UserJpaDao implements UserDao {
                 "SELECT user_id FROM users WHERE LOWER(u.username) LIKE :q ESCAPE '\\' AND u.banned = false")
 		.setParameter("q", likePattern)
                 .setFirstResult((safePage - 1) * safeSize)
-                .setMaxResults(safeSize + 1)
+                .setMaxResults(safeSize)
                 .getResultList();
 
         boolean hasNext = ids.size() > safeSize;
@@ -487,7 +487,7 @@ public class UserJpaDao implements UserDao {
                 .setParameter("q", likePattern)
                 .setParameter("state", activeState.getPersistenceValue())
                 .setFirstResult((safePage - 1) * safeSize)
-                .setMaxResults(safeSize + 1)
+                .setMaxResults(safeSize)
                 .getResultList();
 
         boolean hasNext = ids.size() > safeSize;
