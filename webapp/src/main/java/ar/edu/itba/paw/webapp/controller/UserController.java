@@ -38,6 +38,7 @@ import ar.edu.itba.paw.webapp.form.RegisterForm;
 import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
+import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
 import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
@@ -158,7 +159,10 @@ public class UserController {
 
         if (userId != null) {
             profileUser = userService.findById(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                    .orElseThrow(ResourceNotFoundException::new);
+            if (!profileUser.getEnabled()) {
+                throw new ResourceNotFoundException();
+            }
             isOwnProfile = (authUser != null && authUser.getUser().getId().equals(userId));
         } else {
             profileUser = userService.findById(authUser.getUser().getId())
