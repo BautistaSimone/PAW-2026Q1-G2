@@ -14,8 +14,8 @@ public class ErrorController {
     public ModelAndView forbidden() {
         final ModelAndView mav = new ModelAndView("error");
         mav.addObject("errorCode", "403");
-        mav.addObject("errorMessage", "No tenés permisos para acceder a esta página.");
-        mav.addObject("errorDescription", "Si creés que es un error, intentá iniciar sesión con otra cuenta.");
+        mav.addObject("errorMessageCode", "Error.403.message");
+        mav.addObject("errorDescriptionCode", "Error.403.description");
         return mav;
     }
 
