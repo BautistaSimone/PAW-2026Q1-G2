@@ -12,6 +12,12 @@ import org.springframework.stereotype.Repository;
 import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.Product;
 
+/*
+ * This DAO is read-only and despite it not being 
+ * completely necessary anymore it was left here due 
+ * to compatibility reasons
+ */
+
 @Repository
 public class CategoryJpaDao implements CategoryDao {
 
