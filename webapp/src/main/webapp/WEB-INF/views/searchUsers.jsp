@@ -57,6 +57,11 @@
                                                     <c:out value="${u.lastName}" />
                                                 </p>
                                             </c:if>
+                                            <c:if test="${sellerRatings[u.id].count > 0}">
+                                                <p class="community-user-rating">
+                                                    <ui:sellerRatingStars summary="${sellerRatings[u.id]}" compact="true"/>
+                                                </p>
+                                            </c:if>
                                         </div>
                                     </a>
 
