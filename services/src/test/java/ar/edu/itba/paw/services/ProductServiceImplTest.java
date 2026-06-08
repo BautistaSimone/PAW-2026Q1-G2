@@ -58,6 +58,10 @@ public class ProductServiceImplTest {
     private static final byte[] COVER_BYTES = new byte[] { 1, 2, 3 };
     private static final byte[] DETAIL_BYTES = new byte[] { 4, 5, 6 };
 
+    private static ProductImageData imageData(final byte[] data, final String contentType) {
+        return new ProductImageData(data, contentType);
+    }
+
     @BeforeEach
     public void setUp() {
         productService = new ProductServiceImpl(
@@ -186,7 +190,9 @@ public class ProductServiceImplTest {
             BigDecimal.TEN,
             BigDecimal.ONE,
             1,
-            ProductImageUpdate.unchanged()
+            null,
+            false,
+            Collections.emptyList()
         );
 
         Assertions.assertSame(product, result);
@@ -219,10 +225,12 @@ public class ProductServiceImplTest {
             BigDecimal.TEN,
             BigDecimal.ONE,
             1,
-            ProductImageUpdate.replaceWithNewImages(List.of(
-                image(COVER_BYTES, "image/png"),
-                image(DETAIL_BYTES, "image/jpeg")
-            ))
+            null,
+            false,
+            List.of(
+                imageData(COVER_BYTES, "image/png"),
+                imageData(DETAIL_BYTES, "image/jpeg")
+            )
         );
 
         final InOrder order = Mockito.inOrder(imageDao);
@@ -266,10 +274,11 @@ public class ProductServiceImplTest {
             BigDecimal.TEN,
             BigDecimal.ONE,
             1,
-            ProductImageUpdate.replaceWith(List.of(
-                ProductImageUpdate.existingImage(10L),
-                ProductImageUpdate.newImage(image(DETAIL_BYTES, "image/jpeg"))
-            ))
+            "e:10,n",
+            true,
+            List.of(
+                imageData(DETAIL_BYTES, "image/jpeg")
+            )
         );
 
         final InOrder order = Mockito.inOrder(imageDao);
@@ -293,7 +302,7 @@ public class ProductServiceImplTest {
         final Image foreignImage = new Image(10L, 999L, COVER_BYTES, "image/png");
         Mockito.when(productDao.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         Mockito.when(userDao.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
-        Mockito.when(productDao.updateProduct(
+        Mockito.lenient().when(productDao.updateProduct(
             Mockito.eq(PRODUCT_ID), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
             Mockito.anyString(), Mockito.anyString(), Mockito.eq(Collections.emptyList()), Mockito.anyString(),
             Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.anyInt()
@@ -314,7 +323,9 @@ public class ProductServiceImplTest {
             BigDecimal.TEN,
             BigDecimal.ONE,
             1,
-            ProductImageUpdate.replaceWith(List.of(ProductImageUpdate.existingImage(10L)))
+            "e:10",
+            true,
+            Collections.emptyList()
         ));
 
         Mockito.verify(imageDao, Mockito.never()).deleteByProductId(Mockito.anyLong());

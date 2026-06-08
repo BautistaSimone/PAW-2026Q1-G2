@@ -213,10 +213,9 @@ public class ProductController {
                 form.getRecordCondition(),
                 form.getPrice(),
                 form.getStock(),
-                productService.buildImageUpdate(
-                        form.getImageLayout(),
-                        form.isHadExistingImages(),
-                        imageDataFrom(form.getImages())));
+                form.getImageLayout(),
+                form.isHadExistingImages(),
+                imageDataFrom(form.getImages()));
 
         return new ModelAndView("redirect:/products/" + id + "?updated=1");
     }

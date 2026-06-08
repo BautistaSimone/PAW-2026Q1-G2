@@ -358,7 +358,6 @@ public class ProductServiceImpl implements ProductService {
         return listProducts(criteria);
     }
 
-    @Override
     @Transactional(readOnly = true)
     public ProductImageUpdate buildImageUpdate(
             final String layoutRaw,
@@ -518,7 +517,9 @@ public class ProductServiceImpl implements ProductService {
         final BigDecimal recordCondition,
         final BigDecimal price,
         final int stock,
-        final ProductImageUpdate imageUpdate
+        final String imageLayout,
+        final boolean hadExistingImages,
+        final List<ProductImageData> newImages
     ) {
         final Product product = productDao.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
@@ -529,7 +530,6 @@ public class ProductServiceImpl implements ProductService {
         validateProductFields(title, artist, description, sleeveCondition, recordCondition, price, stock);
 
         final List<Category> categories = resolveCategories(categoryIds);
-
 
         final boolean ok = productDao.updateProduct(
             productId,
@@ -548,6 +548,7 @@ public class ProductServiceImpl implements ProductService {
         if (!ok) {
             throw new IllegalStateException("Product cannot be updated (not active or missing)");
         }
+        final ProductImageUpdate imageUpdate = buildImageUpdate(imageLayout, hadExistingImages, newImages);
         applyImageUpdate(productId, imageUpdate);
         return productDao.findById(productId).orElseThrow(() -> new IllegalStateException("Product missing after update"));
     }

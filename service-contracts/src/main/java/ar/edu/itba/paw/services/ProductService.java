@@ -69,16 +69,6 @@ public interface ProductService {
     /** Active listings from the given followed users, newest first (the "for you" following feed). */
     PaginatedResult<Product> listFollowingFeed(final List<Long> followedIds, final int page, final int pageSize);
 
-    /**
-     * Builds the image update for an edit, given the raw layout token string, whether the product
-     * had existing images, and the already-read new image data (in upload order).
-     */
-    ProductImageUpdate buildImageUpdate(
-        final String layoutRaw,
-        final boolean hadExistingImages,
-        final List<ProductImageData> newImages
-    );
-
     Map<Long, Long> countActiveProductsByUserIds(final List<Long> userIds);
 
     Map<Long, List<Product>> listLatestActiveProductsByUserIds(final List<Long> userIds, final int perUserLimit);
@@ -135,7 +125,9 @@ public interface ProductService {
         final BigDecimal recordCondition,
         final BigDecimal price,
         final int stock,
-        final ProductImageUpdate imageUpdate
+        final String imageLayout,
+        final boolean hadExistingImages,
+        final List<ProductImageData> newImages
     );
 
     /**
