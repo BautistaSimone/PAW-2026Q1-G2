@@ -241,6 +241,8 @@ public class HomeController {
 		}
 
 		final Map<Long, String> productImageUrls = Util.productImageUrls(imageService, initialProducts);
+		final Map<Long, SellerRatingSummary> sellerRatings =
+				reviewService.sellerRatingByUserId(new HashSet<>(displayedUserIds));
 
 		mav.addObject("usersPage", usersPage);
 		mav.addObject("users", displayedUsers);
@@ -248,6 +250,7 @@ public class HomeController {
 		mav.addObject("userPublicationCounts", userPublicationCounts);
 		mav.addObject("sellerProductPagesByUserId", productPagesByUserId);
 		mav.addObject("productImageUrls", productImageUrls);
+		mav.addObject("sellerRatings", sellerRatings);
 
 		if (authUser != null) {
 			final Map<Long, Boolean> followStatusMap = userService.followingStatusByUserIds(authUser.getUser().getId(),
