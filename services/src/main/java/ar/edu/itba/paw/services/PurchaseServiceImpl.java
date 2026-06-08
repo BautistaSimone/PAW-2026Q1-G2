@@ -256,7 +256,8 @@ public class PurchaseServiceImpl implements PurchaseService {
             notifyPurchaseStatusChange(purchase, userId, newStatus);
         }
 
-        return purchaseDao.findById(purchaseId).get();
+        return purchaseDao.findById(purchaseId)
+                .orElseThrow(() -> new IllegalStateException("Purchase missing after update"));
     }
 
     @Override
