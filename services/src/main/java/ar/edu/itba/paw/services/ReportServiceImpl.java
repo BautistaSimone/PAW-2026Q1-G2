@@ -20,21 +20,21 @@ import ar.edu.itba.paw.persistence.ReportedProductProjection;
 @Service
 public class ReportServiceImpl implements ReportService {
 
-    @Value("${mail.username}")
-    private String adminEmail;
-
     private final ReportDao reportDao;
     private final ProductService productService;
     private final EmailService emailService;
     private final UserService userService;
+    private final String adminEmail;
 
     @Autowired
     public ReportServiceImpl(final ReportDao reportDao, final ProductService productService,
-            final EmailService emailService, @Lazy final UserService userService) {
+            final EmailService emailService, @Lazy final UserService userService,
+            @Value("${mail.username}") final String adminEmail) {
         this.reportDao = reportDao;
         this.productService = productService;
         this.emailService = emailService;
         this.userService = userService;
+        this.adminEmail = adminEmail;
     }
 
     @Override

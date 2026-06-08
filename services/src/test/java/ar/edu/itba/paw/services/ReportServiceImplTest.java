@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,7 +26,6 @@ import ar.edu.itba.paw.persistence.ReportedProductProjection;
 @ExtendWith(MockitoExtension.class)
 public class ReportServiceImplTest {
 
-    @InjectMocks
     private ReportServiceImpl reportService;
 
     @Mock
@@ -45,9 +43,7 @@ public class ReportServiceImplTest {
     @BeforeEach
     public void setUp() throws Exception {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
-        java.lang.reflect.Field field = ReportServiceImpl.class.getDeclaredField("adminEmail");
-        field.setAccessible(true);
-        field.set(reportService, "admin@vinyland.com");
+        reportService = new ReportServiceImpl(reportDao, productService, emailService, userService, "admin@vinyland.com");
     }
 
     @Test
