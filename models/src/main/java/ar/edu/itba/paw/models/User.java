@@ -281,6 +281,13 @@ public class User {
         return favoriteCategories;
     }
 
+    /** Ids of the user's favorite categories, for view binding. */
+    public java.util.List<Long> getFavoriteCategoryIds() {
+        return favoriteCategories.stream()
+                .map(Category::getId)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }

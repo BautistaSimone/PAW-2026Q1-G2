@@ -1,11 +1,9 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +30,11 @@ import ar.edu.itba.paw.models.SellerRatingSummary;
 import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.webapp.form.ProductForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
-import ar.edu.itba.paw.webapp.product.ProductImageLayoutParser;
-import ar.edu.itba.paw.webapp.product.ProductImageLayoutParser.Slot;
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator.ValidatedImage;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductImageData;
-import ar.edu.itba.paw.services.ProductImageUpdate;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.ReportService;
 import ar.edu.itba.paw.services.ReviewService;
@@ -221,7 +216,10 @@ public class ProductController {
                 form.getRecordCondition(),
                 form.getPrice(),
                 form.getStock(),
-                imageUpdateFrom(form));
+                productService.buildImageUpdate(
+                        form.getImageLayout(),
+                        form.isHadExistingImages(),
+                        imageDataFrom(form.getImages())));
 
         return new ModelAndView("redirect:/products/" + id + "?updated=1");
     }
@@ -243,30 +241,6 @@ public class ProductController {
             images.add(new ProductImageData(image.getData(), image.getContentType()));
         }
         return images;
-    }
-
-    private static ProductImageUpdate imageUpdateFrom(final ProductForm form) {
-        final List<ProductImageData> newImages = imageDataFrom(form.getImages());
-        final String layoutRaw = form.getImageLayout();
-
-        if (form.isHadExistingImages() && layoutRaw != null && !layoutRaw.isBlank()) {
-            final List<Slot> slots = ProductImageLayoutParser.parse(layoutRaw);
-            final List<ProductImageUpdate.Entry> entries = new ArrayList<>(slots.size());
-            int newImageIndex = 0;
-            for (Slot slot : slots) {
-                if (slot.getKind() == ProductImageLayoutParser.SlotKind.EXISTING) {
-                    entries.add(ProductImageUpdate.existingImage(slot.getExistingImageId()));
-                } else {
-                    entries.add(ProductImageUpdate.newImage(newImages.get(newImageIndex++)));
-                }
-            }
-            return ProductImageUpdate.replaceWith(entries);
-        }
-
-        if (newImages.isEmpty()) {
-            return ProductImageUpdate.unchanged();
-        }
-        return ProductImageUpdate.replaceWithNewImages(newImages);
     }
 
     private ModelAndView editProductFormModelAndView(final Long productId) {
@@ -331,14 +305,9 @@ public class ProductController {
                 10
         );
 
-        final Set<Long> carouselSellerIds = new HashSet<>();
-        for (Product p : sellerProducts) {
-            carouselSellerIds.add(p.getUserId());
-        }
-        for (Product p : relatedProducts) {
-            carouselSellerIds.add(p.getUserId());
-        }
-        final Map<Long, SellerRatingSummary> sellerRatings = reviewService.sellerRatingByUserId(carouselSellerIds);
+        final List<Product> carouselProducts = new ArrayList<>(sellerProducts);
+        carouselProducts.addAll(relatedProducts);
+        final Map<Long, SellerRatingSummary> sellerRatings = reviewService.sellerRatingByProducts(carouselProducts);
 
         mav.addObject("sellerProducts", sellerProducts);
         mav.addObject("relatedProducts", relatedProducts);

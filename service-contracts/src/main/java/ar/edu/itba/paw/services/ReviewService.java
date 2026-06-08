@@ -1,10 +1,13 @@
 package ar.edu.itba.paw.services;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 import java.util.Set;
 
 import ar.edu.itba.paw.models.PaginatedResult;
+import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.Review;
 import ar.edu.itba.paw.models.SellerRatingSummary;
 
@@ -22,4 +25,10 @@ public interface ReviewService {
     SellerRatingSummary summaryForSeller(long sellerId);
 
     Map<Long, SellerRatingSummary> sellerRatingByUserId(final Set<Long> distinctSellerIds);
+
+    /** Maps each purchase id to whether it already has a review. */
+    Map<Long, Boolean> reviewStatusByPurchaseId(final List<Purchase> purchases);
+
+    /** Seller rating summaries keyed by user id, for the distinct sellers of the given products. */
+    Map<Long, SellerRatingSummary> sellerRatingByProducts(final List<Product> products);
 }

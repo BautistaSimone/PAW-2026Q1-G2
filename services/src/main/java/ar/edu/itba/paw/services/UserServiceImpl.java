@@ -2,9 +2,12 @@ package ar.edu.itba.paw.services;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -399,5 +402,30 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Map<Long, Boolean> followingStatusByUserIds(final Long followerId, final List<Long> followedIds) {
         return userDao.followingStatusByUserIds(followerId, followedIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Boolean> followStatusForUsers(
+            final Long currentUserId,
+            final List<User> followers,
+            final List<User> following) {
+        final List<Long> userIds = new ArrayList<>();
+        final Set<Long> seenIds = new HashSet<>();
+        if (followers != null) {
+            for (User user : followers) {
+                if (seenIds.add(user.getId())) {
+                    userIds.add(user.getId());
+                }
+            }
+        }
+        if (following != null) {
+            for (User user : following) {
+                if (seenIds.add(user.getId())) {
+                    userIds.add(user.getId());
+                }
+            }
+        }
+        return followingStatusByUserIds(currentUserId, userIds);
     }
 }

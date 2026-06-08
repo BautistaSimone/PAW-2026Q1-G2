@@ -4,10 +4,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductState;
+import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Image;
 import ar.edu.itba.paw.persistence.ImageDao;
@@ -302,6 +306,84 @@ public class ProductServiceImpl implements ProductService {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
         }
         return productDao.findActiveProductsByUserId(userId, page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Product> productsByPurchaseId(final List<Purchase> purchases) {
+        final Map<Long, Product> productsByPurchaseId = new HashMap<>();
+        if (purchases == null || purchases.isEmpty()) {
+            return productsByPurchaseId;
+        }
+
+        final Set<Long> productIds = new HashSet<>();
+        for (Purchase purchase : purchases) {
+            productIds.add(purchase.getProductId());
+        }
+
+        final Map<Long, Product> productsById = new HashMap<>();
+        for (Product product : findByIds(productIds)) {
+            productsById.put(product.getId(), product);
+        }
+
+        for (Purchase purchase : purchases) {
+            final Product product = productsById.get(purchase.getProductId());
+            if (product != null) {
+                productsByPurchaseId.put(purchase.getPurchaseId(), product);
+            }
+        }
+        return productsByPurchaseId;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedResult<Product> listFollowingFeed(final List<Long> followedIds, final int page, final int pageSize) {
+        if (followedIds == null || followedIds.isEmpty()) {
+            final int safePage = page < 1 ? 1 : page;
+            final int safePageSize = pageSize < 1 ? ProductSearchCriteria.DEFAULT_PAGE_SIZE : pageSize;
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safePageSize, 0);
+        }
+        final ProductSearchCriteria criteria = new ProductSearchCriteria(
+            null,
+            Collections.emptyList(),
+            null,
+            null,
+            Collections.emptyList(),
+            Collections.emptyList(),
+            ProductSortOrder.NEWEST,
+            null,
+            followedIds,
+            page,
+            pageSize);
+        return listProducts(criteria);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProductImageUpdate buildImageUpdate(
+            final String layoutRaw,
+            final boolean hadExistingImages,
+            final List<ProductImageData> newImages) {
+        final List<ProductImageData> images = newImages == null ? Collections.emptyList() : newImages;
+
+        if (hadExistingImages && layoutRaw != null && !layoutRaw.isBlank()) {
+            final List<ProductImageLayoutParser.Slot> slots = ProductImageLayoutParser.parse(layoutRaw);
+            final List<ProductImageUpdate.Entry> entries = new ArrayList<>(slots.size());
+            int newImageIndex = 0;
+            for (ProductImageLayoutParser.Slot slot : slots) {
+                if (slot.getKind() == ProductImageLayoutParser.SlotKind.EXISTING) {
+                    entries.add(ProductImageUpdate.existingImage(slot.getExistingImageId()));
+                } else {
+                    entries.add(ProductImageUpdate.newImage(images.get(newImageIndex++)));
+                }
+            }
+            return ProductImageUpdate.replaceWith(entries);
+        }
+
+        if (images.isEmpty()) {
+            return ProductImageUpdate.unchanged();
+        }
+        return ProductImageUpdate.replaceWithNewImages(images);
     }
 
     @Override

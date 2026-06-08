@@ -90,4 +90,7 @@ public interface UserService {
 	PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize);
 	Map<Long, Long> countFollowersByUserIds(final List<Long> userIds);
 	Map<Long, Boolean> followingStatusByUserIds(final Long followerId, final List<Long> followedIds);
+
+	/** Whether {@code currentUserId} follows each distinct user across the given follower/following lists. */
+	Map<Long, Boolean> followStatusForUsers(final Long currentUserId, final List<User> followers, final List<User> following);
 }

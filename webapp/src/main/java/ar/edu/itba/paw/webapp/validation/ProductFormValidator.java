@@ -13,9 +13,9 @@ import java.util.Set;
 
 import ar.edu.itba.paw.models.Image;
 import ar.edu.itba.paw.services.ImageService;
+import ar.edu.itba.paw.services.ProductImageLayoutParser;
+import ar.edu.itba.paw.services.ProductImageLayoutParser.Slot;
 import ar.edu.itba.paw.webapp.form.ProductForm;
-import ar.edu.itba.paw.webapp.product.ProductImageLayoutParser;
-import ar.edu.itba.paw.webapp.product.ProductImageLayoutParser.Slot;
 
 public class ProductFormValidator implements ConstraintValidator<ValidProductForm, ProductForm> {
 

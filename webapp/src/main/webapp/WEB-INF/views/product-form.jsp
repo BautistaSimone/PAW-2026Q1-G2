@@ -396,7 +396,7 @@
 
         if (isEditWithExisting) {
             try {
-                var ctx = idsJsonEl.getAttribute('data-context') || '';
+                var ctx = (idsJsonEl.getAttribute('data-context') || '').replace(/\/$/, '');
                 var ids = JSON.parse(idsJsonEl.textContent || '[]');
                 ids.forEach(function (id) {
                     slots.push({ kind: 'e', id: id, url: ctx + '/images/' + id });

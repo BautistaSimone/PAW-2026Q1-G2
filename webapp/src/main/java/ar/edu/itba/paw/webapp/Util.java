@@ -1,6 +1,11 @@
 package ar.edu.itba.paw.webapp;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -8,13 +13,37 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 
 public final class Util {
 
     private Util() {
         // Prevent instantiation
+    }
+
+    /**
+     * Maps each product that has at least one image to its image URL ({@code /images/product/{id}}).
+     * URL/route construction is a presentation concern, so it lives here; the data on which products
+     * have images comes from the service layer.
+     */
+    public static Map<Long, String> productImageUrls(final ImageService imageService, final List<Product> products) {
+        final Map<Long, String> productImageUrls = new HashMap<>();
+        if (products == null || products.isEmpty()) {
+            return productImageUrls;
+        }
+
+        final List<Long> productIds = new ArrayList<>();
+        for (Product product : products) {
+            productIds.add(product.getId());
+        }
+        final Set<Long> productIdsWithImages = imageService.findProductIdsWithImages(productIds);
+        for (Long productId : productIdsWithImages) {
+            productImageUrls.put(productId, "/images/product/" + productId);
+        }
+        return productImageUrls;
     }
 
     public static void refreshAuthenticationPrincipal(final PawAuthUser current, final User refreshedUser) {

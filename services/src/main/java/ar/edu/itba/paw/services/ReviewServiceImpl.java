@@ -3,6 +3,9 @@ package ar.edu.itba.paw.services;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Map;
@@ -123,5 +126,36 @@ public class ReviewServiceImpl implements ReviewService {
             return Collections.emptyMap();
         }
         return reviewDao.sellerRatingByUserId(distinctSellerIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Boolean> reviewStatusByPurchaseId(final List<Purchase> purchases) {
+        final Map<Long, Boolean> purchaseHasReview = new HashMap<>();
+        if (purchases == null || purchases.isEmpty()) {
+            return purchaseHasReview;
+        }
+
+        final Set<Long> purchaseIds = new HashSet<>();
+        for (Purchase purchase : purchases) {
+            purchaseIds.add(purchase.getPurchaseId());
+        }
+        final Set<Long> reviewedPurchaseIds = findReviewedPurchaseIds(purchaseIds);
+        for (Purchase purchase : purchases) {
+            purchaseHasReview.put(purchase.getPurchaseId(), reviewedPurchaseIds.contains(purchase.getPurchaseId()));
+        }
+        return purchaseHasReview;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, SellerRatingSummary> sellerRatingByProducts(final List<Product> products) {
+        final Set<Long> distinctSellerIds = new HashSet<>();
+        if (products != null) {
+            for (Product product : products) {
+                distinctSellerIds.add(product.getUserId());
+            }
+        }
+        return sellerRatingByUserId(distinctSellerIds);
     }
 }

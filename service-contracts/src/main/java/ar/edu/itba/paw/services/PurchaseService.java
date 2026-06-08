@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.services;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -91,6 +93,18 @@ public interface PurchaseService {
 
         public String getPaymentProofFileName() {
             return purchase.getPaymentProofFileName();
+        }
+
+        /**
+         * Seconds left in the reservation window for a pending purchase (floored at 0),
+         * or {@code null} when the purchase is not pending or has no reservation deadline.
+         */
+        public Long getRemainingReservationSeconds() {
+            if (purchase.getStatus() != PurchaseStatus.PENDING || purchase.getReservedUntil() == null) {
+                return null;
+            }
+            final long remaining = Duration.between(LocalDateTime.now(), purchase.getReservedUntil()).getSeconds();
+            return remaining < 0 ? 0L : remaining;
         }
     }
 }
