@@ -10,6 +10,7 @@ import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductSortOrder;
+import ar.edu.itba.paw.models.Purchase;
 
 public interface ProductService {
     Product createProduct(
@@ -61,6 +62,22 @@ public interface ProductService {
     PaginatedResult<Product> listUserDeletedProducts(final Long userId, final int page, final int pageSize);
 
     PaginatedResult<Product> listActiveProductsByUser(final Long userId, final int page, final int pageSize);
+
+    /** Resolves the product behind each purchase, keyed by purchase id. */
+    Map<Long, Product> productsByPurchaseId(final List<Purchase> purchases);
+
+    /** Active listings from the given followed users, newest first (the "for you" following feed). */
+    PaginatedResult<Product> listFollowingFeed(final List<Long> followedIds, final int page, final int pageSize);
+
+    /**
+     * Builds the image update for an edit, given the raw layout token string, whether the product
+     * had existing images, and the already-read new image data (in upload order).
+     */
+    ProductImageUpdate buildImageUpdate(
+        final String layoutRaw,
+        final boolean hadExistingImages,
+        final List<ProductImageData> newImages
+    );
 
     Map<Long, Long> countActiveProductsByUserIds(final List<Long> userIds);
 

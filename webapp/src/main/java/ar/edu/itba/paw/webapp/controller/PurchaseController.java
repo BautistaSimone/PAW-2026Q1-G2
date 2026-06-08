@@ -1,7 +1,5 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -163,11 +161,8 @@ public class PurchaseController {
         mav.addObject("isBuyer", details.isBuyerView());
         mav.addObject("isSeller", details.isSellerView());
 
-        if (purchase.getStatus() == PurchaseStatus.PENDING && purchase.getReservedUntil() != null) {
-            long remainingSeconds = Duration.between(LocalDateTime.now(), purchase.getReservedUntil()).getSeconds();
-            if (remainingSeconds < 0) {
-                remainingSeconds = 0;
-            }
+        final Long remainingSeconds = details.getRemainingReservationSeconds();
+        if (remainingSeconds != null) {
             mav.addObject("remainingSeconds", remainingSeconds);
         }
 

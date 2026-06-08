@@ -29,6 +29,7 @@ import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.ReviewService;
+import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 
 @Controller
@@ -85,8 +86,8 @@ public class HomeController {
 
 		final PaginatedResult<Product> productsPage = productService.listProducts(criteria);
 
-		final Map<Long, String> productImageUrls = productImageUrlsFor(productsPage.getResults());
-		final Map<Long, SellerRatingSummary> sellerRatingByUserId = sellerRatingsFor(productsPage.getResults());
+		final Map<Long, String> productImageUrls = Util.productImageUrls(imageService, productsPage.getResults());
+		final Map<Long, SellerRatingSummary> sellerRatingByUserId = reviewService.sellerRatingByProducts(productsPage.getResults());
 
 		final Set<Long> selectedCategoryIds = new HashSet<>();
 		if (categoryIds != null) {
@@ -171,28 +172,9 @@ public class HomeController {
 		mav.addObject("hasFollowing", !followedIds.isEmpty());
 		mav.addObject("currentUserId", currentUserId);
 
-		PaginatedResult<Product> productsPage = new PaginatedResult<>(Collections.emptyList(), page, 12, 0);
-		final Map<Long, String> productImageUrls = new HashMap<>();
-		Map<Long, SellerRatingSummary> sellerRatingByUserId = new HashMap<>();
-		if (!followedIds.isEmpty()) {
-			final ProductSearchCriteria criteria = new ProductSearchCriteria(
-					null,
-					Collections.emptyList(),
-					null,
-					null,
-					Collections.emptyList(),
-					Collections.emptyList(),
-					ProductSortOrder.NEWEST,
-					null,
-					followedIds,
-					page,
-					12);
-
-			productsPage = productService.listProducts(criteria);
-
-			productImageUrls.putAll(productImageUrlsFor(productsPage.getResults()));
-			sellerRatingByUserId = sellerRatingsFor(productsPage.getResults());
-		}
+		final PaginatedResult<Product> productsPage = productService.listFollowingFeed(followedIds, page, 12);
+		final Map<Long, String> productImageUrls = Util.productImageUrls(imageService, productsPage.getResults());
+		final Map<Long, SellerRatingSummary> sellerRatingByUserId = reviewService.sellerRatingByProducts(productsPage.getResults());
 
 		mav.addObject("productsPage", productsPage);
 		mav.addObject("products", productsPage.getResults());
@@ -200,8 +182,8 @@ public class HomeController {
 		mav.addObject("sellerRatingByUserId", sellerRatingByUserId);
 
 		final List<Product> wishlistProducts = productService.getRecommendedProducts(currentUserId, 12, null);
-		final Map<Long, String> wishlistProductImageUrls = productImageUrlsFor(wishlistProducts);
-		final Map<Long, SellerRatingSummary> wishlistSellerRatingByUserId = sellerRatingsFor(wishlistProducts);
+		final Map<Long, String> wishlistProductImageUrls = Util.productImageUrls(imageService, wishlistProducts);
+		final Map<Long, SellerRatingSummary> wishlistSellerRatingByUserId = reviewService.sellerRatingByProducts(wishlistProducts);
 		mav.addObject("wishlistProducts", wishlistProducts);
 		mav.addObject("wishlistProductImageUrls", wishlistProductImageUrls);
 		mav.addObject("wishlistSellerRatingByUserId", wishlistSellerRatingByUserId);
@@ -245,12 +227,10 @@ public class HomeController {
 				.listLatestActiveProductsByUserIds(displayedUserIds, COMMUNITY_PRODUCT_LIMIT);
 
 		final Map<Long, PaginatedResult<Product>> productPagesByUserId = new HashMap<>();
-		final List<Long> initialProductIds = new ArrayList<>();
+		final List<Product> initialProducts = new ArrayList<>();
 		for (User user : displayedUsers) {
 			final List<Product> userProducts = productsByUserId.getOrDefault(user.getId(), Collections.emptyList());
-			for (Product product : userProducts) {
-				initialProductIds.add(product.getId());
-			}
+			initialProducts.addAll(userProducts);
 			productPagesByUserId.put(
 					user.getId(),
 					new PaginatedResult<>(
@@ -260,11 +240,7 @@ public class HomeController {
 							userPublicationCounts.getOrDefault(user.getId(), 0L)));
 		}
 
-		final Set<Long> productIdsWithImages = imageService.findProductIdsWithImages(initialProductIds);
-		final Map<Long, String> productImageUrls = new HashMap<>();
-		for (Long productId : productIdsWithImages) {
-			productImageUrls.put(productId, "/images/product/" + productId);
-		}
+		final Map<Long, String> productImageUrls = Util.productImageUrls(imageService, initialProducts);
 
 		mav.addObject("usersPage", usersPage);
 		mav.addObject("users", displayedUsers);
@@ -283,30 +259,4 @@ public class HomeController {
 		return mav;
 	}
 
-	private Map<Long, String> productImageUrlsFor(final List<Product> products) {
-		final Map<Long, String> productImageUrls = new HashMap<>();
-		if (products == null || products.isEmpty()) {
-			return productImageUrls;
-		}
-
-		final List<Long> productIds = new ArrayList<>();
-		for (Product product : products) {
-			productIds.add(product.getId());
-		}
-		final Set<Long> productIdsWithImages = imageService.findProductIdsWithImages(productIds);
-		for (Long productId : productIdsWithImages) {
-			productImageUrls.put(productId, "/images/product/" + productId);
-		}
-		return productImageUrls;
-	}
-
-	private Map<Long, SellerRatingSummary> sellerRatingsFor(final List<Product> products) {
-		final Set<Long> distinctSellerIds = new HashSet<>();
-		if (products != null) {
-			for (Product product : products) {
-				distinctSellerIds.add(product.getUserId());
-			}
-		}
-		return reviewService.sellerRatingByUserId(distinctSellerIds);
-	}
 }

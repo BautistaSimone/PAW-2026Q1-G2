@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.webapp.product;
+package ar.edu.itba.paw.services;
 
 import java.util.ArrayList;
 import java.util.Collections;
