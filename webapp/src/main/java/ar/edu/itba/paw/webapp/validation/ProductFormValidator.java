@@ -44,7 +44,7 @@ public class ProductFormValidator implements ConstraintValidator<ValidProductFor
             reject(context, "images", e.getMessage());
             valid = false;
         } catch (IOException e) {
-            reject(context, "images", "Read.productForm.images");
+            reject(context, "images", "{Read.productForm.images}");
             valid = false;
         }
 
@@ -55,7 +55,7 @@ public class ProductFormValidator implements ConstraintValidator<ValidProductFor
         final int uploadedCount = countNonEmptyFiles(form.getImages());
         if (!form.isEditing() || !form.isHadExistingImages()) {
             if (uploadedCount == 0) {
-                reject(context, "images", "Required.productForm.images");
+                reject(context, "images", "{Required.productForm.images}");
                 return false;
             }
             return true;
@@ -66,7 +66,7 @@ public class ProductFormValidator implements ConstraintValidator<ValidProductFor
             return true;
         }
         if (layout.isBlank()) {
-            reject(context, "images", "Invalid.productForm.imageLayout");
+            reject(context, "images", "{Invalid.productForm.imageLayout}");
             return false;
         }
 
@@ -74,12 +74,12 @@ public class ProductFormValidator implements ConstraintValidator<ValidProductFor
         try {
             slots = ProductImageLayoutParser.parse(layout);
         } catch (IllegalArgumentException e) {
-            reject(context, "images", "Invalid.productForm.imageLayout");
+            reject(context, "images", "{Invalid.productForm.imageLayout}");
             return false;
         }
 
         if (slots.isEmpty() || slots.size() > ImageUploadValidator.MAX_IMAGES_PER_PRODUCT) {
-            reject(context, "images", "Invalid.productForm.imageLayout");
+            reject(context, "images", "{Invalid.productForm.imageLayout}");
             return false;
         }
 
@@ -94,12 +94,12 @@ public class ProductFormValidator implements ConstraintValidator<ValidProductFor
         }
 
         if (newSlotCount != uploadedCount) {
-            reject(context, "images", "Invalid.productForm.imageLayout");
+            reject(context, "images", "{Invalid.productForm.imageLayout}");
             return false;
         }
 
         if (!existingImageIds.isEmpty() && !existingImagesBelongToProduct(form.getProductId(), existingImageIds)) {
-            reject(context, "images", "Invalid.productForm.imageLayout");
+            reject(context, "images", "{Invalid.productForm.imageLayout}");
             return false;
         }
 
