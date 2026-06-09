@@ -47,7 +47,7 @@ class PaginationValidationTest {
         final HomeController controller = new HomeController(null, null, null, null, null);
 
         assertThrows(IllegalArgumentException.class, () ->
-            controller.searchUsers(null, null, -1)
+            controller.searchUsers(null, null, null, -1)
         );
     }
 }
