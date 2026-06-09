@@ -656,13 +656,13 @@ public class UserJpaDao implements UserDao {
         List<Number> ids = em.createNativeQuery(
                 "SELECT u.user_id FROM users AS u " +
                 "LEFT JOIN user_follows uf ON uf.followed_id = u.user_id " +
-                "LEFT JOIN products p2 ON p2.user_id = u.user_id AND p2.state = :state " +
+                "LEFT JOIN products p ON p.user_id = u.user_id AND p.state = :state " +
                 reviewsJoin +
                 "WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
                 "AND u.banned = false " +
                 "AND EXISTS (" +
-                " SELECT p.product_id FROM products AS p " +
-                " WHERE p.user_id = u.user_id AND p.state = :state2) " +
+                " SELECT p2.product_id FROM products AS p2 " +
+                " WHERE p2.user_id = u.user_id AND p2.state = :state2) " +
                 "GROUP BY u.user_id " +
                 "ORDER BY " + orderClause)
                 .setParameter("q", likePattern)

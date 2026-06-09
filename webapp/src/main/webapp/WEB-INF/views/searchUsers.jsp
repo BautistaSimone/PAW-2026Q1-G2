@@ -35,8 +35,7 @@
                     <label for="communitySortSelect" class="community-sort-label">
                         <spring:message code="SearchUsers.sort.label" />
                     </label>
-                    <select id="communitySortSelect" class="form-select form-select-sm community-sort-select"
-                        onchange="var sort=this.value;var url=new URL(window.location.href);url.searchParams.set('sort',sort);url.searchParams.delete('page');window.location.href=url.toString();">
+                    <select id="communitySortSelect" class="form-select form-select-sm community-sort-select">
                         <c:forEach items="${sortOptions}" var="opt">
                             <c:set var="sortKey" value="SearchUsers.sort.${opt.paramValue}" />
                             <option value="${opt.paramValue}" <c:if test="${selectedSort eq opt}">selected</c:if>>
@@ -44,6 +43,9 @@
                             </option>
                         </c:forEach>
                     </select>
+                    <button type="button" id="communitySortApplyBtn" class="btn btn-retro btn-retro-primary community-sort-apply-btn">
+                        <spring:message code="SearchUsers.sort.apply" />
+                    </button>
                 </div>
             </div>
 
@@ -215,4 +217,14 @@
         <c:param name="v" value="carousel-dynamic-padding-v1" />
     </c:url>
     <script src="<c:out value='${communityJsUrl}' />"></script>
+
+    <script>
+        document.getElementById('communitySortApplyBtn').addEventListener('click', function() {
+            var sort = document.getElementById('communitySortSelect').value;
+            var url = new URL(window.location.href);
+            url.searchParams.set('sort', sort);
+            url.searchParams.delete('page');
+            window.location.href = url.toString();
+        });
+    </script>
 </ui:layout>
