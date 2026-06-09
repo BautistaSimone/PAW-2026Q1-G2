@@ -60,7 +60,7 @@
                 var form = document.createElement('form');
                 form.action = (window.contextPath || '') + '/profile/follow';
                 form.method = 'post';
-                form.className = 'community-follow-form';
+                form.style.flex = 'none';
 
                 var csrfInput = document.createElement('input');
                 csrfInput.type = 'hidden';
