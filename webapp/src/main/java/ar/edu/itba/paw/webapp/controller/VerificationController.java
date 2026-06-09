@@ -39,7 +39,6 @@ public class VerificationController {
         return mv;
     }
 
-    // TODO: Should this be always accessible?
     @RequestMapping(value = "/sendVerificationEmail")
     public ModelAndView showVerificationEmailSent() {
 
