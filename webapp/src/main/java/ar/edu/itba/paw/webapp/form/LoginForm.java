@@ -14,8 +14,7 @@ public class LoginForm {
     @Size(max = 254)
     private String email;
 
-    // TODO: Volver a agregar una vez todos los usuarios hayan cambiado la password
-    // @NotBlank(message = "{NotBlank.authForm.password}")
+    @NotBlank(message = "{NotBlank.authForm.password}")
     @Size(min = 0, max = 100, message = "{Size.authForm.password}")
     @Pattern(
         regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$",
