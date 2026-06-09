@@ -364,6 +364,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    public PaginatedResult<User> searchFollowers(final Long userId, final String query, final int page, final int pageSize) {
+        return userDao.searchFollowers(userId, query, page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedResult<User> searchFollowing(final Long userId, final String query, final int page, final int pageSize) {
+        return userDao.searchFollowing(userId, query, page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Long> getFollowedUserIds(final Long userId) {
         return userDao.getFollowedUserIds(userId);
     }

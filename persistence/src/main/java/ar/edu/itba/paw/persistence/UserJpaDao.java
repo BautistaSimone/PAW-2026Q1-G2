@@ -347,6 +347,94 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
+    public PaginatedResult<User> searchFollowers(final Long userId, final String query, final int page, final int pageSize) {
+        final int safePage = Math.max(page, 1);
+        final int safeSize = Math.max(pageSize, 1);
+
+        final String likePattern = "%" + escapeForLike(query.trim().toLowerCase()) + "%";
+
+        final Number countResult = (Number) em.createNativeQuery(
+                "SELECT COUNT(*) FROM user_follows uf " +
+                "JOIN users u ON u.user_id = uf.follower_id " +
+                "WHERE uf.followed_id = :uid AND LOWER(u.username) LIKE :q ESCAPE '\\'")
+                .setParameter("uid", userId)
+                .setParameter("q", likePattern)
+                .getSingleResult();
+        final long totalCount = countResult == null ? 0 : countResult.longValue();
+
+        if (totalCount == 0) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, 0);
+        }
+
+        @SuppressWarnings("unchecked")
+        final List<Number> ids = em.createNativeQuery(
+                "SELECT uf.follower_id FROM user_follows uf " +
+                "JOIN users u ON u.user_id = uf.follower_id " +
+                "WHERE uf.followed_id = :uid AND LOWER(u.username) LIKE :q ESCAPE '\\' " +
+                "ORDER BY uf.created_at DESC")
+                .setParameter("uid", userId)
+                .setParameter("q", likePattern)
+                .setFirstResult((safePage - 1) * safeSize)
+                .setMaxResults(safeSize)
+                .getResultList();
+
+        if (ids.isEmpty()) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, totalCount);
+        }
+
+        final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
+        final List<User> users = em.createQuery("FROM User WHERE id IN :ids", User.class)
+                .setParameter("ids", longIds)
+                .getResultList();
+
+        return new PaginatedResult<>(users, safePage, safeSize, totalCount);
+    }
+
+    @Override
+    public PaginatedResult<User> searchFollowing(final Long userId, final String query, final int page, final int pageSize) {
+        final int safePage = Math.max(page, 1);
+        final int safeSize = Math.max(pageSize, 1);
+
+        final String likePattern = "%" + escapeForLike(query.trim().toLowerCase()) + "%";
+
+        final Number countResult = (Number) em.createNativeQuery(
+                "SELECT COUNT(*) FROM user_follows uf " +
+                "JOIN users u ON u.user_id = uf.followed_id " +
+                "WHERE uf.follower_id = :uid AND LOWER(u.username) LIKE :q ESCAPE '\\'")
+                .setParameter("uid", userId)
+                .setParameter("q", likePattern)
+                .getSingleResult();
+        final long totalCount = countResult == null ? 0 : countResult.longValue();
+
+        if (totalCount == 0) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, 0);
+        }
+
+        @SuppressWarnings("unchecked")
+        final List<Number> ids = em.createNativeQuery(
+                "SELECT uf.followed_id FROM user_follows uf " +
+                "JOIN users u ON u.user_id = uf.followed_id " +
+                "WHERE uf.follower_id = :uid AND LOWER(u.username) LIKE :q ESCAPE '\\' " +
+                "ORDER BY uf.created_at DESC")
+                .setParameter("uid", userId)
+                .setParameter("q", likePattern)
+                .setFirstResult((safePage - 1) * safeSize)
+                .setMaxResults(safeSize)
+                .getResultList();
+
+        if (ids.isEmpty()) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, totalCount);
+        }
+
+        final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
+        final List<User> users = em.createQuery("FROM User WHERE id IN :ids", User.class)
+                .setParameter("ids", longIds)
+                .getResultList();
+
+        return new PaginatedResult<>(users, safePage, safeSize, totalCount);
+    }
+
+    @Override
     public List<Long> getFollowedUserIds(final Long userId) {
         @SuppressWarnings("unchecked")
         final List<Number> ids = em.createNativeQuery(

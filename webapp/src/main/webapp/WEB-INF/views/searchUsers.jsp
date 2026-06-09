@@ -90,9 +90,9 @@
                                                     <input type="hidden" name="userId" value="${u.id}" />
                                                     <c:choose>
                                                         <c:when test="${followStatusMap[u.id]}">
-                                                            <button type="submit" class="btn btn-retro btn-retro-secondary community-follow-button">
-                                                                <i class="bi bi-person-dash" aria-hidden="true"></i>
-                                                                <spring:message code="Profile.unfollow" />
+                                                            <button type="submit" class="btn btn-retro btn-retro-secondary community-follow-button ms-auto">
+                                                            <i class="bi bi-person-dash" aria-hidden="true"></i>
+                                                            <spring:message code="Profile.unfollow" />
                                                             </button>
                                                         </c:when>
                                                         <c:otherwise>

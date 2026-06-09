@@ -83,6 +83,8 @@ public interface UserService {
 	long countFollowing(final Long userId);
 	PaginatedResult<User> getFollowers(final Long userId, final int page, final int pageSize);
 	PaginatedResult<User> getFollowing(final Long userId, final int page, final int pageSize);
+	PaginatedResult<User> searchFollowers(final Long userId, final String query, final int page, final int pageSize);
+	PaginatedResult<User> searchFollowing(final Long userId, final String query, final int page, final int pageSize);
 	List<Long> getFollowedUserIds(final Long userId);
 	PaginatedResult<User> searchUsers(final String query, final int page, final int pageSize);
 	List<User> getMostFollowedUsers(final int limit);

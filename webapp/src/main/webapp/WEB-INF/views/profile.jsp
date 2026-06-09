@@ -960,7 +960,10 @@
                 </div>
 
                 <div class="modal fade profile-modal" id="followersModal" tabindex="-1"
-                    aria-labelledby="followersModalLabel" aria-hidden="true">
+                    aria-labelledby="followersModalLabel" aria-hidden="true"
+                    data-follow-list="followers"
+                    data-follow-search-url="<c:url value='/profile/followers/search' />"
+                    data-follow-target-id="${user.id}">
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -971,68 +974,49 @@
                                     data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <c:choose>
-                                    <c:when test="${not empty followers}">
-                                        <div class="d-flex flex-column gap-3">
-                                            <c:forEach items="${followers}"
-                                                var="followerUser">
-                                                <div class="user-card-row">
-                                                    <a href="<c:url value='/profile?userId=${followerUser.id}'/>"
-                                                        class="user-card-link">
+                                <div class="mb-3">
+                                    <spring:message code="FollowModal.search.placeholder" var="searchPlaceholder" />
+                                    <input type="text"
+                                        class="form-control follow-modal-search-input"
+                                        placeholder="${searchPlaceholder}"
+                                        aria-label="${searchPlaceholder}" />
+                                </div>
+                                <div class="d-flex flex-column gap-3 follow-modal-list">
+                                    <c:choose>
+                                        <c:when test="${not empty followers}">
+                                            <c:forEach items="${followers}" var="followerUser">
+                                                <div class="user-card-row" data-user-id="${followerUser.id}">
+                                                    <a href="<c:url value='/profile?userId=${followerUser.id}'/>" class="user-card-link">
                                                         <div class="user-card-avatar">
-                                                            <c:out
-                                                                value="${fn:substring(followerUser.username, 0, 1)}" />
+                                                            <c:out value="${fn:substring(followerUser.username, 0, 1)}" />
                                                         </div>
                                                         <div class="user-card-info">
-                                                            <div
-                                                                class="user-card-username">
-                                                                <c:out
-                                                                    value="${followerUser.username}" />
+                                                            <div class="user-card-username">
+                                                                <c:out value="${followerUser.username}" />
                                                             </div>
-                                                            <c:if
-                                                                test="${not empty followerUser.firstName or not empty followerUser.lastName}">
-                                                                <div
-                                                                    class="user-card-name">
-                                                                    <c:out
-                                                                        value="${followerUser.firstName}" />
-                                                                    <c:out
-                                                                        value="${followerUser.lastName}" />
+                                                            <c:if test="${not empty followerUser.firstName or not empty followerUser.lastName}">
+                                                                <div class="user-card-name">
+                                                                    <c:out value="${followerUser.firstName}" />
+                                                                    <c:out value="${followerUser.lastName}" />
                                                                 </div>
                                                             </c:if>
                                                         </div>
                                                     </a>
-                                                    <sec:authorize
-                                                        access="isAuthenticated()">
-                                                        <sec:authentication
-                                                            property="principal.user.id"
-                                                            var="currentUserId" />
-                                                        <c:if
-                                                            test="${followerUser.id != currentUserId}">
-                                                            <form
-                                                                action="<c:url value='/profile/follow' />"
-                                                                method="post">
-                                                                <input type="hidden"
-                                                                    name="${_csrf.parameterName}"
-                                                                    value="${_csrf.token}" />
-                                                                <input type="hidden"
-                                                                    name="userId"
-                                                                    value="${followerUser.id}" />
+                                                    <sec:authorize access="isAuthenticated()">
+                                                        <sec:authentication property="principal.user.id" var="currentUserId" />
+                                                        <c:if test="${followerUser.id != currentUserId}">
+                                                            <form action="<c:url value='/profile/follow' />" method="post">
+                                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                                <input type="hidden" name="userId" value="${followerUser.id}" />
                                                                 <c:choose>
-                                                                    <c:when
-                                                                        test="${followStatusMap[followerUser.id]}">
-                                                                        <button
-                                                                            type="submit"
-                                                                            class="btn btn-retro btn-retro-secondary btn-follow-sm">
-                                                                            <spring:message
-                                                                                code="Profile.unfollow" />
+                                                                    <c:when test="${followStatusMap[followerUser.id]}">
+                                                                        <button type="submit" class="btn btn-retro btn-retro-secondary btn-follow-sm">
+                                                                            <spring:message code="Profile.unfollow" />
                                                                         </button>
                                                                     </c:when>
                                                                     <c:otherwise>
-                                                                        <button
-                                                                            type="submit"
-                                                                            class="btn btn-retro btn-retro-primary btn-follow-sm">
-                                                                            <spring:message
-                                                                                code="Profile.follow" />
+                                                                        <button type="submit" class="btn btn-retro btn-retro-primary btn-follow-sm">
+                                                                            <spring:message code="Profile.follow" />
                                                                         </button>
                                                                     </c:otherwise>
                                                                 </c:choose>
@@ -1041,26 +1025,30 @@
                                                     </sec:authorize>
                                                 </div>
                                             </c:forEach>
-                                        </div>
-                                        <ui:pagination result="${followersPage}" />
-                                    </c:when>
-                                    <c:otherwise>
-                                        <div class="empty-products-state">
-                                            <i class="bi bi-people profile-i-4"></i>
-                                            <p class="profile-p-5">
-                                                <spring:message
-                                                    code="Profile.followers.empty" />
-                                            </p>
-                                        </div>
-                                    </c:otherwise>
-                                </c:choose>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="empty-products-state follow-modal-empty">
+                                                <i class="bi bi-people profile-i-4"></i>
+                                                <p class="profile-p-5">
+                                                    <spring:message code="Profile.followers.empty" />
+                                                </p>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                                <div class="follow-modal-pagination">
+                                    <ui:pagination result="${followersPage}" />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="modal fade profile-modal" id="followingModal" tabindex="-1"
-                    aria-labelledby="followingModalLabel" aria-hidden="true">
+                    aria-labelledby="followingModalLabel" aria-hidden="true"
+                    data-follow-list="following"
+                    data-follow-search-url="<c:url value='/profile/following/search' />"
+                    data-follow-target-id="${user.id}">
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -1071,68 +1059,49 @@
                                     data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <c:choose>
-                                    <c:when test="${not empty followingUsers}">
-                                        <div class="d-flex flex-column gap-3">
-                                            <c:forEach items="${followingUsers}"
-                                                var="followedUser">
-                                                <div class="user-card-row">
-                                                    <a href="<c:url value='/profile?userId=${followedUser.id}'/>"
-                                                        class="user-card-link">
+                                <div class="mb-3">
+                                    <spring:message code="FollowModal.search.placeholder" var="searchPlaceholder" />
+                                    <input type="text"
+                                        class="form-control follow-modal-search-input"
+                                        placeholder="${searchPlaceholder}"
+                                        aria-label="${searchPlaceholder}" />
+                                </div>
+                                <div class="d-flex flex-column gap-3 follow-modal-list">
+                                    <c:choose>
+                                        <c:when test="${not empty followingUsers}">
+                                            <c:forEach items="${followingUsers}" var="followedUser">
+                                                <div class="user-card-row" data-user-id="${followedUser.id}">
+                                                    <a href="<c:url value='/profile?userId=${followedUser.id}'/>" class="user-card-link">
                                                         <div class="user-card-avatar">
-                                                            <c:out
-                                                                value="${fn:substring(followedUser.username, 0, 1)}" />
+                                                            <c:out value="${fn:substring(followedUser.username, 0, 1)}" />
                                                         </div>
                                                         <div class="user-card-info">
-                                                            <div
-                                                                class="user-card-username">
-                                                                <c:out
-                                                                    value="${followedUser.username}" />
+                                                            <div class="user-card-username">
+                                                                <c:out value="${followedUser.username}" />
                                                             </div>
-                                                            <c:if
-                                                                test="${not empty followedUser.firstName or not empty followedUser.lastName}">
-                                                                <div
-                                                                    class="user-card-name">
-                                                                    <c:out
-                                                                        value="${followedUser.firstName}" />
-                                                                    <c:out
-                                                                        value="${followedUser.lastName}" />
+                                                            <c:if test="${not empty followedUser.firstName or not empty followedUser.lastName}">
+                                                                <div class="user-card-name">
+                                                                    <c:out value="${followedUser.firstName}" />
+                                                                    <c:out value="${followedUser.lastName}" />
                                                                 </div>
                                                             </c:if>
                                                         </div>
                                                     </a>
-                                                    <sec:authorize
-                                                        access="isAuthenticated()">
-                                                        <sec:authentication
-                                                            property="principal.user.id"
-                                                            var="currentUserId" />
-                                                        <c:if
-                                                            test="${followedUser.id != currentUserId}">
-                                                            <form
-                                                                action="<c:url value='/profile/follow' />"
-                                                                method="post">
-                                                                <input type="hidden"
-                                                                    name="${_csrf.parameterName}"
-                                                                    value="${_csrf.token}" />
-                                                                <input type="hidden"
-                                                                    name="userId"
-                                                                    value="${followedUser.id}" />
+                                                    <sec:authorize access="isAuthenticated()">
+                                                        <sec:authentication property="principal.user.id" var="currentUserId" />
+                                                        <c:if test="${followedUser.id != currentUserId}">
+                                                            <form action="<c:url value='/profile/follow' />" method="post">
+                                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                                <input type="hidden" name="userId" value="${followedUser.id}" />
                                                                 <c:choose>
-                                                                    <c:when
-                                                                        test="${followStatusMap[followedUser.id]}">
-                                                                        <button
-                                                                            type="submit"
-                                                                            class="btn btn-retro btn-retro-secondary btn-follow-sm">
-                                                                            <spring:message
-                                                                                code="Profile.unfollow" />
+                                                                    <c:when test="${followStatusMap[followedUser.id]}">
+                                                                        <button type="submit" class="btn btn-retro btn-retro-secondary btn-follow-sm">
+                                                                            <spring:message code="Profile.unfollow" />
                                                                         </button>
                                                                     </c:when>
                                                                     <c:otherwise>
-                                                                        <button
-                                                                            type="submit"
-                                                                            class="btn btn-retro btn-retro-primary btn-follow-sm">
-                                                                            <spring:message
-                                                                                code="Profile.follow" />
+                                                                        <button type="submit" class="btn btn-retro btn-retro-primary btn-follow-sm">
+                                                                            <spring:message code="Profile.follow" />
                                                                         </button>
                                                                     </c:otherwise>
                                                                 </c:choose>
@@ -1141,20 +1110,20 @@
                                                     </sec:authorize>
                                                 </div>
                                             </c:forEach>
-                                        </div>
-                                        <ui:pagination result="${followingPage}" />
-                                    </c:when>
-                                    <c:otherwise>
-                                        <div class="empty-products-state">
-                                            <i
-                                                class="bi bi-person-check profile-i-4"></i>
-                                            <p class="profile-p-5">
-                                                <spring:message
-                                                    code="Profile.following.empty" />
-                                            </p>
-                                        </div>
-                                    </c:otherwise>
-                                </c:choose>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="empty-products-state follow-modal-empty">
+                                                <i class="bi bi-person-check profile-i-4"></i>
+                                                <p class="profile-p-5">
+                                                    <spring:message code="Profile.following.empty" />
+                                                </p>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                                <div class="follow-modal-pagination">
+                                    <ui:pagination result="${followingPage}" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1392,6 +1361,9 @@
             </div>
         </div>
     </div>
+    <meta name="is-authenticated" content="<sec:authorize access='isAuthenticated()'>true</sec:authorize><sec:authorize access='!isAuthenticated()'>false</sec:authorize>" />
+    <meta name="current-user-id" content="<sec:authorize access='isAuthenticated()'><sec:authentication property='principal.user.id' /></sec:authorize><sec:authorize access='!isAuthenticated()'>-1</sec:authorize>" />
+    <script src="<c:url value="/assets/js/profile-follow-modals.js" />"></script>
     <script>
         (function () {
 

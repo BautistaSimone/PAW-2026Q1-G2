@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.controller;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
@@ -36,6 +38,7 @@ import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.Util;
+import ar.edu.itba.paw.webapp.dto.UserFollowDto;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.Purchase;
@@ -366,6 +369,49 @@ public class UserController {
         String referer = request.getHeader("Referer");
 
         return new ModelAndView("redirect:" + referer);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/profile/followers/search", method = RequestMethod.GET, produces = "application/json")
+    public Map<String, Object> searchFollowers(
+            @AuthenticationPrincipal final PawAuthUser authUser,
+            @RequestParam("userId") final Long userId,
+            @RequestParam(value = "q", defaultValue = "") final String query,
+            @RequestParam(value = "page", defaultValue = "1") final int page) {
+        final PaginatedResult<User> result = userService.searchFollowers(userId, query, page, PROFILE_FOLLOW_PAGE_SIZE);
+        return buildFollowJsonResponse(result, authUser != null ? authUser.getUser().getId() : null);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/profile/following/search", method = RequestMethod.GET, produces = "application/json")
+    public Map<String, Object> searchFollowing(
+            @AuthenticationPrincipal final PawAuthUser authUser,
+            @RequestParam("userId") final Long userId,
+            @RequestParam(value = "q", defaultValue = "") final String query,
+            @RequestParam(value = "page", defaultValue = "1") final int page) {
+        final PaginatedResult<User> result = userService.searchFollowing(userId, query, page, PROFILE_FOLLOW_PAGE_SIZE);
+        return buildFollowJsonResponse(result, authUser != null ? authUser.getUser().getId() : null);
+    }
+
+    private Map<String, Object> buildFollowJsonResponse(final PaginatedResult<User> result, final Long currentUserId) {
+        final Map<String, Object> response = new HashMap<>();
+        final List<UserFollowDto> dtos = result.getResults().stream()
+                .map(u -> new UserFollowDto(u.getId(), u.getUsername(), u.getFirstName(), u.getLastName()))
+                .collect(java.util.stream.Collectors.toList());
+        response.put("results", dtos);
+        response.put("page", result.getCurrentPage());
+        response.put("totalCount", result.getTotalCount());
+        response.put("totalPages", result.getTotalPages());
+
+        if (currentUserId != null) {
+            final List<Long> userIds = dtos.stream()
+                    .map(UserFollowDto::getId)
+                    .collect(java.util.stream.Collectors.toList());
+            response.put("followStatusMap", userService.followingStatusByUserIds(currentUserId, userIds));
+        } else {
+            response.put("followStatusMap", Collections.emptyMap());
+        }
+        return response;
     }
 
     @RequestMapping(value = "/profile/follow", method = RequestMethod.POST)
