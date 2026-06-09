@@ -43,7 +43,7 @@
                             </option>
                         </c:forEach>
                     </select>
-                    <button type="button" id="communitySortApplyBtn" class="btn btn-retro btn-retro-primary community-sort-apply-btn">
+                    <button type="button" id="communitySortApplyBtn" class="btn btn-retro btn-retro-primary community-sort-apply-btn" disabled>
                         <spring:message code="SearchUsers.sort.apply" />
                     </button>
                 </div>
@@ -219,12 +219,26 @@
     <script src="<c:out value='${communityJsUrl}' />"></script>
 
     <script>
-        document.getElementById('communitySortApplyBtn').addEventListener('click', function() {
-            var sort = document.getElementById('communitySortSelect').value;
-            var url = new URL(window.location.href);
-            url.searchParams.set('sort', sort);
-            url.searchParams.delete('page');
-            window.location.href = url.toString();
-        });
+        (function() {
+            var select = document.getElementById('communitySortSelect');
+            var btn = document.getElementById('communitySortApplyBtn');
+            var initialValue = select.value;
+
+            function checkChanges() {
+                var hasChanged = (select.value !== initialValue);
+                btn.disabled = !hasChanged;
+                btn.classList.toggle('is-active', hasChanged);
+            }
+
+            select.addEventListener('change', checkChanges);
+
+            btn.addEventListener('click', function() {
+                var sort = select.value;
+                var url = new URL(window.location.href);
+                url.searchParams.set('sort', sort);
+                url.searchParams.delete('page');
+                window.location.href = url.toString();
+            });
+        })();
     </script>
 </ui:layout>

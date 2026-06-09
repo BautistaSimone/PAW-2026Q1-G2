@@ -4540,6 +4540,39 @@ input[type="password"]::-ms-clear {
   font-size: 0.85rem;
 }
 
+.community-sort-apply-btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  color: #fff;
+}
+
+.community-sort-apply-btn:disabled {
+  background: #e9ecef !important;
+  color: #6c757d !important;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.community-sort-apply-btn:not(:disabled) {
+  background: var(--color-accent);
+  box-shadow: 0 4px 12px rgba(231, 111, 81, 0.25);
+}
+
+.community-sort-apply-btn:not(:disabled):hover {
+  background: var(--color-accent-hover);
+}
+
+.community-sort-apply-btn:not(:disabled):active {
+  transform: translateY(0);
+}
+
 .community-seller-list {
   display: flex;
   flex-direction: column;

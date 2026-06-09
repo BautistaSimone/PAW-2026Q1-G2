@@ -682,9 +682,7 @@ public class UserJpaDao implements UserDao {
         }
 
         final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
-        final List<User> users = em.createQuery("FROM User u WHERE u.id IN :ids", User.class)
-                .setParameter("ids", longIds)
-                .getResultList();
+        final List<User> users = findUsersPreservingOrder(longIds);
 
         return new PaginatedResult<>(users, safePage, safeSize, totalCount);
     }
