@@ -51,7 +51,7 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     private static final int PROFILE_PUBLICATIONS_PAGE_SIZE = 12;
-    private static final int PROFILE_OTHER_PAGE_SIZE = 3;
+    private static final int PROFILE_OTHER_PAGE_SIZE = 8;
     private static final int PROFILE_TRASH_PAGE_SIZE = 12;
     private static final int PROFILE_FOLLOW_PAGE_SIZE = 12;
     private static final int PROFILE_WISHLIST_PAGE_SIZE = 12;
