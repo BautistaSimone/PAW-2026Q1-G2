@@ -72,7 +72,7 @@ public interface UserService {
 	void toggleWishlistProduct(final Long userId, final Long productId);
 
 	boolean isProductInWishlist(final Long userId, final Long productId);
-        List<Product> getWishlistProducts(final Long userId, final int limit);
+        PaginatedResult<Product> getWishlistProducts(final Long userId, final int page, final int pageSize);
         List<Long> getWishlistCategoryIds(final Long userId);
 
 	void follow(final Long followerId, final Long followedId);

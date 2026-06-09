@@ -57,7 +57,7 @@ public interface UserDao {
 
         boolean isProductInWishlist(final Long userId, final Long productId);
 
-        List<Product> getWishlistProducts(final Long userId, final int limit);
+        PaginatedResult<Product> getWishlistProducts(final Long userId, final int page, final int pageSize);
 
         List<Long> getWishlistCategoryIds(final Long userId);
 

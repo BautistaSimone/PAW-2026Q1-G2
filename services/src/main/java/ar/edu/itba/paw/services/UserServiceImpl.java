@@ -292,8 +292,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Product> getWishlistProducts(final Long userId, final int limit) {
-        return userDao.getWishlistProducts(userId, limit);
+    public PaginatedResult<Product> getWishlistProducts(final Long userId, final int page, final int pageSize) {
+        return userDao.getWishlistProducts(userId, page, pageSize);
     }
 
     @Override

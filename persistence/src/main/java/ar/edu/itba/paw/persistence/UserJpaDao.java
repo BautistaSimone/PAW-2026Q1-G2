@@ -194,24 +194,40 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
-    public List<Product> getWishlistProducts(final Long userId, final int limit) {
-        final int safeLimit = Math.max(limit, 1);
+    public PaginatedResult<Product> getWishlistProducts(final Long userId, final int page, final int pageSize) {
+        final int safePage = Math.max(page, 1);
+        final int safeSize = Math.max(pageSize, 1);
+
+        final long totalCount = countWishlistProducts(userId);
+        if (totalCount == 0) {
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, 0);
+        }
 
         @SuppressWarnings("unchecked")
         List<Number> ids = em.createNativeQuery("SELECT product_id FROM user_wishlist_products WHERE user_id = :userId")
                 .setParameter("userId", userId)
-                .setFirstResult(0)
-                .setMaxResults(safeLimit)
+                .setFirstResult((safePage - 1) * safeSize)
+                .setMaxResults(safeSize)
                 .getResultList();
 
         if (ids.isEmpty()) {
-            return Collections.emptyList();
+            return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, totalCount);
         }
 
         final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
-        return em.createQuery("FROM Product p WHERE p.productId IN :ids ORDER BY p.published DESC", Product.class)
+        final List<Product> products = em.createQuery("FROM Product p WHERE p.productId IN :ids ORDER BY p.published DESC", Product.class)
                 .setParameter("ids", longIds)
                 .getResultList();
+
+        return new PaginatedResult<>(products, safePage, safeSize, totalCount);
+    }
+
+    private long countWishlistProducts(final Long userId) {
+        final Number count = (Number) em.createNativeQuery(
+                "SELECT COUNT(*) FROM user_wishlist_products WHERE user_id = :userId")
+                .setParameter("userId", userId)
+                .getSingleResult();
+        return count.longValue();
     }
 
     @Override
