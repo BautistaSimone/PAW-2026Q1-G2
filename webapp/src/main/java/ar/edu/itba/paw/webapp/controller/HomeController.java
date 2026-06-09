@@ -24,6 +24,7 @@ import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.SellerRatingSummary;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.UserSortOrder;
 import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
@@ -195,23 +196,28 @@ public class HomeController {
 	public ModelAndView searchUsers(
 			@AuthenticationPrincipal PawAuthUser authUser,
 			@RequestParam(value = "q", required = false) final String query,
+			@RequestParam(value = "sort", required = false) final String sortParam,
 			@RequestParam(value = "page", defaultValue = "1") final int page) {
 
 		if (page < 1) {
 			throw new IllegalArgumentException("Invalid page");
 		}
 
+		final UserSortOrder sortOrder = UserSortOrder.parse(sortParam);
+
 		final ModelAndView mav = new ModelAndView("searchUsers");
 
 		final boolean hasQuery = query != null && !query.trim().isEmpty();
 		mav.addObject("searchQuery", hasQuery ? query.trim() : "");
+		mav.addObject("selectedSort", sortOrder);
+		mav.addObject("sortOptions", UserSortOrder.values());
 
 		final PaginatedResult<User> usersPage;
 		if (hasQuery) {
-			usersPage = userService.searchActiveSellers(query.trim(), page, COMMUNITY_USER_PAGE_SIZE);
+			usersPage = userService.searchActiveSellers(query.trim(), page, COMMUNITY_USER_PAGE_SIZE, sortOrder);
 			mav.addObject("showingSearchResults", true);
 		} else {
-			usersPage = userService.getFeaturedActiveSellers(page, COMMUNITY_USER_PAGE_SIZE);
+			usersPage = userService.getFeaturedActiveSellers(page, COMMUNITY_USER_PAGE_SIZE, sortOrder);
 			mav.addObject("showingSearchResults", false);
 		}
 

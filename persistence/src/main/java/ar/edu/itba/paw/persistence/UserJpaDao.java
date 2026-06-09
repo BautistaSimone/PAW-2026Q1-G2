@@ -18,6 +18,7 @@ import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductState;
+import ar.edu.itba.paw.models.UserSortOrder;
 
 @Repository
 public class UserJpaDao implements UserDao {
@@ -514,10 +515,17 @@ public class UserJpaDao implements UserDao {
 
     @Override
     public PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize) {
+        return getFeaturedActiveSellers(page, pageSize, UserSortOrder.FOLLOWERS_DESC);
+    }
+
+    @Override
+    public PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize, final UserSortOrder sortOrder) {
         final int safePage = Math.max(page, 1);
         final int safeSize = Math.max(pageSize, 1);
 
         final String activeState = ProductState.ACTIVE.getPersistenceValue();
+        final boolean isRatingSort = sortOrder == UserSortOrder.RATING_DESC || sortOrder == UserSortOrder.RATING_ASC;
+
         final Number countResult = (Number) em.createNativeQuery(
                 "SELECT COUNT(*) FROM users u " +
                         "WHERE u.banned = false " +
@@ -533,17 +541,19 @@ public class UserJpaDao implements UserDao {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, 0);
         }
 
+        final String orderClause = getSellerOrderClause(sortOrder);
+        final String reviewsJoin = isRatingSort ? "LEFT JOIN reviews r ON r.seller_id = u.user_id " : "";
+
         @SuppressWarnings("unchecked")
         final List<Number> ids = em.createNativeQuery(
                 "SELECT u.user_id " +
                         "FROM users u " +
                         "JOIN products p ON p.user_id = u.user_id AND p.state = :state " +
                         "LEFT JOIN user_follows uf ON uf.followed_id = u.user_id " +
+                        reviewsJoin +
                         "WHERE u.banned = false " +
                         "GROUP BY u.user_id " +
-                        "ORDER BY COUNT(DISTINCT uf.follower_id) DESC, " +
-                        "COUNT(DISTINCT p.product_id) DESC, " +
-                        "u.user_id ASC")
+                        "ORDER BY " + orderClause)
                 .setParameter("state", activeState)
                 .setFirstResult((safePage - 1) * safeSize)
                 .setMaxResults(safeSize)
@@ -555,11 +565,17 @@ public class UserJpaDao implements UserDao {
 
     @Override
     public PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize) {
+        return searchActiveSellers(query, page, pageSize, UserSortOrder.FOLLOWERS_DESC);
+    }
+
+    @Override
+    public PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize, final UserSortOrder sortOrder) {
         final int safePage = Math.max(page, 1);
         final int safeSize = Math.max(pageSize, 1);
         final String rawQuery = query == null ? "" : query.trim().toLowerCase();
         final String likePattern = "%" + escapeForLike(rawQuery) + "%";
         final ProductState activeState = ProductState.ACTIVE;
+        final boolean isRatingSort = sortOrder == UserSortOrder.RATING_DESC || sortOrder == UserSortOrder.RATING_ASC;
 
         final long totalCount = em.createQuery(
                 "SELECT COUNT(u) " +
@@ -579,17 +595,25 @@ public class UserJpaDao implements UserDao {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, 0);
         }
 
-	// Paginate with 1 + 1 queries
+        final String orderClause = getSellerOrderClause(sortOrder);
+        final String reviewsJoin = isRatingSort ? "LEFT JOIN reviews r ON r.seller_id = u.user_id " : "";
+
         @SuppressWarnings("unchecked")
         List<Number> ids = em.createNativeQuery(
-                "SELECT u.user_id FROM users AS u " + 
-		"WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
+                "SELECT u.user_id FROM users AS u " +
+                "LEFT JOIN user_follows uf ON uf.followed_id = u.user_id " +
+                "LEFT JOIN products p2 ON p2.user_id = u.user_id AND p2.state = :state " +
+                reviewsJoin +
+                "WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
                 "AND u.banned = false " +
                 "AND EXISTS (" +
                 " SELECT p.product_id FROM products AS p " +
-                " WHERE p.user_id = u.user_id AND p.state = :state)")
+                " WHERE p.user_id = u.user_id AND p.state = :state2) " +
+                "GROUP BY u.user_id " +
+                "ORDER BY " + orderClause)
                 .setParameter("q", likePattern)
                 .setParameter("state", activeState.getPersistenceValue())
+                .setParameter("state2", activeState.getPersistenceValue())
                 .setFirstResult((safePage - 1) * safeSize)
                 .setMaxResults(safeSize)
                 .getResultList();
@@ -599,19 +623,37 @@ public class UserJpaDao implements UserDao {
             ids = ids.subList(0, safeSize);
         }
 
-	if (ids.isEmpty()) {
+        if (ids.isEmpty()) {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, totalCount);
         }
-         
-	final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
- 
-        final List<User> users = em.createQuery(
-                "FROM User u WHERE u.id IN :ids ORDER BY LOWER(u.username) ASC, u.id ASC",
-                User.class)
+
+        final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
+        final List<User> users = em.createQuery("FROM User u WHERE u.id IN :ids", User.class)
                 .setParameter("ids", longIds)
                 .getResultList();
 
-	return new PaginatedResult<>(users, safePage, safeSize, totalCount);
+        return new PaginatedResult<>(users, safePage, safeSize, totalCount);
+    }
+
+    private String getSellerOrderClause(final UserSortOrder sortOrder) {
+        if (sortOrder == null) {
+            return "COUNT(DISTINCT uf.follower_id) DESC, COUNT(DISTINCT p.product_id) DESC, u.user_id ASC";
+        }
+        switch (sortOrder) {
+            case FOLLOWERS_ASC:
+                return "COUNT(DISTINCT uf.follower_id) ASC, u.user_id ASC";
+            case PRODUCTS_DESC:
+                return "COUNT(DISTINCT p.product_id) DESC, u.user_id ASC";
+            case PRODUCTS_ASC:
+                return "COUNT(DISTINCT p.product_id) ASC, u.user_id ASC";
+            case RATING_DESC:
+                return "COALESCE(AVG(r.score), 0) DESC, COUNT(DISTINCT uf.follower_id) DESC, u.user_id ASC";
+            case RATING_ASC:
+                return "COALESCE(AVG(r.score), 0) ASC, COUNT(DISTINCT uf.follower_id) DESC, u.user_id ASC";
+            case FOLLOWERS_DESC:
+            default:
+                return "COUNT(DISTINCT uf.follower_id) DESC, COUNT(DISTINCT p.product_id) DESC, u.user_id ASC";
+        }
     }
 
     @Override

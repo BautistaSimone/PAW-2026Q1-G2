@@ -7,6 +7,7 @@ import java.util.Optional;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.UserSortOrder;
 
 public interface UserService {
 
@@ -89,7 +90,9 @@ public interface UserService {
 	PaginatedResult<User> searchUsers(final String query, final int page, final int pageSize);
 	List<User> getMostFollowedUsers(final int limit);
 	PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize);
+	PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize, final UserSortOrder sortOrder);
 	PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize);
+	PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize, final UserSortOrder sortOrder);
 	Map<Long, Long> countFollowersByUserIds(final List<Long> userIds);
 	Map<Long, Boolean> followingStatusByUserIds(final Long followerId, final List<Long> followedIds);
 

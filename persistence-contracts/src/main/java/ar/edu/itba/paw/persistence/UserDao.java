@@ -7,6 +7,7 @@ import java.util.Optional;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.UserSortOrder;
 
 public interface UserDao {
 
@@ -87,7 +88,11 @@ public interface UserDao {
 
         PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize);
 
+        PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize, final UserSortOrder sortOrder);
+
         PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize);
+
+        PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize, final UserSortOrder sortOrder);
 
         Map<Long, Long> countFollowersByUserIds(final List<Long> userIds);
 

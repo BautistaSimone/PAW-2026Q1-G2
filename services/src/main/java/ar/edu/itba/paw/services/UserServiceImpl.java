@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import ar.edu.itba.paw.models.PaginatedResult;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.UserSortOrder;
 
 import ar.edu.itba.paw.persistence.UserDao;
 
@@ -400,8 +401,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    public PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize, final UserSortOrder sortOrder) {
+        return userDao.getFeaturedActiveSellers(page, pageSize, sortOrder);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize) {
         return userDao.searchActiveSellers(query, page, pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize, final UserSortOrder sortOrder) {
+        return userDao.searchActiveSellers(query, page, pageSize, sortOrder);
     }
 
     @Override

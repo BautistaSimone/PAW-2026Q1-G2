@@ -18,17 +18,33 @@
         <div class="container-fluid products-shell">
 
             <div class="community-section-heading">
-                <c:choose>
-                    <c:when test="${showingSearchResults}">
-                        <h2>
-                            <spring:message code="SearchUsers.resultsFor" />
-                            <span>"<c:out value='${searchQuery}' />"</span>
-                        </h2>
-                    </c:when>
-                    <c:otherwise>
-                        <h2><spring:message code="SearchUsers.mostFollowed" /></h2>
-                    </c:otherwise>
-                </c:choose>
+                <div>
+                    <c:choose>
+                        <c:when test="${showingSearchResults}">
+                            <h2>
+                                <spring:message code="SearchUsers.resultsFor" />
+                                <span>"<c:out value='${searchQuery}' />"</span>
+                            </h2>
+                        </c:when>
+                        <c:otherwise>
+                            <h2><spring:message code="SearchUsers.mostFollowed" /></h2>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+                <div class="community-sort-control">
+                    <label for="communitySortSelect" class="community-sort-label">
+                        <spring:message code="SearchUsers.sort.label" />
+                    </label>
+                    <select id="communitySortSelect" class="form-select form-select-sm community-sort-select"
+                        onchange="var sort=this.value;var url=new URL(window.location.href);url.searchParams.set('sort',sort);url.searchParams.delete('page');window.location.href=url.toString();">
+                        <c:forEach items="${sortOptions}" var="opt">
+                            <c:set var="sortKey" value="SearchUsers.sort.${opt.paramValue}" />
+                            <option value="${opt.paramValue}" <c:if test="${selectedSort eq opt}">selected</c:if>>
+                                <spring:message code="${sortKey}" />
+                            </option>
+                        </c:forEach>
+                    </select>
+                </div>
             </div>
 
             <c:choose>

@@ -4522,6 +4522,24 @@ input[type="password"]::-ms-clear {
   color: var(--color-accent);
 }
 
+.community-sort-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.community-sort-label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.community-sort-select {
+  min-width: 150px;
+  font-size: 0.85rem;
+}
+
 .community-seller-list {
   display: flex;
   flex-direction: column;
