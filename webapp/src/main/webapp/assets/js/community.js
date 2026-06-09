@@ -112,7 +112,12 @@
 
             track.addEventListener('scroll', update, { passive: true });
             window.addEventListener('resize', update);
+            track.scrollLeft = 0;
             update();
+            requestAnimationFrame(function () {
+                track.scrollLeft = 0;
+                update();
+            });
         });
     }
 
