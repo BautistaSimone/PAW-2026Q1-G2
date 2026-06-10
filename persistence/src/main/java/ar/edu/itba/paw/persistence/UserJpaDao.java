@@ -212,7 +212,9 @@ public class UserJpaDao implements UserDao {
         }
 
         final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
-        final List<Product> products = em.createQuery("FROM Product p WHERE p.productId IN :ids ORDER BY p.published DESC", Product.class)
+        final List<Product> products = em.createQuery(
+                "SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.categories WHERE p.productId IN :ids ORDER BY p.published DESC",
+                Product.class)
                 .setParameter("ids", longIds)
                 .getResultList();
 
@@ -346,7 +348,8 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
-    public PaginatedResult<User> searchFollowers(final Long userId, final String query, final int page, final int pageSize) {
+    public PaginatedResult<User> searchFollowers(final Long userId, final String query, final int page,
+            final int pageSize) {
         final int safePage = Math.max(page, 1);
         final int safeSize = Math.max(pageSize, 1);
 
@@ -354,8 +357,8 @@ public class UserJpaDao implements UserDao {
 
         final Number countResult = (Number) em.createNativeQuery(
                 "SELECT COUNT(*) FROM user_follows uf " +
-                "JOIN users u ON u.user_id = uf.follower_id " +
-                "WHERE uf.followed_id = :uid AND LOWER(u.username) LIKE :q ESCAPE '\\'")
+                        "JOIN users u ON u.user_id = uf.follower_id " +
+                        "WHERE uf.followed_id = :uid AND LOWER(u.username) LIKE :q ESCAPE '\\'")
                 .setParameter("uid", userId)
                 .setParameter("q", likePattern)
                 .getSingleResult();
@@ -368,9 +371,9 @@ public class UserJpaDao implements UserDao {
         @SuppressWarnings("unchecked")
         final List<Number> ids = em.createNativeQuery(
                 "SELECT uf.follower_id FROM user_follows uf " +
-                "JOIN users u ON u.user_id = uf.follower_id " +
-                "WHERE uf.followed_id = :uid AND LOWER(u.username) LIKE :q ESCAPE '\\' " +
-                "ORDER BY uf.created_at DESC")
+                        "JOIN users u ON u.user_id = uf.follower_id " +
+                        "WHERE uf.followed_id = :uid AND LOWER(u.username) LIKE :q ESCAPE '\\' " +
+                        "ORDER BY uf.created_at DESC")
                 .setParameter("uid", userId)
                 .setParameter("q", likePattern)
                 .setFirstResult((safePage - 1) * safeSize)
@@ -390,7 +393,8 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
-    public PaginatedResult<User> searchFollowing(final Long userId, final String query, final int page, final int pageSize) {
+    public PaginatedResult<User> searchFollowing(final Long userId, final String query, final int page,
+            final int pageSize) {
         final int safePage = Math.max(page, 1);
         final int safeSize = Math.max(pageSize, 1);
 
@@ -398,8 +402,8 @@ public class UserJpaDao implements UserDao {
 
         final Number countResult = (Number) em.createNativeQuery(
                 "SELECT COUNT(*) FROM user_follows uf " +
-                "JOIN users u ON u.user_id = uf.followed_id " +
-                "WHERE uf.follower_id = :uid AND LOWER(u.username) LIKE :q ESCAPE '\\'")
+                        "JOIN users u ON u.user_id = uf.followed_id " +
+                        "WHERE uf.follower_id = :uid AND LOWER(u.username) LIKE :q ESCAPE '\\'")
                 .setParameter("uid", userId)
                 .setParameter("q", likePattern)
                 .getSingleResult();
@@ -412,9 +416,9 @@ public class UserJpaDao implements UserDao {
         @SuppressWarnings("unchecked")
         final List<Number> ids = em.createNativeQuery(
                 "SELECT uf.followed_id FROM user_follows uf " +
-                "JOIN users u ON u.user_id = uf.followed_id " +
-                "WHERE uf.follower_id = :uid AND LOWER(u.username) LIKE :q ESCAPE '\\' " +
-                "ORDER BY uf.created_at DESC")
+                        "JOIN users u ON u.user_id = uf.followed_id " +
+                        "WHERE uf.follower_id = :uid AND LOWER(u.username) LIKE :q ESCAPE '\\' " +
+                        "ORDER BY uf.created_at DESC")
                 .setParameter("uid", userId)
                 .setParameter("q", likePattern)
                 .setFirstResult((safePage - 1) * safeSize)
@@ -460,11 +464,11 @@ public class UserJpaDao implements UserDao {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, 0);
         }
 
-	// Paginate with 1 + 1 queries
+        // Paginate with 1 + 1 queries
         @SuppressWarnings("unchecked")
         List<Number> ids = em.createNativeQuery(
                 "SELECT user_id FROM users WHERE LOWER(u.username) LIKE :q ESCAPE '\\' AND u.banned = false")
-		.setParameter("q", likePattern)
+                .setParameter("q", likePattern)
                 .setFirstResult((safePage - 1) * safeSize)
                 .setMaxResults(safeSize)
                 .getResultList();
@@ -474,12 +478,12 @@ public class UserJpaDao implements UserDao {
             ids = ids.subList(0, safeSize);
         }
 
-	if (ids.isEmpty()) {
+        if (ids.isEmpty()) {
             return new PaginatedResult<>(Collections.emptyList(), safePage, safeSize, totalCount);
         }
-        
-	final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
- 
+
+        final List<Long> longIds = ids.stream().map(Number::longValue).collect(Collectors.toList());
+
         final List<User> users = em.createQuery(
                 "FROM User u WHERE u.id IN :ids ORDER BY u.username ASC",
                 User.class)
@@ -517,7 +521,8 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
-    public PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize, final UserSortOrder sortOrder) {
+    public PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize,
+            final UserSortOrder sortOrder) {
         final int safePage = Math.max(page, 1);
         final int safeSize = Math.max(pageSize, 1);
 
@@ -590,11 +595,11 @@ public class UserJpaDao implements UserDao {
         @SuppressWarnings("unchecked")
         List<Number> ids = em.createNativeQuery(
                 "SELECT u.user_id FROM users AS u " +
-                "WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
-                "AND u.banned = false " +
-                "AND EXISTS (" +
-                " SELECT p.product_id FROM products AS p " +
-                " WHERE p.user_id = u.user_id AND p.state = :state)")
+                        "WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
+                        "AND u.banned = false " +
+                        "AND EXISTS (" +
+                        " SELECT p.product_id FROM products AS p " +
+                        " WHERE p.user_id = u.user_id AND p.state = :state)")
                 .setParameter("q", likePattern)
                 .setParameter("state", activeState.getPersistenceValue())
                 .setFirstResult((safePage - 1) * safeSize)
@@ -621,7 +626,8 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
-    public PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize, final UserSortOrder sortOrder) {
+    public PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize,
+            final UserSortOrder sortOrder) {
         final int safePage = Math.max(page, 1);
         final int safeSize = Math.max(pageSize, 1);
         final String rawQuery = query == null ? "" : query.trim().toLowerCase();
@@ -653,16 +659,16 @@ public class UserJpaDao implements UserDao {
         @SuppressWarnings("unchecked")
         List<Number> ids = em.createNativeQuery(
                 "SELECT u.user_id FROM users AS u " +
-                "LEFT JOIN user_follows uf ON uf.followed_id = u.user_id " +
-                "LEFT JOIN products p ON p.user_id = u.user_id AND p.state = :state " +
-                reviewsJoin +
-                "WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
-                "AND u.banned = false " +
-                "AND EXISTS (" +
-                " SELECT p2.product_id FROM products AS p2 " +
-                " WHERE p2.user_id = u.user_id AND p2.state = :state2) " +
-                "GROUP BY u.user_id " +
-                "ORDER BY " + orderClause)
+                        "LEFT JOIN user_follows uf ON uf.followed_id = u.user_id " +
+                        "LEFT JOIN products p ON p.user_id = u.user_id AND p.state = :state " +
+                        reviewsJoin +
+                        "WHERE LOWER(u.username) LIKE :q ESCAPE '\\' " +
+                        "AND u.banned = false " +
+                        "AND EXISTS (" +
+                        " SELECT p2.product_id FROM products AS p2 " +
+                        " WHERE p2.user_id = u.user_id AND p2.state = :state2) " +
+                        "GROUP BY u.user_id " +
+                        "ORDER BY " + orderClause)
                 .setParameter("q", likePattern)
                 .setParameter("state", activeState.getPersistenceValue())
                 .setParameter("state2", activeState.getPersistenceValue())
