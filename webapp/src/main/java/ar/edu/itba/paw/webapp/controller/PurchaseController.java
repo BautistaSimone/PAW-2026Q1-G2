@@ -108,18 +108,27 @@ public class PurchaseController {
 
         final PurchaseStatus statusObj = PurchaseStatus.valueOf(form.getNewStatus());
 
-        ValidatedPaymentProof proof = null;
-        if (statusObj == PurchaseStatus.PAID) {
-            proof = PaymentProofValidator.validate(form.getProofFile());
+        byte[] proofData = null;
+        String proofContentType = null;
+        String proofFileName = null;
+        
+        if (statusObj == PurchaseStatus.PAID && form.getProofFile() != null && !form.getProofFile().isEmpty()) {
+            try {
+                proofData = form.getProofFile().getBytes();
+                proofContentType = PaymentProofValidator.detectSafeContentType(proofData).orElse("application/pdf");
+                proofFileName = PaymentProofValidator.safeFileName(form.getProofFile().getOriginalFilename());
+            } catch (java.io.IOException e) {
+                throw new RuntimeException("Failed to read uploaded payment proof bytes", e);
+            }
         }
 
         final Purchase updated = purchaseService.updateStatus(
                 id,
                 authUser.getUser().getId(),
                 statusObj,
-                proof != null ? proof.getData() : null,
-                proof != null ? proof.getContentType() : null,
-                proof != null ? proof.getFileName() : null);
+                proofData,
+                proofContentType,
+                proofFileName);
 
         if (statusObj == PurchaseStatus.DELIVERED && authUser.getUser().getId().equals(updated.getBuyerId())) {
             return new ModelAndView("redirect:/purchases/" + id + "/review");

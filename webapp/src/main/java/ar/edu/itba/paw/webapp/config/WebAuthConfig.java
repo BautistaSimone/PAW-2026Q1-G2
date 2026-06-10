@@ -46,7 +46,6 @@ public class WebAuthConfig {
                 .requestMatchers("/products/*/edit", "/products/*/report", "/products/*/delete", "/products/*/restore")
                 .authenticated()
                 // Authenticated-only miscellaneous actions
-                .requestMatchers(HttpMethod.GET, "/sendVerificationEmail").authenticated()
                 .requestMatchers(HttpMethod.POST, "/sendVerificationEmail", "/toggle-wishlist-product",
                         "/profile/follow")
                 .authenticated()
@@ -60,7 +59,7 @@ public class WebAuthConfig {
                 .requestMatchers(HttpMethod.POST, "/images", "/images/**").denyAll()
                 // Public routes
                 .requestMatchers("/", "/changePassword", "/resetPassword", "/verificationStatus", "/verifyEmail",
-                        "/notVerified", "/search-users", "/banned")
+                        "/notVerified", "/sendVerificationEmail", "/search-users", "/banned")
                 .permitAll()
                 .requestMatchers("/css/**", "/js/**", "/img/**", "/assets/**", "/favicon.ico", "/403").permitAll()
                 .and().formLogin()

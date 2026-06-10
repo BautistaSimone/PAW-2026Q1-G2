@@ -31,13 +31,3 @@ A continuación, se listan los errores conceptuales encontrados en el repositori
   - La relación `wishlistProducts` está mapeada mediante `@ManyToMany`. La "wishlist" de un usuario puede crecer indefinidamente y no debería mapearse como una colección directa en el modelo `User`. Debería consultarse a través de un DAO paginado.
 
 ---
-
-## 3. CONTROLLERS
-
-### 🟠 4.1 Validación de formularios en el Controller en lugar de Custom Validators (GRAVE)
-
-**Descripción del error:** La lógica de validación de negocio (especialmente de archivos subidos) se realiza manualmente llamando a validadores estáticos o métodos manuales desde el controlador, en lugar de integrarse con `@Valid` y custom Validators de Spring (por ej. `@FileValidator`).
-**Ubicaciones encontradas:**
-
-- **`ProductController.java` (método `createProduct` / `imageDataFrom`):** Llama directamente a `ImageUploadValidator.readAll(files)` dentro del flujo del controlador para validar e instanciar las imágenes en lugar de validar el `MultipartFile[]` a través de anotaciones de Spring en el `ProductForm`.
-- **`PurchaseController.java` (método `updateStatus`):** Verifica manualmente `PaymentProofValidator.validate(form.getProofFile())` si el status es `PAID`. Esto es validación de reglas de negocio atadas a la vista y debería estar encapsulada en un Constraint de validación propio del formulario.
