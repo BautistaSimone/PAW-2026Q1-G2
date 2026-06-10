@@ -20,9 +20,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.PurchaseStatus;
-import ar.edu.itba.paw.services.PurchaseDisplayService;
 import ar.edu.itba.paw.services.PurchasePaymentProof;
 import ar.edu.itba.paw.services.PurchaseService;
+import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
@@ -35,17 +35,17 @@ import ar.edu.itba.paw.webapp.validation.PaymentProofValidator.ValidatedPaymentP
 public class PurchaseController {
 
     private final PurchaseService purchaseService;
+    private final ReviewService reviewService;
     private final ProductService productService;
-    private final PurchaseDisplayService purchaseDisplayService;
 
     @Autowired
     public PurchaseController(
             final PurchaseService purchaseService,
-            final ProductService productService,
-            final PurchaseDisplayService purchaseDisplayService) {
+            final ReviewService reviewService,
+            final ProductService productService) {
         this.purchaseService = purchaseService;
+        this.reviewService = reviewService;
         this.productService = productService;
-        this.purchaseDisplayService = purchaseDisplayService;
     }
 
     @RequestMapping(value = "/purchases", method = RequestMethod.POST)
@@ -169,24 +169,30 @@ public class PurchaseController {
     }
 
     private ModelAndView buildPurchaseView(final PawAuthUser authUser, final Long id) {
-        final PurchaseDisplayService.PurchaseDisplay display =
-                purchaseDisplayService.getPurchaseDisplay(id, authUser.getUser().getId());
+        final PurchaseService.PurchaseDetails details = purchaseService.getPurchaseDetailsForUser(
+                id,
+                authUser.getUser().getId());
+        final Purchase purchase = details.getPurchase();
 
         final ModelAndView mav = new ModelAndView("purchase-panel");
-        mav.addObject("purchase", display.getPurchase());
-        mav.addObject("product", display.getProduct());
-        mav.addObject("orderBuyer", display.getOrderBuyer());
-        mav.addObject("orderSeller", display.getOrderSeller());
-        mav.addObject("isBuyer", display.isBuyer());
-        mav.addObject("isSeller", display.isSeller());
+        mav.addObject("purchase", purchase);
+        mav.addObject("product", details.getProduct());
+        mav.addObject("orderBuyer", details.getBuyer());
+        mav.addObject("orderSeller", details.getSeller());
+        mav.addObject("isBuyer", details.isBuyerView());
+        mav.addObject("isSeller", details.isSellerView());
 
-        if (display.getRemainingSeconds() != null) {
-            mav.addObject("remainingSeconds", display.getRemainingSeconds());
+        final Long remainingSeconds = details.getRemainingReservationSeconds();
+        if (remainingSeconds != null) {
+            mav.addObject("remainingSeconds", remainingSeconds);
         }
 
-        mav.addObject("hasPaymentProof", display.isHasPaymentProof());
-        mav.addObject("paymentProofFileName", display.getPaymentProofFileName());
-        mav.addObject("hasReview", display.isHasReview());
+        mav.addObject("hasPaymentProof", details.hasPaymentProof());
+        mav.addObject("paymentProofFileName", details.getPaymentProofFileName());
+
+        if (details.isBuyerView() && purchase.getStatus() == PurchaseStatus.DELIVERED) {
+            mav.addObject("hasReview", reviewService.findByPurchaseId(id).isPresent());
+        }
 
         return mav;
     }

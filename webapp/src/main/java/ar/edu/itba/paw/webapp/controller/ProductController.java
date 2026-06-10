@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import ar.edu.itba.paw.models.Category;
 import ar.edu.itba.paw.models.Image;
 import ar.edu.itba.paw.models.Product;
+import ar.edu.itba.paw.models.SellerRatingSummary;
 import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.webapp.form.ProductForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
@@ -33,11 +35,12 @@ import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator.ValidatedImage;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
-import ar.edu.itba.paw.services.ProductDetailService;
 import ar.edu.itba.paw.services.ProductImageData;
 import ar.edu.itba.paw.services.ProductImageUpdate;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.ReportService;
+import ar.edu.itba.paw.services.ReviewService;
+import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.webapp.validation.ProductImageLayoutParser;
 import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
 
@@ -52,7 +55,8 @@ public class ProductController {
     private final CategoryService categoryService;
     private final ImageService imageService;
     private final ReportService reportService;
-    private final ProductDetailService productDetailService;
+    private final ReviewService reviewService;
+    private final UserService userService;
 
     @Autowired
     public ProductController(
@@ -60,12 +64,14 @@ public class ProductController {
             final CategoryService categoryService,
             final ImageService imageService,
             final ReportService reportService,
-            final ProductDetailService productDetailService) {
+            final ReviewService reviewService,
+            final UserService userService) {
         this.productService = productService;
         this.categoryService = categoryService;
         this.imageService = imageService;
         this.reportService = reportService;
-        this.productDetailService = productDetailService;
+        this.reviewService = reviewService;
+        this.userService = userService;
     }
 
     @ModelAttribute("categories")
@@ -270,33 +276,54 @@ public class ProductController {
             @AuthenticationPrincipal final PawAuthUser authUser,
             final HttpServletRequest request,
             @ModelAttribute("purchaseCreateForm") final ar.edu.itba.paw.webapp.form.PurchaseCreateForm purchaseForm) {
-        final Long currentUserId = authUser != null ? authUser.getUser().getId() : null;
-        final ProductDetailService.ProductDetail detail = productDetailService.getProductDetail(id, currentUserId);
+        final Product product = productService.findByIdIfAvailable(id)
+                .orElseThrow(ResourceNotFoundException::new);
 
         final ModelAndView mav = new ModelAndView("product-detail");
-        mav.addObject("product", detail.getProduct());
-        mav.addObject("isOwnProduct", detail.isOwnProduct());
-        mav.addObject("isWishlisted", detail.isWishlisted());
-
-        final List<ar.edu.itba.paw.models.Image> productImages = detail.getProductImages();
-        if (!productImages.isEmpty()) {
-            mav.addObject("productImages", productImages);
-            mav.addObject("productImageUrl", "/images/" + productImages.get(0).getImageId());
-        }
-
-        mav.addObject("sellerRating", detail.getSellerRating());
-        if (detail.getSeller() != null) {
-            mav.addObject("seller", detail.getSeller());
-        }
-        mav.addObject("sellerReviews", detail.getSellerReviews());
-        mav.addObject("sellerProducts", detail.getSellerProducts());
-        mav.addObject("relatedProducts", detail.getRelatedProducts());
-        mav.addObject("sellerRatings", detail.getSellerRatings());
+        mav.addObject("product", product);
 
         String backUrl = Util.resolveBackUrl(request);
         if (!isSameProductDetailPath(backUrl, id)) {
             mav.addObject("productDetailBackUrl", backUrl);
         }
+
+        if (authUser != null) {
+            final boolean isOwnProduct = product.getUserId() == authUser.getUser().getId();
+            final boolean isWishlisted = userService.isProductInWishlist(authUser.getUser().getId(), product.getId());
+
+            mav.addObject("isOwnProduct", isOwnProduct);
+            mav.addObject("isWishlisted", isWishlisted);
+
+        } else {
+            mav.addObject("isOwnProduct", false);
+            mav.addObject("isWishlisted", false);
+        }
+
+        final List<ar.edu.itba.paw.models.Image> productImages = imageService.findAllByProductId(product.getId());
+        if (!productImages.isEmpty()) {
+            mav.addObject("productImages", productImages);
+            mav.addObject("productImageUrl", "/images/" + productImages.get(0).getImageId());
+        }
+
+        mav.addObject("sellerRating", reviewService.summaryForSeller(product.getUserId()));
+        userService.findById(product.getUserId()).ifPresent(seller -> mav.addObject("seller", seller));
+        mav.addObject("sellerReviews", reviewService.findBySellerId(product.getUserId(), 1, 3).getResults());
+
+        List<Product> sellerProducts = productService.listProductsByUserExcept(product.getUserId(), product.getId());
+
+        final List<Product> relatedProducts = productService.getRelatedProducts(
+                product,
+                authUser != null ? authUser.getUser().getId() : null,
+                10
+        );
+
+        final List<Product> carouselProducts = new ArrayList<>(sellerProducts);
+        carouselProducts.addAll(relatedProducts);
+        final Map<Long, SellerRatingSummary> sellerRatings = reviewService.sellerRatingByProducts(carouselProducts);
+
+        mav.addObject("sellerProducts", sellerProducts);
+        mav.addObject("relatedProducts", relatedProducts);
+        mav.addObject("sellerRatings", sellerRatings);
 
         return mav;
     }
