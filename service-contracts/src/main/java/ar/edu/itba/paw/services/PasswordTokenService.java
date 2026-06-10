@@ -5,7 +5,7 @@ import java.util.Optional;
 import ar.edu.itba.paw.models.PasswordToken;
 
 public interface PasswordTokenService {
-    void createPasswordResetTokenForUser(final Long userId, String token);
+    void createPasswordResetTokenForUser(final Long userId);
 
     boolean isValidPasswordResetToken(String token);
 

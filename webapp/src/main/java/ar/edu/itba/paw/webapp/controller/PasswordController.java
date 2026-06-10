@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
@@ -73,9 +72,7 @@ public class PasswordController {
 
         final User user = userOpt.get();
 
-        final String token = UUID.randomUUID().toString();
-
-        passwordTokenService.createPasswordResetTokenForUser(user.getId(), token);
+        passwordTokenService.createPasswordResetTokenForUser(user.getId());
 
         redirectAttributes.addFlashAttribute("message", "EmailSent.authForm.email");
 

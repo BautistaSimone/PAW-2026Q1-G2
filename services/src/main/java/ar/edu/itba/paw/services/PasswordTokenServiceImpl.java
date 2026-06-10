@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.services;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.time.Instant;
 import java.time.Duration;
 
@@ -52,8 +53,9 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
 
     @Override
     @Transactional
-    public void createPasswordResetTokenForUser(final Long userId, String token) {
+    public void createPasswordResetTokenForUser(final Long userId) {
 
+        final String token = UUID.randomUUID().toString();
         Instant expiryDate = Instant.now().plus(Duration.ofMinutes(EXPIRATION));
 
         passwordTokenDao.createToken(userId, token, expiryDate);
