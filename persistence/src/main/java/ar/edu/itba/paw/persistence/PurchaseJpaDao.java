@@ -139,6 +139,17 @@ public class PurchaseJpaDao implements PurchaseDao {
     }
 
     @Override
+    public boolean cancelExpiredPurchase(final Long purchaseId) {
+        return em.createQuery(
+            "UPDATE Purchase p SET p.status = :cancelled " +
+            "WHERE p.id = :purchaseId AND p.status = :pending")
+            .setParameter("cancelled", PurchaseStatus.CANCELLED)
+            .setParameter("purchaseId", purchaseId)
+            .setParameter("pending", PurchaseStatus.PENDING)
+            .executeUpdate() >= 1;
+    }
+
+    @Override
     public List<Purchase> findExpiredPending(final LocalDateTime now) {
         return em.createQuery(
             "FROM Purchase p WHERE p.reservedUntil IS NOT NULL AND p.reservedUntil < :now AND p.status = :status",

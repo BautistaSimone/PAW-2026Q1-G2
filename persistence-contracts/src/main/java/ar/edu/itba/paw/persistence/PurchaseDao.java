@@ -20,6 +20,7 @@ public interface PurchaseDao {
     );
     Optional<Purchase> findById(Long purchaseId);
     void updateStatus(Long purchaseId, PurchaseStatus status);
+    boolean cancelExpiredPurchase(Long purchaseId);
     List<Purchase> findExpiredPending(LocalDateTime now);
     PaginatedResult<Purchase> findByBuyerId(Long buyerId, List<PurchaseStatus> statuses, int page, int pageSize);
     PaginatedResult<Purchase> findBySellerId(Long sellerId, List<PurchaseStatus> statuses, int page, int pageSize);

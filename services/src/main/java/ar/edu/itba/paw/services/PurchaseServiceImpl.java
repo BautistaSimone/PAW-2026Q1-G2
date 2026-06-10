@@ -275,11 +275,14 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     private boolean cancelIfExpired(final Purchase purchase, final LocalDateTime now) {
-        if (purchase.getStatus() != PurchaseStatus.PENDING) {
-            return false;
-        }
         final LocalDateTime reservedUntil = purchase.getReservedUntil();
         if (reservedUntil == null || !reservedUntil.isBefore(now)) {
+            return false;
+        }
+        // Atomic operation: set status to CANCELLED only if still PENDING in the database.
+        // This prevents race conditions where multiple threads might attempt to cancel the
+        // same purchase and increment the stock multiple times.
+        if (!purchaseDao.cancelExpiredPurchase(purchase.getPurchaseId())) {
             return false;
         }
         purchase.setStatus(PurchaseStatus.CANCELLED);
