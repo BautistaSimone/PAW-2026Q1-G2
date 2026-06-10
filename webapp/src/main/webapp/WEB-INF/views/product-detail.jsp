@@ -230,6 +230,12 @@
                                                                 name="productId"
                                                                 value="<c:out value='${product.id}'/>" />
 
+                                                            <c:if test="${not empty productDetailBackUrl}">
+                                                                <input type="hidden"
+                                                                    name="back"
+                                                                    value="<c:out value='${productDetailBackUrl}'/>" />
+                                                            </c:if>
+
                                                             <button type="submit"
                                                                     class="btn w-100 product-detail-button-17">
 
@@ -255,6 +261,12 @@
                                                                 name="productId"
                                                                 value="<c:out value='${product.id}'/>" />
 
+                                                            <c:if test="${not empty productDetailBackUrl}">
+                                                                <input type="hidden"
+                                                                    name="back"
+                                                                    value="<c:out value='${productDetailBackUrl}'/>" />
+                                                            </c:if>
+
                                                             <button type="submit"
                                                                     class="btn w-100 product-detail-button-18">
 
@@ -279,6 +291,9 @@
                                                             <c:url var="reportPostUrl" value="/products/${product.id}/report" />
                                                             <form action="<c:out value='${reportPostUrl}'/>" method="POST" class="w-100">
                                                                 <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
+                                                                <c:if test="${not empty productDetailBackUrl}">
+                                                                    <input type="hidden" name="back" value="<c:out value='${productDetailBackUrl}'/>" />
+                                                                </c:if>
                                                                 <button type="submit" class="btn w-100 product-detail-button-18"
                                                                     
                                                                     onmouseover="this.style.background='rgba(231, 111, 81, 0.08)'; this.style.borderColor='var(--color-accent)';"
@@ -339,7 +354,7 @@
                                                         <c:when test="${not empty sellerReviews}">
                                                             <div class="product-detail-div-30" >
                                                                 <c:forEach items="${sellerReviews}" var="review" varStatus="st">
-                                                                    <div style="padding-bottom: ${st.last ? '0' : '1rem'}; border-bottom: ${st.last ? 'none' : '1px solid rgba(0,0,0,0.05)'};">
+                                                                    <div style="${st.last ? 'padding-bottom: 0; border-bottom: none;' : 'padding-bottom: 1rem; border-bottom: 1px solid rgba(0,0,0,0.05);'}">
                                                                         <div class="product-detail-div-31" >
                                                                             <c:forEach begin="1" end="${review.score}">
                                                                                 <i class="bi bi-star-fill"></i>

@@ -57,6 +57,14 @@ public final class Util {
     }
 
     public static String resolveBackUrl(final HttpServletRequest request) {
+        final String backParam = request.getParameter("back");
+        if (backParam != null && !backParam.isBlank()) {
+            final String trimmed = backParam.trim();
+            if (trimmed.startsWith("/") && !trimmed.startsWith("//") && !trimmed.contains("\\")) {
+                return trimmed;
+            }
+        }
+
         final String fallbackUrl = "/";
         if ("1".equals(request.getParameter("created"))) {
             return fallbackUrl;
