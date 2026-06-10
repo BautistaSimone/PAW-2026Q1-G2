@@ -156,6 +156,7 @@ public class PendingNotificationJpaDaoTest {
         pendingNotificationDao.createForAllFollowersOf(seller.getId(), product.getId());
 
         // Assert
+        em.flush();
         em.clear();
 
         final List<PendingNotification> all = em.createQuery(
@@ -216,6 +217,7 @@ public class PendingNotificationJpaDaoTest {
         pendingNotificationDao.deleteByIds(List.of(first.getNotificationId(), third.getNotificationId()));
 
         // Assert
+        em.flush();
         em.clear();
 
         final List<PendingNotification> remaining = em.createQuery(
@@ -227,6 +229,8 @@ public class PendingNotificationJpaDaoTest {
         // An empty id list is a no-op
         pendingNotificationDao.deleteByIds(Collections.emptyList());
         pendingNotificationDao.deleteByIds(null);
+
+        em.flush();
         em.clear();
 
         Assertions.assertEquals(1, em.createQuery(

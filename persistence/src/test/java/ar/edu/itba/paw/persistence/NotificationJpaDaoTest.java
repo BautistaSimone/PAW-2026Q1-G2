@@ -173,6 +173,7 @@ public class NotificationJpaDaoTest {
         notificationDao.createForAllFollowers(NotificationType.NEW_PRODUCT, seller.getId(), product.getId());
 
         // Assert
+        em.flush();
         em.clear();
 
         final List<Notification> notifications = em.createQuery(
@@ -296,6 +297,7 @@ public class NotificationJpaDaoTest {
                 othersNotification.getNotificationId()));
 
         // Assert
+        em.flush();
         em.clear();
 
         Assertions.assertNotNull(em.find(Notification.class, first.getNotificationId()).getReadAt());
@@ -323,6 +325,7 @@ public class NotificationJpaDaoTest {
         notificationDao.markAllRead(recipient.getId());
 
         // Assert
+        em.flush();
         em.clear();
 
         Assertions.assertNotNull(em.find(Notification.class, first.getNotificationId()).getReadAt());
