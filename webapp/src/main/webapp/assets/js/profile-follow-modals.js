@@ -103,6 +103,8 @@
             return emptyDiv;
         }
 
+        var activeController = null;
+
         function doSearch(query, page) {
             var params = new URLSearchParams();
             params.set('userId', targetUserId);
@@ -111,12 +113,24 @@
 
             var url = searchUrl + '?' + params.toString();
 
-            fetch(url, {
+            if (activeController) {
+                activeController.abort();
+                activeController = null;
+            }
+
+            var options = {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json'
                 }
-            })
+            };
+
+            if (typeof window.AbortController === 'function') {
+                activeController = new AbortController();
+                options.signal = activeController.signal;
+            }
+
+            fetch(url, options)
             .then(function (response) {
                 if (!response.ok) {
                     throw new Error('Search failed');
@@ -154,6 +168,9 @@
                 }
             })
             .catch(function (err) {
+                if (err && err.name === 'AbortError') {
+                    return;
+                }
                 listContainer.innerHTML = '';
                 paginationContainer.innerHTML = '';
                 var errDiv = document.createElement('div');
@@ -240,7 +257,7 @@
             var query = searchInput.value.trim();
             debounceTimer = setTimeout(function () {
                 doSearch(query, 1);
-            }, 300);
+            }, 1000);
         });
 
         // Re-search when modal is shown (to reset state)
