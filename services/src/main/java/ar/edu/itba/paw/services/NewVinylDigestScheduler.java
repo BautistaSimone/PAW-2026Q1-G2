@@ -18,8 +18,7 @@ public class NewVinylDigestScheduler {
         this.pendingNotificationService = pendingNotificationService;
     }
 
-    // TODO poner un horario fijo, ahora es cada 30 segundos se manda todo
-    @Scheduled(cron = "0/30 * * * * *")
+    @Scheduled(cron = "0 0 12 * * *")
     public void sendDailyDigest() {
         LOGGER.info("Starting daily new-vinyl digest email job");
         try {
