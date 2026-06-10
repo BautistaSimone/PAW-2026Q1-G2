@@ -71,7 +71,7 @@ public class PasswordController {
 
         final User user = userOpt.get();
 
-        passwordTokenService.createPasswordResetTokenForUser(user.getId());
+        passwordTokenService.createPasswordResetTokenForUser(user);
 
         redirectAttributes.addFlashAttribute("message", "EmailSent.authForm.email");
 

@@ -22,16 +22,13 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
 
     private final PasswordTokenDao passwordTokenDao;
 
-    private final UserService userService;
     private final EmailService emailService;
 
     @Autowired
     public PasswordTokenServiceImpl(
             final PasswordTokenDao passwordTokenDao,
-            final UserService userService,
             final EmailService emailService) {
         this.passwordTokenDao = passwordTokenDao;
-        this.userService = userService;
         this.emailService = emailService;
     }
 
@@ -53,15 +50,12 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
 
     @Override
     @Transactional
-    public void createPasswordResetTokenForUser(final Long userId) {
+    public void createPasswordResetTokenForUser(final User user) {
 
         final String token = UUID.randomUUID().toString();
         Instant expiryDate = Instant.now().plus(Duration.ofMinutes(EXPIRATION));
 
-        passwordTokenDao.createToken(userId, token, expiryDate);
-
-        final User user = userService.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        passwordTokenDao.createToken(user.getId(), token, expiryDate);
 
         runAfterCommit(() -> emailService.sendPasswordResetEmail(
                 user.getEmail(),

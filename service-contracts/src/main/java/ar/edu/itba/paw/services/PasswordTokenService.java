@@ -2,10 +2,11 @@ package ar.edu.itba.paw.services;
 
 import java.util.Optional;
 
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.PasswordToken;
 
 public interface PasswordTokenService {
-    void createPasswordResetTokenForUser(final Long userId);
+    void createPasswordResetTokenForUser(final User user);
 
     boolean isValidPasswordResetToken(String token);
 
