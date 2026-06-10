@@ -20,7 +20,7 @@
 
 <div class="modal fade confirm-form-modal" id="<c:out value='${id}' />" tabindex="-1" aria-labelledby="<c:out value='${id}' />Label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border: 2px solid var(--color-border); border-radius: 12px; box-shadow: 4px 4px 0 var(--color-border); background-color: var(--color-card-bg, #ffffff);">
+        <div class="modal-content" style="border: 2px solid var(--color-border); border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); background-color: var(--color-card-bg, #ffffff);">
             <div class="modal-header" style="border-bottom: 2px solid var(--color-border); background-color: var(--color-card-bg, #ffffff);">
                 <h5 class="modal-title" id="<c:out value='${id}' />Label" style="font-weight: bold; color: var(--color-text-main, #264653);">
                     <c:out value="${title}"/>

@@ -289,18 +289,26 @@
                                                     <sec:authorize access="isAuthenticated()">
                                                         <div class="d-grid mt-3">
                                                             <c:url var="reportPostUrl" value="/products/${product.id}/report" />
-                                                            <form action="<c:out value='${reportPostUrl}'/>" method="POST" class="w-100">
-                                                                <input type="hidden" name="<c:out value='${_csrf.parameterName}'/>" value="<c:out value='${_csrf.token}'/>" />
-                                                                <c:if test="${not empty productDetailBackUrl}">
-                                                                    <input type="hidden" name="back" value="<c:out value='${productDetailBackUrl}'/>" />
-                                                                </c:if>
-                                                                <button type="submit" class="btn w-100 product-detail-button-18"
-                                                                    
-                                                                    onmouseover="this.style.background='rgba(231, 111, 81, 0.08)'; this.style.borderColor='var(--color-accent)';"
-                                                                    onmouseout="this.style.background='transparent'; this.style.borderColor='rgba(231, 111, 81, 0.5)';">
-                                                                    <i class="bi bi-flag" aria-hidden="true"></i> <spring:message code="ProductDetail.report.button" />
-                                                                </button>
-                                                            </form>
+                                                            <spring:message code="ProductDetail.report.button" var="reportBtnText" />
+                                                            <spring:message code="ProductDetail.report.confirm.title" var="reportConfirmTitle" />
+                                                            <spring:message code="ProductDetail.report.confirm.text" var="reportConfirmText" />
+                                                            <c:set var="reportBackName" value="${not empty productDetailBackUrl ? 'back' : ''}" />
+                                                            <button type="button" class="btn w-100 product-detail-button-18"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#reportProductModal"
+                                                                onmouseover="this.style.background='rgba(231, 111, 81, 0.08)'; this.style.borderColor='var(--color-accent)';"
+                                                                onmouseout="this.style.background='transparent'; this.style.borderColor='rgba(231, 111, 81, 0.5)';">
+                                                                <i class="bi bi-flag" aria-hidden="true"></i> <c:out value="${reportBtnText}" />
+                                                            </button>
+                                                            <ui:confirmFormModal
+                                                                id="reportProductModal"
+                                                                title="${reportConfirmTitle}"
+                                                                message="${reportConfirmText}"
+                                                                confirmBtnText="${reportBtnText}"
+                                                                actionUrl="${reportPostUrl}"
+                                                                hiddenInputName="${reportBackName}"
+                                                                hiddenInputValue="${productDetailBackUrl}"
+                                                                confirmBtnClass="btn-retro-danger" />
                                                         </div>
                                                     </sec:authorize>
                                                 </c:otherwise>

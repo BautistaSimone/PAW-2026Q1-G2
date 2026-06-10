@@ -2507,6 +2507,9 @@ details.filter-section:not([open]) .filter-section-chevron {
   background-color: var(--color-card-bg, #ffffff);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+  /* Clip the squared-corner header/footer backgrounds to the rounded border
+     so they don't poke out past the corners ("card behind the card"). */
+  overflow: hidden;
 }
 
 .confirm-form-modal .modal-header,
