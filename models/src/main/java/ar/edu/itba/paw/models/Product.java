@@ -50,8 +50,7 @@ public class Product {
     @Column(name = "edition_country", length = 255, nullable = false)
     private String editionCountry;
 
-    // TODO: Check how it behaves with deletion
-    //@BatchSize(size = 20)
+    // @BatchSize(size = 20)
     @ManyToMany
     @JoinTable(
         name = "products_categories", 
