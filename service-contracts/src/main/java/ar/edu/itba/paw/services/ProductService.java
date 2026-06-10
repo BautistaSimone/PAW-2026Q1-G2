@@ -125,9 +125,7 @@ public interface ProductService {
         final BigDecimal recordCondition,
         final BigDecimal price,
         final int stock,
-        final String imageLayout,
-        final boolean hadExistingImages,
-        final List<ProductImageData> newImages
+        final ProductImageUpdate imageUpdate
     );
 
     /**
