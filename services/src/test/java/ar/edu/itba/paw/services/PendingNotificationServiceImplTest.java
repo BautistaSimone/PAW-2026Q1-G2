@@ -21,7 +21,7 @@ import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductState;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.persistence.PendingNotificationDao;
-import ar.edu.itba.paw.persistence.ProductDao;
+import ar.edu.itba.paw.services.ProductService;
 
 @ExtendWith(MockitoExtension.class)
 public class PendingNotificationServiceImplTest {
@@ -33,7 +33,7 @@ public class PendingNotificationServiceImplTest {
     private PendingNotificationDao pendingNotificationDao;
 
     @Mock
-    private ProductDao productDao;
+    private ProductService productService;
 
     @Mock
     private UserService userService;
@@ -74,7 +74,7 @@ public class PendingNotificationServiceImplTest {
         pendingNotificationService.processAndSendDigestEmails();
 
         // Assert
-        Mockito.verifyNoInteractions(productDao, userService, emailService);
+        Mockito.verifyNoInteractions(productService, userService, emailService);
         Mockito.verify(pendingNotificationDao, Mockito.never()).deleteByIds(Mockito.anyList());
     }
 
@@ -83,7 +83,7 @@ public class PendingNotificationServiceImplTest {
         // Arrange
         PendingNotification pn = createPendingNotification(100L, 1L, 10L);
         Mockito.when(pendingNotificationDao.findAll()).thenReturn(Collections.singletonList(pn));
-        Mockito.when(productDao.findByIds(Collections.singleton(10L))).thenReturn(Collections.emptyList());
+        Mockito.when(productService.findByIds(Collections.singleton(10L))).thenReturn(Collections.emptyList());
         Mockito.when(userService.findById(1L)).thenReturn(Optional.empty());
 
         // Act
@@ -99,7 +99,7 @@ public class PendingNotificationServiceImplTest {
         // Arrange
         PendingNotification pn = createPendingNotification(100L, 1L, 10L);
         Mockito.when(pendingNotificationDao.findAll()).thenReturn(Collections.singletonList(pn));
-        Mockito.when(productDao.findByIds(Collections.singleton(10L))).thenReturn(Collections.emptyList()); // product
+        Mockito.when(productService.findByIds(Collections.singleton(10L))).thenReturn(Collections.emptyList()); // product
                                                                                                             // not found
 
         User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null,
@@ -124,7 +124,7 @@ public class PendingNotificationServiceImplTest {
                 Collections.emptyList(), "Desc", BigDecimal.TEN, BigDecimal.TEN, LocalDate.now(),
                 BigDecimal.valueOf(100), 1);
         inactiveProduct.setState(ProductState.SOLD); // inactive
-        Mockito.when(productDao.findByIds(Collections.singleton(10L)))
+        Mockito.when(productService.findByIds(Collections.singleton(10L)))
                 .thenReturn(Collections.singletonList(inactiveProduct));
 
         User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null,
@@ -149,7 +149,7 @@ public class PendingNotificationServiceImplTest {
                 Collections.emptyList(), "Desc", BigDecimal.TEN, BigDecimal.TEN, LocalDate.now(),
                 BigDecimal.valueOf(100), 1);
         activeProduct.setState(ProductState.ACTIVE); // active
-        Mockito.when(productDao.findByIds(Collections.singleton(10L)))
+        Mockito.when(productService.findByIds(Collections.singleton(10L)))
                 .thenReturn(Collections.singletonList(activeProduct));
 
         User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null,
@@ -177,7 +177,7 @@ public class PendingNotificationServiceImplTest {
                 Collections.emptyList(), "Desc", BigDecimal.TEN, BigDecimal.TEN, LocalDate.now(),
                 BigDecimal.valueOf(100), 1);
         activeProduct.setState(ProductState.ACTIVE);
-        Mockito.when(productDao.findByIds(Collections.singleton(10L)))
+        Mockito.when(productService.findByIds(Collections.singleton(10L)))
                 .thenReturn(Collections.singletonList(activeProduct));
 
         User user = new User(1L, "user@test.com", "pass", "user", false, true, false, null, null, null, null, null,
