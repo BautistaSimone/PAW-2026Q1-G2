@@ -130,4 +130,23 @@ public class PasswordTokenJpaDaoTest {
         Assertions.assertEquals(userId, result.get().getUserId());
     }
 
+    @Test
+    public void testDeleteByToken() {
+        // Arrange
+        insertPasswordToken();
+        em.clear();
+
+        // Act
+        passwordTokenDao.deleteByToken(tkn);
+        em.flush();
+        em.clear();
+
+        // Assert
+        Long count = em.createQuery(
+                "SELECT COUNT(pt) FROM PasswordToken pt",
+                Long.class).getSingleResult();
+
+        Assertions.assertEquals(0L, count);
+    }
+
 }

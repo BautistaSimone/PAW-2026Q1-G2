@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,10 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ar.edu.itba.paw.models.PaginatedResult;
+import ar.edu.itba.paw.models.PasswordToken;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.UserSortOrder;
 
+import ar.edu.itba.paw.persistence.PasswordTokenDao;
 import ar.edu.itba.paw.persistence.UserDao;
 
 @Service
@@ -34,15 +37,18 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final ProductService productService;
     private final NotificationService notificationService;
+    private final PasswordTokenDao passwordTokenDao;
 
     @Autowired
     public UserServiceImpl(final UserDao userDao, final PasswordEncoder passwordEncoder,
             @Lazy final ProductService productService,
-            final NotificationService notificationService) {
+            final NotificationService notificationService,
+            final PasswordTokenDao passwordTokenDao) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.productService = productService;
         this.notificationService = notificationService;
+        this.passwordTokenDao = passwordTokenDao;
     }
 
     private static String trimToNull(final String s) {
@@ -217,6 +223,24 @@ public class UserServiceImpl implements UserService {
 
 		userDao.updatePassword(userId, encodedPassword);
 	}
+
+    @Override
+    @Transactional
+    public boolean resetPasswordWithToken(final String token, final String newPassword) {
+        final Optional<PasswordToken> passTokenOpt = passwordTokenDao.findByToken(token);
+        if (!passTokenOpt.isPresent()) {
+            return false;
+        }
+
+        final PasswordToken passToken = passTokenOpt.get();
+        if (passToken.getExpirationDate().isBefore(Instant.now())) {
+            return false;
+        }
+
+        updatePassword(passToken.getUserId(), newPassword);
+        passwordTokenDao.deleteByToken(token);
+        return true;
+    }
 
     @Override
     @Transactional(readOnly = true)

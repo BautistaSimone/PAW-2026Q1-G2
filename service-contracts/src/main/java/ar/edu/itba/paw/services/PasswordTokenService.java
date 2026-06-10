@@ -11,6 +11,4 @@ public interface PasswordTokenService {
 
     Optional<PasswordToken> findByUserId(final Long userId);
 
-    Optional<PasswordToken> findByToken(final String token);
-
 }

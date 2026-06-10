@@ -55,6 +55,8 @@ public interface UserService {
 
     void updatePassword(final Long userId, final String newPassword);
 
+    boolean resetPasswordWithToken(final String token, final String newPassword);
+
     void updateFavoriteCategories(final Long userId, final List<Long> categoryIds);
 
     Optional<User> findByEmail(final String email);

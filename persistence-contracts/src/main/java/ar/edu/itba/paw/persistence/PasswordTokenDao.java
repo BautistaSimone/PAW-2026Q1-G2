@@ -11,4 +11,6 @@ public interface PasswordTokenDao {
     Optional<PasswordToken> findByUserId(final Long userId);
 
     Optional<PasswordToken> findByToken(final String token);
+
+    void deleteByToken(final String token);
 }
