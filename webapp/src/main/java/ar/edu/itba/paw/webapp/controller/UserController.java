@@ -105,16 +105,13 @@ public class UserController {
             @Valid @ModelAttribute RegisterForm form,
             final BindingResult errors) {
 
-        ModelAndView mv = new ModelAndView("register");
-        mv.addObject("registerForm", form);
-
         if (errors.hasErrors()) {
-            return mv;
+            return new ModelAndView("register");
         }
 
         LOGGER.atDebug().addArgument(form.getEmail()).log("About to attempt register email {}");
 
-        final java.util.Optional<User> user = userService.createUserIfEmailAvailable(
+        final User user = userService.createUser(
                     form.getEmail(),
                     form.getPassword(),
                     form.getUsername(),
@@ -128,12 +125,8 @@ public class UserController {
                     form.getProvince(),
                     form.getExtraAddressInfo(),
                     form.getCbuCvu());
-        if (!user.isPresent()) {
-            errors.rejectValue("email", "EmailInUse.authForm.email");
-            return mv;
-        }
 
-        verificationTokenService.createVerificationTokenForUser(user.get().getId());
+        verificationTokenService.createVerificationTokenForUser(user.getId());
         return new ModelAndView("redirect:/sendVerificationEmail");
     }
 

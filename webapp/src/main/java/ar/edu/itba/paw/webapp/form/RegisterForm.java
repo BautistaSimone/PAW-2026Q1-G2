@@ -6,6 +6,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.Pattern;
 
+import ar.edu.itba.paw.webapp.validation.EmailAvailable;
 import ar.edu.itba.paw.webapp.validation.FieldMatch;
 
 @FieldMatch(
@@ -23,6 +24,7 @@ public class RegisterForm {
     @Size(max = 100, message = "{Size.registerForm.lastName}")
     private String lastName;
 
+    @EmailAvailable
     @Email(message = "{Email.authForm.email}")
     @NotBlank(message = "{NotBlank.authForm.email}")
     @NotEmpty(message = "{NotEmpty.authForm.email}")
