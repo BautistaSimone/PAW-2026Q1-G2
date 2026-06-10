@@ -24,7 +24,7 @@ public class Notification {
     private Long notificationId;
 
     @Column(name = "recipient_user_id", nullable = false)
-    private Long recipientUserId;
+    private long recipientUserId;
 
     @Column(name = "actor_user_id")
     private Long actorUserId;
@@ -53,7 +53,7 @@ public class Notification {
     }
 
     public Notification(
-        final Long recipientUserId,
+        final long recipientUserId,
         final Long actorUserId,
         final NotificationType type,
         final Long productId,
@@ -73,7 +73,7 @@ public class Notification {
         return notificationId;
     }
 
-    public Long getRecipientUserId() {
+    public long getRecipientUserId() {
         return recipientUserId;
     }
 

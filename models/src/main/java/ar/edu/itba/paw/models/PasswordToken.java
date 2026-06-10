@@ -14,7 +14,7 @@ public class PasswordToken extends Token {
         super();
     }
 
-    public PasswordToken(final Long userId, final String token, final Instant expirationDate) {
+    public PasswordToken(final long userId, final String token, final Instant expirationDate) {
         super(userId, token, expirationDate);
     }
 

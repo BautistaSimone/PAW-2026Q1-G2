@@ -207,7 +207,7 @@ class ProductFormValidatorTest {
         @Override
         public List<Image> findAllByProductId(final Long productId) {
             return images.stream()
-                .filter(image -> image.getProductId().equals(productId))
+                .filter(image -> image.getProductId() == productId)
                 .collect(Collectors.toList());
         }
 

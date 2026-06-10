@@ -480,7 +480,7 @@ public class ProductServiceImpl implements ProductService {
     public boolean hideProductByUser(final Long productId, final Long ownerUserId) {
         final Product product = productDao.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        if (!product.getUserId().equals(ownerUserId)) {
+        if (product.getUserId() != ownerUserId) {
             return false;
         }
         return productDao.markAsUserDeleted(productId);
@@ -523,7 +523,7 @@ public class ProductServiceImpl implements ProductService {
     ) {
         final Product product = productDao.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        if (!product.getUserId().equals(ownerUserId)) {
+        if (product.getUserId() != ownerUserId) {
             throw new IllegalArgumentException("Not the product owner");
         }
         validatePublisherCanSell(ownerUserId);
@@ -558,7 +558,7 @@ public class ProductServiceImpl implements ProductService {
     public boolean restoreUserDeletedProduct(final Long productId, final Long ownerUserId) {
         final Product product = productDao.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        if (!product.getUserId().equals(ownerUserId)) {
+        if (product.getUserId() != ownerUserId) {
             return false;
         }
         return productDao.restoreUserDeletedProduct(productId);

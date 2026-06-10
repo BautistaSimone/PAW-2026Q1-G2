@@ -1,19 +1,19 @@
 package ar.edu.itba.paw.models;
 
 public enum PurchaseStatus {
-    PENDING("Pendiente de pago"),
-    PAID("Pagado"),
-    SHIPPED("Enviado"),
-    DELIVERED("Entregado"),
-    CANCELLED("Cancelado");
+    PENDING("PurchaseStatus.PENDING"),
+    PAID("PurchaseStatus.PAID"),
+    SHIPPED("PurchaseStatus.SHIPPED"),
+    DELIVERED("PurchaseStatus.DELIVERED"),
+    CANCELLED("PurchaseStatus.CANCELLED");
 
-    private final String description;
+    private final String messageCode;
 
-    PurchaseStatus(String description) {
-        this.description = description;
+    PurchaseStatus(final String messageCode) {
+        this.messageCode = messageCode;
     }
 
-    public String getDescription() {
-        return description;
+    public String getMessageCode() {
+        return messageCode;
     }
 }

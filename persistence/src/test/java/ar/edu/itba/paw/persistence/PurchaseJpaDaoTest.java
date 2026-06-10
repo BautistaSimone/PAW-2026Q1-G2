@@ -231,7 +231,7 @@ public class PurchaseJpaDaoTest {
         Assertions.assertEquals(1, result.getCurrentPage());
         Assertions.assertEquals(1, result.getTotalPages());
         Assertions.assertEquals(2, result.getResults().size());
-        Assertions.assertTrue(result.getResults().stream().allMatch(p -> p.getBuyerId().equals(buyerId)));
+        Assertions.assertTrue(result.getResults().stream().allMatch(p -> p.getBuyerId() == buyerId));
     }
 
     @Test
@@ -252,7 +252,7 @@ public class PurchaseJpaDaoTest {
 
         // Assert
         Assertions.assertEquals(2, purchases.size());
-        Assertions.assertTrue(purchases.stream().allMatch(p -> p.getSellerId().equals(sellerId)));
+        Assertions.assertTrue(purchases.stream().allMatch(p -> p.getSellerId() == sellerId));
     }
 
     @Test

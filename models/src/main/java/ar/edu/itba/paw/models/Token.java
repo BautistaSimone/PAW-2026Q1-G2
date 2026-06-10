@@ -21,26 +21,28 @@ abstract class Token {
     @Column(name = "token_id")
     private Long tokenId;
  
-    private String token;
+    @Column(nullable = false, unique = true)
+    private final String token;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private long userId;
 
     @Column(name = "expiration_date", nullable = false)
-    private Instant expirationDate;
+    private final Instant expirationDate;
 
     Token() {
-
+        this.token = null;
+        this.expirationDate = null;
     }
 
-    public Token(final Long userId, final String token, final Instant expirationDate) {
+    public Token(final long userId, final String token, final Instant expirationDate) {
         super();
         this.userId = userId;
         this.token = token;
         this.expirationDate = expirationDate;
     }
 
-    public Long getUserId() {
+    public long getUserId() {
         return userId;
     }
 

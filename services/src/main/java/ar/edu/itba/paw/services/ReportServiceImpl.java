@@ -43,7 +43,7 @@ public class ReportServiceImpl implements ReportService {
         final Product product = productService.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        if (product.getUserId().equals(reporterUserId)) {
+        if (product.getUserId() == reporterUserId) {
             throw new IllegalArgumentException("Cannot report your own product");
         }
 

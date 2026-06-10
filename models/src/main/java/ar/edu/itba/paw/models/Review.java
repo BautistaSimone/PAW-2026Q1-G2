@@ -22,13 +22,13 @@ public class Review {
     private Long reviewId;
 
     @Column(name = "purchase_id", nullable = false, unique = true)
-    private Long purchaseId;
+    private long purchaseId;
 
     @Column(name = "seller_id", nullable = false)
-    private Long sellerId;
+    private long sellerId;
 
     @Column(name = "buyer_id", nullable = false)
-    private Long buyerId;
+    private long buyerId;
 
     @Column(nullable = false)
     private int score;
@@ -48,9 +48,9 @@ public class Review {
 
     public Review(
         final Long reviewId,
-        final Long purchaseId,
-        final Long sellerId,
-        final Long buyerId,
+        final long purchaseId,
+        final long sellerId,
+        final long buyerId,
         final int score,
         final String text,
         final LocalDateTime createdAt,
@@ -67,9 +67,9 @@ public class Review {
     }
 
     public Review(
-        final Long purchaseId,
-        final Long sellerId,
-        final Long buyerId,
+        final long purchaseId,
+        final long sellerId,
+        final long buyerId,
         final int score,
         final String text,
         final LocalDateTime createdAt
@@ -86,15 +86,15 @@ public class Review {
         return reviewId;
     }
 
-    public Long getPurchaseId() {
+    public long getPurchaseId() {
         return purchaseId;
     }
 
-    public Long getSellerId() {
+    public long getSellerId() {
         return sellerId;
     }
 
-    public Long getBuyerId() {
+    public long getBuyerId() {
         return buyerId;
     }
 

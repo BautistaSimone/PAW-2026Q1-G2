@@ -33,7 +33,7 @@ public class Product {
     private Long productId;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
@@ -86,7 +86,7 @@ public class Product {
 
     public Product(
         Long productId,
-        Long userId,
+        long userId,
         String title,
         String artist,
         String recordLabel,
@@ -117,7 +117,7 @@ public class Product {
     }
 
     public Product(
-        Long userId,
+        long userId,
         String title,
         String artist,
         String recordLabel,
@@ -150,7 +150,7 @@ public class Product {
         return productId;
     }
 
-    public Long getUserId() {
+    public long getUserId() {
         return userId;
     }
 
@@ -230,7 +230,7 @@ public class Product {
         this.state = state;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 

@@ -15,10 +15,10 @@ public class PendingNotification {
     private Long notificationId;
 
     @Column(name = "follower_user_id", nullable = false)
-    private Long followerUserId;
+    private long followerUserId;
 
     @Column(name = "product_id", nullable = false)
-    private Long productId;
+    private long productId;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -27,14 +27,14 @@ public class PendingNotification {
         // Hibernate
     }
 
-    public PendingNotification(Long followerUserId, Long productId) {
+    public PendingNotification(long followerUserId, long productId) {
         this.followerUserId = followerUserId;
         this.productId = productId;
         this.createdAt = LocalDateTime.now();
     }
 
     public Long getNotificationId() { return notificationId; }
-    public Long getFollowerUserId() { return followerUserId; }
-    public Long getProductId() { return productId; }
+    public long getFollowerUserId() { return followerUserId; }
+    public long getProductId() { return productId; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }

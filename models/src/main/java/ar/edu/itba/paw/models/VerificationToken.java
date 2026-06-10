@@ -13,7 +13,7 @@ public class VerificationToken extends Token {
         // Just for Hibernate, we love you!
     }
 
-    public VerificationToken(final Long userId, final String token, final Instant expirationDate) {
+    public VerificationToken(final long userId, final String token, final Instant expirationDate) {
         super(userId, token, expirationDate);
     }
 

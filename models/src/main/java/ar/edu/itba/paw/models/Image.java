@@ -18,7 +18,7 @@ public class Image {
     private Long imageId;
 
     @Column(name = "product_id", nullable = false)
-    private Long productId;
+    private long productId;
 
     @Column(name = "data", nullable = false)
     private byte[] data;
@@ -30,13 +30,13 @@ public class Image {
         // Just for Hibernate, we love you!
     }
 
-    public Image(Long productId, byte[] data, String contentType) {
+    public Image(long productId, byte[] data, String contentType) {
         this.productId = productId;
         this.data = data;
         this.contentType = contentType;
     }
 
-    public Image(Long imageId, Long productId, byte[] data, String contentType) {
+    public Image(Long imageId, long productId, byte[] data, String contentType) {
         this.imageId = imageId;
         this.productId = productId;
         this.data = data;
@@ -47,7 +47,7 @@ public class Image {
         return imageId;
     }
 
-    public Long getProductId() {
+    public long getProductId() {
         return productId;
     }
 

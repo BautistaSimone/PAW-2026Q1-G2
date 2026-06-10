@@ -272,7 +272,7 @@ public class ProductController {
         }
 
         if (authUser != null) {
-            final boolean isOwnProduct = product.getUserId().equals(authUser.getUser().getId());
+            final boolean isOwnProduct = product.getUserId() == authUser.getUser().getId();
             final boolean isWishlisted = userService.isProductInWishlist(authUser.getUser().getId(), product.getId());
 
             mav.addObject("isOwnProduct", isOwnProduct);

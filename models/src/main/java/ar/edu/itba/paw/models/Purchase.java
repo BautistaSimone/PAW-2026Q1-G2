@@ -24,13 +24,13 @@ public class Purchase {
     private Long purchaseId;
 
     @Column(name = "product_id", nullable = false)
-    private Long productId;
+    private long productId;
 
     @Column(name = "buyer_user_id", nullable = false)
-    private Long buyerId;
+    private long buyerId;
 
     @Column(name = "seller_user_id", nullable = false)
-    private Long sellerId;
+    private long sellerId;
 
     @Column(nullable = false)
     private LocalDate date;
@@ -66,9 +66,9 @@ public class Purchase {
 
     public Purchase(
         final Long purchaseId,
-        final Long productId,
-        final Long buyerId,
-        final Long sellerId,
+        final long productId,
+        final long buyerId,
+        final long sellerId,
         final LocalDate date,
         final PurchaseStatus status,
         final String buyerToken,
@@ -86,9 +86,9 @@ public class Purchase {
     }
 
     public Purchase(
-        final Long productId,
-        final Long buyerId,
-        final Long sellerId,
+        final long productId,
+        final long buyerId,
+        final long sellerId,
         final LocalDate date,
         final PurchaseStatus status,
         final String buyerToken,
@@ -108,15 +108,15 @@ public class Purchase {
         return purchaseId;
     }
 
-    public Long getProductId() {
+    public long getProductId() {
         return productId;
     }
 
-    public Long getBuyerId() {
+    public long getBuyerId() {
         return buyerId;
     }
 
-    public Long getSellerId() {
+    public long getSellerId() {
         return sellerId;
     }
 

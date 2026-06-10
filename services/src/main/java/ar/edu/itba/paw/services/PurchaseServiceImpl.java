@@ -58,7 +58,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         final Product product = productService.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        if (product.getUserId().equals(userId)) {
+        if (product.getUserId() == userId) {
             throw new IllegalArgumentException("Users cannot buy their own products");
         }
 
@@ -299,7 +299,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 purchase.getProductId(),
                 newStatus);
 
-        if (!purchase.getSellerId().equals(purchase.getBuyerId())) {
+        if (purchase.getSellerId() != purchase.getBuyerId()) {
             notificationService.notifyPurchaseStatus(
                     purchase.getSellerId(),
                     actorUserId,

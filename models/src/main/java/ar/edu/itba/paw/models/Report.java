@@ -22,13 +22,13 @@ public class Report {
     private Long reportId;
 
     @Column(name = "product_id", nullable = false)
-    private Long productId;
+    private long productId;
 
     @Column(name = "owner_user_id", nullable = false)
-    private Long ownerUserId;
+    private long ownerUserId;
 
     @Column(name = "reporter_user_id", nullable = false)
-    private Long reporterUserId;
+    private long reporterUserId;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -39,9 +39,9 @@ public class Report {
 
     public Report(
             final Long reportId,
-            final Long productId,
-            final Long ownerUserId,
-            final Long reporterUserId,
+            final long productId,
+            final long ownerUserId,
+            final long reporterUserId,
             final LocalDateTime createdAt) {
         this.reportId = reportId;
         this.productId = productId;
@@ -51,9 +51,9 @@ public class Report {
     }
 
     public Report(
-            final Long productId,
-            final Long ownerUserId,
-            final Long reporterUserId) {
+            final long productId,
+            final long ownerUserId,
+            final long reporterUserId) {
         this.productId = productId;
         this.ownerUserId = ownerUserId;
         this.reporterUserId = reporterUserId;
@@ -70,15 +70,15 @@ public class Report {
         return reportId;
     }
 
-    public Long getProductId() {
+    public long getProductId() {
         return productId;
     }
 
-    public Long getOwnerUserId() {
+    public long getOwnerUserId() {
         return ownerUserId;
     }
 
-    public Long getReporterUserId() {
+    public long getReporterUserId() {
         return reporterUserId;
     }
 

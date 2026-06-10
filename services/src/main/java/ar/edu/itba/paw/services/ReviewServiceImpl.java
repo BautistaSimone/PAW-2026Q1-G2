@@ -51,7 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
         final Purchase purchase = purchaseService.findById(purchaseId)
                 .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
 
-        if (!purchase.getBuyerId().equals(buyerId)) {
+        if (purchase.getBuyerId() != buyerId) {
             return ReviewEligibility.unavailable(ReviewEligibility.Status.NOT_BUYER);
         }
         if (purchase.getStatus() != PurchaseStatus.DELIVERED) {
