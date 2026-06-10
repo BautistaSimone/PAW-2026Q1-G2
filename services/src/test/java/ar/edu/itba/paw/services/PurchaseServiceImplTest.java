@@ -183,7 +183,7 @@ public class PurchaseServiceImplTest {
         Mockito.when(userService.findById(BUYER_ID)).thenReturn(Optional.of(buyer));
         Mockito.when(productService.decrementStock(PRODUCT_ID)).thenReturn(false);
 
-        Assertions.assertThrows(IllegalStateException.class,
+        Assertions.assertThrows(PurchaseCreationException.class,
                 () -> purchaseService.createPurchase(PRODUCT_ID, BUYER_ID));
     }
 
@@ -227,7 +227,7 @@ public class PurchaseServiceImplTest {
         Mockito.when(userService.findById(SELLER_ID)).thenReturn(Optional.of(seller));
         Mockito.when(userService.findById(BUYER_ID)).thenReturn(Optional.of(incompleteBuyer));
 
-        Assertions.assertThrows(IllegalStateException.class,
+        Assertions.assertThrows(PurchaseCreationException.class,
                 () -> purchaseService.createPurchase(PRODUCT_ID, BUYER_ID));
 
         Mockito.verify(productService, Mockito.never()).decrementStock(Mockito.anyLong());
@@ -245,7 +245,7 @@ public class PurchaseServiceImplTest {
     public void createPurchaseRejectsOwnProduct() {
         Mockito.when(productService.findById(PRODUCT_ID)).thenReturn(Optional.of(product()));
 
-        Assertions.assertThrows(IllegalArgumentException.class,
+        Assertions.assertThrows(PurchaseCreationException.class,
                 () -> purchaseService.createPurchase(PRODUCT_ID, SELLER_ID));
     }
 }
