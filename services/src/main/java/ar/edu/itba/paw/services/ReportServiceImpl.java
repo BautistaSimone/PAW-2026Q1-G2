@@ -27,7 +27,7 @@ public class ReportServiceImpl implements ReportService {
     private final String adminEmail;
 
     @Autowired
-    public ReportServiceImpl(final ReportDao reportDao, final ProductService productService,
+    public ReportServiceImpl(final ReportDao reportDao, @Lazy final ProductService productService,
             final EmailService emailService, @Lazy final UserService userService,
             @Value("${mail.username}") final String adminEmail) {
         this.reportDao = reportDao;
