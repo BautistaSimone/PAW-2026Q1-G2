@@ -18,7 +18,9 @@ public class NewVinylDigestScheduler {
         this.pendingNotificationService = pendingNotificationService;
     }
 
-    @Scheduled(cron = "0 0 12 * * *")
+    // Lo pusimos cada dos minutos para poder hacer mejor la demo de la entrega,
+    // pero en el uso real de la pagina web lo hariamos una vez al dia
+    @Scheduled(cron = "0 */2 * * * *")
     public void sendDailyDigest() {
         LOGGER.info("Starting daily new-vinyl digest email job");
         try {
