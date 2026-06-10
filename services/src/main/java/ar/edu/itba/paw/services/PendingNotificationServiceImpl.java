@@ -7,7 +7,6 @@ import ar.edu.itba.paw.models.PendingNotification;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.persistence.PendingNotificationDao;
-import ar.edu.itba.paw.services.ProductService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,7 @@ public class PendingNotificationServiceImpl implements PendingNotificationServic
     @Autowired
     public PendingNotificationServiceImpl(
             final PendingNotificationDao pendingNotificationDao,
-            final ProductService productService,
+            @Lazy final ProductService productService,
             @Lazy final UserService userService,
             final EmailService emailService) {
         this.pendingNotificationDao = pendingNotificationDao;
@@ -93,8 +92,7 @@ public class PendingNotificationServiceImpl implements PendingNotificationServic
                             user.getEmail(),
                             user.getUsername(),
                             products,
-                            user.getPreferredLocale()
-                    );
+                            user.getPreferredLocale());
                     LOGGER.info("Sent digest email to user {} with {} products", userId, products.size());
                 } catch (Exception e) {
                     LOGGER.error("Failed to send digest email to user {}", userId, e);

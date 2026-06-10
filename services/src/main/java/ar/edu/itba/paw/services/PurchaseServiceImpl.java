@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -279,8 +278,10 @@ public class PurchaseServiceImpl implements PurchaseService {
         if (reservedUntil == null || !reservedUntil.isBefore(now)) {
             return false;
         }
-        // Atomic operation: set status to CANCELLED only if still PENDING in the database.
-        // This prevents race conditions where multiple threads might attempt to cancel the
+        // Atomic operation: set status to CANCELLED only if still PENDING in the
+        // database.
+        // This prevents race conditions where multiple threads might attempt to cancel
+        // the
         // same purchase and increment the stock multiple times.
         if (!purchaseDao.cancelExpiredPurchase(purchase.getPurchaseId())) {
             return false;
