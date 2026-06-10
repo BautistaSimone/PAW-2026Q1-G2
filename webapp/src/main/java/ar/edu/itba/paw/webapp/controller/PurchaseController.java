@@ -106,7 +106,7 @@ public class PurchaseController {
             return buildPurchaseView(authUser, id);
         }
 
-        final PurchaseStatus statusObj = PurchaseStatus.valueOf(form.getNewStatus());
+        final PurchaseStatus statusObj = form.getNewStatus();
 
         byte[] proofData = null;
         String proofContentType = null;

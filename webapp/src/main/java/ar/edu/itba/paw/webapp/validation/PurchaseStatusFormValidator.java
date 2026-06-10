@@ -17,15 +17,7 @@ public class PurchaseStatusFormValidator implements ConstraintValidator<ValidPur
             return true;
         }
 
-        PurchaseStatus statusObj = null;
-        try {
-            statusObj = PurchaseStatus.valueOf(form.getNewStatus());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            // Let standard validation or controller handle invalid status values
-            return true;
-        }
-
-        if (statusObj == PurchaseStatus.PAID) {
+        if (form.getNewStatus() == PurchaseStatus.PAID) {
             if (form.getProofFile() == null || form.getProofFile().isEmpty()) {
                 context.disableDefaultConstraintViolation();
                 context.buildConstraintViolationWithTemplate("PurchaseForm.proof.required")
