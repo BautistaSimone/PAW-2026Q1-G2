@@ -160,38 +160,34 @@ public class UserJpaDao implements UserDao {
     }
 
     @Override
-    public void addWishlistProduct(final Long id, Product product) {
-        User user = findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        ;
-
-        // Set it, hibernate will take care of it
-        user.getWishlistProducts().add(product);
+    public void addWishlistProduct(final Long userId, final Long productId) {
+        if (isProductInWishlist(userId, productId)) {
+            return;
+        }
+        em.createNativeQuery(
+                "INSERT INTO user_wishlist_products (user_id, product_id) VALUES (:userId, :productId)")
+                .setParameter("userId", userId)
+                .setParameter("productId", productId)
+                .executeUpdate();
     }
 
     @Override
-    public void removeWishlistProduct(final Long id, Product product) {
-        User user = findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        ;
-
-        // Set it, hibernate will take care of it
-        user.getWishlistProducts().remove(product);
+    public void removeWishlistProduct(final Long userId, final Long productId) {
+        em.createNativeQuery(
+                "DELETE FROM user_wishlist_products WHERE user_id = :userId AND product_id = :productId")
+                .setParameter("userId", userId)
+                .setParameter("productId", productId)
+                .executeUpdate();
     }
 
     @Override
     public boolean isProductInWishlist(final Long userId, final Long productId) {
-        final TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(p) " +
-                        "FROM User u JOIN u.wishlistProducts p " +
-                        "WHERE u.id = :userId " +
-                        "AND p.id = :productId",
-                Long.class);
-
-        query.setParameter("userId", userId);
-        query.setParameter("productId", productId);
-
-        return query.getSingleResult() > 0;
+        final Number count = (Number) em.createNativeQuery(
+                "SELECT COUNT(*) FROM user_wishlist_products WHERE user_id = :userId AND product_id = :productId")
+                .setParameter("userId", userId)
+                .setParameter("productId", productId)
+                .getSingleResult();
+        return count.longValue() > 0;
     }
 
     @Override
@@ -233,13 +229,15 @@ public class UserJpaDao implements UserDao {
 
     @Override
     public List<Long> getWishlistCategoryIds(final Long userId) {
-        final List<Long> ids = em.createQuery(
-                "SELECT DISTINCT c.id FROM User u JOIN u.wishlistProducts p "
-                        + "JOIN p.categories c WHERE u.id = :userId",
-                Long.class)
+        @SuppressWarnings("unchecked")
+        final List<Number> ids = em.createNativeQuery(
+                "SELECT DISTINCT pc.category_id " +
+                        "FROM user_wishlist_products uwp " +
+                        "JOIN products_categories pc ON pc.product_id = uwp.product_id " +
+                        "WHERE uwp.user_id = :userId")
                 .setParameter("userId", userId)
                 .getResultList();
-        return ids != null ? ids : Collections.emptyList();
+        return ids == null ? Collections.emptyList() : ids.stream().map(Number::longValue).collect(Collectors.toList());
     }
 
     @Override

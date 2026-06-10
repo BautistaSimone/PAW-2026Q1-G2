@@ -64,15 +64,6 @@ public class User {
     //@BatchSize(size = 20)
     @ManyToMany
     @JoinTable(
-        name = "user_wishlist_products", 
-        joinColumns = { @JoinColumn(name = "user_id") }, // Owner side of relationship
-        inverseJoinColumns = { @JoinColumn(name = "product_id") }
-    )
-    private Set<Product> wishlistProducts = new HashSet<>();
-
-    //@BatchSize(size = 20)
-    @ManyToMany
-    @JoinTable(
         name = "user_favorite_categories",
         joinColumns = { @JoinColumn(name = "user_id") },
         inverseJoinColumns = { @JoinColumn(name = "category_id") }
@@ -273,10 +264,6 @@ public class User {
         return cbuCvu;
     }
 
-    public Set<Product> getWishlistProducts() {
-        return wishlistProducts;
-    }
-
     public Set<Category> getFavoriteCategories() {
         return favoriteCategories;
     }
@@ -345,10 +332,6 @@ public class User {
             return java.util.Locale.ENGLISH;
         }
         return new java.util.Locale("es");
-    }
-
-    public void setWishlistProducts(Set<Product> wishlistProducts) {
-        this.wishlistProducts = wishlistProducts;
     }
 
     public void setFavoriteCategories(Set<Category> favoriteCategories) {

@@ -1,15 +1,20 @@
 package ar.edu.itba.paw.persistence;
 
 import javax.persistence.EntityManagerFactory;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.hsqldb.jdbc.JDBCDriver;
 
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -34,11 +39,28 @@ public class TestConfiguration {
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+    public DataSourceInitializer dataSourceInitializer(final DataSource dataSource) {
+        final ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
+        databasePopulator.addScript(new ByteArrayResource((
+                "CREATE TABLE IF NOT EXISTS user_wishlist_products (" +
+                        "product_id INTEGER NOT NULL, " +
+                        "user_id INTEGER NOT NULL, " +
+                        "PRIMARY KEY(product_id, user_id)" +
+                        ")").getBytes(StandardCharsets.UTF_8)));
+
+        final DataSourceInitializer initializer = new DataSourceInitializer();
+        initializer.setDataSource(dataSource);
+        initializer.setDatabasePopulator(databasePopulator);
+        return initializer;
+    }
+
+    @Bean
+    @DependsOn("dataSourceInitializer")
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(final DataSource dataSource) {
 
         final LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setPackagesToScan("ar.edu.itba.paw.models");
-        factoryBean.setDataSource(dataSource());
+        factoryBean.setDataSource(dataSource);
 
         final JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         factoryBean.setJpaVendorAdapter(vendorAdapter);

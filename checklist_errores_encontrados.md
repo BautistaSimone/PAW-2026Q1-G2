@@ -22,12 +22,4 @@ A continuación, se listan los errores conceptuales encontrados en el repositori
 
 ## 2. PERSISTENCIA / DAOs
 
-### 🔴 2.2 Colecciones de alta cardinalidad mapeadas con @OneToMany/@ManyToMany (CRÍTICO)
-
-**Descripción del error:** Mapear relaciones que pueden crecer indefinidamente como colecciones en las entidades, lo que carga todos los elementos en memoria o genera múltiples queries.
-**Ubicaciones encontradas:**
-
-- **`User.java` (líneas 65 y 74):**
-  - La relación `wishlistProducts` está mapeada mediante `@ManyToMany`. La "wishlist" de un usuario puede crecer indefinidamente y no debería mapearse como una colección directa en el modelo `User`. Debería consultarse a través de un DAO paginado.
-
 ---

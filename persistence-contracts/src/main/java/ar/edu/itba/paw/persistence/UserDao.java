@@ -52,9 +52,9 @@ public interface UserDao {
 
         void ban(final Long id);
 
-        void removeWishlistProduct(final Long id, Product product);
+        void removeWishlistProduct(final Long userId, final Long productId);
 
-        void addWishlistProduct(final Long id, Product product);
+        void addWishlistProduct(final Long userId, final Long productId);
 
         boolean isProductInWishlist(final Long userId, final Long productId);
 

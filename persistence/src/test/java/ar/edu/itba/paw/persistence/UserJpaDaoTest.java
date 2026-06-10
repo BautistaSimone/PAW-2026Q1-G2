@@ -166,8 +166,8 @@ public class UserJpaDaoTest {
         final Product otherProduct = createProduct(user, "Other Album");
 
         // Act
-        userDao.addWishlistProduct(user.getId(), product);
-        userDao.addWishlistProduct(user.getId(), otherProduct);
+        userDao.addWishlistProduct(user.getId(), product.getId());
+        userDao.addWishlistProduct(user.getId(), otherProduct.getId());
 
         // Assert
         em.flush();
@@ -211,12 +211,12 @@ public class UserJpaDaoTest {
         final Product product = createProduct(user, "Album");
         final Product otherProduct = createProduct(user, "Other Album");
 
-        user.getWishlistProducts().add(product);
-        user.getWishlistProducts().add(otherProduct);
+        userDao.addWishlistProduct(user.getId(), product.getId());
+        userDao.addWishlistProduct(user.getId(), otherProduct.getId());
         em.flush();
 
         // Act
-        userDao.removeWishlistProduct(user.getId(), product);
+        userDao.removeWishlistProduct(user.getId(), product.getId());
 
         // Assert
         em.flush();
@@ -259,7 +259,7 @@ public class UserJpaDaoTest {
 
         final Product product = createProduct(user, "Album");
 
-        user.getWishlistProducts().add(product);
+        userDao.addWishlistProduct(user.getId(), product.getId());
         em.flush();
 
         // Act
