@@ -201,6 +201,24 @@
     });
   });
 
+  // Clean up notification panel query params from the URL on page load
+  // so they don't pollute the URL after page reload
+  (function cleanNotifPanelParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let hasNotifParams = false;
+    ["notifFilter", "notifPage", "notifOpen"].forEach(function (key) {
+      if (urlParams.has(key)) {
+        hasNotifParams = true;
+        urlParams.delete(key);
+      }
+    });
+    if (hasNotifParams) {
+      const queryString = urlParams.toString();
+      const nextUrl = queryString ? "?" + queryString : window.location.pathname;
+      window.history.replaceState(null, "", nextUrl);
+    }
+  })();
+
   // Localize and format notification timestamps nicely
   document.querySelectorAll(".notification-time").forEach(function (el) {
     const rawDate = el.textContent.trim();

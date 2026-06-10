@@ -203,13 +203,13 @@
                         <spring:message code="Profile.alert.missingData.publish" />
                     </div>
                 </c:if>
-                <c:if test="${param.deleted eq '1'}">
+                <c:if test="${deleted}">
                     <div class="alert-retro alert-retro-success mt-3" role="alert">
                         <i class="bi bi-check-circle" aria-hidden="true"></i>
                         <spring:message code="Profile.alert.deleted" />
                     </div>
                 </c:if>
-                <c:if test="${param.deleteError eq 'forbidden'}">
+                <c:if test="${deleteError eq 'forbidden'}">
                     <div class="alert-retro alert-retro-warning mt-3" role="alert">
                         <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
                         <spring:message code="Profile.alert.deleteForbidden" />
@@ -217,13 +217,13 @@
                 </c:if>
             </c:if>
 
-            <c:if test="${isOwnProfile and param.hidden eq '1'}">
+            <c:if test="${isOwnProfile and hidden}">
                 <div class="alert-retro alert-retro-success mt-3" role="alert">
                     <i class="bi bi-check-circle" aria-hidden="true"></i>
                     <spring:message code="Profile.alert.hidden" />
                 </div>
             </c:if>
-            <c:if test="${isOwnProfile and param.banned eq '1'}">
+            <c:if test="${isOwnProfile and banned}">
                 <div class="alert-retro alert-retro-success mt-3" role="alert">
                     <i class="bi bi-check-circle" aria-hidden="true"></i>
                     <spring:message code="Profile.alert.banned" />
@@ -1133,21 +1133,21 @@
                 <c:if test="${isOwnProfile}">
                     <div class="tab-pane fade<c:if test='${activeTrash}'> show active</c:if>"
                         id="trash" role="tabpanel" aria-labelledby="trash-tab">
-                        <c:if test="${param.restored eq '1'}">
-                            <div class="alert-retro alert-retro-success mb-3"
-                                role="alert">
-                                <i class="bi bi-check-circle" aria-hidden="true"></i>
-                                <spring:message code="Trash.alert.restored" />
-                            </div>
-                        </c:if>
-                        <c:if test="${param.restoreError eq '1'}">
-                            <div class="alert-retro alert-retro-warning mb-3"
-                                role="alert">
-                                <i class="bi bi-exclamation-triangle"
-                                    aria-hidden="true"></i>
-                                <spring:message code="Trash.alert.restoreError" />
-                            </div>
-                        </c:if>
+                <c:if test="${restored}">
+                    <div class="alert-retro alert-retro-success mb-3"
+                        role="alert">
+                        <i class="bi bi-check-circle" aria-hidden="true"></i>
+                        <spring:message code="Trash.alert.restored" />
+                    </div>
+                </c:if>
+                <c:if test="${restoreError}">
+                    <div class="alert-retro alert-retro-warning mb-3"
+                        role="alert">
+                        <i class="bi bi-exclamation-triangle"
+                            aria-hidden="true"></i>
+                        <spring:message code="Trash.alert.restoreError" />
+                    </div>
+                </c:if>
                         <h2 class="h5 mb-3 profile-h2-22">
                             <i class="bi bi-trash3" aria-hidden="true"></i>
                             <spring:message code="Trash.heading" />

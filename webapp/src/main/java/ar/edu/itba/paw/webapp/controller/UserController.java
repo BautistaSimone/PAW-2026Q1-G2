@@ -332,20 +332,23 @@ public class UserController {
 
     @RequestMapping(value = "/profile/admin/hide-product", method = RequestMethod.POST)
     public ModelAndView adminHideProduct(
-            @RequestParam("productId") final Long productId) {
+            @RequestParam("productId") final Long productId,
+            final RedirectAttributes redirectAttributes) {
         // Authorization enforced by Spring Security: only ROLE_ADMIN can reach this
         // endpoint
         productService.hideProductByAdmin(productId);
-        return new ModelAndView("redirect:/profile?tab=reports&hidden=1");
+        redirectAttributes.addFlashAttribute("hidden", true);
+        return new ModelAndView("redirect:/profile?tab=reports");
     }
 
     @RequestMapping(value = "/profile/admin/ban-user", method = RequestMethod.POST)
     public ModelAndView adminBanUser(
-            @RequestParam("userId") final Long userId) {
+            @RequestParam("userId") final Long userId,
+            final RedirectAttributes redirectAttributes) {
         // Ban the user
         userService.ban(userId);
-
-        return new ModelAndView("redirect:/profile?tab=reports&banned=1");
+        redirectAttributes.addFlashAttribute("banned", true);
+        return new ModelAndView("redirect:/profile?tab=reports");
     }
 
     @RequestMapping(value = "/profile/trash", method = RequestMethod.GET)
