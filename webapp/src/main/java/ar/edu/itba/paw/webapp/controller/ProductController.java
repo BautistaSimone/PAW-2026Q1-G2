@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.validation.BindingResult;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
@@ -223,11 +224,14 @@ public class ProductController {
     @RequestMapping(value = "/products/{id:\\d+}/restore", method = RequestMethod.POST)
     public ModelAndView restoreDeletedProduct(
             @AuthenticationPrincipal final PawAuthUser authUser,
-            @PathVariable("id") final Long id) {
+            @PathVariable("id") final Long id,
+            final RedirectAttributes redirectAttributes) {
         if (!productService.restoreUserDeletedProduct(id, authUser.getUser().getId())) {
-            return new ModelAndView("redirect:/profile?tab=trash&restoreError=1");
+            redirectAttributes.addFlashAttribute("restoreError", true);
+            return new ModelAndView("redirect:/profile?tab=trash");
         }
-        return new ModelAndView("redirect:/profile?tab=trash&restored=1");
+        redirectAttributes.addFlashAttribute("restored", true);
+        return new ModelAndView("redirect:/profile?tab=trash");
     }
 
     private static List<ProductImageData> imageDataFrom(final MultipartFile[] files) {
@@ -343,12 +347,15 @@ public class ProductController {
     @RequestMapping(value = "/products/{id:\\d+}/delete", method = RequestMethod.POST)
     public ModelAndView deleteOwnProduct(
             @AuthenticationPrincipal final PawAuthUser authUser,
-            @PathVariable("id") final Long id) {
+            @PathVariable("id") final Long id,
+            final RedirectAttributes redirectAttributes) {
 
         if (!productService.hideProductByUser(id, authUser.getUser().getId())) {
-            return new ModelAndView("redirect:/profile?deleteError=forbidden");
+            redirectAttributes.addFlashAttribute("deleteError", "forbidden");
+            return new ModelAndView("redirect:/profile?tab=publications");
         }
-        return new ModelAndView("redirect:/profile?deleted=1");
+        redirectAttributes.addFlashAttribute("deleted", true);
+        return new ModelAndView("redirect:/profile?tab=publications");
     }
 
     /**
