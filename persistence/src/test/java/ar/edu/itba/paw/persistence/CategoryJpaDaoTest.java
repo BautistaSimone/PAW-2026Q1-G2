@@ -33,9 +33,11 @@ public class CategoryJpaDaoTest {
     @PersistenceContext
     private EntityManager em;
 
-    private Category insertCategory(final String name) {
+    private Category insertCategory(final String name) 
+    {
         final Category category = new Category(name);
         em.persist(category);
+        em.flush();
         return category;
     }
 
