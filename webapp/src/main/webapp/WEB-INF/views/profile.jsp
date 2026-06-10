@@ -133,16 +133,28 @@
                                 class="btn btn-retro btn-retro-secondary" role="button">
                                 <spring:message code="Profile.changePassword" />
                             </a>
-                            <form action="<c:url value='/logout' />" method="post">
-                                <input type="hidden" name="${_csrf.parameterName}"
-                                    value="${_csrf.token}" />
-                                <button type="submit"
-                                    class="btn btn-retro btn-retro-secondary">
-                                    <i class="bi bi-box-arrow-right"
-                                        aria-hidden="true"></i>
-                                    <spring:message code="Profile.logout" />
-                                </button>
-                            </form>
+                            <button type="button"
+                                class="btn btn-retro btn-retro-secondary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#logoutConfirmModal">
+                                <i class="bi bi-box-arrow-right"
+                                    aria-hidden="true"></i>
+                                <spring:message code="Profile.logout" />
+                            </button>
+                            <c:url var="logoutUrl" value="/logout" />
+                            <spring:message code="Profile.logout.confirm.title"
+                                var="logoutConfirmTitle" />
+                            <spring:message code="Profile.logout.confirm.text"
+                                var="logoutConfirmText" />
+                            <spring:message code="Profile.logout" var="logoutBtnText" />
+                            <ui:confirmFormModal
+                                id="logoutConfirmModal"
+                                title="${logoutConfirmTitle}"
+                                message="${logoutConfirmText}"
+                                confirmBtnText="${logoutBtnText}"
+                                cancelBtnText="${cancelText}"
+                                actionUrl="${logoutUrl}"
+                                confirmBtnClass="btn-retro-primary" />
                         </c:when>
                         <c:otherwise>
                             <sec:authorize access="isAuthenticated()">
@@ -399,20 +411,25 @@
                                                 <spring:message
                                                     code="Profile.publications.deleteConfirm"
                                                     var="confirmDelete" />
-                                                <form action="${deleteProductUrl}"
-                                                    method="post" class="mt-2"
-                                                    onsubmit="return showConfirmationModal(event);">
-                                                    <input type="hidden"
-                                                        name="${_csrf.parameterName}"
-                                                        value="${_csrf.token}" />
-                                                    <button type="submit"
-                                                        class="btn btn-retro btn-retro-secondary w-100 profile-button-3">
-                                                        <i class="bi bi-trash"
-                                                            aria-hidden="true"></i>
-                                                        <spring:message
-                                                            code="Profile.publications.deleteButton" />
-                                                    </button>
-                                                </form>
+                                                <spring:message
+                                                    code="Profile.publications.deleteButton"
+                                                    var="deleteListingText" />
+                                                <button type="button"
+                                                    class="btn btn-retro btn-retro-secondary w-100 profile-button-3 mt-2"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteListingModal-${product.id}">
+                                                    <i class="bi bi-trash"
+                                                        aria-hidden="true"></i>
+                                                    <c:out value="${deleteListingText}" />
+                                                </button>
+                                                <ui:confirmFormModal
+                                                    id="deleteListingModal-${product.id}"
+                                                    title="${deleteListingText}"
+                                                    message="${confirmDelete}"
+                                                    confirmBtnText="${deleteListingText}"
+                                                    cancelBtnText="${cancelText}"
+                                                    actionUrl="${deleteProductUrl}"
+                                                    confirmBtnClass="btn-retro-danger" />
                                             </c:if>
                                         </div>
                                     </c:forEach>
