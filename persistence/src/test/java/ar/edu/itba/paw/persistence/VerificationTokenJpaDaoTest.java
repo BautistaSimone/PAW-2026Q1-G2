@@ -39,6 +39,13 @@ public class VerificationTokenJpaDaoTest {
     private String tkn;
     private Instant expirationDate;
 
+    private VerificationToken insertVerificationToken() {
+        final VerificationToken token = new VerificationToken(userId, tkn, expirationDate);
+        em.persist(token);
+        em.flush();
+        return token;
+    }
+
     @BeforeEach
     public void setUp() {
         User user = new User(
@@ -83,6 +90,9 @@ public class VerificationTokenJpaDaoTest {
         Assertions.assertEquals(expirationDate, token.getExpirationDate());
         Assertions.assertEquals(tkn, token.getToken());
 
+        em.flush();
+        em.clear();
+
         Long count = em.createQuery(
                 "SELECT COUNT(vt) FROM VerificationToken vt",
                 Long.class).getSingleResult();
@@ -93,7 +103,8 @@ public class VerificationTokenJpaDaoTest {
     @Test
     public void testFindByUserId() {
         // Arrange
-        verificationTokenDao.createToken(userId, tkn, expirationDate);
+        insertVerificationToken();
+        em.clear();
 
         // Act
         Optional<VerificationToken> result = verificationTokenDao.findByUserId(userId);
@@ -107,7 +118,8 @@ public class VerificationTokenJpaDaoTest {
     @Test
     public void testFindByToken() {
         // Arrange
-        verificationTokenDao.createToken(userId, tkn, expirationDate);
+        insertVerificationToken();
+        em.clear();
 
         // Act
         Optional<VerificationToken> result = verificationTokenDao.findByToken(tkn);

@@ -125,6 +125,9 @@ public class UserJpaDaoTest {
         Assertions.assertEquals(username, user.getUsername());
         Assertions.assertEquals(password, user.getPassword());
 
+        em.flush();
+        em.clear();
+
         Long count = em.createQuery(
                 "SELECT COUNT(u) FROM User u",
                 Long.class).getSingleResult();
@@ -168,6 +171,7 @@ public class UserJpaDaoTest {
 
         // Assert
         em.flush();
+        em.clear();
 
         Number count = (Number) em.createNativeQuery(
                 "SELECT COUNT(*) FROM user_wishlist_products wp WHERE wp.user_id = :userId")
@@ -215,6 +219,9 @@ public class UserJpaDaoTest {
         userDao.removeWishlistProduct(user.getId(), product);
 
         // Assert
+        em.flush();
+        em.clear();
+
         Number count = (Number) em.createNativeQuery(
                 "SELECT COUNT(*) FROM user_wishlist_products wp WHERE wp.user_id = :userId")
                 .setParameter("userId", user.getId())

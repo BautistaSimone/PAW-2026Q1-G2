@@ -115,6 +115,7 @@ public class ReportJpaDaoTest {
         // Act
         reportDao.create(productId, ownerId, reporterId);
         em.flush();
+        em.clear();
 
         // Assert
         Long count = em.createQuery(
@@ -175,6 +176,7 @@ public class ReportJpaDaoTest {
         // Act
         reportDao.deleteByProductId(productId);
         em.flush();
+        em.clear();
 
         // Assert
         final Long productCount = em.createQuery(
@@ -207,6 +209,7 @@ public class ReportJpaDaoTest {
         // Act
         reportDao.deleteByOwnerUserId(ownerId);
         em.flush();
+        em.clear();
 
         // Assert — all reports for ownerId are gone
         final Long ownerReports = em.createQuery(

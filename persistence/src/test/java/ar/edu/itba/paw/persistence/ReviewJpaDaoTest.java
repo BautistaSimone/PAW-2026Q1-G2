@@ -145,6 +145,7 @@ public class ReviewJpaDaoTest {
         // Act
         final Review review = reviewDao.create(purchaseId, sellerId, buyerId, 4, "Great seller!");
         em.flush();
+        em.clear();
 
         // Assert
         Assertions.assertNotNull(review);

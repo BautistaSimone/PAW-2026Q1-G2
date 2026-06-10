@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
-import java.time.Instant;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,8 +18,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.PasswordToken;
+import ar.edu.itba.paw.models.User;
 
 @Rollback
 @Transactional
@@ -38,6 +38,13 @@ public class PasswordTokenJpaDaoTest {
     private long userId;
     private String tkn;
     private Instant expirationDate;
+
+    private PasswordToken insertPasswordToken() {
+        final PasswordToken token = new PasswordToken(userId, tkn, expirationDate);
+        em.persist(token);
+        em.flush();
+        return token;
+    }
 
     @BeforeEach
     public void setUp() {
@@ -83,6 +90,9 @@ public class PasswordTokenJpaDaoTest {
         Assertions.assertEquals(expirationDate, token.getExpirationDate());
         Assertions.assertEquals(tkn, token.getToken());
 
+        em.flush();
+        em.clear();
+
         Long count = em.createQuery(
                 "SELECT COUNT(pt) FROM PasswordToken pt",
                 Long.class).getSingleResult();
@@ -93,7 +103,8 @@ public class PasswordTokenJpaDaoTest {
     @Test
     public void testFindByUserId() {
         // Arrange
-        passwordTokenDao.createToken(userId, tkn, expirationDate);
+        insertPasswordToken();
+        em.clear();
 
         // Act
         Optional<PasswordToken> result = passwordTokenDao.findByUserId(userId);
@@ -107,7 +118,8 @@ public class PasswordTokenJpaDaoTest {
     @Test
     public void testFindByToken() {
         // Arrange
-        passwordTokenDao.createToken(userId, tkn, expirationDate);
+        insertPasswordToken();
+        em.clear();
 
         // Act
         Optional<PasswordToken> result = passwordTokenDao.findByToken(tkn);
