@@ -130,4 +130,23 @@ public class VerificationTokenJpaDaoTest {
         Assertions.assertEquals(userId, result.get().getUserId());
     }
 
+    @Test
+    public void testDeleteByToken() {
+        // Arrange
+        insertVerificationToken();
+        em.clear();
+
+        // Act
+        verificationTokenDao.deleteByToken(tkn);
+        em.flush();
+        em.clear();
+
+        // Assert
+        Long count = em.createQuery(
+                "SELECT COUNT(vt) FROM VerificationToken vt",
+                Long.class).getSingleResult();
+
+        Assertions.assertEquals(0L, count);
+    }
+
 }

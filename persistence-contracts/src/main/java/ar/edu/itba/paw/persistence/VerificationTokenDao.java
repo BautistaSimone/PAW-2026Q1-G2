@@ -11,4 +11,6 @@ public interface VerificationTokenDao {
     Optional<VerificationToken> findByUserId(final Long userId);
 
     Optional<VerificationToken> findByToken(final String token);
+
+    void deleteByToken(final String token);
 }

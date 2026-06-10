@@ -46,4 +46,11 @@ public class VerificationTokenJpaDao implements VerificationTokenDao {
         query.setParameter("token", token);
         return query.getResultList().stream().findFirst();
     }
+
+    @Override
+    public void deleteByToken(final String token) {
+        em.createQuery("DELETE FROM VerificationToken WHERE token = :token")
+            .setParameter("token", token)
+            .executeUpdate();
+    }
 }
