@@ -44,6 +44,7 @@ import ar.edu.itba.paw.webapp.interceptor.BannedUserInterceptor;
 import ar.edu.itba.paw.models.ConditionBucket;
 import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.PurchaseStatus;
+import ar.edu.itba.paw.models.UserSortOrder;
 
 @EnableWebMvc // Use all the defaults from webmvc
 @EnableTransactionManagement
@@ -212,6 +213,12 @@ public class WebConfig implements WebMvcConfigurer {
             } catch (IllegalArgumentException ex) {
                 return null;
             }
+        });
+        registry.addConverter(String.class, UserSortOrder.class, source -> {
+            if (source == null || source.trim().isEmpty()) {
+                return null;
+            }
+            return UserSortOrder.parse(source);
         });
     }
 }

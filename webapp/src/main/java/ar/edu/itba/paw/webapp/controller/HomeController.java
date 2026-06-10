@@ -196,14 +196,14 @@ public class HomeController {
 	public ModelAndView searchUsers(
 			@AuthenticationPrincipal PawAuthUser authUser,
 			@RequestParam(value = "q", required = false) final String query,
-			@RequestParam(value = "sort", required = false) final String sortParam,
+			@RequestParam(value = "sort", required = false) final UserSortOrder sortOrder,
 			@RequestParam(value = "page", defaultValue = "1") final int page) {
 
 		if (page < 1) {
 			throw new IllegalArgumentException("Invalid page");
 		}
 
-		final UserSortOrder sortOrder = UserSortOrder.parse(sortParam);
+		final UserSortOrder effectiveSortOrder = sortOrder != null ? sortOrder : UserSortOrder.FOLLOWERS_DESC;
 
 		final ModelAndView mav = new ModelAndView("searchUsers");
 
@@ -214,10 +214,10 @@ public class HomeController {
 
 		final PaginatedResult<User> usersPage;
 		if (hasQuery) {
-			usersPage = userService.searchActiveSellers(query.trim(), page, COMMUNITY_USER_PAGE_SIZE, sortOrder);
+			usersPage = userService.searchActiveSellers(query.trim(), page, COMMUNITY_USER_PAGE_SIZE, effectiveSortOrder);
 			mav.addObject("showingSearchResults", true);
 		} else {
-			usersPage = userService.getFeaturedActiveSellers(page, COMMUNITY_USER_PAGE_SIZE, sortOrder);
+			usersPage = userService.getFeaturedActiveSellers(page, COMMUNITY_USER_PAGE_SIZE, effectiveSortOrder);
 			mav.addObject("showingSearchResults", false);
 		}
 
