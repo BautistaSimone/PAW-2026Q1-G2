@@ -25,13 +25,14 @@ abstract class Token {
     private final String token;
 
     @Column(name = "user_id", nullable = false)
-    private long userId;
+    private final long userId;
 
     @Column(name = "expiration_date", nullable = false)
     private final Instant expirationDate;
 
     Token() {
         this.token = null;
+        this.userId = 0L;
         this.expirationDate = null;
     }
 
