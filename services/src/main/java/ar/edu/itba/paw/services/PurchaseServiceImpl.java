@@ -48,17 +48,17 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Transactional
     public Purchase createPurchase(Long productId, Long userId) {
         if (productId == null) {
-            throw new IllegalArgumentException("Valid product is required");
+            throw new PurchaseCreationException(PurchaseCreationException.Reason.PRODUCT_NOT_FOUND, null);
         }
         if (userId == null) {
             throw new IllegalArgumentException("Valid user is required");
         }
 
         final Product product = productService.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                .orElseThrow(() -> new PurchaseCreationException(PurchaseCreationException.Reason.PRODUCT_NOT_FOUND, productId));
 
         if (product.getUserId() == userId) {
-            throw new IllegalArgumentException("Users cannot buy their own products");
+            throw new PurchaseCreationException(PurchaseCreationException.Reason.OWN_PRODUCT, productId);
         }
 
         final User seller = userService.findById(product.getUserId())
@@ -68,11 +68,11 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .orElseThrow(() -> new IllegalArgumentException("Buyer not found"));
 
         if (!buyer.hasCompleteBuyerDataForPurchase()) {
-            throw new IllegalStateException("Buyer must complete shipping profile data");
+            throw new PurchaseCreationException(PurchaseCreationException.Reason.MISSING_BUYER_DATA, productId);
         }
 
         if (!productService.decrementStock(productId)) {
-            throw new IllegalStateException("Product is no longer available");
+            throw new PurchaseCreationException(PurchaseCreationException.Reason.OUT_OF_STOCK, productId);
         }
 
         final String buyerToken = UUID.randomUUID().toString();

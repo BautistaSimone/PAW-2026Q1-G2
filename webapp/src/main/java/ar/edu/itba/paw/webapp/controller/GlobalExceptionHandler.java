@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
 import ar.edu.itba.paw.webapp.exception.AccessDeniedException;
+import ar.edu.itba.paw.services.PurchaseCreationException;
 import ar.edu.itba.paw.services.PurchaseExpiredException;
 
 @ControllerAdvice
@@ -33,6 +34,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PurchaseExpiredException.class)
     public ModelAndView handlePurchaseExpired(final PurchaseExpiredException e) {
         return new ModelAndView("redirect:/purchases/" + e.getPurchaseId() + "?expired=1");
+    }
+
+    @ExceptionHandler(PurchaseCreationException.class)
+    public ModelAndView handlePurchaseCreation(final PurchaseCreationException e) {
+        final Long productId = e.getProductId();
+        switch (e.getReason()) {
+            case MISSING_BUYER_DATA:
+                return new ModelAndView("redirect:/profile?tab=mydata&missingData=purchase&productId=" + productId);
+            case OWN_PRODUCT:
+                return new ModelAndView("redirect:/products/" + productId + "?purchaseError=1");
+            case OUT_OF_STOCK:
+                return new ModelAndView("redirect:/?purchaseUnavailable=1");
+            case PRODUCT_NOT_FOUND:
+            default:
+                return new ModelAndView("redirect:/?purchaseError=1");
+        }
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)

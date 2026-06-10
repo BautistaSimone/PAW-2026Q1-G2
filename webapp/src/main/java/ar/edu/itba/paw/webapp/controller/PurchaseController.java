@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.PurchaseStatus;
+import ar.edu.itba.paw.services.PurchaseCreationException;
 import ar.edu.itba.paw.services.PurchasePaymentProof;
 import ar.edu.itba.paw.services.PurchaseService;
 import ar.edu.itba.paw.services.ReviewService;
@@ -59,29 +60,7 @@ public class PurchaseController {
             if (form.getProductId() == null) {
                 return new ModelAndView("redirect:/?purchaseError=1");
             }
-            String target = "redirect:/products/" + form.getProductId() + "?purchaseError=1";
-            if (back != null && !back.isBlank()) {
-                target += "&back=" + java.net.URLEncoder.encode(back, java.nio.charset.StandardCharsets.UTF_8);
-            }
-            return new ModelAndView(target);
-        }
-
-        if (!purchaseService.canCreatePurchases(authUser.getUser().getId())) {
-            return new ModelAndView(
-                    "redirect:/profile?tab=mydata&missingData=purchase&productId=" + form.getProductId());
-        }
-
-        final Product product = productService.findByIdIfAvailable(form.getProductId()).orElse(null);
-        if (product == null || product.getUserId() == authUser.getUser().getId()) {
-            String target = "redirect:/products/" + form.getProductId() + "?purchaseError=1";
-            if (back != null && !back.isBlank()) {
-                target += "&back=" + java.net.URLEncoder.encode(back, java.nio.charset.StandardCharsets.UTF_8);
-            }
-            return new ModelAndView(target);
-        }
-
-        if (product.getStock() <= 0) {
-            return new ModelAndView("redirect:/?purchaseUnavailable=1");
+            return new ModelAndView("redirect:/products/" + form.getProductId() + "?purchaseError=1");
         }
 
         final Purchase purchase = purchaseService.createPurchase(form.getProductId(), authUser.getUser().getId());

@@ -122,7 +122,10 @@ public class ProductController {
     public ModelAndView newProductForm(
             @AuthenticationPrincipal final PawAuthUser authUser,
             @ModelAttribute("productForm") final ProductForm form) {
-        return redirectIfCannotPublishProducts(authUser).orElseGet(this::productFormView);
+        if (!productService.canPublishProducts(authUser.getUser().getId())) {
+            return new ModelAndView("redirect:/profile?tab=mydata&missingData=publish");
+        }
+        return productFormView();
     }
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
@@ -131,9 +134,8 @@ public class ProductController {
             @Valid @ModelAttribute("productForm") final ProductForm form,
             final BindingResult errors) {
 
-        final Optional<ModelAndView> publishGuard = redirectIfCannotPublishProducts(authUser);
-        if (publishGuard.isPresent()) {
-            return publishGuard.get();
+        if (!productService.canPublishProducts(authUser.getUser().getId())) {
+            return new ModelAndView("redirect:/profile?tab=mydata&missingData=publish");
         }
 
         if (errors.hasErrors()) {
@@ -163,9 +165,8 @@ public class ProductController {
             @AuthenticationPrincipal final PawAuthUser authUser,
             @PathVariable("id") final Long id,
             @ModelAttribute("productForm") final ProductForm form) {
-        final Optional<ModelAndView> publishGuard = redirectIfCannotPublishProducts(authUser);
-        if (publishGuard.isPresent()) {
-            return publishGuard.get();
+        if (!productService.canPublishProducts(authUser.getUser().getId())) {
+            return new ModelAndView("redirect:/profile?tab=mydata&missingData=publish");
         }
 
         final Product product = productService.findEditableProduct(id, authUser.getUser().getId())
@@ -193,9 +194,8 @@ public class ProductController {
             @PathVariable("id") final Long id,
             @Valid @ModelAttribute("productForm") final ProductForm form,
             final BindingResult errors) {
-        final Optional<ModelAndView> publishGuard = redirectIfCannotPublishProducts(authUser);
-        if (publishGuard.isPresent()) {
-            return publishGuard.get();
+        if (!productService.canPublishProducts(authUser.getUser().getId())) {
+            return new ModelAndView("redirect:/profile?tab=mydata&missingData=publish");
         }
 
         if (errors.hasErrors()) {
@@ -372,17 +372,6 @@ public class ProductController {
         return new ModelAndView("redirect:/profile?tab=publications");
     }
 
-    /**
-     * No CBU/CVU → profile Mis datos with warning. Empty if OK to show or submit
-     * the publish form.
-     * Authentication is enforced by Spring Security.
-     */
-    private Optional<ModelAndView> redirectIfCannotPublishProducts(final PawAuthUser authUser) {
-        if (!productService.canPublishProducts(authUser.getUser().getId())) {
-            return Optional.of(new ModelAndView("redirect:/profile?tab=mydata&missingData=publish"));
-        }
-        return Optional.empty();
-    }
 
     private void populateProductFormContext(final ProductForm form, final Long productId) {
         final boolean editing = productId != null;
