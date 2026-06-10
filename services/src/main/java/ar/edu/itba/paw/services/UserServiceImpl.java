@@ -25,7 +25,6 @@ import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.UserSortOrder;
 
-import ar.edu.itba.paw.persistence.PasswordTokenDao;
 import ar.edu.itba.paw.persistence.UserDao;
 
 @Service
@@ -37,18 +36,18 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final ProductService productService;
     private final NotificationService notificationService;
-    private final PasswordTokenDao passwordTokenDao;
+    private final PasswordTokenService passwordTokenService;
 
     @Autowired
     public UserServiceImpl(final UserDao userDao, final PasswordEncoder passwordEncoder,
             @Lazy final ProductService productService,
             final NotificationService notificationService,
-            final PasswordTokenDao passwordTokenDao) {
+            final PasswordTokenService passwordTokenService) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
         this.productService = productService;
         this.notificationService = notificationService;
-        this.passwordTokenDao = passwordTokenDao;
+        this.passwordTokenService = passwordTokenService;
     }
 
     private static String trimToNull(final String s) {
@@ -216,18 +215,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-	@Transactional
-	public void updatePassword(final Long userId, final String newPassword) {
-		// Encode password before storing
-		final String encodedPassword = passwordEncoder.encode(newPassword);
+    @Transactional
+    public void updatePassword(final Long userId, final String newPassword) {
+        // Encode password before storing
+        final String encodedPassword = passwordEncoder.encode(newPassword);
 
-		userDao.updatePassword(userId, encodedPassword);
-	}
+        userDao.updatePassword(userId, encodedPassword);
+    }
 
     @Override
     @Transactional
     public boolean resetPasswordWithToken(final String token, final String newPassword) {
-        final Optional<PasswordToken> passTokenOpt = passwordTokenDao.findByToken(token);
+        final Optional<PasswordToken> passTokenOpt = passwordTokenService.findByToken(token);
         if (!passTokenOpt.isPresent()) {
             return false;
         }
@@ -238,7 +237,7 @@ public class UserServiceImpl implements UserService {
         }
 
         updatePassword(passToken.getUserId(), newPassword);
-        passwordTokenDao.deleteByToken(token);
+        passwordTokenService.deleteByToken(token);
         return true;
     }
 
@@ -254,7 +253,7 @@ public class UserServiceImpl implements UserService {
         return userDao.findByIds(ids);
     }
 
-	@Override
+    @Override
     @Transactional(readOnly = true)
     public boolean isPasswordEmpty(User usr) {
         return passwordEncoder.matches("", usr.getPassword());
@@ -282,24 +281,24 @@ public class UserServiceImpl implements UserService {
                 .orElse(false);
     }
 
-	@Override
+    @Override
     @Transactional
     public void enable(final Long id) {
         userDao.enable(id);
     }
 
-	@Override
+    @Override
     @Transactional
     public void ban(final Long id) {
         productService.hideAllProductsByAdmin(id);
         userDao.ban(id);
     }
 
-	@Override
+    @Override
     @Transactional
-	public void toggleWishlistProduct(final Long userId, final Long productId) {
+    public void toggleWishlistProduct(final Long userId, final Long productId) {
         productService.findById(productId)
-            .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
 
         if (this.isProductInWishlist(userId, productId)) {
             userDao.removeWishlistProduct(userId, productId);
@@ -389,13 +388,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginatedResult<User> searchFollowers(final Long userId, final String query, final int page, final int pageSize) {
+    public PaginatedResult<User> searchFollowers(final Long userId, final String query, final int page,
+            final int pageSize) {
         return userDao.searchFollowers(userId, query, page, pageSize);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PaginatedResult<User> searchFollowing(final Long userId, final String query, final int page, final int pageSize) {
+    public PaginatedResult<User> searchFollowing(final Long userId, final String query, final int page,
+            final int pageSize) {
         return userDao.searchFollowing(userId, query, page, pageSize);
     }
 
@@ -425,7 +426,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize, final UserSortOrder sortOrder) {
+    public PaginatedResult<User> getFeaturedActiveSellers(final int page, final int pageSize,
+            final UserSortOrder sortOrder) {
         return userDao.getFeaturedActiveSellers(page, pageSize, sortOrder);
     }
 
@@ -437,7 +439,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize, final UserSortOrder sortOrder) {
+    public PaginatedResult<User> searchActiveSellers(final String query, final int page, final int pageSize,
+            final UserSortOrder sortOrder) {
         return userDao.searchActiveSellers(query, page, pageSize, sortOrder);
     }
 

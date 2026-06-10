@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import ar.edu.itba.paw.services.UserService;
 import ar.edu.itba.paw.services.PasswordTokenService;
 import ar.edu.itba.paw.webapp.form.UpdatePasswordForm;
-import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.models.User;
@@ -59,7 +58,8 @@ public class PasswordController {
     }
 
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
-    public ModelAndView resetPassword(@RequestParam("email") String userEmail, final RedirectAttributes redirectAttributes) {
+    public ModelAndView resetPassword(@RequestParam("email") String userEmail,
+            final RedirectAttributes redirectAttributes) {
 
         final Optional<User> userOpt = userService.findByEmail(userEmail);
 

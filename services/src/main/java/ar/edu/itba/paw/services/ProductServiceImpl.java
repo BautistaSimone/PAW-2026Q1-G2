@@ -26,10 +26,7 @@ import ar.edu.itba.paw.models.ProductState;
 import ar.edu.itba.paw.models.Purchase;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Image;
-import ar.edu.itba.paw.persistence.ImageDao;
 import ar.edu.itba.paw.persistence.ProductDao;
-import ar.edu.itba.paw.persistence.ReportDao;
-import ar.edu.itba.paw.persistence.UserDao;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -37,9 +34,9 @@ public class ProductServiceImpl implements ProductService {
     private static final int MAX_IMAGES_PER_PRODUCT = 8;
 
     private final ProductDao productDao;
-    private final ImageDao imageDao;
-    private final ReportDao reportDao;
-    private final UserDao userDao;
+    private final ImageService imageService;
+    private final ReportService reportService;
+    private final UserService userService;
     private final CategoryService categoryService;
     private final PendingNotificationService pendingNotificationService;
     private final NotificationService notificationService;
@@ -47,16 +44,16 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     public ProductServiceImpl(
             final ProductDao productDao,
-            final ImageDao imageDao,
-            final ReportDao reportDao,
-            final UserDao userDao,
+            final ImageService imageService,
+            final ReportService reportService,
+            final UserService userService,
             final CategoryService categoryService,
             final PendingNotificationService pendingNotificationService,
             final NotificationService notificationService) {
         this.productDao = productDao;
-        this.imageDao = imageDao;
-        this.reportDao = reportDao;
-        this.userDao = userDao;
+        this.imageService = imageService;
+        this.reportService = reportService;
+        this.userService = userService;
         this.categoryService = categoryService;
         this.pendingNotificationService = pendingNotificationService;
         this.notificationService = notificationService;
@@ -431,7 +428,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public boolean canPublishProducts(final Long userId) {
-        return userDao.findById(userId)
+        return userService.findById(userId)
             .map(user -> user.hasCbuCvu() && user.hasNeighborhoodAndProvince())
             .orElse(false);
     }
@@ -463,14 +460,14 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void hideProductByAdmin(final Long id) {
         productDao.markAsAdminHidden(id);
-        reportDao.deleteByProductId(id);
+        reportService.deleteByProductId(id);
     }
 
     @Override
     @Transactional
     public int hideAllProductsByAdmin(final Long userId) {
         final int hidden = productDao.markAllAsAdminHiddenByUserId(userId);
-        reportDao.deleteByOwnerUserId(userId);
+        reportService.deleteByOwnerUserId(userId);
         return hidden;
     }
 
@@ -561,7 +558,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void validatePublisherCanSell(final Long userId) {
-        final User publisher = userDao.findById(userId)
+        final User publisher = userService.findById(userId)
             .orElseThrow(() -> new IllegalArgumentException("Publisher not found"));
         if (!publisher.hasCbuCvu() || !publisher.hasNeighborhoodAndProvince()) {
             throw new IllegalStateException("Publisher must complete seller profile data");
@@ -585,7 +582,7 @@ public class ProductServiceImpl implements ProductService {
     private void persistImages(final Long productId, final List<ProductImageData> images) {
         validateImageDataList(images);
         for (ProductImageData image : images) {
-            imageDao.createImage(productId, image.getData(), image.getContentType());
+            imageService.createImage(productId, image.getData(), image.getContentType());
         }
     }
 
@@ -596,7 +593,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         final List<ProductImageData> replacementImages = buildReplacementImages(productId, effectiveUpdate.getEntries());
-        imageDao.deleteByProductId(productId);
+        imageService.deleteImagesByProductId(productId);
         persistImages(productId, replacementImages);
     }
 
@@ -616,7 +613,7 @@ public class ProductServiceImpl implements ProductService {
                 throw new IllegalArgumentException("Image update entry is required");
             }
             if (entry.getKind() == ProductImageUpdate.EntryKind.EXISTING) {
-                final Image image = imageDao.findById(entry.getExistingImageId())
+                final Image image = imageService.findById(entry.getExistingImageId())
                     .orElseThrow(() -> new IllegalArgumentException("Existing image not found"));
                 if (!productId.equals(image.getProductId())) {
                     throw new IllegalArgumentException("Existing image does not belong to product");

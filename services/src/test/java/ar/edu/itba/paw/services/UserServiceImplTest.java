@@ -14,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import ar.edu.itba.paw.models.PasswordToken;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.persistence.PasswordTokenDao;
 import ar.edu.itba.paw.persistence.UserDao;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -36,11 +35,11 @@ public class UserServiceImplTest {
     private NotificationService notificationService;
 
     @Mock
-    private PasswordTokenDao passwordTokenDao;
+    private PasswordTokenService passwordTokenService;
 
     @BeforeEach
     void setUp() throws Exception {
-        userService = new UserServiceImpl(userDao, passwordEncoder, productService, notificationService, passwordTokenDao);
+        userService = new UserServiceImpl(userDao, passwordEncoder, productService, notificationService, passwordTokenService);
     }
 
     @Test
@@ -194,7 +193,7 @@ public class UserServiceImplTest {
             "token",
             Instant.now().plus(Duration.ofMinutes(60))
         );
-        Mockito.when(passwordTokenDao.findByToken("token")).thenReturn(Optional.of(token));
+        Mockito.when(passwordTokenService.findByToken("token")).thenReturn(Optional.of(token));
         Mockito.when(passwordEncoder.encode("NewPass1")).thenReturn("encoded");
 
         // Act
@@ -203,7 +202,7 @@ public class UserServiceImplTest {
         // Assert
         Assertions.assertTrue(result);
         Mockito.verify(userDao).updatePassword(1L, "encoded");
-        Mockito.verify(passwordTokenDao).deleteByToken("token");
+        Mockito.verify(passwordTokenService).deleteByToken("token");
     }
 
     @Test
@@ -214,7 +213,7 @@ public class UserServiceImplTest {
             "token",
             Instant.now().minus(Duration.ofMinutes(1))
         );
-        Mockito.when(passwordTokenDao.findByToken("token")).thenReturn(Optional.of(token));
+        Mockito.when(passwordTokenService.findByToken("token")).thenReturn(Optional.of(token));
 
         // Act
         final boolean result = userService.resetPasswordWithToken("token", "NewPass1");
@@ -222,13 +221,13 @@ public class UserServiceImplTest {
         // Assert
         Assertions.assertFalse(result);
         Mockito.verify(userDao, Mockito.never()).updatePassword(Mockito.anyLong(), Mockito.anyString());
-        Mockito.verify(passwordTokenDao, Mockito.never()).deleteByToken(Mockito.anyString());
+        Mockito.verify(passwordTokenService, Mockito.never()).deleteByToken(Mockito.anyString());
     }
 
     @Test
     public void testResetPasswordWithUnknownTokenFailsWithoutUpdatingOrConsuming() {
         // Arrange
-        Mockito.when(passwordTokenDao.findByToken("token")).thenReturn(Optional.empty());
+        Mockito.when(passwordTokenService.findByToken("token")).thenReturn(Optional.empty());
 
         // Act
         final boolean result = userService.resetPasswordWithToken("token", "NewPass1");
@@ -236,6 +235,6 @@ public class UserServiceImplTest {
         // Assert
         Assertions.assertFalse(result);
         Mockito.verify(userDao, Mockito.never()).updatePassword(Mockito.anyLong(), Mockito.anyString());
-        Mockito.verify(passwordTokenDao, Mockito.never()).deleteByToken(Mockito.anyString());
+        Mockito.verify(passwordTokenService, Mockito.never()).deleteByToken(Mockito.anyString());
     }
 }

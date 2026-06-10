@@ -22,10 +22,7 @@ import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.models.ProductSearchCriteria;
 import ar.edu.itba.paw.models.ProductSortOrder;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.persistence.ImageDao;
 import ar.edu.itba.paw.persistence.ProductDao;
-import ar.edu.itba.paw.persistence.ReportDao;
-import ar.edu.itba.paw.persistence.UserDao;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceImplTest {
@@ -36,13 +33,13 @@ public class ProductServiceImplTest {
     private ProductDao productDao;
 
     @Mock
-    private ImageDao imageDao;
+    private ImageService imageService;
 
     @Mock
-    private ReportDao reportDao;
+    private ReportService reportService;
 
     @Mock
-    private UserDao userDao;
+    private UserService userService;
 
     @Mock
     private CategoryService categoryService;
@@ -65,182 +62,174 @@ public class ProductServiceImplTest {
     @BeforeEach
     public void setUp() {
         productService = new ProductServiceImpl(
-            productDao,
-            imageDao,
-            reportDao,
-            userDao,
-            categoryService,
-            pendingNotificationService,
-            notificationService
-        );
+                productDao,
+                imageService,
+                reportService,
+                userService,
+                categoryService,
+                pendingNotificationService,
+                notificationService);
     }
 
     @Test
     public void createProductPersistsProductAndImagesInOneServiceCall() {
         final Product product = product(PRODUCT_ID, USER_ID);
-        Mockito.when(userDao.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
+        Mockito.when(userService.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
         Mockito.when(productDao.createProduct(
-            Mockito.eq(USER_ID), Mockito.eq("Abbey Road"), Mockito.eq("The Beatles"), Mockito.eq("Apple Records"),
-            Mockito.eq("PCS 7088"), Mockito.eq("UK"), Mockito.eq(Collections.emptyList()), Mockito.eq("Great condition"),
-            Mockito.eq(new BigDecimal("8.5")), Mockito.eq(new BigDecimal("9.0")), Mockito.eq(new BigDecimal("1500.00")), Mockito.eq(2)
-        )).thenReturn(product);
+                Mockito.eq(USER_ID), Mockito.eq("Abbey Road"), Mockito.eq("The Beatles"), Mockito.eq("Apple Records"),
+                Mockito.eq("PCS 7088"), Mockito.eq("UK"), Mockito.eq(Collections.emptyList()),
+                Mockito.eq("Great condition"),
+                Mockito.eq(new BigDecimal("8.5")), Mockito.eq(new BigDecimal("9.0")),
+                Mockito.eq(new BigDecimal("1500.00")), Mockito.eq(2))).thenReturn(product);
 
         final Product result = productService.createProduct(
-            USER_ID,
-            "Abbey Road",
-            "The Beatles",
-            "Apple Records",
-            "PCS 7088",
-            "UK",
-            Collections.emptyList(),
-            "Great condition",
-            new BigDecimal("8.5"),
-            new BigDecimal("9.0"),
-            new BigDecimal("1500.00"),
-            2,
-            List.of(image(COVER_BYTES, "image/png"))
-        );
+                USER_ID,
+                "Abbey Road",
+                "The Beatles",
+                "Apple Records",
+                "PCS 7088",
+                "UK",
+                Collections.emptyList(),
+                "Great condition",
+                new BigDecimal("8.5"),
+                new BigDecimal("9.0"),
+                new BigDecimal("1500.00"),
+                2,
+                List.of(image(COVER_BYTES, "image/png")));
 
         Assertions.assertSame(product, result);
-        Mockito.verify(imageDao).createImage(
-            Mockito.eq(PRODUCT_ID),
-            Mockito.argThat(data -> Arrays.equals(data, COVER_BYTES)),
-            Mockito.eq("image/png")
-        );
+        Mockito.verify(imageService).createImage(
+                Mockito.eq(PRODUCT_ID),
+                Mockito.argThat(data -> Arrays.equals(data, COVER_BYTES)),
+                Mockito.eq("image/png"));
         Mockito.verify(pendingNotificationService).enqueueForFollowers(USER_ID, PRODUCT_ID);
         Mockito.verify(notificationService).notifyNewProduct(USER_ID, PRODUCT_ID);
     }
 
     @Test
     public void createProductRejectsMissingImages() {
-        Mockito.when(userDao.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
+        Mockito.when(userService.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> productService.createProduct(
-            USER_ID,
-            "Title",
-            "Artist",
-            "Label",
-            "Catalog",
-            "Country",
-            Collections.emptyList(),
-            "Description",
-            BigDecimal.TEN,
-            BigDecimal.TEN,
-            BigDecimal.ONE,
-            1,
-            Collections.emptyList()
-        ));
+                USER_ID,
+                "Title",
+                "Artist",
+                "Label",
+                "Catalog",
+                "Country",
+                Collections.emptyList(),
+                "Description",
+                BigDecimal.TEN,
+                BigDecimal.TEN,
+                BigDecimal.ONE,
+                1,
+                Collections.emptyList()));
 
         Mockito.verify(productDao, Mockito.never()).createProduct(
-            Mockito.anyLong(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-            Mockito.anyString(), Mockito.anyString(), Mockito.anyList(), Mockito.anyString(),
-            Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.anyInt()
-        );
+                Mockito.anyLong(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.anyString(), Mockito.anyString(), Mockito.anyList(), Mockito.anyString(),
+                Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class),
+                Mockito.anyInt());
     }
 
     @Test
     public void createProductRejectsPublisherWithoutSellerData() {
-        Mockito.when(userDao.findById(USER_ID)).thenReturn(Optional.of(userWithoutSellerData(USER_ID)));
+        Mockito.when(userService.findById(USER_ID)).thenReturn(Optional.of(userWithoutSellerData(USER_ID)));
 
         Assertions.assertThrows(IllegalStateException.class, () -> productService.createProduct(
-            USER_ID,
-            "Title",
-            "Artist",
-            "Label",
-            "Catalog",
-            "Country",
-            Collections.emptyList(),
-            "Description",
-            BigDecimal.TEN,
-            BigDecimal.TEN,
-            BigDecimal.ONE,
-            1,
-            List.of(image(COVER_BYTES, "image/png"))
-        ));
+                USER_ID,
+                "Title",
+                "Artist",
+                "Label",
+                "Catalog",
+                "Country",
+                Collections.emptyList(),
+                "Description",
+                BigDecimal.TEN,
+                BigDecimal.TEN,
+                BigDecimal.ONE,
+                1,
+                List.of(image(COVER_BYTES, "image/png"))));
 
         Mockito.verify(productDao, Mockito.never()).createProduct(
-            Mockito.anyLong(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-            Mockito.anyString(), Mockito.anyString(), Mockito.anyList(), Mockito.anyString(),
-            Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.anyInt()
-        );
+                Mockito.anyLong(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.anyString(), Mockito.anyString(), Mockito.anyList(), Mockito.anyString(),
+                Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class),
+                Mockito.anyInt());
     }
 
     @Test
     public void updateProductDoesNotTouchImagesWhenUnchanged() {
         final Product product = product(PRODUCT_ID, USER_ID);
         Mockito.when(productDao.findById(PRODUCT_ID)).thenReturn(Optional.of(product), Optional.of(product));
-        Mockito.when(userDao.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
+        Mockito.when(userService.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
         Mockito.when(productDao.updateProduct(
-            Mockito.eq(PRODUCT_ID), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-            Mockito.anyString(), Mockito.anyString(), Mockito.eq(Collections.emptyList()), Mockito.anyString(),
-            Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.anyInt()
-        )).thenReturn(true);
+                Mockito.eq(PRODUCT_ID), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.anyString(), Mockito.anyString(), Mockito.eq(Collections.emptyList()), Mockito.anyString(),
+                Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class),
+                Mockito.anyInt())).thenReturn(true);
 
         final Product result = productService.updateProduct(
-            USER_ID,
-            PRODUCT_ID,
-            "New Title",
-            "New Artist",
-            "New Label",
-            "New Catalog",
-            "New Country",
-            Collections.emptyList(),
-            "New Description",
-            BigDecimal.TEN,
-            BigDecimal.TEN,
-            BigDecimal.ONE,
-            1,
-            ProductImageUpdate.unchanged()
-        );
+                USER_ID,
+                PRODUCT_ID,
+                "New Title",
+                "New Artist",
+                "New Label",
+                "New Catalog",
+                "New Country",
+                Collections.emptyList(),
+                "New Description",
+                BigDecimal.TEN,
+                BigDecimal.TEN,
+                BigDecimal.ONE,
+                1,
+                ProductImageUpdate.unchanged());
 
         Assertions.assertSame(product, result);
-        Mockito.verify(imageDao, Mockito.never()).deleteByProductId(Mockito.anyLong());
-        Mockito.verify(imageDao, Mockito.never()).createImage(Mockito.anyLong(), Mockito.any(), Mockito.anyString());
+        Mockito.verify(imageService, Mockito.never()).deleteImagesByProductId(Mockito.anyLong());
+        Mockito.verify(imageService, Mockito.never()).createImage(Mockito.anyLong(), Mockito.any(),
+                Mockito.anyString());
     }
 
     @Test
     public void updateProductReplacesImagesWithNewUploads() {
         final Product product = product(PRODUCT_ID, USER_ID);
         Mockito.when(productDao.findById(PRODUCT_ID)).thenReturn(Optional.of(product), Optional.of(product));
-        Mockito.when(userDao.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
+        Mockito.when(userService.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
         Mockito.when(productDao.updateProduct(
-            Mockito.eq(PRODUCT_ID), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-            Mockito.anyString(), Mockito.anyString(), Mockito.eq(Collections.emptyList()), Mockito.anyString(),
-            Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.anyInt()
-        )).thenReturn(true);
+                Mockito.eq(PRODUCT_ID), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.anyString(), Mockito.anyString(), Mockito.eq(Collections.emptyList()), Mockito.anyString(),
+                Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class),
+                Mockito.anyInt())).thenReturn(true);
 
         productService.updateProduct(
-            USER_ID,
-            PRODUCT_ID,
-            "New Title",
-            "New Artist",
-            "New Label",
-            "New Catalog",
-            "New Country",
-            Collections.emptyList(),
-            "New Description",
-            BigDecimal.TEN,
-            BigDecimal.TEN,
-            BigDecimal.ONE,
-            1,
-            ProductImageUpdate.replaceWithNewImages(List.of(
-                imageData(COVER_BYTES, "image/png"),
-                imageData(DETAIL_BYTES, "image/jpeg")
-            ))
-        );
+                USER_ID,
+                PRODUCT_ID,
+                "New Title",
+                "New Artist",
+                "New Label",
+                "New Catalog",
+                "New Country",
+                Collections.emptyList(),
+                "New Description",
+                BigDecimal.TEN,
+                BigDecimal.TEN,
+                BigDecimal.ONE,
+                1,
+                ProductImageUpdate.replaceWithNewImages(List.of(
+                        imageData(COVER_BYTES, "image/png"),
+                        imageData(DETAIL_BYTES, "image/jpeg"))));
 
-        final InOrder order = Mockito.inOrder(imageDao);
-        order.verify(imageDao).deleteByProductId(PRODUCT_ID);
-        order.verify(imageDao).createImage(
-            Mockito.eq(PRODUCT_ID),
-            Mockito.argThat(data -> Arrays.equals(data, COVER_BYTES)),
-            Mockito.eq("image/png")
-        );
-        order.verify(imageDao).createImage(
-            Mockito.eq(PRODUCT_ID),
-            Mockito.argThat(data -> Arrays.equals(data, DETAIL_BYTES)),
-            Mockito.eq("image/jpeg")
-        );
+        final InOrder order = Mockito.inOrder(imageService);
+        order.verify(imageService).deleteImagesByProductId(PRODUCT_ID);
+        order.verify(imageService).createImage(
+                Mockito.eq(PRODUCT_ID),
+                Mockito.argThat(data -> Arrays.equals(data, COVER_BYTES)),
+                Mockito.eq("image/png"));
+        order.verify(imageService).createImage(
+                Mockito.eq(PRODUCT_ID),
+                Mockito.argThat(data -> Arrays.equals(data, DETAIL_BYTES)),
+                Mockito.eq("image/jpeg"));
     }
 
     @Test
@@ -248,47 +237,43 @@ public class ProductServiceImplTest {
         final Product product = product(PRODUCT_ID, USER_ID);
         final Image existingImage = new Image(10L, PRODUCT_ID, COVER_BYTES, "image/png");
         Mockito.when(productDao.findById(PRODUCT_ID)).thenReturn(Optional.of(product), Optional.of(product));
-        Mockito.when(userDao.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
+        Mockito.when(userService.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
         Mockito.when(productDao.updateProduct(
-            Mockito.eq(PRODUCT_ID), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-            Mockito.anyString(), Mockito.anyString(), Mockito.eq(Collections.emptyList()), Mockito.anyString(),
-            Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.anyInt()
-        )).thenReturn(true);
-        Mockito.when(imageDao.findById(10L)).thenReturn(Optional.of(existingImage));
+                Mockito.eq(PRODUCT_ID), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.anyString(), Mockito.anyString(), Mockito.eq(Collections.emptyList()), Mockito.anyString(),
+                Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class),
+                Mockito.anyInt())).thenReturn(true);
+        Mockito.when(imageService.findById(10L)).thenReturn(Optional.of(existingImage));
 
         productService.updateProduct(
-            USER_ID,
-            PRODUCT_ID,
-            "New Title",
-            "New Artist",
-            "New Label",
-            "New Catalog",
-            "New Country",
-            Collections.emptyList(),
-            "New Description",
-            BigDecimal.TEN,
-            BigDecimal.TEN,
-            BigDecimal.ONE,
-            1,
-            ProductImageUpdate.replaceWith(List.of(
-                ProductImageUpdate.existingImage(10L),
-                ProductImageUpdate.newImage(imageData(DETAIL_BYTES, "image/jpeg"))
-            ))
-        );
+                USER_ID,
+                PRODUCT_ID,
+                "New Title",
+                "New Artist",
+                "New Label",
+                "New Catalog",
+                "New Country",
+                Collections.emptyList(),
+                "New Description",
+                BigDecimal.TEN,
+                BigDecimal.TEN,
+                BigDecimal.ONE,
+                1,
+                ProductImageUpdate.replaceWith(List.of(
+                        ProductImageUpdate.existingImage(10L),
+                        ProductImageUpdate.newImage(imageData(DETAIL_BYTES, "image/jpeg")))));
 
-        final InOrder order = Mockito.inOrder(imageDao);
-        order.verify(imageDao).findById(10L);
-        order.verify(imageDao).deleteByProductId(PRODUCT_ID);
-        order.verify(imageDao).createImage(
-            Mockito.eq(PRODUCT_ID),
-            Mockito.argThat(data -> Arrays.equals(data, COVER_BYTES)),
-            Mockito.eq("image/png")
-        );
-        order.verify(imageDao).createImage(
-            Mockito.eq(PRODUCT_ID),
-            Mockito.argThat(data -> Arrays.equals(data, DETAIL_BYTES)),
-            Mockito.eq("image/jpeg")
-        );
+        final InOrder order = Mockito.inOrder(imageService);
+        order.verify(imageService).findById(10L);
+        order.verify(imageService).deleteImagesByProductId(PRODUCT_ID);
+        order.verify(imageService).createImage(
+                Mockito.eq(PRODUCT_ID),
+                Mockito.argThat(data -> Arrays.equals(data, COVER_BYTES)),
+                Mockito.eq("image/png"));
+        order.verify(imageService).createImage(
+                Mockito.eq(PRODUCT_ID),
+                Mockito.argThat(data -> Arrays.equals(data, DETAIL_BYTES)),
+                Mockito.eq("image/jpeg"));
     }
 
     @Test
@@ -296,34 +281,32 @@ public class ProductServiceImplTest {
         final Product product = product(PRODUCT_ID, USER_ID);
         final Image foreignImage = new Image(10L, 999L, COVER_BYTES, "image/png");
         Mockito.when(productDao.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
-        Mockito.when(userDao.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
+        Mockito.when(userService.findById(USER_ID)).thenReturn(Optional.of(sellerWithPaymentData(USER_ID)));
         Mockito.lenient().when(productDao.updateProduct(
-            Mockito.eq(PRODUCT_ID), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-            Mockito.anyString(), Mockito.anyString(), Mockito.eq(Collections.emptyList()), Mockito.anyString(),
-            Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.anyInt()
-        )).thenReturn(true);
-        Mockito.when(imageDao.findById(10L)).thenReturn(Optional.of(foreignImage));
+                Mockito.eq(PRODUCT_ID), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.anyString(), Mockito.anyString(), Mockito.eq(Collections.emptyList()), Mockito.anyString(),
+                Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class), Mockito.any(BigDecimal.class),
+                Mockito.anyInt())).thenReturn(true);
+        Mockito.when(imageService.findById(10L)).thenReturn(Optional.of(foreignImage));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> productService.updateProduct(
-            USER_ID,
-            PRODUCT_ID,
-            "New Title",
-            "New Artist",
-            "New Label",
-            "New Catalog",
-            "New Country",
-            Collections.emptyList(),
-            "New Description",
-            BigDecimal.TEN,
-            BigDecimal.TEN,
-            BigDecimal.ONE,
-            1,
-            ProductImageUpdate.replaceWith(List.of(
-                ProductImageUpdate.existingImage(10L)
-            ))
-        ));
+                USER_ID,
+                PRODUCT_ID,
+                "New Title",
+                "New Artist",
+                "New Label",
+                "New Catalog",
+                "New Country",
+                Collections.emptyList(),
+                "New Description",
+                BigDecimal.TEN,
+                BigDecimal.TEN,
+                BigDecimal.ONE,
+                1,
+                ProductImageUpdate.replaceWith(List.of(
+                        ProductImageUpdate.existingImage(10L)))));
 
-        Mockito.verify(imageDao, Mockito.never()).deleteByProductId(Mockito.anyLong());
+        Mockito.verify(imageService, Mockito.never()).deleteImagesByProductId(Mockito.anyLong());
     }
 
     @Test
@@ -331,7 +314,7 @@ public class ProductServiceImplTest {
         productService.hideProductByAdmin(PRODUCT_ID);
 
         Mockito.verify(productDao).markAsAdminHidden(PRODUCT_ID);
-        Mockito.verify(reportDao).deleteByProductId(PRODUCT_ID);
+        Mockito.verify(reportService).deleteByProductId(PRODUCT_ID);
     }
 
     @Test
@@ -342,21 +325,20 @@ public class ProductServiceImplTest {
 
         Assertions.assertEquals(3, hidden);
         Mockito.verify(productDao).markAllAsAdminHiddenByUserId(USER_ID);
-        Mockito.verify(reportDao).deleteByOwnerUserId(USER_ID);
+        Mockito.verify(reportService).deleteByOwnerUserId(USER_ID);
     }
 
     @Test
     public void getProductSearchCriteriaNormalizesPriceBounds() {
         final ProductSearchCriteria criteria = productService.getProductSearchCriteria(
-            "   Abbey Road  ",
-            List.of(3L),
-            new BigDecimal("500"),
-            new BigDecimal("100"),
-            List.of("Label"),
-            Collections.emptyList(),
-            ProductSortOrder.PRICE_ASC,
-            1
-        );
+                "   Abbey Road  ",
+                List.of(3L),
+                new BigDecimal("500"),
+                new BigDecimal("100"),
+                List.of("Label"),
+                Collections.emptyList(),
+                ProductSortOrder.PRICE_ASC,
+                1);
 
         Assertions.assertEquals("Abbey Road", criteria.getSearchText());
         Assertions.assertEquals(new BigDecimal("100"), criteria.getMinPrice());
@@ -406,9 +388,8 @@ public class ProductServiceImplTest {
 
         Assertions.assertEquals(expected, result);
         Mockito.verify(productDao).getRecommendedProducts(USER_ID, 10, PRODUCT_ID);
-        Mockito.verify(productDao).findProducts(Mockito.argThat(criteria -> 
-                "Artist".equals(criteria.getSearchText()) && PRODUCT_ID.equals(criteria.getExcludeProductId())
-        ));
+        Mockito.verify(productDao).findProducts(Mockito.argThat(criteria -> "Artist".equals(criteria.getSearchText())
+                && PRODUCT_ID.equals(criteria.getExcludeProductId())));
     }
 
     @Test
@@ -421,21 +402,22 @@ public class ProductServiceImplTest {
         final List<Product> result = productService.getRelatedProducts(product, null, 10);
 
         Assertions.assertEquals(expected, result);
-        Mockito.verify(productDao).findProducts(Mockito.argThat(criteria -> 
-                "Artist".equals(criteria.getSearchText()) && PRODUCT_ID.equals(criteria.getExcludeProductId())
-        ));
-        Mockito.verify(productDao, Mockito.never()).getRecommendedProducts(Mockito.anyLong(), Mockito.anyInt(), Mockito.anyLong());
+        Mockito.verify(productDao).findProducts(Mockito.argThat(criteria -> "Artist".equals(criteria.getSearchText())
+                && PRODUCT_ID.equals(criteria.getExcludeProductId())));
+        Mockito.verify(productDao, Mockito.never()).getRecommendedProducts(Mockito.anyLong(), Mockito.anyInt(),
+                Mockito.anyLong());
     }
 
     @Test
     public void getRelatedProductsFallsBackToGeneralWhenArtistIsEmpty() {
         final Product product = product(PRODUCT_ID, USER_ID);
         final List<Product> expected = List.of(product(3L, 4L));
-        
+
         Mockito.when(productDao.getRecommendedProducts(USER_ID, 10, PRODUCT_ID)).thenReturn(Collections.emptyList());
-        
+
         Mockito.when(productDao.findProducts(Mockito.any(ProductSearchCriteria.class)))
-                .thenReturn(new PaginatedResult<>(Collections.emptyList(), 1, 10, 0), new PaginatedResult<>(expected, 1, 10, 1));
+                .thenReturn(new PaginatedResult<>(Collections.emptyList(), 1, 10, 0),
+                        new PaginatedResult<>(expected, 1, 10, 1));
 
         final List<Product> result = productService.getRelatedProducts(product, USER_ID, 10);
 
@@ -449,60 +431,57 @@ public class ProductServiceImplTest {
 
     private static Product product(final Long productId, final Long userId) {
         return new Product(
-            productId,
-            userId,
-            "Title",
-            "Artist",
-            "Label",
-            "Catalog",
-            "Country",
-            Collections.emptyList(),
-            "Description",
-            BigDecimal.TEN,
-            BigDecimal.TEN,
-            LocalDate.now(),
-            BigDecimal.ONE,
-            1
-        );
+                productId,
+                userId,
+                "Title",
+                "Artist",
+                "Label",
+                "Catalog",
+                "Country",
+                Collections.emptyList(),
+                "Description",
+                BigDecimal.TEN,
+                BigDecimal.TEN,
+                LocalDate.now(),
+                BigDecimal.ONE,
+                1);
     }
 
     private static User sellerWithPaymentData(final Long userId) {
         return new User(
-            userId,
-            "seller@test.com",
-            "password",
-            "seller",
-            false,
-            true,
-            false,
-            null,
-            null,
-            null,
-            null,
-            "Palermo",
-            "CABA",
-            null,
-            "1234567890123456789012"
-        );
+                userId,
+                "seller@test.com",
+                "password",
+                "seller",
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                "Palermo",
+                "CABA",
+                null,
+                "1234567890123456789012");
     }
 
     private static User userWithoutSellerData(final Long userId) {
         return new User(
-            userId,
-            "seller@test.com",
-            "password",
-            "seller",
-            false,
-            true,
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+                userId,
+                "seller@test.com",
+                "password",
+                "seller",
+                false,
+                true,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 }

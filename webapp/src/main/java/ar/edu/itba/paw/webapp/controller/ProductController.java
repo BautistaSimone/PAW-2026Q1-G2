@@ -3,7 +3,6 @@ package ar.edu.itba.paw.webapp.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,6 @@ import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.webapp.form.ProductForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.validation.ImageUploadValidator;
-import ar.edu.itba.paw.webapp.validation.ImageUploadValidator.ValidatedImage;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductImageData;
@@ -314,8 +312,7 @@ public class ProductController {
         final List<Product> relatedProducts = productService.getRelatedProducts(
                 product,
                 authUser != null ? authUser.getUser().getId() : null,
-                10
-        );
+                10);
 
         final List<Product> carouselProducts = new ArrayList<>(sellerProducts);
         carouselProducts.addAll(relatedProducts);
@@ -340,7 +337,7 @@ public class ProductController {
 
         String queryParams = "";
         final Product product = productService.findByIdIfAvailable(id).orElse(null);
-        
+
         if (product == null || product.getUserId() == authUser.getUser().getId()) {
             queryParams = "reportError=1";
         } else if (reportService.hasReported(id, authUser.getUser().getId())) {
@@ -372,7 +369,6 @@ public class ProductController {
         return new ModelAndView("redirect:/profile?tab=publications");
     }
 
-
     private void populateProductFormContext(final ProductForm form, final Long productId) {
         final boolean editing = productId != null;
         form.setEditing(editing);
@@ -396,7 +392,8 @@ public class ProductController {
         }
         final String layout = form.getImageLayout();
         if (layout == null || layout.isBlank()) {
-            return newImages.isEmpty() ? ProductImageUpdate.unchanged() : ProductImageUpdate.replaceWithNewImages(newImages);
+            return newImages.isEmpty() ? ProductImageUpdate.unchanged()
+                    : ProductImageUpdate.replaceWithNewImages(newImages);
         }
         final List<ProductImageLayoutParser.Slot> slots = ProductImageLayoutParser.parse(layout);
         final List<ProductImageUpdate.Entry> entries = new ArrayList<>(slots.size());

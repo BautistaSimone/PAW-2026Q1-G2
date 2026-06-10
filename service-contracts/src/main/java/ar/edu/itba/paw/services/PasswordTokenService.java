@@ -11,4 +11,8 @@ public interface PasswordTokenService {
 
     Optional<PasswordToken> findByUserId(final Long userId);
 
+    Optional<PasswordToken> findByToken(String token);
+
+    void deleteByToken(String token);
+
 }
