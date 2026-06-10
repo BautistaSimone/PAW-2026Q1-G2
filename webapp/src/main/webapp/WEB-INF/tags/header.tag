@@ -243,7 +243,7 @@
                                                 </div>
 
                                                 <div class="notification-links">
-                                                    <c:if test="${notification.productId != null}">
+                                                    <c:if test="${notification.productId != null and notification.type ne 'PURCHASE_STATUS'}">
                                                         <c:url value="/products/${notification.productId}" var="productUrl" />
                                                         <a class="notification-link" href="<c:out value='${productUrl}'/>">
                                                             <spring:message code="Notifications.link.product" />
