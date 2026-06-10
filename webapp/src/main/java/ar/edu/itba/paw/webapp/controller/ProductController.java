@@ -236,10 +236,21 @@ public class ProductController {
     }
 
     private static List<ProductImageData> imageDataFrom(final MultipartFile[] files) {
-        final List<ValidatedImage> validatedImages = ImageUploadValidator.readAll(files);
-        final List<ProductImageData> images = new ArrayList<>(validatedImages.size());
-        for (ValidatedImage image : validatedImages) {
-            images.add(new ProductImageData(image.getData(), image.getContentType()));
+        if (files == null || files.length == 0) {
+            return java.util.Collections.emptyList();
+        }
+        final List<ProductImageData> images = new ArrayList<>();
+        for (MultipartFile file : files) {
+            if (file == null || file.isEmpty()) {
+                continue;
+            }
+            try {
+                byte[] data = file.getBytes();
+                String contentType = ImageUploadValidator.detectSafeContentType(data).orElse("image/jpeg");
+                images.add(new ProductImageData(data, contentType));
+            } catch (java.io.IOException e) {
+                throw new RuntimeException("Failed to read uploaded image bytes", e);
+            }
         }
         return images;
     }

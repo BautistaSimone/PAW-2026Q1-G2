@@ -15,6 +15,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import ar.edu.itba.paw.webapp.validation.ValidImage;
 import ar.edu.itba.paw.webapp.validation.ValidProductForm;
 
 @ValidProductForm
@@ -63,6 +64,7 @@ public class ProductForm {
     @Size(max = 1000)
     private String description;
 
+    @ValidImage
     private MultipartFile[] images;
 
     @NotNull

@@ -34,7 +34,7 @@ A continuación, se listan los errores conceptuales encontrados en el repositori
 
 ## 3. CONTROLLERS
 
-### 🟠 4.1 Validación de formularios en el Controller en lugar de Custom Validators (GRAVE)
+### 🟢 4.1 Validación de formularios en el Controller en lugar de Custom Validators (GRAVE)
 
 **Descripción del error:** La lógica de validación de negocio (especialmente de archivos subidos) se realiza manualmente llamando a validadores estáticos o métodos manuales desde el controlador, en lugar de integrarse con `@Valid` y custom Validators de Spring (por ej. `@FileValidator`).
 **Ubicaciones encontradas:**

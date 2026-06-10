@@ -5,6 +5,7 @@ import javax.validation.constraints.NotBlank;
 import org.springframework.web.multipart.MultipartFile;
 
 import ar.edu.itba.paw.webapp.validation.ValidPurchaseStatusForm;
+import ar.edu.itba.paw.webapp.validation.ValidPaymentProof;
 
 @ValidPurchaseStatusForm
 public class PurchaseStatusForm {
@@ -12,6 +13,7 @@ public class PurchaseStatusForm {
     @NotBlank
     private String newStatus;
 
+    @ValidPaymentProof
     private MultipartFile proofFile;
 
     public String getNewStatus() {

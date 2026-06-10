@@ -35,21 +35,7 @@ public class ProductFormValidator implements ConstraintValidator<ValidProductFor
             return true;
         }
 
-        boolean valid = true;
 
-        try {
-            ImageUploadValidator.validateAll(form.getImages());
-        } catch (ImageUploadValidator.InvalidImageUploadException e) {
-            reject(context, "images", e.getMessage());
-            valid = false;
-        } catch (IOException e) {
-            reject(context, "images", "{Read.productForm.images}");
-            valid = false;
-        }
-
-        if (!valid) {
-            return false;
-        }
 
         final int uploadedCount = countNonEmptyFiles(form.getImages());
         if (!form.isEditing() || !form.isHadExistingImages()) {

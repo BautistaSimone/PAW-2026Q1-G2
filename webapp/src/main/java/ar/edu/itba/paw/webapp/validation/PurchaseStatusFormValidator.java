@@ -26,11 +26,9 @@ public class PurchaseStatusFormValidator implements ConstraintValidator<ValidPur
         }
 
         if (statusObj == PurchaseStatus.PAID) {
-            try {
-                PaymentProofValidator.validate(form.getProofFile());
-            } catch (PaymentProofValidator.InvalidPaymentProofException e) {
+            if (form.getProofFile() == null || form.getProofFile().isEmpty()) {
                 context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate(e.getMessageKey())
+                context.buildConstraintViolationWithTemplate("PurchaseForm.proof.required")
                        .addPropertyNode("proofFile")
                        .addConstraintViolation();
                 return false;
