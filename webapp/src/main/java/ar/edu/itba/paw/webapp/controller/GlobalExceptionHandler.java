@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
 import ar.edu.itba.paw.webapp.exception.AccessDeniedException;
+import ar.edu.itba.paw.services.PurchaseExpiredException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -27,6 +28,11 @@ public class GlobalExceptionHandler {
         mav.addObject("errorMessageCode", "Error.404.message.resourceNotFound");
         mav.addObject("errorDescriptionCode", "Error.404.description.resourceNotFound");
         return mav;
+    }
+
+    @ExceptionHandler(PurchaseExpiredException.class)
+    public ModelAndView handlePurchaseExpired(final PurchaseExpiredException e) {
+        return new ModelAndView("redirect:/purchases/" + e.getPurchaseId() + "?expired=1");
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)

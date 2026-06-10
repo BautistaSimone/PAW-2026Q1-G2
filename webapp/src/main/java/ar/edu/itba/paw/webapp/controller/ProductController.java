@@ -327,13 +327,15 @@ public class ProductController {
             @RequestParam(value = "back", required = false) final String back) {
 
         String queryParams = "";
-        try {
+        final Product product = productService.findByIdIfAvailable(id).orElse(null);
+        
+        if (product == null || product.getUserId() == authUser.getUser().getId()) {
+            queryParams = "reportError=1";
+        } else if (reportService.hasReported(id, authUser.getUser().getId())) {
+            queryParams = "alreadyReported=1";
+        } else {
             reportService.report(id, authUser.getUser().getId());
             queryParams = "reported=1";
-        } catch (IllegalStateException e) {
-            queryParams = "alreadyReported=1";
-        } catch (IllegalArgumentException e) {
-            queryParams = "reportError=1";
         }
 
         String redirectUrl = "redirect:/products/" + id + "?" + queryParams;

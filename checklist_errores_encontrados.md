@@ -32,7 +32,7 @@ A continuación, se listan los errores conceptuales encontrados en el repositori
 
 ---
 
-## 4. CONTROLLERS
+## 3. CONTROLLERS
 
 ### 🟠 4.1 Validación de formularios en el Controller en lugar de Custom Validators (GRAVE)
 
@@ -41,11 +41,3 @@ A continuación, se listan los errores conceptuales encontrados en el repositori
 
 - **`ProductController.java` (método `createProduct` / `imageDataFrom`):** Llama directamente a `ImageUploadValidator.readAll(files)` dentro del flujo del controlador para validar e instanciar las imágenes en lugar de validar el `MultipartFile[]` a través de anotaciones de Spring en el `ProductForm`.
 - **`PurchaseController.java` (método `updateStatus`):** Verifica manualmente `PaymentProofValidator.validate(form.getProofFile())` si el status es `PAID`. Esto es validación de reglas de negocio atadas a la vista y debería estar encapsulada en un Constraint de validación propio del formulario.
-
-### 🟠 4.2 Try-catch de Exception en Controllers (GRAVE)
-
-**Descripción del error:** El manejo de excepciones debe estar centralizado en clases anotadas con `@ControllerAdvice`, permitiendo a los controladores mantener su código limpio sin la estructura `try-catch`.
-**Ubicaciones encontradas:**
-
-- **`PurchaseController.java` (métodos `createPurchase` y `updateStatus`):** Envuelven llamadas a servicios con `try { ... } catch (IllegalStateException e) { ... } catch (IllegalArgumentException e) { ... }` para redirigir manualmente alterando los query params.
-- **`ProductController.java` (método `reportProduct`):** Captura `IllegalStateException` y `IllegalArgumentException` lanzadas por `reportService.report` para modificar el URL de redirección. Este flujo debiera ser delegado a manejadores de excepciones o controlado sin excepciones para lógicas de control de flujo normal.

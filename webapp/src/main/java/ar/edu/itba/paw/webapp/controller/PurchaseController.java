@@ -23,6 +23,8 @@ import ar.edu.itba.paw.models.PurchaseStatus;
 import ar.edu.itba.paw.services.PurchasePaymentProof;
 import ar.edu.itba.paw.services.PurchaseService;
 import ar.edu.itba.paw.services.ReviewService;
+import ar.edu.itba.paw.services.ProductService;
+import ar.edu.itba.paw.models.Product;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.form.PurchaseCreateForm;
 import ar.edu.itba.paw.webapp.form.PurchaseStatusForm;
@@ -34,13 +36,16 @@ public class PurchaseController {
 
     private final PurchaseService purchaseService;
     private final ReviewService reviewService;
+    private final ProductService productService;
 
     @Autowired
     public PurchaseController(
             final PurchaseService purchaseService,
-            final ReviewService reviewService) {
+            final ReviewService reviewService,
+            final ProductService productService) {
         this.purchaseService = purchaseService;
         this.reviewService = reviewService;
+        this.productService = productService;
     }
 
     @RequestMapping(value = "/purchases", method = RequestMethod.POST)
@@ -66,18 +71,20 @@ public class PurchaseController {
                     "redirect:/profile?tab=mydata&missingData=purchase&productId=" + form.getProductId());
         }
 
-        final Purchase purchase;
-        try {
-            purchase = purchaseService.createPurchase(form.getProductId(), authUser.getUser().getId());
-        } catch (IllegalStateException e) {
-            return new ModelAndView("redirect:/?purchaseUnavailable=1");
-        } catch (IllegalArgumentException e) {
+        final Product product = productService.findByIdIfAvailable(form.getProductId()).orElse(null);
+        if (product == null || product.getUserId() == authUser.getUser().getId()) {
             String target = "redirect:/products/" + form.getProductId() + "?purchaseError=1";
             if (back != null && !back.isBlank()) {
                 target += "&back=" + java.net.URLEncoder.encode(back, java.nio.charset.StandardCharsets.UTF_8);
             }
             return new ModelAndView(target);
         }
+
+        if (product.getStock() <= 0) {
+            return new ModelAndView("redirect:/?purchaseUnavailable=1");
+        }
+
+        final Purchase purchase = purchaseService.createPurchase(form.getProductId(), authUser.getUser().getId());
         return new ModelAndView("redirect:/purchases/" + purchase.getPurchaseId());
     }
 
@@ -106,18 +113,13 @@ public class PurchaseController {
             proof = PaymentProofValidator.validate(form.getProofFile());
         }
 
-        final Purchase updated;
-        try {
-            updated = purchaseService.updateStatus(
-                    id,
-                    authUser.getUser().getId(),
-                    statusObj,
-                    proof != null ? proof.getData() : null,
-                    proof != null ? proof.getContentType() : null,
-                    proof != null ? proof.getFileName() : null);
-        } catch (IllegalStateException e) {
-            return new ModelAndView("redirect:/purchases/" + id + "?expired=1");
-        }
+        final Purchase updated = purchaseService.updateStatus(
+                id,
+                authUser.getUser().getId(),
+                statusObj,
+                proof != null ? proof.getData() : null,
+                proof != null ? proof.getContentType() : null,
+                proof != null ? proof.getFileName() : null);
 
         if (statusObj == PurchaseStatus.DELIVERED && authUser.getUser().getId().equals(updated.getBuyerId())) {
             return new ModelAndView("redirect:/purchases/" + id + "/review");

@@ -191,11 +191,11 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
 
         if (purchase.getStatus() == PurchaseStatus.CANCELLED) {
-            throw new IllegalStateException("Purchase already cancelled");
+            throw new PurchaseExpiredException("Purchase already cancelled", purchaseId);
         }
 
         if (cancelIfExpired(purchase, LocalDateTime.now())) {
-            throw new PurchaseExpiredException("Purchase reservation expired");
+            throw new PurchaseExpiredException("Purchase reservation expired", purchaseId);
         }
 
         final Product product = productService.findById(purchase.getProductId())
