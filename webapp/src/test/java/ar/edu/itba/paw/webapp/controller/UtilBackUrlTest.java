@@ -53,6 +53,38 @@ class UtilBackUrlTest {
         assertEquals("/profile?userId=4", Util.resolveBackUrl(request));
     }
 
+    @Test
+    void usesBackParameterWhenPresentAndValid() {
+        final MockHttpServletRequest request = requestFrom(null);
+        request.setParameter("back", "/search?q=vinyl");
+
+        assertEquals("/search?q=vinyl", Util.resolveBackUrl(request));
+    }
+
+    @Test
+    void ignoresBackParameterWhenExternal() {
+        final MockHttpServletRequest request = requestFrom("http://localhost:8000/profile");
+        request.setParameter("back", "https://example.com/profile");
+
+        assertEquals("/profile", Util.resolveBackUrl(request));
+    }
+
+    @Test
+    void ignoresBackParameterWhenSchemeRelativeExternal() {
+        final MockHttpServletRequest request = requestFrom("http://localhost:8000/profile");
+        request.setParameter("back", "//example.com/profile");
+
+        assertEquals("/profile", Util.resolveBackUrl(request));
+    }
+
+    @Test
+    void ignoresBackParameterWhenContainsBackslash() {
+        final MockHttpServletRequest request = requestFrom("http://localhost:8000/profile");
+        request.setParameter("back", "/\\example.com/profile");
+
+        assertEquals("/profile", Util.resolveBackUrl(request));
+    }
+
     private static MockHttpServletRequest requestFrom(final String referer) {
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.setScheme("http");

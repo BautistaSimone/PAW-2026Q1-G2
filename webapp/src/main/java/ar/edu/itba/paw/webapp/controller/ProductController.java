@@ -319,17 +319,25 @@ public class ProductController {
     @RequestMapping(value = "/products/{id:\\d+}/report", method = RequestMethod.POST)
     public ModelAndView reportProduct(
             @AuthenticationPrincipal final PawAuthUser authUser,
-            @PathVariable("id") final Long id) {
+            @PathVariable("id") final Long id,
+            @RequestParam(value = "back", required = false) final String back) {
 
+        String queryParams = "";
         try {
             reportService.report(id, authUser.getUser().getId());
+            queryParams = "reported=1";
         } catch (IllegalStateException e) {
-            return new ModelAndView("redirect:/products/" + id + "?alreadyReported=1");
+            queryParams = "alreadyReported=1";
         } catch (IllegalArgumentException e) {
-            return new ModelAndView("redirect:/products/" + id + "?reportError=1");
+            queryParams = "reportError=1";
         }
 
-        return new ModelAndView("redirect:/products/" + id + "?reported=1");
+        String redirectUrl = "redirect:/products/" + id + "?" + queryParams;
+        if (back != null && !back.isBlank()) {
+            redirectUrl += "&back=" + java.net.URLEncoder.encode(back, java.nio.charset.StandardCharsets.UTF_8);
+        }
+
+        return new ModelAndView(redirectUrl);
     }
 
     @RequestMapping(value = "/products/{id:\\d+}/delete", method = RequestMethod.POST)

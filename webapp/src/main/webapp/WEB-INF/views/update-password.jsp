@@ -25,6 +25,12 @@
                             <!-- Token hidden field -->
                             <form:hidden path="token" />
 
+                            <c:if test="${not empty productDetailBackUrl}">
+                                <input type="hidden"
+                                    name="back"
+                                    value="<c:out value='${productDetailBackUrl}'/>" />
+                            </c:if>
+
                             <div class="mb-3">
                                 <label class="form-label"><spring:message code="UpdatePassword.newPassword.label" /></label>
                                 <div class="password-toggle-wrapper">

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -46,13 +47,18 @@ public class PurchaseController {
     public ModelAndView createPurchase(
             @AuthenticationPrincipal PawAuthUser authUser,
             @Valid @ModelAttribute("purchaseCreateForm") final PurchaseCreateForm form,
-            final BindingResult errors) {
+            final BindingResult errors,
+            @RequestParam(value = "back", required = false) final String back) {
 
         if (errors.hasErrors()) {
             if (form.getProductId() == null) {
                 return new ModelAndView("redirect:/?purchaseError=1");
             }
-            return new ModelAndView("redirect:/products/" + form.getProductId() + "?purchaseError=1");
+            String target = "redirect:/products/" + form.getProductId() + "?purchaseError=1";
+            if (back != null && !back.isBlank()) {
+                target += "&back=" + java.net.URLEncoder.encode(back, java.nio.charset.StandardCharsets.UTF_8);
+            }
+            return new ModelAndView(target);
         }
 
         if (!purchaseService.canCreatePurchases(authUser.getUser().getId())) {
@@ -66,7 +72,11 @@ public class PurchaseController {
         } catch (IllegalStateException e) {
             return new ModelAndView("redirect:/?purchaseUnavailable=1");
         } catch (IllegalArgumentException e) {
-            return new ModelAndView("redirect:/products/" + form.getProductId() + "?purchaseError=1");
+            String target = "redirect:/products/" + form.getProductId() + "?purchaseError=1";
+            if (back != null && !back.isBlank()) {
+                target += "&back=" + java.net.URLEncoder.encode(back, java.nio.charset.StandardCharsets.UTF_8);
+            }
+            return new ModelAndView(target);
         }
         return new ModelAndView("redirect:/purchases/" + purchase.getPurchaseId());
     }

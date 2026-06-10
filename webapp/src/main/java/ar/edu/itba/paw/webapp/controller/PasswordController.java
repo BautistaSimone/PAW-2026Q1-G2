@@ -87,12 +87,14 @@ public class PasswordController {
             @AuthenticationPrincipal PawAuthUser authUser,
             @Valid @ModelAttribute UpdatePasswordForm form,
             final BindingResult errors,
+            final HttpServletRequest request,
             RedirectAttributes redirectAttributes) {
 
         // Return to the same page if an error occurs
         if (errors.hasErrors()) {
             ModelAndView mv = new ModelAndView("update-password");
             mv.addObject("updatePasswordForm", form);
+            mv.addObject("productDetailBackUrl", Util.resolveBackUrl(request));
             return mv;
         }
 

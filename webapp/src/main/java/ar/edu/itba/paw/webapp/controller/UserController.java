@@ -362,11 +362,19 @@ public class UserController {
     public ModelAndView addWishlistProduct(
             @AuthenticationPrincipal final PawAuthUser authUser,
             @RequestParam("productId") final Long productId,
+            @RequestParam(value = "back", required = false) final String back,
             HttpServletRequest request) {
 
         userService.toggleWishlistProduct(authUser.getUser().getId(), productId);
 
+        if (back != null && !back.isBlank()) {
+            return new ModelAndView("redirect:/products/" + productId + "?back=" + java.net.URLEncoder.encode(back, java.nio.charset.StandardCharsets.UTF_8));
+        }
+
         String referer = request.getHeader("Referer");
+        if (referer == null || referer.isBlank()) {
+            return new ModelAndView("redirect:/products/" + productId);
+        }
 
         return new ModelAndView("redirect:" + referer);
     }
