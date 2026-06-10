@@ -65,6 +65,7 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
         }
 
         userService.enable(verificationToken.getUserId());
+        verificationTokenDao.deleteByToken(token);
         return userService.findById(verificationToken.getUserId());
     }
 

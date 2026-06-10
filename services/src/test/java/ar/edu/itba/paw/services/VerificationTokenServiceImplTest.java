@@ -96,6 +96,7 @@ public class VerificationTokenServiceImplTest {
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(1L, result.get().getId());
         Mockito.verify(userService).enable(1L);
+        Mockito.verify(verificationTokenDao).deleteByToken("token");
     }
 
     @Test
@@ -112,6 +113,7 @@ public class VerificationTokenServiceImplTest {
 
         Assertions.assertFalse(result.isPresent());
         Mockito.verify(userService, Mockito.never()).enable(Mockito.anyLong());
+        Mockito.verify(verificationTokenDao, Mockito.never()).deleteByToken(Mockito.anyString());
     }
 
 }
