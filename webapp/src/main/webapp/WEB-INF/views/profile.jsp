@@ -1380,6 +1380,7 @@
     </div>
     <meta name="is-authenticated" content="<sec:authorize access='isAuthenticated()'>true</sec:authorize><sec:authorize access='!isAuthenticated()'>false</sec:authorize>" />
     <meta name="current-user-id" content="<sec:authorize access='isAuthenticated()'><sec:authentication property='principal.user.id' /></sec:authorize><sec:authorize access='!isAuthenticated()'>-1</sec:authorize>" />
+    <script>window.contextPath = '<c:out value="${pageContext.request.contextPath}" />';</script>
     <script src="<c:url value="/assets/js/profile-follow-modals.js" />"></script>
     <script>
         (function () {
