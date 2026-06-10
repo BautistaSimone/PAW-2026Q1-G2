@@ -410,15 +410,8 @@ public class UserController {
         response.put("page", result.getCurrentPage());
         response.put("totalCount", result.getTotalCount());
         response.put("totalPages", result.getTotalPages());
-
-        if (currentUserId != null) {
-            final List<Long> userIds = dtos.stream()
-                    .map(UserFollowDto::getId)
-                    .collect(java.util.stream.Collectors.toList());
-            response.put("followStatusMap", userService.followingStatusByUserIds(currentUserId, userIds));
-        } else {
-            response.put("followStatusMap", Collections.emptyMap());
-        }
+        response.put("followStatusMap",
+                userService.followStatusForUsers(currentUserId, result.getResults(), null));
         return response;
     }
 
