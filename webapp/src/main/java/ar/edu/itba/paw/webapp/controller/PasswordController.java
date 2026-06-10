@@ -27,7 +27,6 @@ import ar.edu.itba.paw.webapp.form.LoginForm;
 import ar.edu.itba.paw.webapp.auth.PawAuthUser;
 import ar.edu.itba.paw.webapp.Util;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.models.PasswordToken;
 
 @Controller
 public class PasswordController {
@@ -101,17 +100,8 @@ public class PasswordController {
         // If the user is logged in, there is no need for a token
         if (authUser != null) {
             userService.updatePassword(authUser.getUser().getId(), form.getNewPassword());
-        } else if (passwordTokenService.isValidPasswordResetToken(form.getToken())) {
-
-            final Optional<PasswordToken> passTokenOpt = passwordTokenService.findByToken(form.getToken());
-
-            // We already know it exists
-            final PasswordToken passToken = passTokenOpt.get();
-
-            userService.updatePassword(passToken.getUserId(), form.getNewPassword());
-        } else {
-            ModelAndView mv = new ModelAndView("redirect:/login");
-            return mv;
+        } else if (!userService.resetPasswordWithToken(form.getToken(), form.getNewPassword())) {
+            return new ModelAndView("redirect:/login");
         }
 
         // Reset the form on success

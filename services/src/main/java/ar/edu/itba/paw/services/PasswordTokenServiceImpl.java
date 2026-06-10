@@ -74,12 +74,6 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
         return passwordTokenDao.findByUserId(userId);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<PasswordToken> findByToken(final String token) {
-        return passwordTokenDao.findByToken(token);
-    }
-
     private static void runAfterCommit(final Runnable task) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {

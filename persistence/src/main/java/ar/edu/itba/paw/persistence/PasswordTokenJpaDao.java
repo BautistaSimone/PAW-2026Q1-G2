@@ -46,4 +46,11 @@ public class PasswordTokenJpaDao implements PasswordTokenDao {
         query.setParameter("token", token);
         return query.getResultList().stream().findFirst();
     }
+
+    @Override
+    public void deleteByToken(final String token) {
+        em.createQuery("DELETE FROM PasswordToken WHERE token = :token")
+            .setParameter("token", token)
+            .executeUpdate();
+    }
 }
