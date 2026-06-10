@@ -358,33 +358,6 @@ public class ProductServiceImpl implements ProductService {
         return listProducts(criteria);
     }
 
-    @Transactional(readOnly = true)
-    public ProductImageUpdate buildImageUpdate(
-            final String layoutRaw,
-            final boolean hadExistingImages,
-            final List<ProductImageData> newImages) {
-        final List<ProductImageData> images = newImages == null ? Collections.emptyList() : newImages;
-
-        if (hadExistingImages && layoutRaw != null && !layoutRaw.isBlank()) {
-            final List<ProductImageLayoutParser.Slot> slots = ProductImageLayoutParser.parse(layoutRaw);
-            final List<ProductImageUpdate.Entry> entries = new ArrayList<>(slots.size());
-            int newImageIndex = 0;
-            for (ProductImageLayoutParser.Slot slot : slots) {
-                if (slot.getKind() == ProductImageLayoutParser.SlotKind.EXISTING) {
-                    entries.add(ProductImageUpdate.existingImage(slot.getExistingImageId()));
-                } else {
-                    entries.add(ProductImageUpdate.newImage(images.get(newImageIndex++)));
-                }
-            }
-            return ProductImageUpdate.replaceWith(entries);
-        }
-
-        if (images.isEmpty()) {
-            return ProductImageUpdate.unchanged();
-        }
-        return ProductImageUpdate.replaceWithNewImages(images);
-    }
-
     @Override
     @Transactional(readOnly = true)
     public Map<Long, Long> countActiveProductsByUserIds(final List<Long> userIds) {
@@ -517,9 +490,7 @@ public class ProductServiceImpl implements ProductService {
         final BigDecimal recordCondition,
         final BigDecimal price,
         final int stock,
-        final String imageLayout,
-        final boolean hadExistingImages,
-        final List<ProductImageData> newImages
+        final ProductImageUpdate imageUpdate
     ) {
         final Product product = productDao.findById(productId)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
@@ -548,7 +519,6 @@ public class ProductServiceImpl implements ProductService {
         if (!ok) {
             throw new IllegalStateException("Product cannot be updated (not active or missing)");
         }
-        final ProductImageUpdate imageUpdate = buildImageUpdate(imageLayout, hadExistingImages, newImages);
         applyImageUpdate(productId, imageUpdate);
         return productDao.findById(productId).orElseThrow(() -> new IllegalStateException("Product missing after update"));
     }

@@ -190,9 +190,7 @@ public class ProductServiceImplTest {
             BigDecimal.TEN,
             BigDecimal.ONE,
             1,
-            null,
-            false,
-            Collections.emptyList()
+            ProductImageUpdate.unchanged()
         );
 
         Assertions.assertSame(product, result);
@@ -225,12 +223,10 @@ public class ProductServiceImplTest {
             BigDecimal.TEN,
             BigDecimal.ONE,
             1,
-            null,
-            false,
-            List.of(
+            ProductImageUpdate.replaceWithNewImages(List.of(
                 imageData(COVER_BYTES, "image/png"),
                 imageData(DETAIL_BYTES, "image/jpeg")
-            )
+            ))
         );
 
         final InOrder order = Mockito.inOrder(imageDao);
@@ -274,11 +270,10 @@ public class ProductServiceImplTest {
             BigDecimal.TEN,
             BigDecimal.ONE,
             1,
-            "e:10,n",
-            true,
-            List.of(
-                imageData(DETAIL_BYTES, "image/jpeg")
-            )
+            ProductImageUpdate.replaceWith(List.of(
+                ProductImageUpdate.existingImage(10L),
+                ProductImageUpdate.newImage(imageData(DETAIL_BYTES, "image/jpeg"))
+            ))
         );
 
         final InOrder order = Mockito.inOrder(imageDao);
@@ -323,9 +318,9 @@ public class ProductServiceImplTest {
             BigDecimal.TEN,
             BigDecimal.ONE,
             1,
-            "e:10",
-            true,
-            Collections.emptyList()
+            ProductImageUpdate.replaceWith(List.of(
+                ProductImageUpdate.existingImage(10L)
+            ))
         ));
 
         Mockito.verify(imageDao, Mockito.never()).deleteByProductId(Mockito.anyLong());

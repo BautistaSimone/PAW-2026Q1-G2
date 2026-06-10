@@ -36,10 +36,12 @@ import ar.edu.itba.paw.webapp.validation.ImageUploadValidator.ValidatedImage;
 import ar.edu.itba.paw.services.CategoryService;
 import ar.edu.itba.paw.services.ImageService;
 import ar.edu.itba.paw.services.ProductImageData;
+import ar.edu.itba.paw.services.ProductImageUpdate;
 import ar.edu.itba.paw.services.ProductService;
 import ar.edu.itba.paw.services.ReportService;
 import ar.edu.itba.paw.services.ReviewService;
 import ar.edu.itba.paw.services.UserService;
+import ar.edu.itba.paw.webapp.validation.ProductImageLayoutParser;
 import ar.edu.itba.paw.webapp.exception.ResourceNotFoundException;
 
 @Controller
@@ -200,6 +202,7 @@ public class ProductController {
             return editProductFormModelAndView(id);
         }
 
+        final ProductImageUpdate imageUpdate = buildImageUpdateFromForm(form);
         productService.updateProduct(
                 authUser.getUser().getId(),
                 id,
@@ -214,9 +217,7 @@ public class ProductController {
                 form.getRecordCondition(),
                 form.getPrice(),
                 form.getStock(),
-                form.getImageLayout(),
-                form.isHadExistingImages(),
-                imageDataFrom(form.getImages()));
+                imageUpdate);
 
         return new ModelAndView("redirect:/products/" + id + "?updated=1");
     }
@@ -383,5 +384,30 @@ public class ProductController {
         final ModelAndView mav = new ModelAndView("product-form");
         mav.addObject("isEditing", Boolean.FALSE);
         return mav;
+    }
+
+    private ProductImageUpdate buildImageUpdateFromForm(final ProductForm form) {
+        final List<ProductImageData> newImages = imageDataFrom(form.getImages());
+        if (!form.isHadExistingImages()) {
+            if (newImages.isEmpty()) {
+                return ProductImageUpdate.unchanged();
+            }
+            return ProductImageUpdate.replaceWithNewImages(newImages);
+        }
+        final String layout = form.getImageLayout();
+        if (layout == null || layout.isBlank()) {
+            return newImages.isEmpty() ? ProductImageUpdate.unchanged() : ProductImageUpdate.replaceWithNewImages(newImages);
+        }
+        final List<ProductImageLayoutParser.Slot> slots = ProductImageLayoutParser.parse(layout);
+        final List<ProductImageUpdate.Entry> entries = new ArrayList<>(slots.size());
+        int newImageIndex = 0;
+        for (ProductImageLayoutParser.Slot slot : slots) {
+            if (slot.getKind() == ProductImageLayoutParser.SlotKind.EXISTING) {
+                entries.add(ProductImageUpdate.existingImage(slot.getExistingImageId()));
+            } else {
+                entries.add(ProductImageUpdate.newImage(newImages.get(newImageIndex++)));
+            }
+        }
+        return ProductImageUpdate.replaceWith(entries);
     }
 }
